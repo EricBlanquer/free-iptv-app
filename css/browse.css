@@ -1,0 +1,959 @@
+/* Browse Screen - Categories, grid, filters, list view */
+
+#browse-screen {
+    flex-direction: column;
+}
+
+#browse-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+#sidebar {
+    width: 380px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#sidebar-title {
+    padding: 10px 20px;
+    color: #00d4ff;
+    white-space: nowrap;
+}
+
+#categories-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px;
+}
+
+.category-item {
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    transition: all 0.2s;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.category-text {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.category-item:focus,
+.category-item.focused {
+    background: #00d4ff;
+    color: #000;
+}
+
+
+.category-item.category-continue {
+    color: #ffc107;
+}
+
+.category-item.category-continue.empty {
+    color: #666;
+}
+
+.category-item.category-favorites {
+    color: #ffd700;
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+}
+
+.category-item.category-favorites.empty {
+    color: #666;
+}
+
+#content {
+    flex: 1;
+    padding: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Filters Bar */
+#filters-bar {
+    display: flex;
+    align-items: baseline;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+    position: relative;
+}
+
+#filters-bar #sidebar-title {
+    width: 380px;
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#search-filters {
+    display: flex;
+    align-items: baseline;
+    margin-left: 15px;
+    flex: 1;
+    min-width: 0;
+}
+
+#sort-filters {
+    display: flex;
+    align-items: baseline;
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.filter-input {
+    padding: 0 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #333;
+    border-radius: 6px;
+    color: #fff;
+    flex: 1;
+    min-width: 80px;
+    outline: none;
+    height: 32px;
+    box-sizing: border-box;
+    margin-right: 10px;
+}
+
+.filter-input:focus,
+.filter-input.focused {
+    border-color: #00d4ff;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.filter-input::placeholder {
+    color: #888;
+}
+
+.sort-btn {
+    padding: 0 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    height: 32px;
+    line-height: 28px;
+    box-sizing: border-box;
+    margin-left: 8px;
+}
+
+.sort-btn:focus,
+.sort-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff;
+    transform: scale(1.05);
+}
+
+.sort-btn.selected {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+.sort-btn.selected.focused {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 3px #fff;
+}
+
+.filter-btn {
+    padding: 0 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    height: 32px;
+    line-height: 28px;
+    box-sizing: border-box;
+    margin-right: 10px;
+}
+
+.filter-btn:focus,
+.filter-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff;
+    transform: scale(1.05);
+}
+
+.filter-btn.selected {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+.filter-btn.selected.focused {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 3px #fff;
+}
+
+#view-mode-filters {
+    display: flex;
+    margin-left: auto;
+}
+
+#rating-filters {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.rating-star {
+    width: 28px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 32px;
+    transition: color 0.15s;
+}
+
+.rating-star:focus,
+.rating-star.focused {
+    color: #ffb800;
+    text-shadow: 0 0 10px rgba(255, 184, 0, 0.8);
+}
+
+.rating-star.filled {
+    color: #ffb800;
+}
+
+.rating-star:hover {
+    color: #ffb800;
+}
+
+.view-btn {
+    width: 36px;
+    height: 32px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-btn:focus,
+.view-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff;
+    transform: scale(1.05);
+}
+
+.view-btn.selected {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+.view-btn.selected.focused {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 3px #fff;
+}
+
+.sd-tag {
+    color: #ff9800;
+    margin-left: 5px;
+}
+
+/* Content Grid */
+#content-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: min-content;
+    overflow-y: auto;
+    padding: 15px 5px 5px 5px;
+    height: 100%;
+    position: relative;
+}
+
+#grid-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.5;
+}
+
+#grid-loader .hourglass {
+    font-size: 48px;
+}
+
+#content-grid .grid-item {
+    margin: 0 5px 10px 5px;
+}
+
+.grid-item {
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.grid-item:focus,
+.grid-item.focused {
+    transform: scale(1.03);
+    border-color: #00d4ff;
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+}
+
+/* Edit mode for favorites */
+#content-grid.edit-mode .grid-item.focused {
+    border-color: #ff9800;
+    box-shadow: 0 8px 30px rgba(255, 152, 0, 0.4);
+}
+
+#content-grid.edit-mode .grid-item.moving {
+    border-color: #4caf50;
+    box-shadow: 0 8px 30px rgba(76, 175, 80, 0.5);
+}
+
+/* Favorite icon on grid items */
+.grid-item .favorite-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #ffd700;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+}
+
+#content-grid.list-view .grid-item .favorite-icon {
+    position: static;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.grid-download-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+}
+
+.grid-download-fill {
+    height: 100%;
+    background: #4CAF50;
+    transition: width 0.5s;
+}
+
+.grid-download-complete {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    color: #4CAF50;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    z-index: 15;
+}
+
+.grid-item-image {
+    width: 100%;
+    height: 0;
+    padding-bottom: 150%;
+    background-size: cover;
+    background-position: center;
+    background-color: #0a0a18;
+    position: relative;
+}
+
+.grid-item-image::before {
+    content: "⏳";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -18px;
+    margin-left: -18px;
+    font-size: 36px;
+    opacity: 0.5;
+    animation: hourglass-flip 4s ease-in-out infinite;
+}
+
+.grid-item-image[style*="background-image"]::before {
+    display: none;
+}
+
+.grid-item-image.no-image::before {
+    display: none;
+}
+
+.grid-overlay-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 8px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+}
+
+.grid-overlay-top .grid-year {
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.grid-overlay-top .grid-stars {
+    color: #ffc107;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.grid-overlay-top .grid-format-tag {
+    background: rgba(255, 152, 0, 0.85);
+    color: #000;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    margin-right: auto;
+    line-height: 1.2;
+}
+
+.grid-overlay-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 8px 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    z-index: 5;
+    overflow: hidden;
+}
+
+.grid-item-image.no-image .grid-overlay-bottom {
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    padding: 8px;
+}
+
+.grid-overlay-bottom .grid-title {
+    display: none;
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    text-align: center;
+    padding: 0 4px;
+}
+
+.grid-item-image.no-image .grid-overlay-bottom .grid-title {
+    display: block;
+    line-height: 1.3;
+}
+
+.grid-item-image.no-image .grid-overlay-bottom .grid-genre-provider,
+.grid-item-image.no-image .grid-overlay-bottom .grid-genre-tmdb {
+    display: none;
+}
+
+.grid-overlay-bottom .grid-genre-provider,
+.grid-overlay-bottom .grid-genre-tmdb {
+    display: block;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    white-space: nowrap;
+}
+
+.grid-overlay-bottom .grid-genre-provider {
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.grid-overlay-bottom .grid-genre-tmdb {
+    color: rgba(0,212,255,0.8);
+}
+
+.grid-overlay-bottom.genres-inline .grid-genre-provider,
+.grid-overlay-bottom.genres-inline .grid-genre-tmdb {
+    display: inline;
+}
+
+.grid-overlay-bottom.genres-inline .grid-genre-tmdb {
+    margin-left: 6px;
+}
+
+/* Guide TV card in TNT grid */
+.grid-item.guide-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 100, 150, 0.3) 100%);
+    min-height: 200px;
+}
+
+.grid-item.guide-card .guide-icon {
+    font-size: 64px;
+    margin-bottom: 15px;
+}
+
+.grid-item.guide-card .grid-title {
+    font-weight: 600;
+    color: #00d4ff;
+    text-align: center;
+}
+
+#content-grid.list-view .grid-item.guide-card {
+    min-height: 80px;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 20px;
+}
+
+#content-grid.list-view .grid-item.guide-card .guide-icon {
+    font-size: 40px;
+    margin-bottom: 0;
+    margin-right: 20px;
+}
+
+#content-grid.list-view .grid-item.guide-card .grid-title {
+}
+
+.grid-item[data-stream-type="live"] .grid-item-image.no-image::before {
+    content: "📺";
+}
+
+.grid-item-title {
+    padding: 4px 6px 2px;
+    text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.grid-item-info {
+    display: none;
+}
+
+.list-title {
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.list-meta {
+    color: #ffc107;
+    margin-top: 4px;
+}
+
+.list-year {
+    color: rgba(255,255,255,0.7);
+    margin-right: 10px;
+}
+
+.list-stars {
+    color: #ffc107;
+    letter-spacing: 1px;
+}
+
+.list-genre {
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.grid-item-epg {
+    padding: 0 8px 6px;
+    text-align: left;
+    color: #00d4ff;
+    white-space: nowrap;
+    overflow: hidden;
+    min-height: 18px;
+}
+
+.grid-item-date {
+    padding: 0 8px 6px;
+    text-align: center;
+    color: #888;
+}
+
+.grid-item-genre {
+    color: #888;
+    font-size: inherit;
+}
+
+.grid-item-info .grid-year {
+    margin-right: 8px;
+}
+
+.grid-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.grid-progress-fill {
+    height: 100%;
+    background: #00d4ff;
+}
+
+.grid-stars {
+    color: #ffc107;
+    letter-spacing: 1px;
+}
+
+.grid-stars .empty-stars {
+    opacity: 0.25;
+}
+
+.grid-duration {
+    color: #aaa;
+    margin-left: 8px;
+}
+
+.grid-disambig {
+    color: #888;
+    font-size: 0.9em;
+}
+
+/* List view mode */
+#content-grid.list-view {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+#content-grid.list-view .grid-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    min-height: 80px;
+    flex-shrink: 0;
+    margin: 0 0 8px 0;
+    border-radius: 10px;
+}
+
+#content-grid.list-view .grid-item-image {
+    width: 110px;
+    height: 75px;
+    min-width: 110px;
+    padding-bottom: 0;
+    border-radius: 8px;
+    margin: 3px;
+}
+
+#content-grid.list-view .grid-item-title {
+    display: none;
+}
+
+#content-grid.list-view .grid-item-info {
+    display: block;
+    flex: 1;
+    text-align: left;
+    padding: 0 20px;
+    min-width: 0;
+}
+
+#content-grid.list-view .grid-overlay-top,
+#content-grid.list-view .grid-overlay-bottom {
+    display: none;
+}
+
+#content-grid.list-view .grid-item-epg {
+    flex: 2;
+    text-align: right;
+    padding: 0 15px 0 0;
+    color: #888;
+}
+
+#content-grid.list-view .grid-item-date {
+    text-align: right;
+    padding: 0 15px 0 0;
+    color: #666;
+    min-width: 150px;
+}
+
+#content-grid.list-view .grid-progress-bar {
+    width: 100px;
+    left: auto;
+    right: 15px;
+    bottom: 5px;
+}
+
+#content-grid.list-view .grid-item:focus,
+#content-grid.list-view .grid-item.focused {
+    transform: none;
+}
+
+.details-stars {
+    color: #ffc107;
+    letter-spacing: 2px;
+}
+
+.details-stars .empty-stars {
+    opacity: 0.25;
+}
+
+/* ========================================
+   TV Guide Screen - FreeTV Style
+   ======================================== */
+
+#guide-screen.active {
+    flex-direction: row;
+    background: #1a1a1a;
+    padding: 80px 30px 100px 30px;
+    position: relative;
+}
+
+/* Left column with logos */
+#guide-channels-col {
+    width: 100px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#guide-channel-header {
+    height: 0;
+    flex-shrink: 0;
+}
+
+/* Right scrollable area */
+#guide-scroll-area {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+#guide-scroll-content {
+    display: flex;
+    flex-direction: column;
+    min-width: max-content;
+}
+
+/* Header with time bar */
+#guide-header {
+    display: flex;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+#guide-time-bar {
+    display: none;
+}
+
+.guide-time-slot {
+    width: 220px;
+    flex-shrink: 0;
+    text-align: center;
+    color: #888;
+    padding: 15px 0;
+    border-left: 1px solid #333;
+}
+
+.guide-time-slot:first-child {
+    border-left: none;
+}
+
+.guide-time-slot.current {
+    color: #00d4ff;
+    font-weight: bold;
+}
+
+#guide-day-indicator {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 1.4em;
+    font-weight: 600;
+    z-index: 200;
+    background: rgba(40, 40, 40, 0.95);
+    padding: 8px 25px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#guide-day-indicator:empty {
+    display: none;
+}
+
+/* Main grid container */
+#guide-grid {
+    flex: 1;
+    position: relative;
+}
+
+/* Logos column */
+#guide-logos {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.guide-channel-logo {
+    width: 100px;
+    height: 130px;
+    min-height: 130px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid transparent;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.guide-channel-logo.focused {
+    border-color: #00d4ff;
+    background-color: rgba(0, 212, 255, 0.1);
+}
+
+/* Programs row */
+.guide-programs-row {
+    position: relative;
+    height: 130px;
+    min-height: 130px;
+    z-index: 1;
+}
+
+.guide-programs-row.focused {
+    z-index: 10;
+    overflow: visible;
+}
+
+/* Program card */
+.guide-program-card {
+    height: 125px;
+    cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.guide-program-card.focused {
+    z-index: 50;
+    min-width: 150px;
+    overflow: visible;
+    background: #0a0a18;
+}
+
+.guide-program-card.focused .guide-program-image {
+    border: 3px solid #00d4ff;
+}
+
+.guide-program-time {
+    color: #888;
+    padding: 3px 5px;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.guide-program-image {
+    width: 100%;
+    height: 95px;
+    background: linear-gradient(135deg, #141428 0%, #0c0c20 100%);
+    border-radius: 10px;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 15px;
+    box-sizing: border-box;
+}
+
+#guide-time-indicator {
+    position: absolute;
+    top: 18px;
+    bottom: 0;
+    width: 2px;
+    background: #e50914;
+    opacity: 0.8;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#guide-time-indicator-label {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    color: #e50914;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.guide-program-title-inner {
+    color: #fff;
+    text-align: left;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+/* Guide Info Bar */
+#guide-info-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.8));
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 200;
+}
+
+#guide-info-time {
+    color: #00d4ff;
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-right: 30px;
+    white-space: nowrap;
+}
+
+#guide-info-title {
+    color: #fff;
+    font-size: 1.8em;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+}

@@ -1,0 +1,15 @@
+CLAUDE.md
+js/config.local.js
+.buildResult
+.project
+.tproject
+.settings/
+.sign/
+*.backup
+*.wgt
+.azure_speech
+node_modules/
+coverage/
+android/.gradle/
+android/app/build/
+android/build/
