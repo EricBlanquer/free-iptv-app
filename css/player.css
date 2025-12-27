@@ -1,0 +1,438 @@
+/* Player Screen - Video player, controls, modals, subtitles */
+
+#player-screen {
+    background: #000;
+}
+
+#player-container {
+    width: 100%;
+    height: 100%;
+}
+
+#subtitle-display {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 80%;
+    text-align: center;
+    font-size: 42px;
+    color: #fff;
+    text-shadow: 2px 2px 4px #000, -2px -2px 4px #000, 2px -2px 4px #000, -2px 2px 4px #000;
+    z-index: 100;
+    pointer-events: none;
+    white-space: pre-line;
+}
+
+#subtitle-display:empty {
+    display: none;
+}
+
+#buffer-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: #fff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    z-index: 150;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px 30px;
+    border-radius: 12px;
+}
+
+#av-player {
+    width: 100%;
+    height: 100%;
+}
+
+#player-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 50%;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), transparent);
+    padding: 40px 80px;
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+#player-top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: baseline;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), transparent);
+    padding: 40px 80px;
+}
+
+#player-quality {
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+#player-type {
+    margin-left: 20px;
+    padding: 4px 12px;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+}
+
+#player-type.html5 {
+    background: rgba(66, 133, 244, 0.8);
+}
+
+#player-type.native {
+    background: rgba(76, 175, 80, 0.8);
+}
+
+#player-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    padding: 60px 80px;
+}
+
+#player-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#player-progress {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+#progress-bar {
+    height: 100%;
+    background: #e50914;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+#player-meta {
+    display: flex;
+    align-items: center;
+}
+
+#player-state {
+    font-size: 28px;
+    color: #fff;
+    margin-right: 15px;
+}
+
+#player-time {
+    font-size: 28px;
+    color: #fff;
+}
+
+#player-buffer {
+    font-size: 22px;
+    color: #ffa500;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-left: 15px;
+}
+
+#player-tracks {
+    display: flex;
+    align-items: center;
+    margin-left: 30px;
+}
+
+.player-track-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    margin-left: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.player-track-btn .track-icon {
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+.player-track-btn.focused {
+    background: #0077cc;
+    transform: scale(1.05);
+}
+
+/* Seek speed indicator */
+#seek-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 48px;
+    padding: 30px 50px;
+    border-radius: 15px;
+    z-index: 9999;
+    display: none;
+}
+
+#seek-indicator.visible {
+    display: block;
+}
+
+/* Resume Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+    padding: 50px 80px;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+#confirm-modal-title {
+    font-size: 32px;
+    color: #ff9800;
+    margin-bottom: 20px;
+}
+
+#confirm-modal-message {
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 30px;
+}
+
+#confirm-modal-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+#confirm-modal-buttons .modal-btn {
+    margin: 0 15px;
+}
+
+#confirm-yes-btn {
+    background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%) !important;
+}
+
+#confirm-yes-btn.focused {
+    background: linear-gradient(135deg, #ff1744 0%, #b71c1c 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.5);
+}
+
+.disclaimer-content {
+    max-width: 800px;
+}
+
+.disclaimer-title {
+    font-size: 42px;
+    margin-bottom: 30px;
+    color: #ff9800;
+}
+
+.disclaimer-text {
+    font-size: 24px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    color: #ccc;
+}
+
+.disclaimer-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+#resume-modal-title {
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: #fff;
+}
+
+#resume-modal-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 20px 60px;
+    font-size: 28px;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #4CAF50;
+    color: #fff;
+    transition: all 0.2s;
+    margin: 0 15px;
+}
+
+.modal-btn.focused {
+    background: #66BB6A;
+    transform: scale(1.05);
+    outline: 0;
+    border-color: #fff;
+}
+
+#resume-restart-btn {
+    background: #0077cc;
+}
+
+#resume-restart-btn.focused {
+    background: #0099ff;
+}
+
+/* Tracks Modal */
+.tracks-modal-content {
+    display: flex;
+    min-width: 600px;
+}
+
+.tracks-section {
+    flex: 1;
+    padding: 20px;
+}
+
+.tracks-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.track-item {
+    padding: 15px 25px;
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.track-item.focused {
+    background: #0077cc;
+    transform: scale(1.02);
+}
+
+.track-item.selected {
+    background: #4CAF50;
+}
+
+.track-item.selected.focused {
+    background: #66BB6A;
+}
+
+/* Subtitle Options Modal */
+.sub-options-content {
+    min-width: 600px;
+}
+
+.sub-options-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #fff;
+}
+
+.sub-options-section {
+    margin-bottom: 25px;
+}
+
+.sub-options-label {
+    font-size: 22px;
+    color: #aaa;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.sub-options-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sub-option-btn {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    margin: 0 8px;
+    border-radius: 10px;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sub-option-btn.focused {
+    background: #00d4ff;
+    color: #000;
+}
+
+.sub-option-btn.selected {
+    border: 2px solid #00d4ff;
+}
+
+.sub-offset-value {
+    font-size: 28px;
+    min-width: 100px;
+    text-align: center;
+    color: #00d4ff;
+    font-weight: bold;
+}
+
+.sub-options-close {
+    margin-top: 30px;
+}
+
+/* Subtitle display styles */
+#subtitle-display.size-small {
+    font-size: 32px;
+}
+
+#subtitle-display.size-medium {
+    font-size: 42px;
+}
+
+#subtitle-display.size-large {
+    font-size: 56px;
+}
+
+#subtitle-display.style-shadow {
+    text-shadow: 2px 2px 4px #000, -2px -2px 4px #000, 2px -2px 4px #000, -2px 2px 4px #000;
+    background: transparent;
+}
+
+#subtitle-display.style-background {
+    text-shadow: none;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+#subtitle-display.style-none {
+    text-shadow: none;
+    background: transparent;
+}

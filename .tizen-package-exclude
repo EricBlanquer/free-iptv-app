@@ -1,0 +1,10 @@
+*.wgt
+author-signature.xml
+signature1.xml
+.manifest.tmp
+CLAUDE.md
+tests/
+node_modules/
+coverage/
+package.json
+package-lock.json

@@ -1,0 +1,10 @@
+CLAUDE.md
+js/config.local.js
+.project
+.tproject
+.settings/
+.sign/
+*.backup
+*.wgt
+node_modules/
+coverage/

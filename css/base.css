@@ -1,0 +1,97 @@
+/* Base styles - Reset, global styles, common elements */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Samsung Sans', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #ffffff;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.screen.active {
+    display: flex;
+}
+
+.hidden {
+    display: none !important;
+}
+
+button {
+    padding: 20px 60px;
+    font-size: 28px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:focus:not(.favorite-star):not(.action-btn):not(.modal-btn):not(.season-btn):not(.view-btn):not(.sort-btn):not(.filter-btn),
+button.focused:not(.favorite-star):not(.action-btn):not(.modal-btn):not(.season-btn):not(.view-btn):not(.sort-btn):not(.filter-btn) {
+    outline: 3px solid #fff;
+    transform: scale(1.05);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00d4ff;
+    border-radius: 4px;
+}
+
+/* Loading */
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    font-size: 28px;
+    z-index: 9000;
+}
+
+#loading .spinner {
+    margin-bottom: 20px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #00d4ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

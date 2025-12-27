@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Free IPTV</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/browse.css">
+    <link rel="stylesheet" href="css/details.css">
+    <link rel="stylesheet" href="css/continue.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+    <!-- Home Screen - 4 big buttons -->
+    <div id="home-screen" class="screen active">
+        <div id="home-grid">
+            <div class="home-btn focusable" data-section="live">
+                <div class="home-icon">📺</div>
+                <span data-i18n="home.live">Live TV</span>
+            </div>
+            <div class="home-btn focusable" data-section="vod">
+                <div class="home-icon">🎬</div>
+                <span data-i18n="home.movies">Movies</span>
+            </div>
+            <div class="home-btn focusable" data-section="series">
+                <div class="home-icon">📺</div>
+                <span data-i18n="home.series">Series</span>
+            </div>
+            <div class="home-btn focusable" data-section="manga">
+                <div class="home-icon">🇯🇵</div>
+                <span data-i18n="home.manga">Manga</span>
+            </div>
+            <div class="home-btn focusable" data-section="sport">
+                <div class="home-icon">⚽</div>
+                <span data-i18n="home.sport">Sport</span>
+            </div>
+            <div class="home-btn focusable" data-section="entertainment">
+                <div class="home-icon">🎭</div>
+                <span data-i18n="home.entertainment">Entertainment</span>
+            </div>
+            <div class="home-btn focusable" data-section="continue">
+                <div class="home-icon">▶️</div>
+                <span data-i18n="home.continue">Continue</span>
+            </div>
+            <div class="home-btn focusable" data-section="favorites">
+                <div class="home-icon">⭐</div>
+                <span data-i18n="home.favorites">Favorites</span>
+            </div>
+            <!-- Custom categories inserted before settings button -->
+            <div class="home-btn focusable" data-section="settings" id="home-settings-btn">
+                <div class="home-icon">⚙️</div>
+                <span data-i18n="home.settings">Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Watching Screen -->
+    <div id="continue-screen" class="screen">
+        <h1 data-i18n="home.continueWatching">Continue Watching</h1>
+        <div id="continue-grid"></div>
+        <div id="continue-empty" class="hidden" data-i18n="home.noContinue">No content in progress</div>
+    </div>
+
+    <!-- Playlists Screen -->
+    <div id="playlists-screen" class="screen">
+        <h1 data-i18n="settings.playlists">Playlists</h1>
+        <div id="playlists-container">
+            <div id="playlists-list"></div>
+            <div class="playlist-add-btn focusable" data-action="add-playlist">
+                <span class="playlist-add-icon">+</span>
+                <span data-i18n="settings.addPlaylist">Add playlist</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playlist Edit Screen -->
+    <div id="playlist-edit-screen" class="screen">
+        <h1 id="playlist-edit-title" data-i18n="settings.editPlaylist">Edit playlist</h1>
+        <div id="playlist-edit-container">
+            <div class="settings-section">
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.playlistName">Name (optional)</span>
+                    <input type="text" id="playlist-name" class="settings-input focusable" placeholder="My playlist">
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.playlistType">Type</span>
+                    <div class="settings-options">
+                        <div class="settings-option focusable selected" data-setting="playlistType" data-value="provider">Server</div>
+                        <div class="settings-option focusable" data-setting="playlistType" data-value="m3u">M3U URL</div>
+                    </div>
+                </div>
+            </div>
+            <div id="playlist-provider-fields" class="settings-section">
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.serverUrl">Server URL</span>
+                    <input type="text" id="playlist-serverUrl" class="settings-input focusable" placeholder="http://...">
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.username">Username</span>
+                    <input type="text" id="playlist-username" class="settings-input focusable" placeholder="Username">
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.password">Password</span>
+                    <input type="password" id="playlist-password" class="settings-input focusable" placeholder="Password">
+                </div>
+            </div>
+            <div id="playlist-m3u-fields" class="settings-section hidden">
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.m3uUrl">URL M3U</span>
+                    <input type="text" id="playlist-m3uUrl" class="settings-input focusable" placeholder="http://...m3u">
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-row">
+                    <div class="settings-action focusable" data-action="savePlaylist" data-i18n="settings.save">Save</div>
+                    <div class="settings-action focusable" data-action="cancelPlaylist" data-i18n="settings.cancel">Cancel</div>
+                    <div id="playlist-delete-btn" class="settings-action focusable hidden" data-action="deletePlaylist" data-i18n="settings.delete">Delete</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+        <h1 data-i18n="settings.title">Settings</h1>
+        <div id="settings-container">
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.language">Language</div>
+                <div class="settings-row">
+                    <div class="settings-options" id="locale-options">
+                        <div class="settings-option focusable" data-setting="locale" data-value="de">🇩🇪 Deutsch</div>
+                        <div class="settings-option focusable selected" data-setting="locale" data-value="en">🇬🇧 English</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="es">🇪🇸 Español</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="fr">🇫🇷 Français</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="it">🇮🇹 Italiano</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="nl">🇳🇱 Nederlands</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="pl">🇵🇱 Polski</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="pt">🇵🇹 Português</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="ru">🇷🇺 Русский</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="tr">🇹🇷 Türkçe</div>
+                        <div class="settings-option focusable" data-setting="locale" data-value="ar">🇸🇦 العربية</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Remote config section - prominent when no config -->
+            <div id="settings-remote-section" class="settings-section">
+                <div class="settings-title" data-i18n="settings.remoteConfig">Remote configuration</div>
+                <div class="remote-config-instructions" data-i18n="settings.remoteInstructions">On your phone or computer, scan the QR code or open the address below, then enter the displayed code.</div>
+                <div class="remote-config-box">
+                    <div id="settings-qr-code"></div>
+                    <div class="remote-config-info">
+                        <div id="settings-pairing-code" class="pairing-code"></div>
+                        <div class="remote-config-url" id="settings-config-url"></div>
+                        <div id="settings-pairing-status" class="pairing-status" data-i18n="settings.waitingConfig">Waiting for configuration...</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Manual config section -->
+            <div id="settings-manual-section" class="settings-section">
+                <div class="settings-action primary focusable" data-action="managePlaylistsBtn" data-i18n="settings.managePlaylists">Manage playlists</div>
+                <span id="active-playlist-name" class="settings-info"></span>
+            </div>
+            <div id="provider-language-section" class="settings-section hidden">
+                <div class="settings-title" data-i18n="settings.providerLanguage">VOD Filter</div>
+                <div class="settings-row">
+                    <div class="settings-options" id="provider-lang-options">
+                        <div class="settings-option focusable selected" data-setting="providerLanguage" data-value="ALL" data-i18n="languages.ALL">All</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="AUTO" data-i18n="settings.providerAuto">Auto</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="DE" data-i18n="languages.DE">German</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="UK" data-i18n="languages.UK">English</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="AR" data-i18n="languages.AR">Arabic</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="ES" data-i18n="languages.ES">Spanish</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="FR" data-i18n="languages.FR">French</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="IT" data-i18n="languages.IT">Italian</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="PT" data-i18n="languages.PT">Portuguese</div>
+                        <div class="settings-option focusable" data-setting="providerLanguage" data-value="TR" data-i18n="languages.TR">Turkish</div>
+                    </div>
+                </div>
+                <div class="settings-desc" style="margin-left: 0;" data-i18n="settings.providerLanguageDesc">Filter VOD categories by language. Auto uses interface language.</div>
+            </div>
+            <div class="settings-section hidden" id="category-patterns-section">
+                <div class="settings-title" data-i18n="settings.categoryPatterns">Category Patterns</div>
+                <div class="settings-desc" data-i18n="settings.categoryPatternsDesc">Keywords to filter VOD categories by section</div>
+                <div id="pattern-categories-list">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="settings-row">
+                    <div class="settings-action primary focusable" data-action="addCategory">+ <span data-i18n="settings.addCategory">Add category</span></div>
+                    <div class="settings-action focusable" data-action="resetPatterns" data-i18n="settings.resetPatterns">Reset to defaults</div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.apis">APIs</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.tmdbKey">TMDB API Key</span>
+                    <input type="text" id="setting-tmdbApiKey" class="settings-input focusable" data-i18n-placeholder="settings.tmdbKey" placeholder="TMDB API Key">
+                </div>
+                <div class="settings-desc" data-i18n="settings.tmdbDesc">Posters, descriptions, cast. themoviedb.org/settings/api</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.openSubtitlesKey">OpenSubtitles API Key</span>
+                    <input type="text" id="setting-openSubtitlesApiKey" class="settings-input focusable" data-i18n-placeholder="settings.openSubtitlesKey" placeholder="OpenSubtitles API Key">
+                </div>
+                <div class="settings-desc" data-i18n="settings.openSubtitlesDesc">Subtitles. opensubtitles.com/consumers</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.subDLKey">SubDL API Key</span>
+                    <input type="text" id="setting-subDLApiKey" class="settings-input focusable" data-i18n-placeholder="settings.subDLKey" placeholder="SubDL API Key">
+                </div>
+                <div class="settings-desc" data-i18n="settings.subDLDesc">Subtitles (alternative). subdl.com/panel/api</div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.display">Display</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.hideSDDefault">Hide SD by default</span>
+                    <div class="settings-toggle focusable" data-setting="hideSD" data-value="true" data-i18n="settings.yes">Yes</div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.hideHIDefault">Hide Hearing Impaired by default</span>
+                    <div class="settings-toggle focusable" data-setting="hideHearingImpaired" data-value="true" data-i18n="settings.yes">Yes</div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.focusOnCategories">Focus on categories</span>
+                    <div class="settings-toggle focusable" data-setting="focusOnCategories" data-value="true" data-i18n="settings.yes">Yes</div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.progress">Progress</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.historyMaxItems">Max history</span>
+                    <div class="settings-value">
+                        <div class="settings-btn focusable" data-setting="historyMaxItems" data-action="decrease">-</div>
+                        <span id="setting-historyMaxItems">50</span>
+                        <div class="settings-btn focusable" data-setting="historyMaxItems" data-action="increase">+</div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.retention">Retention (weeks)</span>
+                    <div class="settings-value">
+                        <div class="settings-btn focusable" data-setting="retentionWeeks" data-action="decrease">-</div>
+                        <span id="setting-retentionWeeks">4</span>
+                        <div class="settings-btn focusable" data-setting="retentionWeeks" data-action="increase">+</div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.minThreshold">Min threshold (minutes)</span>
+                    <div class="settings-value">
+                        <div class="settings-btn focusable" data-setting="minProgressMinutes" data-action="decrease">-</div>
+                        <span id="setting-minProgressMinutes">2</span>
+                        <div class="settings-btn focusable" data-setting="minProgressMinutes" data-action="increase">+</div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.watchedThreshold">Watched threshold (%)</span>
+                    <div class="settings-value">
+                        <div class="settings-btn focusable" data-setting="watchedThreshold" data-action="decrease">-</div>
+                        <span id="setting-watchedThreshold">90</span>
+                        <div class="settings-btn focusable" data-setting="watchedThreshold" data-action="increase">+</div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section hidden" id="player-settings-section">
+                <div class="settings-title" data-i18n="settings.player">Player</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.preferHtml5">HTML5 Player</span>
+                    <div class="settings-toggle focusable" data-setting="preferHtml5Player" data-value="false" data-i18n="settings.no">No</div>
+                </div>
+                <div class="settings-desc" data-i18n="settings.preferHtml5Desc">Use HTML5 player instead of native Samsung player. Required for dialogue boost.</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.dialogueBoost">Dialogue boost</span>
+                    <div class="settings-toggle focusable" data-setting="dialogueBoost" data-value="false" data-i18n="settings.no">No</div>
+                </div>
+                <div class="settings-desc" data-i18n="settings.dialogueBoostDesc">Improves dialogue clarity (dynamic compression). Only works with HTML5 player.</div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.subtitles">Subtitles</div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.defaultSize">Default size</span>
+                    <div class="settings-options">
+                        <div class="settings-option focusable" data-setting="subtitleSize" data-value="small" data-i18n="subtitleOptions.small">Small</div>
+                        <div class="settings-option focusable selected" data-setting="subtitleSize" data-value="medium" data-i18n="subtitleOptions.medium">Medium</div>
+                        <div class="settings-option focusable" data-setting="subtitleSize" data-value="large" data-i18n="subtitleOptions.large">Large</div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.defaultStyle">Default style</span>
+                    <div class="settings-options">
+                        <div class="settings-option focusable selected" data-setting="subtitleStyle" data-value="shadow" data-i18n="subtitleOptions.shadow">Shadow</div>
+                        <div class="settings-option focusable" data-setting="subtitleStyle" data-value="background" data-i18n="subtitleOptions.background">Background</div>
+                        <div class="settings-option focusable" data-setting="subtitleStyle" data-value="none" data-i18n="subtitleOptions.simple">Simple</div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-title" data-i18n="settings.data">Data</div>
+                <div class="settings-row">
+                    <div class="settings-action focusable" data-action="clearTMDBCache" data-i18n="settings.clearCache">Clear TMDB cache</div>
+                    <div class="settings-action focusable" data-action="clearProgress" data-i18n="settings.clearProgress">Clear progress</div>
+                    <div class="settings-action focusable" data-action="clearFavorites" data-i18n="settings.clearFavorites">Clear favorites</div>
+                </div>
+            </div>
+            <div id="debug-settings-row" class="settings-section hidden">
+                <div class="settings-title">Debug</div>
+                <div class="settings-row">
+                    <span class="settings-label">Mode debug</span>
+                    <div class="settings-toggle focusable" data-setting="debugMode" data-value="false">Off</div>
+                </div>
+            </div>
+            <div id="device-duid" style="text-align: center; font-family: monospace; font-size: 14px; color: #666; margin-top: 40px; padding-bottom: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- Loading overlay (global) -->
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <span data-i18n="app.loading">Loading...</span>
+    </div>
+
+    <!-- Browse Screen - categories left, content right -->
+    <div id="browse-screen" class="screen">
+        <div id="filters-bar">
+            <div id="sidebar-title">Categories</div>
+            <div id="search-filters">
+                <input type="text" id="search-title" class="filter-input focusable" placeholder="Title..." data-i18n-placeholder="filters.title">
+                <input type="text" id="search-year" class="filter-input focusable" placeholder="Year..." data-i18n-placeholder="filters.year">
+                <button id="hide-sd-btn" class="filter-btn focusable selected" data-active="true" data-i18n="filters.hideSD">Hide SD</button>
+                <button id="hide-sm-btn" class="filter-btn focusable selected" data-active="true" data-i18n="filters.hideHI">Hide HI</button>
+            </div>
+            <div id="sort-filters">
+                <button class="sort-btn focusable selected" data-sort="default" data-i18n="filters.default">Default</button>
+                <button class="sort-btn focusable" data-sort="name" data-i18n="filters.aToZ">A-Z</button>
+                <button class="sort-btn focusable" data-sort="name-desc" data-i18n="filters.zToA">Z-A</button>
+                <button class="sort-btn focusable" data-sort="rating" data-i18n="filters.rating">Rating ⭐</button>
+                <button class="sort-btn focusable" data-sort="date" data-i18n="filters.recent">Recent</button>
+                <button class="sort-btn focusable" data-sort="date-asc" data-i18n="filters.old">Oldest</button>
+            </div>
+            <div id="view-mode-filters">
+                <button id="view-grid-btn" class="view-btn focusable selected" data-view="grid" title="Thumbnails">▦</button>
+                <button id="view-list-btn" class="view-btn focusable" data-view="list" title="List">☰</button>
+                <button id="edit-favorites-btn" class="view-btn focusable hidden" title="Edit">✏️</button>
+            </div>
+        </div>
+        <div id="browse-main">
+            <div id="sidebar">
+                <div id="categories-list"></div>
+            </div>
+            <div id="content">
+                <div id="content-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Screen -->
+    <div id="details-screen" class="screen">
+        <div id="details-backdrop"></div>
+        <button id="favorite-btn" class="focusable favorite-star">☆</button>
+        <div id="details-wrapper">
+            <div id="details-content">
+                <div id="details-poster-wrapper">
+                    <div id="details-poster"></div>
+                    <div id="details-progress-bar" class="hidden">
+                        <div id="details-progress-fill"></div>
+                    </div>
+                </div>
+                <div id="details-info">
+                    <h1 id="details-title">Title</h1>
+                    <div id="details-meta"></div>
+                    <div id="details-genres"></div>
+                    <p id="details-description"></p>
+                    <div id="details-actions">
+                        <button id="continue-btn" class="focusable action-btn hidden" data-i18n="player.continueAt">Continue</button>
+                        <button id="play-btn" class="focusable action-btn secondary" data-i18n="player.play">Play</button>
+                        <button id="mark-watched-btn" class="focusable action-btn tertiary hidden" data-i18n="player.markWatched">Mark as watched</button>
+                    </div>
+                    <div id="series-status" class="hidden"></div>
+                </div>
+            </div>
+            <div id="details-director-section" class="hidden">
+                <div id="details-director-title" data-i18n="details.director">Director</div>
+                <div id="details-director-grid"></div>
+            </div>
+            <div id="details-cast-section">
+                <div id="details-cast-title" data-i18n="details.cast">Cast</div>
+                <div id="details-cast-grid"></div>
+            </div>
+            <div id="details-episodes-section" class="hidden">
+                <div id="details-season-selector"></div>
+                <div id="details-episodes-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actor Screen -->
+    <div id="actor-screen" class="screen">
+        <div id="actor-backdrop"></div>
+        <div id="actor-wrapper">
+            <div id="actor-content">
+                <div id="actor-photo-large"></div>
+                <div id="actor-info">
+                    <h1 id="actor-name">Name</h1>
+                    <div id="actor-meta"></div>
+                    <p id="actor-bio"></p>
+                </div>
+            </div>
+            <div id="actor-filmography-section">
+                <div id="actor-filmography-title" data-i18n="details.filmography">Filmography</div>
+                <div id="actor-filmography-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Screen -->
+    <div id="player-screen" class="screen">
+        <div id="player-container">
+            <object id="av-player" type="application/avplayer"></object>
+            <video id="html5-video" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#000;z-index:1;"></video>
+        </div>
+        <div id="subtitle-display"></div>
+        <div id="buffer-indicator" class="hidden"></div>
+        <div id="player-title" class="hidden"></div>
+        <div id="player-top-right" class="hidden">
+            <span id="player-quality"></span>
+            <span id="player-type"></span>
+        </div>
+        <div id="player-overlay" class="hidden">
+            <div id="player-info">
+                <div id="player-progress">
+                    <div id="progress-bar"></div>
+                </div>
+                <div id="player-meta">
+                    <span id="player-state"></span>
+                    <span id="player-time">0:00 / 0:00</span>
+                    <span id="player-buffer" class="hidden">Buffer: 0s</span>
+                    <div id="player-tracks" class="hidden">
+                        <div id="player-audio-btn" class="player-track-btn focusable">
+                            <span class="track-icon">🔊</span>
+                            <span id="player-audio-label" data-i18n="player.audio">Audio</span>
+                        </div>
+                        <div id="player-subtitle-btn" class="player-track-btn focusable">
+                            <span class="track-icon">💬</span>
+                            <span id="player-subtitle-label" data-i18n="player.subtitlesLabel">Subtitles</span>
+                        </div>
+                        <div id="player-sub-options-btn" class="player-track-btn focusable hidden">
+                            <span class="track-icon">⚙️</span>
+                            <span>Options</span>
+                        </div>
+                        <div id="player-favorite-btn" class="player-track-btn focusable">
+                            <span class="track-icon" id="player-favorite-icon">☆</span>
+                            <span data-i18n="player.favorite">Favorite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seek Indicator -->
+    <div id="seek-indicator"></div>
+
+    <!-- Disclaimer Modal (first launch) -->
+    <div id="disclaimer-modal" class="modal hidden">
+        <div class="modal-content disclaimer-content">
+            <div class="disclaimer-title" data-i18n="disclaimer.title">Disclaimer</div>
+            <div class="disclaimer-text" data-i18n="disclaimer.text">This application does not provide any content. Users are solely responsible for the sources they configure and must ensure they have the legal right to access such content. The developer assumes no responsibility for how this application is used.</div>
+            <div class="disclaimer-buttons">
+                <button id="disclaimer-accept-btn" class="focusable modal-btn" data-i18n="disclaimer.accept">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Modal -->
+    <div id="resume-modal" class="modal hidden">
+        <div class="modal-content">
+            <div id="resume-modal-title" data-i18n="modal.resumeTitle">Resume playback?</div>
+            <div id="resume-modal-buttons">
+                <button id="resume-continue-btn" class="focusable modal-btn" data-i18n="modal.continue">Continue</button>
+                <button id="resume-restart-btn" class="focusable modal-btn" data-i18n="modal.fromStart">From start</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content">
+            <div id="confirm-modal-title" data-i18n="settings.confirmDelete">Confirm deletion</div>
+            <div id="confirm-modal-message"></div>
+            <div id="confirm-modal-buttons">
+                <button id="confirm-yes-btn" class="focusable modal-btn" data-i18n="settings.delete">Delete</button>
+                <button id="confirm-no-btn" class="focusable modal-btn" data-i18n="settings.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtitle Options Modal -->
+    <div id="sub-options-modal" class="modal hidden">
+        <div class="modal-content sub-options-content">
+            <div class="sub-options-title" data-i18n="subtitleOptions.title">Subtitle options</div>
+            <div class="sub-options-section">
+                <div class="sub-options-label" data-i18n="subtitleOptions.offset">Offset</div>
+                <div class="sub-options-row">
+                    <div class="sub-option-btn focusable" data-action="offset" data-value="-500">-0.5s</div>
+                    <div class="sub-option-btn focusable" data-action="offset" data-value="-100">-0.1s</div>
+                    <div id="sub-offset-display" class="sub-offset-value">0.0s</div>
+                    <div class="sub-option-btn focusable" data-action="offset" data-value="100">+0.1s</div>
+                    <div class="sub-option-btn focusable" data-action="offset" data-value="500">+0.5s</div>
+                </div>
+            </div>
+            <div class="sub-options-section">
+                <div class="sub-options-label" data-i18n="subtitleOptions.size">Size</div>
+                <div class="sub-options-row">
+                    <div class="sub-option-btn focusable" data-action="size" data-value="small" data-i18n="subtitleOptions.small">Small</div>
+                    <div class="sub-option-btn focusable selected" data-action="size" data-value="medium" data-i18n="subtitleOptions.medium">Medium</div>
+                    <div class="sub-option-btn focusable" data-action="size" data-value="large" data-i18n="subtitleOptions.large">Large</div>
+                </div>
+            </div>
+            <div class="sub-options-section">
+                <div class="sub-options-label" data-i18n="subtitleOptions.style">Style</div>
+                <div class="sub-options-row">
+                    <div class="sub-option-btn focusable selected" data-action="style" data-value="shadow" data-i18n="subtitleOptions.shadow">Shadow</div>
+                    <div class="sub-option-btn focusable" data-action="style" data-value="background" data-i18n="subtitleOptions.background">Background</div>
+                    <div class="sub-option-btn focusable" data-action="style" data-value="none" data-i18n="subtitleOptions.simple">Simple</div>
+                </div>
+            </div>
+            <div class="sub-options-close">
+                <div class="sub-option-btn focusable" data-action="close" data-i18n="subtitleOptions.close">Close</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Track Selection Modal -->
+    <div id="tracks-modal" class="modal hidden">
+        <div class="modal-content tracks-modal-content">
+            <div class="tracks-section">
+                <div class="tracks-title">🔊 <span data-i18n="player.audio">Audio</span></div>
+                <div id="audio-tracks-list"></div>
+            </div>
+            <div class="tracks-section">
+                <div class="tracks-title">💬 <span data-i18n="player.subtitlesLabel">Subtitles</span></div>
+                <div id="subtitle-tracks-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pattern Editor Modal -->
+    <!-- Add Category Modal -->
+    <div id="add-category-modal" class="modal hidden">
+        <div class="modal-content pattern-modal-content">
+            <div class="pattern-modal-header" data-i18n="settings.addCategory">Add Category</div>
+            <div class="settings-row" style="margin-bottom: 10px;">
+                <span class="settings-label" data-i18n="settings.categoryName">Name</span>
+                <input type="text" id="new-category-name" class="settings-input focusable" placeholder="Sport, Anime...">
+            </div>
+            <div class="settings-row" style="margin-bottom: 5px;">
+                <span class="settings-label" data-i18n="settings.categoryIcon">Icon</span>
+                <div class="icon-type-toggle">
+                    <span class="icon-type-btn focusable selected" data-type="emoji" data-i18n="settings.iconEmoji">Emoji</span>
+                    <span class="icon-type-btn focusable" data-type="custom" data-i18n="settings.iconCustom">Custom</span>
+                </div>
+            </div>
+            <div id="icon-emoji-section" class="icon-section-aligned">
+                <div id="icon-picker" class="icon-picker">
+                    <span class="icon-option focusable" data-icon="⚽">⚽</span>
+                    <span class="icon-option focusable" data-icon="🎭">🎭</span>
+                    <span class="icon-option focusable" data-icon="🇯🇵">🇯🇵</span>
+                    <span class="icon-option focusable" data-icon="🎬">🎬</span>
+                    <span class="icon-option focusable" data-icon="🎵">🎵</span>
+                    <span class="icon-option focusable" data-icon="📺">📺</span>
+                    <span class="icon-option focusable" data-icon="🎮">🎮</span>
+                    <span class="icon-option focusable" data-icon="🎤">🎤</span>
+                    <span class="icon-option focusable" data-icon="🎸">🎸</span>
+                    <span class="icon-option focusable" data-icon="🎯">🎯</span>
+                    <span class="icon-option focusable" data-icon="🏆">🏆</span>
+                    <span class="icon-option focusable" data-icon="🎪">🎪</span>
+                </div>
+            </div>
+            <div id="icon-custom-section" class="hidden icon-section-aligned">
+                <div class="custom-icon-row">
+                    <div class="custom-icon-field">
+                        <span class="settings-label" data-i18n="settings.iconText">Text</span>
+                        <input type="text" id="custom-icon-text" class="custom-icon-input focusable" maxlength="2" placeholder="A">
+                    </div>
+                    <div class="custom-icon-field">
+                        <span class="settings-label" data-i18n="settings.iconPreview">Preview</span>
+                        <div id="custom-icon-preview" class="custom-icon-preview"></div>
+                    </div>
+                </div>
+                <div class="color-palettes-row">
+                    <div class="custom-icon-field">
+                        <span class="settings-label" data-i18n="settings.iconTextColor">Text</span>
+                        <div class="color-palette" id="text-color-palette">
+                            <span class="color-option focusable selected" data-color="#ffffff" style="background:#ffffff"></span>
+                            <span class="color-option focusable" data-color="#000000" style="background:#000000"></span>
+                            <span class="color-option focusable" data-color="#e50914" style="background:#e50914"></span>
+                            <span class="color-option focusable" data-color="#ff9900" style="background:#ff9900"></span>
+                            <span class="color-option focusable" data-color="#ffcc00" style="background:#ffcc00"></span>
+                            <span class="color-option focusable" data-color="#00cc00" style="background:#00cc00"></span>
+                            <span class="color-option focusable" data-color="#00d4ff" style="background:#00d4ff"></span>
+                            <span class="color-option focusable" data-color="#9933ff" style="background:#9933ff"></span>
+                        </div>
+                    </div>
+                    <div class="custom-icon-field">
+                        <span class="settings-label" data-i18n="settings.iconBgColor">Fond</span>
+                        <div class="color-palette" id="bg-color-palette">
+                            <span class="color-option focusable" data-color="#000000" style="background:#000000"></span>
+                            <span class="color-option focusable selected" data-color="#1a1a1a" style="background:#1a1a1a"></span>
+                            <span class="color-option focusable" data-color="#e50914" style="background:#e50914"></span>
+                            <span class="color-option focusable" data-color="#ff9900" style="background:#ff9900"></span>
+                            <span class="color-option focusable" data-color="#ffcc00" style="background:#ffcc00"></span>
+                            <span class="color-option focusable" data-color="#00cc00" style="background:#00cc00"></span>
+                            <span class="color-option focusable" data-color="#00d4ff" style="background:#00d4ff"></span>
+                            <span class="color-option focusable" data-color="#ffffff" style="background:#ffffff"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-modal-actions">
+                <div class="pattern-modal-btn focusable" id="add-category-cancel-btn" data-i18n="settings.cancel">Cancel</div>
+                <div class="pattern-modal-btn primary focusable" id="add-category-save-btn" data-i18n="settings.save">Save</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pattern-modal" class="modal hidden">
+        <div class="modal-content pattern-modal-content">
+            <div class="pattern-modal-header">
+                <span id="pattern-modal-title" data-i18n="settings.editKeywords">Edit Keywords</span>
+                <span id="pattern-modal-section"></span>
+            </div>
+            <div id="pattern-category-edit" class="pattern-category-edit hidden">
+                <div class="pattern-category-edit-row">
+                    <span class="settings-label" data-i18n="settings.categoryIcon">Icon</span>
+                    <div id="pattern-icon-type-toggle" class="icon-type-toggle">
+                        <span class="icon-type-btn focusable" data-type="emoji" data-i18n="settings.iconEmoji">Emoji</span>
+                        <span class="icon-type-btn focusable" data-type="custom" data-i18n="settings.iconCustom">Custom</span>
+                    </div>
+                </div>
+                <div id="pattern-icon-emoji-section" class="icon-section-aligned hidden">
+                    <div class="icon-picker">
+                        <span class="icon-option focusable" data-icon="⚽">⚽</span>
+                        <span class="icon-option focusable" data-icon="🎭">🎭</span>
+                        <span class="icon-option focusable" data-icon="🇯🇵">🇯🇵</span>
+                        <span class="icon-option focusable" data-icon="🎬">🎬</span>
+                        <span class="icon-option focusable" data-icon="🎵">🎵</span>
+                        <span class="icon-option focusable" data-icon="📺">📺</span>
+                        <span class="icon-option focusable" data-icon="🎮">🎮</span>
+                        <span class="icon-option focusable" data-icon="🎤">🎤</span>
+                        <span class="icon-option focusable" data-icon="🎸">🎸</span>
+                        <span class="icon-option focusable" data-icon="🎯">🎯</span>
+                        <span class="icon-option focusable" data-icon="🏆">🏆</span>
+                        <span class="icon-option focusable" data-icon="🎪">🎪</span>
+                    </div>
+                </div>
+                <div id="pattern-icon-custom-section" class="icon-section-aligned hidden">
+                    <div class="custom-icon-row">
+                        <div class="custom-icon-field">
+                            <span class="settings-label" data-i18n="settings.iconText">Text</span>
+                            <input type="text" id="pattern-category-icon" class="custom-icon-input focusable" maxlength="2" placeholder="A">
+                        </div>
+                        <div class="custom-icon-field">
+                            <span class="settings-label" data-i18n="settings.iconPreview">Preview</span>
+                            <div id="pattern-icon-preview" class="custom-icon-preview"></div>
+                        </div>
+                    </div>
+                    <div class="color-palettes-row">
+                        <div class="custom-icon-field">
+                            <span class="settings-label" data-i18n="settings.iconTextColor">Text</span>
+                            <div class="color-palette" id="pattern-text-color-palette">
+                                <span class="color-option focusable" data-color="#ffffff" style="background:#ffffff"></span>
+                                <span class="color-option focusable" data-color="#000000" style="background:#000000"></span>
+                                <span class="color-option focusable" data-color="#e50914" style="background:#e50914"></span>
+                                <span class="color-option focusable" data-color="#ff9900" style="background:#ff9900"></span>
+                                <span class="color-option focusable" data-color="#ffcc00" style="background:#ffcc00"></span>
+                                <span class="color-option focusable" data-color="#00cc00" style="background:#00cc00"></span>
+                                <span class="color-option focusable" data-color="#00d4ff" style="background:#00d4ff"></span>
+                                <span class="color-option focusable" data-color="#9933ff" style="background:#9933ff"></span>
+                            </div>
+                        </div>
+                        <div class="custom-icon-field">
+                            <span class="settings-label" data-i18n="settings.iconBgColor">Fond</span>
+                            <div class="color-palette" id="pattern-bg-color-palette">
+                                <span class="color-option focusable" data-color="#000000" style="background:#000000"></span>
+                                <span class="color-option focusable" data-color="#1a1a1a" style="background:#1a1a1a"></span>
+                                <span class="color-option focusable" data-color="#e50914" style="background:#e50914"></span>
+                                <span class="color-option focusable" data-color="#ff9900" style="background:#ff9900"></span>
+                                <span class="color-option focusable" data-color="#ffcc00" style="background:#ffcc00"></span>
+                                <span class="color-option focusable" data-color="#00cc00" style="background:#00cc00"></span>
+                                <span class="color-option focusable" data-color="#00d4ff" style="background:#00d4ff"></span>
+                                <span class="color-option focusable" data-color="#ffffff" style="background:#ffffff"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pattern-category-edit-row">
+                    <span class="settings-label" data-i18n="settings.categoryName">Name</span>
+                    <input type="text" id="pattern-category-name" class="settings-input focusable">
+                </div>
+                <div class="pattern-category-edit-row">
+                    <span class="settings-label" data-i18n="settings.useTMDB">TMDB</span>
+                    <div id="pattern-use-tmdb-toggle" class="settings-toggle with-options focusable" data-value="yes">
+                        <span class="toggle-option" data-value="yes" data-i18n="settings.yes">Yes</span>
+                        <span class="toggle-option" data-value="no" data-i18n="settings.no">No</span>
+                    </div>
+                </div>
+            </div>
+            <div id="pattern-subcategory-tabs" class="pattern-subcategory-tabs hidden"></div>
+            <div class="pattern-chips" id="pattern-chips"></div>
+            <div class="pattern-add-section">
+                <input type="text" id="pattern-add-input" class="focusable" data-i18n-placeholder="settings.addKeyword" placeholder="Add keyword...">
+                <div class="pattern-add-btn focusable" id="pattern-add-btn" data-i18n="settings.addKeywordBtn">Add</div>
+            </div>
+            <div class="pattern-preview">
+                <div class="pattern-preview-label" data-i18n="settings.previewMatched">Matched categories:</div>
+                <div id="pattern-preview-list"></div>
+            </div>
+            <div class="pattern-modal-actions">
+                <div class="pattern-modal-btn focusable" id="pattern-cancel-btn" data-i18n="settings.cancel">Cancel</div>
+                <div class="pattern-modal-btn primary focusable" id="pattern-save-btn" data-i18n="settings.save">Save</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug -->
+    <div id="debug" style="display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;font-size:18px;padding:10px;max-height:200px;overflow-y:auto;font-family:monospace;z-index:9999;"></div>
+    <script>
+        window.onerror = function(msg, url, line) {
+            var d = document.getElementById('debug');
+            d.style.display = 'block';
+            d.innerHTML += 'ERR L' + line + ': ' + msg + '<br>';
+            return false;
+        };
+        window.log = function(msg) {
+            if (!window.debugMode) return;
+            var d = document.getElementById('debug');
+            d.style.display = 'block';
+            d.innerHTML += msg + '<br>';
+            d.scrollTop = d.scrollHeight;
+        };
+    </script>
+    <script>
+        // Load webapis dynamically
+        (function() {
+            var script = document.createElement('script');
+            script.src = '$WEBAPIS/webapis/webapis.js';
+            script.onerror = function() { console.log('webapis not available'); };
+            document.head.appendChild(script);
+        })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/provider.js"></script>
+    <script src="js/tmdb.js"></script>
+    <script src="js/opensubtitles.js"></script>
+    <script src="js/subdl.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/flags.js"></script>
+    <script src="js/category-patterns.js"></script>
+    <script src="js/regex.js"></script>
+    <script>Regex.init();</script>
+    <script src="js/config.local.js"></script>
+    <script src="js/app.js"></script>
+    <!-- Extension modules (add methods to IPTVApp.prototype) -->
+    <script src="js/storage.js"></script>
+    <script src="js/playback.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/browse.js"></script>
+    <script src="js/details.js"></script>
+</body>
+</html>
