@@ -1,0 +1,11 @@
+[Unit]
+Description=IPTV Stream Proxy
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/youruser/stream-proxy.py
+Restart=always
+User=youruser
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+Free IPTV - Riproduci i tuoi contenuti
+
+Riproduci i tuoi contenuti IPTV personali sulla tua TV Samsung. Questo lettore supporta le playlist M3U, dandoti il pieno controllo sulla tua libreria multimediale.
+
+Funzionalita:
+- Canali TV in diretta con guida EPG
+- Film (VOD) con locandine
+- Serie TV con navigazione stagioni/episodi
+- Supporto tracce audio multiple
+- Supporto sottotitoli (integrati ed esterni)
+- Continua a guardare - riprendi da dove ti eri fermato
+- Preferiti e cronologia di visualizzazione
+- Modalita di visualizzazione a griglia e lista
+- Opzioni di ricerca e filtro
+- 11 lingue di interfaccia
+
+L'applicazione non fornisce alcun contenuto. Gli utenti devono configurare le proprie playlist IPTV e sono responsabili di assicurarsi di avere il diritto legale di accedere a tali contenuti.
+
+Richiede: Connessione Internet, playlist M3U

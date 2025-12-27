@@ -1,0 +1,19 @@
+Free IPTV - Streamen Sie Ihre Inhalte
+
+Streamen Sie Ihre persoenlichen IPTV-Inhalte auf Ihrem Samsung TV. Dieser Player unterstuetzt M3U-Playlists und gibt Ihnen die volle Kontrolle ueber Ihre Medienbibliothek.
+
+Funktionen:
+- Live-TV-Kanaele mit EPG-Guide
+- Filme (VOD) mit Posterbildern
+- TV-Serien mit Staffel-/Episodennavigation
+- Unterstuetzung mehrerer Audiospuren
+- Untertitelunterstuetzung (eingebettet und extern)
+- Weiterschauen - setzen Sie fort, wo Sie aufgehoert haben
+- Favoriten und Wiedergabeverlauf
+- Raster- und Listenansicht
+- Such- und Filteroptionen
+- 11 Oberflachensprachen
+
+Die Anwendung stellt keine Inhalte bereit. Benutzer muessen ihre eigenen IPTV-Playlists konfigurieren und sind dafuer verantwortlich, dass sie das gesetzliche Recht haben, auf solche Inhalte zuzugreifen.
+
+Erforderlich: Internetverbindung, M3U-Playlist

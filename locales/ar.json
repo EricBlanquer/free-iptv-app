@@ -1,0 +1,418 @@
+{
+  "iso639Codes": [
+    "ara",
+    "arabic"
+  ],
+  "localeName": "العربية",
+  "localeFlag": "🇸🇦",
+  "providerLangCode": "AR",
+  "contentTypePrefix": [
+    "أفلام",
+    "فيلم",
+    "مسلسلات",
+    "مسلسل"
+  ],
+  "common": {
+    "select": "اختر...",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "connectionError": "خطأ في الاتصال"
+  },
+  "app": {
+    "loading": "جاري التحميل...",
+    "noResults": "لا توجد نتائج",
+    "timeout": "انتهت المهلة"
+  },
+  "home": {
+    "live": "البث المباشر",
+    "movies": "أفلام",
+    "series": "مسلسلات",
+    "favorites": "المفضلة",
+    "sport": "رياضة",
+    "concerts": "حفلات",
+    "theatre": "مسرح",
+    "spectacles": "عروض",
+    "blindtest": "Blind Test",
+    "karaoke": "كاريوكي",
+    "settings": "الإعدادات",
+    "continueWatching": "متابعة المشاهدة",
+    "noContinue": "لا يوجد محتوى قيد التشغيل",
+    "noFavorites": "لا توجد مفضلات",
+    "manga": "Manga",
+    "entertainment": "ترفيه",
+    "continue": "متابعة",
+    "tnt": "National TV",
+    "tvGuide": "TV Guide",
+    "cacheLoading": "جاري تحميل {name} ({step}/{total})...",
+    "history": "السجل",
+    "noHistory": "لا يوجد سجل مشاهدة",
+    "downloads": "التنزيلات",
+    "noDownloads": "لا توجد تنزيلات",
+    "categories": "الفئات"
+  },
+  "guide": {
+    "today": "اليوم",
+    "tomorrow": "غداً",
+    "days": [
+      "الأحد",
+      "الإثنين",
+      "الثلاثاء",
+      "الأربعاء",
+      "الخميس",
+      "الجمعة",
+      "السبت"
+    ],
+    "noProgram": "لا يوجد برنامج"
+  },
+  "languages": {
+    "ALL": "الكل"
+  },
+  "filters": {
+    "default": "تاريخ الإضافة",
+    "aToZ": "أ-ي",
+    "zToA": "ي-أ",
+    "yearDesc": "السنة ↓",
+    "yearAsc": "السنة ↑",
+    "title": "Title...",
+    "person": "شخص...",
+    "year": "Year..."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "serverUrl": "رابط الخادم",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "apis": "واجهات برمجة التطبيقات (اختياري)",
+    "tmdbKey": "مفتاح TMDB API",
+    "tmdbDesc": "ملصقات، أوصاف، طاقم التمثيل. themoviedb.org/settings/api",
+    "openSubtitlesKey": "مفتاح OpenSubtitles API",
+    "openSubtitlesDesc": "ترجمات. opensubtitles.com/consumers",
+    "subDLKey": "مفتاح SubDL API",
+    "subDLDesc": "ترجمات (بديل). subdl.com/panel/api",
+    "display": "العرض",
+    "hideSDDefault": "إخفاء SD افتراضياً",
+    "hide3DDefault": "إخفاء 3D افتراضياً",
+    "secureSubtitles": "ترجمات آمنة",
+    "hideHIDefault": "إخفاء HI افتراضياً",
+    "providerLanguage": "فلتر VOD",
+    "providerAuto": "تلقائي (الواجهة)",
+    "providerLanguageDesc": "تصفية فئات VOD حسب اللغة. تلقائي يستخدم لغة الواجهة.",
+    "defaultSubtitleLang": "الترجمات الافتراضية",
+    "yes": "نعم",
+    "no": "لا",
+    "progress": "التقدم",
+    "minThreshold": "الحد الأدنى (دقائق)",
+    "watchedThreshold": "حد المشاهدة (%)",
+    "retention": "الاحتفاظ (أسابيع)",
+    "historyMaxItems": "الحد الأقصى للسجل",
+    "focusOnCategories": "التركيز على الفئات",
+    "textSize": "حجم النص",
+    "textSmall": "صغير",
+    "textMedium": "متوسط",
+    "textLarge": "كبير",
+    "subtitles": "الترجمات",
+    "defaultSize": "الحجم الافتراضي",
+    "defaultStyle": "النمط الافتراضي",
+    "data": "البيانات",
+    "clearAllCaches": "مسح جميع الذاكرات المؤقتة",
+    "clearCache": "مسح ذاكرة TMDB",
+    "clearProgress": "مسح التقدم",
+    "clearFavorites": "مسح المفضلة",
+    "playlists": "قوائم التشغيل",
+    "managePlaylists": "إدارة قوائم التشغيل",
+    "addPlaylist": "إضافة قائمة تشغيل",
+    "editPlaylist": "تعديل قائمة التشغيل",
+    "newPlaylist": "قائمة تشغيل جديدة",
+    "playlistName": "الاسم (اختياري)",
+    "playlistType": "النوع",
+    "m3uUrl": "رابط M3U",
+    "services": "الخدمات (اختياري)",
+    "servicesEnabled": "تفعيل الخدمات",
+    "streamProxy": "وكيل البث",
+    "ttsVoice": "صوت TTS",
+    "ttsRate": "سرعة TTS",
+    "ttsVolume": "مستوى صوت TTS",
+    "ttsPitch": "نغمة TTS",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "active": "نشط",
+    "noPlaylists": "لا توجد قوائم تشغيل",
+    "remoteConfig": "التكوين عن بعد",
+    "waitingConfig": "في انتظار التكوين...",
+    "configReceived": "تم استلام التكوين!",
+    "remoteInstructions": "من هاتفك أو حاسوبك، امسح رمز QR أو افتح العنوان أدناه، ثم أدخل الرمز المعروض.",
+    "player": "المشغل",
+    "preferHtml5": "مشغل HTML5",
+    "preferHtml5Desc": "استخدم مشغل HTML5 بدلاً من مشغل سامسونج الأصلي. مطلوب لتعزيز الحوار.",
+    "dialogueBoost": "تعزيز الحوار",
+    "dialogueBoostDesc": "يحسن وضوح الحوار (ضغط ديناميكي). يعمل فقط مع مشغل HTML5.",
+    "categoryPatterns": "أنماط الفئات",
+    "categoryPatternsDesc": "كلمات مفتاحية لتصفية فئات VOD حسب القسم",
+    "editKeywords": "تعديل",
+    "addKeyword": "إضافة كلمة مفتاحية...",
+    "addKeywordBtn": "إضافة",
+    "noKeywords": "لا توجد كلمات مفتاحية",
+    "previewMatched": "الفئات المطابقة:",
+    "resetPatterns": "إعادة تعيين",
+    "noMatchingCategories": "لا توجد فئات مطابقة",
+    "noApiAvailable": "API غير متاح",
+    "failedToLoadCategories": "فشل تحميل الفئات",
+    "confirmDelete": "تأكيد الحذف",
+    "confirmDeletePlaylist": "حذف قائمة التشغيل هذه؟",
+    "addCategory": "إضافة فئة",
+    "categoryName": "الاسم",
+    "categoryIcon": "الأيقونة",
+    "useTMDB": "استخدام TMDB",
+    "confirmDeleteCategory": "حذف الفئة \"{name}\"؟",
+    "iconEmoji": "إيموجي",
+    "iconCustom": "مخصص",
+    "iconTextColor": "لون النص",
+    "iconBgColor": "الخلفية",
+    "iconPreview": "معاينة",
+    "expired": "منتهي الصلاحية",
+    "mergePlaylists": "دمج الكل",
+    "validation": {
+      "incomplete": "Incomplete",
+      "auth_failed": "Auth failed",
+      "parse_error": "Parse error",
+      "timeout": "Timeout",
+      "network": "Network error",
+      "invalid_format": "Invalid format",
+      "http_403": "Access denied",
+      "http_404": "Not found",
+      "http_500": "Server error"
+    },
+    "confirmDeleteHistory": "حذف سجل المشاهدة؟",
+    "freeboxTitle": "تحميل Freebox",
+    "freeboxEnabled": "تفعيل تحميل Freebox",
+    "freeboxHost": "عنوان Freebox",
+    "freeboxStatus": "الحالة",
+    "freeboxPair": "إقران",
+    "freeboxUnpair": "إلغاء الإقران",
+    "freeboxPaired": "مقترن",
+    "freeboxNotPaired": "غير مقترن",
+    "freeboxDesc": "تحميل محتوى VOD على Freebox",
+    "proxyRequired": "مطلوب بروكسي",
+    "playlistTypeProvider": "خادم API",
+    "playlistTypeM3u": "M3U",
+    "playlistDefault": "قائمة تشغيل {id}",
+    "moreItems": "+ {count} المزيد...",
+    "connectionMax": "اتصال: {count}",
+    "connectionActive": "({count} نشط)",
+    "myPlaylist": "قائمتي",
+    "categoryExample": "رياضة، أنمي...",
+    "streamCount": "{count} قنوات",
+    "freeboxBatch": "وضع التنزيل",
+    "freeboxBatchAll": "الكل دفعة واحدة",
+    "freeboxBatchSeq": "واحد تلو الآخر"
+  },
+  "player": {
+    "play": "تشغيل",
+    "continueAt": "متابعة",
+    "fromStart": "من البداية",
+    "markWatched": "تحديد كمشاهد",
+    "unavailable": "غير متاح",
+    "disabled": "معطل",
+    "audio": "صوت",
+    "subtitlesLabel": "الترجمات",
+    "noTracks": "لا توجد مسارات",
+    "noEpisodes": "لا توجد حلقات",
+    "hearingImpaired": "ضعاف السمع",
+    "audioDescription": "وصف صوتي",
+    "commentary": "تعليق",
+    "forced": "إجباري",
+    "unknown": "غير معروف",
+    "undetermined": "غير محدد",
+    "playbackError": "تعذر تشغيل هذا البث",
+    "unsupportedCodec": "الترميز {codec} غير مدعوم من هذا التلفزيون",
+    "tryingHtml5": "جاري تجربة مشغل بديل...",
+    "pauseDuration": "إيقاف مؤقت",
+    "returnToLive": "← مباشر",
+    "hourShort": "س",
+    "minShort": "د",
+    "replay": "Replay",
+    "displayAuto": "Auto",
+    "displayLetterbox": "Letterbox",
+    "displayStretch": "Stretch",
+    "displayZoom": "Zoom",
+    "tryingNative": "جاري تجربة المشغل الأصلي...",
+    "reconnecting": "جاري إعادة الاتصال...",
+    "streamUnavailable": "البث غير متوفر",
+    "connectionLimit": "تم الوصول إلى حد الاتصالات ({active}/{max}). أغلق البثوث الأخرى وحاول مرة أخرى",
+    "options": "خيارات"
+  },
+  "subtitleOptions": {
+    "title": "خيارات الترجمة",
+    "offset": "الإزاحة",
+    "size": "الحجم",
+    "small": "صغير",
+    "medium": "متوسط",
+    "large": "كبير",
+    "style": "النمط",
+    "shadow": "ظل",
+    "background": "خلفية",
+    "simple": "بسيط",
+    "close": "إغلاق"
+  },
+  "subtitleSearch": {
+    "searchSubDL": "بحث SubDL...",
+    "searchOpenSubtitles": "بحث OpenSubtitles...",
+    "back": "رجوع"
+  },
+  "details": {
+    "defaultVersion": "الإصدار الأصلي",
+    "director": "المخرج",
+    "creator": "المبدع",
+    "filmography": "الأعمال السينمائية",
+    "noDescription": "لا يوجد وصف",
+    "noBiography": "لا توجد سيرة ذاتية",
+    "season": "الموسم",
+    "episode": "الحلقة",
+    "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
+    "age": "{count} سنة"
+  },
+  "department": {
+    "Acting": "تمثيل",
+    "Directing": "إخراج",
+    "Production": "إنتاج",
+    "Writing": "كتابة",
+    "Camera": "تصوير",
+    "Editing": "مونتاج",
+    "Sound": "صوت",
+    "Art": "فن",
+    "Costume & Make-Up": "أزياء ومكياج",
+    "Crew": "طاقم",
+    "Visual Effects": "مؤثرات بصرية",
+    "Lighting": "إضاءة"
+  },
+  "series": {
+    "lastWatched": "آخر حلقة شوهدت:",
+    "newEpisode": "حلقة جديدة متاحة",
+    "newEpisodes": "حلقات جديدة متاحة",
+    "noNewEpisode": "لا توجد حلقة جديدة"
+  },
+  "modal": {
+    "resumeTitle": "استئناف التشغيل؟",
+    "resumeAt": "استئناف عند",
+    "continue": "متابعة",
+    "fromStart": "من البداية"
+  },
+  "disclaimer": {
+    "title": "إخلاء المسؤولية",
+    "text": "هذا التطبيق لا يوفر أي محتوى. المستخدمون هم المسؤولون الوحيدون عن المصادر التي يقومون بتكوينها ويجب عليهم التأكد من أن لديهم الحق القانوني للوصول إلى هذا المحتوى. المطور لا يتحمل أي مسؤولية عن استخدام هذا التطبيق.",
+    "accept": "فهمت"
+  },
+  "messages": {
+    "searching": "جاري البحث: \"{title}\"...",
+    "all": "الكل"
+  },
+  "categoryPatterns": {
+    "sport": [
+      "رياضة",
+      "sport",
+      "nba",
+      "nfl",
+      "موتو جي بي",
+      "فورمولا 1",
+      "f1",
+      "ملاكمة",
+      "مصارعة",
+      "ufc"
+    ],
+    "manga": [
+      "مانجا",
+      "manga",
+      "انمي",
+      "anime",
+      "رسوم متحركة"
+    ],
+    "entertainment": {
+      "concerts": [
+        "حفلة",
+        "حفل",
+        "concert"
+      ],
+      "theatre": [
+        "مسرح",
+        "theatre"
+      ],
+      "spectacles": [
+        "عرض",
+        "show",
+        "tv show",
+        "ترفيه"
+      ],
+      "blindtest": [
+        "blind test",
+        "مسابقة"
+      ],
+      "karaoke": [
+        "كاريوكي",
+        "karaoke"
+      ]
+    }
+  },
+  "cleanupPatterns": {
+    "langTags": [
+      "ARABIC",
+      "عربي",
+      "مدبلج",
+      "مترجم"
+    ],
+    "season": [
+      "موسم"
+    ],
+    "part": [
+      "جزء"
+    ],
+    "series": [
+      "مسلسلات",
+      "مسلسل"
+    ]
+  },
+  "catchup": {
+    "today": "اليوم",
+    "yesterday": "أمس"
+  },
+  "errors": {
+    "noData": "لا توجد بيانات متاحة"
+  },
+  "freebox": {
+    "downloadStarted": "بدأ التحميل",
+    "downloadError": "خطأ في التحميل",
+    "sessionExpired": "انتهت الجلسة، إعادة الاتصال...",
+    "pairingPending": "قم بالتأكيد على Freebox...",
+    "pairingGranted": "تم الإقران بنجاح!",
+    "pairingDenied": "تم رفض الإقران",
+    "pairingTimeout": "انتهت مهلة الإقران",
+    "downloadQueued": "التحميل في قائمة الانتظار. سيبدأ تلقائيًا.",
+    "downloadCancelled": "تم إلغاء التحميل",
+    "paused": "متوقف مؤقتًا",
+    "downloadsActive": "تحميلات",
+    "inQueue": "في الانتظار",
+    "seasonQueued": "{n} حلقات في قائمة الانتظار",
+    "allAlreadyQueued": "جميع الحلقات موجودة بالفعل في قائمة الانتظار أو قيد التحميل",
+    "selectEpisodes": "حدد الحلقات، ثم اضغط تنزيل",
+    "noEpisodesSelected": "لم يتم تحديد حلقات، تنزيل الكل",
+    "downloadAll": "الكل"
+  },
+  "time": {
+    "now": "الآن",
+    "minuteAgo": "منذ دقيقة",
+    "minutesAgo": "منذ {n} دقائق",
+    "hourAgo": "منذ ساعة",
+    "hoursAgo": "منذ {n} ساعات",
+    "dayAgo": "منذ يوم",
+    "daysAgo": "منذ {n} أيام",
+    "monthAgo": "منذ شهر",
+    "monthsAgo": "منذ {n} أشهر",
+    "yearShort": "سنة",
+    "yearsShort": "سنة",
+    "monthShort": "ش.",
+    "monthsShort": "أشهر",
+    "dayShort": "يوم",
+    "daysShort": "أيام"
+  }
+}

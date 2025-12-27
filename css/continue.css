@@ -1,0 +1,80 @@
+/* Continue Watching Screen */
+
+#continue-screen {
+    flex-direction: column;
+    padding: 60px;
+    background: linear-gradient(135deg, #080810 0%, #0c1025 100%);
+}
+
+#continue-screen h1 {
+    margin-bottom: 40px;
+    color: #00d4ff;
+}
+
+#continue-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#continue-empty {
+    color: #888;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.continue-item {
+    width: 280px;
+    margin: 15px;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.continue-item:focus,
+.continue-item.focused {
+    background: rgba(0, 212, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.continue-poster {
+    width: 260px;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    background-color: #333;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.continue-info {
+    padding: 0 5px;
+}
+
+.continue-title {
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.continue-delete {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(224, 80, 80, 0.9);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.continue-item:focus .continue-delete,
+.continue-item.focused .continue-delete {
+    opacity: 1;
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns="http://tizen.org/ns/packages" api-version="5.0" package="FreeIPTVAp" version="1.0.0">
+    <profile name="tv-samsung"/>
+    <ui-application appid="FreeIPTVAp.SamsungIPTV" exec="SamsungIPTV" type="webapp" multiple="false" taskmanage="true" nodisplay="false" launch_mode="single">
+        <icon>images/icon.png</icon>
+        <label>Samsung IPTV</label>
+    </ui-application>
+    <privileges>
+        <privilege>http://tizen.org/privilege/internet</privilege>
+        <privilege>http://tizen.org/privilege/tv.inputdevice</privilege>
+    </privileges>
+</manifest>
