@@ -1,0 +1,356 @@
+{
+  "iso639Codes": [
+    "pol",
+    "polish",
+    "polski"
+  ],
+  "localeName": "Polski",
+  "localeFlag": "🇵🇱",
+  "providerLangCode": "FR",
+  "contentTypePrefix": [
+    "Filmy",
+    "Film",
+    "Seriale",
+    "Serial"
+  ],
+  "app": {
+    "title": "Free IPTV",
+    "loading": "Ładowanie..."
+  },
+  "home": {
+    "live": "TV na żywo",
+    "movies": "Filmy",
+    "series": "Seriale",
+    "favorites": "Ulubione",
+    "sport": "Sport",
+    "concerts": "Koncerty",
+    "theater": "Teatr",
+    "theatre": "Teatr",
+    "shows": "Programy",
+    "spectacles": "Programy",
+    "blindtest": "Blind Test",
+    "karaoke": "Karaoke",
+    "settings": "Ustawienia",
+    "languageSelection": "Wybór języka",
+    "continueWatching": "Kontynuuj oglądanie",
+    "noContinue": "Brak treści w trakcie",
+    "noFavorites": "Brak ulubionych",
+    "manga": "Manga",
+    "entertainment": "Rozrywka",
+    "games": "Gry",
+    "continue": "Kontynuuj",
+    "tnt": "National TV",
+    "replay": "Catch-up",
+    "tvGuide": "TV Guide",
+    "cacheLoading": "Loading {name} ({step}/{total})...",
+    "pleaseWait": "Please wait, loading data...",
+    "history": "History",
+    "noHistory": "No viewing history"
+  },
+  "guide": {
+    "today": "Dziś",
+    "tomorrow": "Jutro",
+    "days": ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"],
+    "noProgram": "Brak programu"
+  },
+  "languages": {
+    "FR": "Francuski",
+    "IT": "Włoski",
+    "ES": "Hiszpański",
+    "PT": "Portugalski",
+    "DE": "Niemiecki",
+    "NL": "Holenderski",
+    "UK": "Angielski",
+    "GR": "Grecki",
+    "AR": "Arabski",
+    "TR": "Turecki",
+    "IND": "Indyjski",
+    "VO": "Oryginał",
+    "ALL": "Wszystkie"
+  },
+  "filters": {
+    "hideSD": "SD",
+    "hideHI": "HI",
+    "default": "Domyślne",
+    "aToZ": "A-Z",
+    "zToA": "Z-A",
+    "rating": "Ocena",
+    "recent": "Najnowsze",
+    "old": "Najstarsze",
+    "title": "Title...",
+    "person": "Osoba...",
+    "year": "Year..."
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "language": "Język",
+    "server": "Serwer IPTV",
+    "serverUrl": "URL serwera",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "apis": "API (opcjonalnie)",
+    "tmdbKey": "Klucz API TMDB",
+    "tmdbDesc": "Plakaty, opisy, obsada. themoviedb.org/settings/api",
+    "openSubtitlesKey": "Klucz API OpenSubtitles",
+    "openSubtitlesDesc": "Napisy. opensubtitles.com/consumers",
+    "subDLKey": "Klucz API SubDL",
+    "subDLDesc": "Napisy (alternatywa). subdl.com/panel/api",
+    "display": "Wyświetlanie",
+    "hideSDDefault": "Domyślnie ukryj SD",
+    "secureSubtitles": "Bezpieczne napisy",
+    "debugMode": "Tryb debugowania",
+    "hideHIDefault": "Domyślnie ukryj HI",
+    "providerLanguage": "Filtr VOD",
+    "providerAuto": "Auto (interfejs)",
+    "providerLanguageDesc": "Filtruj kategorie VOD według języka. Auto używa języka interfejsu.",
+    "yes": "Tak",
+    "no": "Nie",
+    "progress": "Postęp",
+    "minThreshold": "Minimalny próg (minuty)",
+    "watchedThreshold": "Próg obejrzenia (%)",
+    "retention": "Przechowywanie (tygodnie)",
+    "historyMaxItems": "Maksimum historii",
+    "focusOnCategories": "Skupienie na kategoriach",
+    "textSize": "Rozmiar tekstu",
+    "textSmall": "Mały",
+    "textMedium": "Średni",
+    "textLarge": "Duży",
+    "subtitles": "Napisy",
+    "defaultSize": "Domyślny rozmiar",
+    "defaultStyle": "Domyślny styl",
+    "data": "Dane",
+    "clearAllCaches": "Wyczyść wszystkie pamięci",
+    "clearCache": "Wyczyść pamięć TMDB",
+    "clearProgress": "Wyczyść postęp",
+    "clearFavorites": "Wyczyść ulubione",
+    "playlists": "Playlisty",
+    "managePlaylists": "Zarządzaj playlistami",
+    "addPlaylist": "Dodaj playlistę",
+    "editPlaylist": "Edytuj playlistę",
+    "newPlaylist": "Nowa playlista",
+    "playlistName": "Nazwa (opcjonalnie)",
+    "playlistType": "Typ",
+    "m3uUrl": "URL M3U",
+    "proxyUrl": "URL proxy",
+    "proxyDesc": "Proxy do omijania ograniczeń sieciowych (opcjonalne)",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "active": "Aktywna",
+    "noPlaylists": "Brak skonfigurowanych playlist",
+    "remoteConfig": "Konfiguracja zdalna",
+    "remoteConfigDesc": "Zeskanuj ten kod QR lub odwiedź ten URL z telefonu lub komputera:",
+    "importCodeDesc": "Lub wprowadź kod konfiguracji:",
+    "import": "Importuj",
+    "back": "Wstecz",
+    "importCodePlaceholder": "Kod...",
+    "importSuccess": "Konfiguracja zaimportowana pomyślnie!",
+    "importError": "Błąd importu",
+    "waitingConfig": "Oczekiwanie na konfigurację...",
+    "configReceived": "Konfiguracja otrzymana!",
+    "remoteInstructions": "Na telefonie lub komputerze zeskanuj kod QR lub otwórz poniższy adres, a następnie wprowadź wyświetlony kod.",
+    "player": "Odtwarzacz",
+    "preferHtml5": "Odtwarzacz HTML5",
+    "preferHtml5Desc": "Używaj odtwarzacza HTML5 zamiast natywnego Samsung. Wymagane dla boost dialogów.",
+    "dialogueBoost": "Boost dialogów",
+    "dialogueBoostDesc": "Poprawia wyrazistość dialogów (kompresja dynamiczna). Działa tylko z odtwarzaczem HTML5.",
+    "categoryPatterns": "Wzorce kategorii",
+    "categoryPatternsDesc": "Słowa kluczowe do filtrowania kategorii VOD według sekcji",
+    "editKeywords": "Edytuj",
+    "addKeyword": "Dodaj słowo kluczowe...",
+    "addKeywordBtn": "Dodaj",
+    "noKeywords": "Brak słów kluczowych",
+    "previewMatched": "Pasujące kategorie:",
+    "resetPatterns": "Resetuj",
+    "noMatchingCategories": "Brak pasujących kategorii",
+    "noApiAvailable": "API niedostępne",
+    "failedToLoadCategories": "Nie udało się załadować kategorii",
+    "confirmDelete": "Potwierdź usunięcie",
+    "confirmDeletePlaylist": "Usunąć tę playlistę?",
+    "addCategory": "Dodaj kategorię",
+    "categoryName": "Nazwa",
+    "categoryIcon": "Ikona",
+    "iconColors": "Kolory",
+    "useTMDB": "Użyj TMDB",
+    "confirmDeleteCategory": "Usunąć kategorię \"{name}\"?",
+    "iconEmoji": "Emoji",
+    "iconCustom": "Niestandardowa",
+    "iconText": "Tekst",
+    "iconTextColor": "Kolor tekstu",
+    "iconBgColor": "Tło",
+    "iconPreview": "Podgląd",
+    "expired": "Expired",
+    "mergePlaylists": "Merge all",
+    "validation": {
+      "incomplete": "Incomplete",
+      "auth_failed": "Auth failed",
+      "parse_error": "Parse error",
+      "timeout": "Timeout",
+      "network": "Network error",
+      "invalid_format": "Invalid format",
+      "http_403": "Access denied",
+      "http_404": "Not found",
+      "http_500": "Server error"
+    },
+    "confirmDeleteHistory": "Delete viewing history?"
+  },
+  "player": {
+    "play": "Odtwórz",
+    "continueAt": "Kontynuuj",
+    "fromStart": "Od początku",
+    "markWatched": "Oznacz jako obejrzane",
+    "unavailable": "Niedostępne",
+    "disabled": "Wyłączone",
+    "external": "Zewnętrzne",
+    "audio": "Audio",
+    "subtitlesLabel": "Napisy",
+    "noTracks": "Brak dostępnych ścieżek",
+    "noEpisodes": "Brak dostępnych odcinków",
+    "hearingImpaired": "Dla niesłyszących",
+    "audioDescription": "Audiodeskrypcja",
+    "commentary": "Komentarz",
+    "forced": "Wymuszony",
+    "unknown": "Nieznany",
+    "undetermined": "Nieokreślony",
+    "playbackError": "Nie można odtworzyć tego strumienia",
+    "unsupportedCodec": "Kodek {codec} nie jest obsługiwany przez ten TV",
+    "tryingHtml5": "Próbuję alternatywnego odtwarzacza...",
+    "favorite": "Ulubiony",
+    "pauseDuration": "Pauza",
+    "returnToLive": "→ Na żywo",
+    "hourShort": "h",
+    "minShort": "min",
+    "replay": "Replay",
+    "displayAuto": "Auto",
+    "displayLetterbox": "Letterbox",
+    "displayStretch": "Stretch",
+    "displayZoom": "Zoom",
+    "tryingNative": "Trying native player...",
+    "reconnecting": "Reconnecting..."
+  },
+  "subtitleOptions": {
+    "title": "Opcje napisów",
+    "offset": "Przesunięcie",
+    "size": "Rozmiar",
+    "small": "Mały",
+    "medium": "Średni",
+    "large": "Duży",
+    "style": "Styl",
+    "shadow": "Cień",
+    "background": "Tło",
+    "simple": "Prosty",
+    "close": "Zamknij"
+  },
+  "subtitleSearch": {
+    "searchSubDL": "Szukaj SubDL...",
+    "searchOpenSubtitles": "Szukaj OpenSubtitles...",
+    "back": "Wstecz"
+  },
+  "details": {
+    "director": "Reżyser",
+    "creator": "Twórca",
+    "cast": "Obsada",
+    "filmography": "Filmografia",
+    "noDescription": "Brak opisu",
+    "noBiography": "Brak biografii",
+    "season": "Sezon",
+    "episode": "Odcinek",
+    "continueCount": "Kontynuuj",
+    "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy."
+  },
+  "series": {
+    "lastWatched": "Ostatni obejrzany odcinek:",
+    "newEpisode": "nowy odcinek dostępny",
+    "newEpisodes": "nowe odcinki dostępne",
+    "noNewEpisode": "brak nowego odcinka"
+  },
+  "modal": {
+    "resumeTitle": "Wznowić odtwarzanie?",
+    "resumeAt": "Wznów od",
+    "continue": "Kontynuuj",
+    "fromStart": "Od początku"
+  },
+  "disclaimer": {
+    "title": "Zastrzeżenie",
+    "text": "Ta aplikacja nie dostarcza żadnych treści. Użytkownicy są wyłącznie odpowiedzialni za źródła, które konfigurują i muszą upewnić się, że mają prawo do dostępu do takich treści. Deweloper nie ponosi odpowiedzialności za sposób korzystania z tej aplikacji.",
+    "accept": "Rozumiem"
+  },
+  "messages": {
+    "searching": "Szukam: \"{title}\"...",
+    "all": "Wszystkie"
+  },
+  "categoryPatterns": {
+    "sport": [
+      "sport",
+      "nba",
+      "nfl",
+      "moto gp",
+      "formula 1",
+      "f1",
+      "boks",
+      "wrestling",
+      "ufc",
+      "walki"
+    ],
+    "manga": [
+      "manga",
+      "anime",
+      "animacja"
+    ],
+    "entertainment": {
+      "concerts": [
+        "koncert",
+        "concert",
+        "muzyka na zywo"
+      ],
+      "theatre": [
+        "teatr",
+        "theatre"
+      ],
+      "spectacles": [
+        "spektakl",
+        "show",
+        "tv show",
+        "rozrywka"
+      ],
+      "blindtest": [
+        "blind test",
+        "quiz"
+      ],
+      "karaoke": [
+        "karaoke"
+      ]
+    }
+  },
+  "cleanupPatterns": {
+    "langTags": [
+      "POLISH",
+      "POLSKI",
+      "PL",
+      "LEKTOR"
+    ],
+    "season": [
+      "Sezon"
+    ],
+    "part": [
+      "Część"
+    ],
+    "series": [
+      "Seriale",
+      "Serial"
+    ]
+  },
+  "favorites": {
+    "edit": "Edit",
+    "done": "Done",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
+  },
+  "catchup": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "errors": {
+    "noData": "No data available"
+  }
+}
