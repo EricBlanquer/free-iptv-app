@@ -1,0 +1,353 @@
+{
+  "iso639Codes": [
+    "dut",
+    "nld",
+    "dutch",
+    "nederlands"
+  ],
+  "localeName": "Nederlands",
+  "localeFlag": "🇳🇱",
+  "providerLangCode": "NL",
+  "contentTypePrefix": [
+    "Films",
+    "Film",
+    "Series",
+    "Serie"
+  ],
+  "app": {
+    "title": "Free IPTV",
+    "loading": "Laden..."
+  },
+  "home": {
+    "live": "Live TV",
+    "movies": "Films",
+    "series": "Series",
+    "favorites": "Favorieten",
+    "sport": "Sport",
+    "concerts": "Concerten",
+    "theater": "Theater",
+    "theatre": "Theater",
+    "shows": "Shows",
+    "spectacles": "Shows",
+    "blindtest": "Blind Test",
+    "karaoke": "Karaoke",
+    "settings": "Instellingen",
+    "languageSelection": "Taalkeuze",
+    "continueWatching": "Verder kijken",
+    "noContinue": "Geen lopende inhoud",
+    "noFavorites": "Geen favorieten",
+    "manga": "Manga",
+    "entertainment": "Entertainment",
+    "games": "Spelletjes",
+    "continue": "Doorgaan",
+    "tnt": "National TV",
+    "replay": "Catch-up",
+    "tvGuide": "TV Guide",
+    "cacheLoading": "Loading {name} ({step}/{total})...",
+    "pleaseWait": "Please wait, loading data...",
+    "history": "History",
+    "noHistory": "No viewing history"
+  },
+  "guide": {
+    "today": "Vandaag",
+    "tomorrow": "Morgen",
+    "days": ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"],
+    "noProgram": "Geen programma"
+  },
+  "languages": {
+    "FR": "Frans",
+    "IT": "Italiaans",
+    "ES": "Spaans",
+    "PT": "Portugees",
+    "DE": "Duits",
+    "NL": "Nederlands",
+    "UK": "Engels",
+    "GR": "Grieks",
+    "AR": "Arabisch",
+    "TR": "Turks",
+    "IND": "Indiaas",
+    "VO": "Origineel",
+    "ALL": "Alle"
+  },
+  "filters": {
+    "hideSD": "SD",
+    "hideHI": "HI",
+    "default": "Standaard",
+    "aToZ": "A-Z",
+    "zToA": "Z-A",
+    "rating": "Beoordeling",
+    "recent": "Recent",
+    "old": "Oudste",
+    "title": "Title...",
+    "actor": "Actor...",
+    "year": "Year..."
+  },
+  "settings": {
+    "title": "Instellingen",
+    "language": "Taal",
+    "server": "IPTV Server",
+    "serverUrl": "Server URL",
+    "username": "Gebruikersnaam",
+    "password": "Wachtwoord",
+    "apis": "API's (optioneel)",
+    "tmdbKey": "TMDB API Sleutel",
+    "tmdbDesc": "Posters, beschrijvingen, cast. themoviedb.org/settings/api",
+    "openSubtitlesKey": "OpenSubtitles API Sleutel",
+    "openSubtitlesDesc": "Ondertitels. opensubtitles.com/consumers",
+    "subDLKey": "SubDL API Sleutel",
+    "subDLDesc": "Ondertitels (alternatief). subdl.com/panel/api",
+    "display": "Weergave",
+    "hideSDDefault": "SD standaard verbergen",
+    "secureSubtitles": "Beveiligde ondertitels",
+    "debugMode": "Debug modus",
+    "hideHIDefault": "HI standaard verbergen",
+    "providerLanguage": "VOD filter",
+    "providerAuto": "Auto (interface)",
+    "providerLanguageDesc": "Filter VOD-categorieën op taal. Auto gebruikt de interfacetaal.",
+    "yes": "Ja",
+    "no": "Nee",
+    "progress": "Voortgang",
+    "minThreshold": "Minimum drempel (minuten)",
+    "watchedThreshold": "Bekeken drempel (%)",
+    "retention": "Bewaring (weken)",
+    "historyMaxItems": "Geschiedenis max",
+    "focusOnCategories": "Focus op categorieën",
+    "textSize": "Tekstgrootte",
+    "textSmall": "Klein",
+    "textMedium": "Gemiddeld",
+    "textLarge": "Groot",
+    "subtitles": "Ondertitels",
+    "defaultSize": "Standaard grootte",
+    "defaultStyle": "Standaard stijl",
+    "data": "Gegevens",
+    "clearAllCaches": "Alle caches wissen",
+    "clearCache": "TMDB cache wissen",
+    "clearProgress": "Voortgang wissen",
+    "clearFavorites": "Favorieten wissen",
+    "playlists": "Afspeellijsten",
+    "managePlaylists": "Afspeellijsten beheren",
+    "addPlaylist": "Afspeellijst toevoegen",
+    "editPlaylist": "Afspeellijst bewerken",
+    "newPlaylist": "Nieuwe afspeellijst",
+    "playlistName": "Naam (optioneel)",
+    "playlistType": "Type",
+    "m3uUrl": "M3U URL",
+    "proxyUrl": "Proxy URL",
+    "proxyDesc": "Proxy om netwerkbeperkingen te omzeilen (optioneel)",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "active": "Actief",
+    "noPlaylists": "Geen afspeellijsten geconfigureerd",
+    "remoteConfig": "Configuratie op afstand",
+    "remoteConfigDesc": "Scan deze QR-code of bezoek deze URL vanaf uw telefoon of computer:",
+    "importCodeDesc": "Of voer de configuratiecode in:",
+    "import": "Importeren",
+    "back": "Terug",
+    "importCodePlaceholder": "Code...",
+    "importSuccess": "Configuratie succesvol geïmporteerd!",
+    "importError": "Importfout",
+    "waitingConfig": "Wachten op configuratie...",
+    "configReceived": "Configuratie ontvangen!",
+    "remoteInstructions": "Scan op uw telefoon of computer de QR-code of open het onderstaande adres en voer vervolgens de weergegeven code in.",
+    "player": "Speler",
+    "preferHtml5": "HTML5-speler",
+    "preferHtml5Desc": "Gebruik HTML5-speler in plaats van de native Samsung-speler. Vereist voor dialoogboost.",
+    "dialogueBoost": "Dialoogboost",
+    "dialogueBoostDesc": "Verbetert de helderheid van dialogen (dynamische compressie). Werkt alleen met HTML5-speler.",
+    "categoryPatterns": "Categoriepatronen",
+    "categoryPatternsDesc": "Trefwoorden om VOD-categorieën per sectie te filteren",
+    "editKeywords": "Bewerken",
+    "addKeyword": "Trefwoord toevoegen...",
+    "addKeywordBtn": "Toevoegen",
+    "noKeywords": "Geen trefwoorden",
+    "previewMatched": "Overeenkomende categorieën:",
+    "resetPatterns": "Herstellen",
+    "noMatchingCategories": "Geen overeenkomende categorieën",
+    "noApiAvailable": "API niet beschikbaar",
+    "failedToLoadCategories": "Categorieën laden mislukt",
+    "confirmDelete": "Verwijdering bevestigen",
+    "confirmDeletePlaylist": "Deze afspeellijst verwijderen?",
+    "addCategory": "Categorie toevoegen",
+    "categoryName": "Naam",
+    "categoryIcon": "Pictogram",
+    "iconColors": "Kleuren",
+    "useTMDB": "TMDB gebruiken",
+    "confirmDeleteCategory": "Categorie \"{name}\" verwijderen?",
+    "iconEmoji": "Emoji",
+    "iconCustom": "Aangepast",
+    "iconText": "Tekst",
+    "iconTextColor": "Tekstkleur",
+    "iconBgColor": "Achtergrond",
+    "iconPreview": "Voorbeeld",
+    "expired": "Expired",
+    "mergePlaylists": "Merge all",
+    "validation": {
+      "incomplete": "Incomplete",
+      "auth_failed": "Auth failed",
+      "parse_error": "Parse error",
+      "timeout": "Timeout",
+      "network": "Network error",
+      "invalid_format": "Invalid format",
+      "http_403": "Access denied",
+      "http_404": "Not found",
+      "http_500": "Server error"
+    },
+    "confirmDeleteHistory": "Delete viewing history?"
+  },
+  "player": {
+    "play": "Afspelen",
+    "continueAt": "Doorgaan",
+    "fromStart": "Vanaf begin",
+    "markWatched": "Markeren als bekeken",
+    "unavailable": "Niet beschikbaar",
+    "disabled": "Uitgeschakeld",
+    "external": "Extern",
+    "audio": "Audio",
+    "subtitlesLabel": "Ondertitels",
+    "noTracks": "Geen tracks beschikbaar",
+    "noEpisodes": "Geen afleveringen beschikbaar",
+    "hearingImpaired": "Slechthorend",
+    "audioDescription": "Audiobeschrijving",
+    "commentary": "Commentaar",
+    "forced": "Geforceerd",
+    "unknown": "Onbekend",
+    "undetermined": "Onbepaald",
+    "playbackError": "Kan deze stream niet afspelen",
+    "unsupportedCodec": "Codec {codec} niet ondersteund door deze TV",
+    "tryingHtml5": "Alternatieve speler proberen...",
+    "favorite": "Favoriet",
+    "pauseDuration": "Pauze",
+    "returnToLive": "→ Live",
+    "hourShort": "u",
+    "minShort": "min",
+    "replay": "Replay",
+    "displayAuto": "Auto",
+    "displayLetterbox": "Letterbox",
+    "displayStretch": "Stretch",
+    "displayZoom": "Zoom",
+    "tryingNative": "Trying native player...",
+    "reconnecting": "Reconnecting..."
+  },
+  "subtitleOptions": {
+    "title": "Ondertitel opties",
+    "offset": "Offset",
+    "size": "Grootte",
+    "small": "Klein",
+    "medium": "Middel",
+    "large": "Groot",
+    "style": "Stijl",
+    "shadow": "Schaduw",
+    "background": "Achtergrond",
+    "simple": "Eenvoudig",
+    "close": "Sluiten"
+  },
+  "subtitleSearch": {
+    "searchSubDL": "Zoek SubDL...",
+    "searchOpenSubtitles": "Zoek OpenSubtitles...",
+    "back": "Terug"
+  },
+  "details": {
+    "director": "Regisseur",
+    "creator": "Maker",
+    "cast": "Cast",
+    "filmography": "Filmografie",
+    "noDescription": "Geen beschrijving beschikbaar",
+    "noBiography": "Geen biografie beschikbaar",
+    "season": "Seizoen",
+    "episode": "Aflevering",
+    "continueCount": "Doorgaan",
+    "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven."
+  },
+  "series": {
+    "lastWatched": "Laatst bekeken aflevering:",
+    "newEpisode": "nieuwe aflevering beschikbaar",
+    "newEpisodes": "nieuwe afleveringen beschikbaar",
+    "noNewEpisode": "geen nieuwe aflevering"
+  },
+  "modal": {
+    "resumeTitle": "Afspelen hervatten?",
+    "resumeAt": "Hervatten bij",
+    "continue": "Doorgaan",
+    "fromStart": "Vanaf begin"
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "text": "Deze applicatie levert geen inhoud. Gebruikers zijn zelf verantwoordelijk voor de bronnen die zij configureren en moeten ervoor zorgen dat zij het wettelijke recht hebben om toegang te krijgen tot dergelijke inhoud. De ontwikkelaar aanvaardt geen verantwoordelijkheid voor het gebruik van deze applicatie.",
+    "accept": "Begrepen"
+  },
+  "messages": {
+    "searching": "Zoeken: \"{title}\"...",
+    "all": "Alle"
+  },
+  "categoryPatterns": {
+    "sport": [
+      "sport",
+      "nba",
+      "nfl",
+      "moto gp",
+      "formule 1",
+      "f1",
+      "boksen",
+      "worstelen",
+      "ufc"
+    ],
+    "manga": [
+      "manga",
+      "anime",
+      "animatie"
+    ],
+    "entertainment": {
+      "concerts": [
+        "concert",
+        "live muziek"
+      ],
+      "theatre": [
+        "theater",
+        "theatre"
+      ],
+      "spectacles": [
+        "show",
+        "tv show",
+        "variete"
+      ],
+      "blindtest": [
+        "blind test",
+        "quiz"
+      ],
+      "karaoke": [
+        "karaoke"
+      ]
+    }
+  },
+  "cleanupPatterns": {
+    "langTags": [
+      "DUTCH",
+      "NEDERLANDS",
+      "NL"
+    ],
+    "season": [
+      "Seizoen"
+    ],
+    "part": [
+      "Deel"
+    ],
+    "series": [
+      "Series",
+      "Serie"
+    ]
+  },
+  "favorites": {
+    "edit": "Edit",
+    "done": "Done",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
+  },
+  "catchup": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "errors": {
+    "noData": "No data available"
+  }
+}
