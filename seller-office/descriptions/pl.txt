@@ -1,0 +1,19 @@
+Free IPTV - Streamuj swoje tresci
+
+Streamuj swoje osobiste tresci IPTV na telewizorze Samsung. Ten odtwarzacz obsluguje playlisty M3U, dajac pelna kontrole nad biblioteka mediow.
+
+Funkcje:
+- Kanaly TV na zywo z przewodnikiem EPG
+- Filmy (VOD) z plakatami
+- Seriale TV z nawigacja po sezonach/odcinkach
+- Obsluga wielu sciezek audio
+- Obsluga napisow (wbudowanych i zewnetrznych)
+- Kontynuuj ogladanie - wznow od miejsca, w ktorym skonczyles
+- Ulubione i historia ogladania
+- Tryby widoku siatki i listy
+- Opcje wyszukiwania i filtrowania
+- 11 jezykow interfejsu
+
+Aplikacja nie dostarcza zadnych tresci. Uzytkownicy musza skonfigurowac wlasne playlisty IPTV i sa odpowiedzialni za upewnienie sie, ze maja prawo dostepu do takich tresci.
+
+Wymagane: Polaczenie internetowe, playlista M3U

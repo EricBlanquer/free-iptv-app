@@ -1,0 +1,19 @@
+Free IPTV - Iceriklerinizi izleyin
+
+Kisisel IPTV iceriklerinizi Samsung TV'nizde izleyin. Bu oynatici M3U calisma listelerini destekler ve medya kutuphaneniz uzerinde tam kontrol saglar.
+
+Ozellikler:
+- EPG rehberli canli TV kanallari
+- Afisli filmler (VOD)
+- Sezon/bolum gezintili TV dizileri
+- Coklu ses parcasi destegi
+- Altyazi destegi (gomulu ve harici)
+- Izlemeye devam et - kaldiginiz yerden devam edin
+- Favoriler ve izleme gecmisi
+- Izgara ve liste gorunum modlari
+- Arama ve filtreleme secenekleri
+- 11 arayuz dili
+
+Uygulama herhangi bir icerik saglamamaktadir. Kullanicilar kendi IPTV calisma listelerini yapilandirmali ve bu tur iceriklere erisim icin yasal hakka sahip olduklarindan emin olmalidir.
+
+Gereksinimler: Internet baglantisi, M3U calisma listesi

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free IPTV - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #080810;
+            color: #e0dcd6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #00d4ff; margin-bottom: 20px; }
+        h2 { color: #ffd700; margin: 30px 0 15px; }
+        .login-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .login-box input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 15px;
+            width: 300px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .login-box button, .gen-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: #00d4ff;
+            color: #000;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .gen-btn {
+            background: #4CAF50;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            text-align: left;
+            color: #888;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+            font-weight: 400;
+        }
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        .code {
+            font-family: 'JetBrains Mono', monospace;
+            color: #ffd700;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+        .used { color: #4CAF50; }
+        .unused { color: #888; }
+        .revoke-btn {
+            padding: 4px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,82,82,0.3);
+            background: rgba(255,82,82,0.1);
+            color: #ff5252;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .revoke-btn:hover { background: rgba(255,82,82,0.25); }
+        .device-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #aaa;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .email { color: #00d4ff; }
+        .date { color: #888; font-size: 13px; }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin: 5px;
+            text-align: center;
+        }
+        .stat-value { font-size: 28px; font-weight: 600; color: #00d4ff; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+        #content { display: none; }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal-box {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            min-width: 320px;
+        }
+        .modal-box p { margin-bottom: 20px; color: #ccc; }
+        .modal-box .code { font-size: 18px; }
+        .modal-btns { display: flex; justify-content: center; }
+        .modal-btns button {
+            padding: 8px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 6px;
+        }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: #aaa; }
+        .btn-danger { background: rgba(255,82,82,0.2); color: #ff5252; border: 1px solid rgba(255,82,82,0.3) !important; }
+        .btn-confirm { background: rgba(76,175,80,0.2); color: #4CAF50; border: 1px solid rgba(76,175,80,0.3) !important; }
+        .generated-code {
+            background: rgba(76,175,80,0.15);
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .generated-code .code { font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="display: inline-block;">Free IPTV Admin</h1>
+        <button id="logout-btn" class="revoke-btn" style="display: none; margin-left: 15px; vertical-align: middle;" onclick="logout()">Logout</button>
+
+        <div id="login" class="login-box">
+            <input type="password" id="secret-input" placeholder="Admin secret">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="content">
+            <div class="stats" id="stats"></div>
+
+            <h2>Devices</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>License</th>
+                        <th>Location</th>
+                        <th>Install Date</th>
+                        <th>Licensed At</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="devices-body"></tbody>
+            </table>
+
+            <h2>Unused Codes</h2>
+            <button class="gen-btn" onclick="generateCode()">Generate new code</button>
+            <div id="gen-result"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="unused-codes-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="confirm-overlay" class="modal-overlay">
+        <div class="modal-box">
+            <p id="confirm-message"></p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+                <button id="confirm-action-btn" class="btn-danger" onclick="execConfirm()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var API_URL = 'https://iptv.blanquer.org/premium-api.php';
+        var secret = '';
+        var confirmCallback = null;
+
+        function logout() {
+            localStorage.removeItem('adminSecret');
+            secret = '';
+            document.getElementById('login').style.display = '';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('secret-input').value = '';
+        }
+
+        function login() {
+            secret = document.getElementById('secret-input').value.trim();
+            if (!secret) return;
+            localStorage.setItem('adminSecret', secret);
+            loadData();
+        }
+
+        document.getElementById('secret-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        var saved = localStorage.getItem('adminSecret');
+        if (saved) {
+            secret = saved;
+            document.getElementById('login').style.display = 'none';
+            loadData();
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '-';
+            var d = new Date(ts);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+        }
+
+        function loadData() {
+            Promise.all([
+                fetch(API_URL + '?action=admin-licenses', { headers: { 'X-Admin-Secret': secret } }).then(function(r) { return r.json(); }),
+                fetch(API_URL + '?action=admin-devices', { headers: { 'X-Admin-Secret': secret } }).then(function(r) { return r.json(); })
+            ]).then(function(results) {
+                var licensesData = results[0];
+                var devicesData = results[1];
+
+                if (licensesData.error) {
+                    localStorage.removeItem('adminSecret');
+                    document.getElementById('login').style.display = '';
+                    document.getElementById('content').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('logout-btn').style.display = '';
+
+                var licenses = licensesData.licenses || [];
+                var devices = devicesData.devices || [];
+
+                var totalLicenses = licenses.length;
+                var usedLicenses = licenses.filter(function(l) { return l.used; }).length;
+                var totalDevices = devices.length;
+                var licensedDevices = devices.filter(function(d) { return d.licenseCode; }).length;
+
+                var statsEl = document.getElementById('stats');
+                statsEl.textContent = '';
+
+                var statsData = [
+                    { value: totalDevices, label: 'Devices' },
+                    { value: licensedDevices, label: 'Licensed' },
+                    { value: totalDevices - licensedDevices, label: 'Unlicensed' },
+                    { value: totalLicenses - usedLicenses, label: 'Available codes' }
+                ];
+
+                statsData.forEach(function(s) {
+                    var box = document.createElement('div');
+                    box.className = 'stat-box';
+                    var val = document.createElement('div');
+                    val.className = 'stat-value';
+                    val.textContent = s.value;
+                    var lbl = document.createElement('div');
+                    lbl.className = 'stat-label';
+                    lbl.textContent = s.label;
+                    box.appendChild(val);
+                    box.appendChild(lbl);
+                    statsEl.appendChild(box);
+                });
+
+                var licenseByDevice = {};
+                licenses.forEach(function(lic) {
+                    if (lic.used && lic.deviceId) licenseByDevice[lic.deviceId] = lic;
+                });
+
+                var dbody = document.getElementById('devices-body');
+                dbody.textContent = '';
+                devices.forEach(function(dev) {
+                    var tr = document.createElement('tr');
+                    var lic = licenseByDevice[dev.deviceId];
+
+                    var tdDev = document.createElement('td');
+                    tdDev.className = 'device-id';
+                    tdDev.textContent = dev.deviceId;
+                    tdDev.title = dev.deviceId;
+
+                    var tdLic = document.createElement('td');
+                    if (dev.licenseCode) {
+                        var licSpan = document.createElement('span');
+                        licSpan.className = 'code';
+                        licSpan.textContent = dev.licenseCode;
+                        tdLic.appendChild(licSpan);
+                    }
+                    else {
+                        var genBtn = document.createElement('button');
+                        genBtn.className = 'gen-btn';
+                        genBtn.style.margin = '0';
+                        genBtn.style.padding = '4px 10px';
+                        genBtn.style.fontSize = '12px';
+                        genBtn.textContent = 'Generate';
+                        genBtn.dataset.deviceId = dev.deviceId;
+                        genBtn.onclick = function() { licenseDevice(this.dataset.deviceId); };
+                        tdLic.appendChild(genBtn);
+                    }
+
+                    var tdLoc = document.createElement('td');
+                    tdLoc.style.cssText = 'color:#888;font-size:12px;';
+                    tdLoc.textContent = dev.location || '-';
+
+                    var tdInstall = document.createElement('td');
+                    tdInstall.className = 'date';
+                    tdInstall.textContent = formatDate(dev.installDate);
+
+                    var tdLicAt = document.createElement('td');
+                    tdLicAt.className = 'date';
+                    tdLicAt.textContent = formatDate(dev.licensedAt);
+
+                    var tdRevoke = document.createElement('td');
+                    if (dev.licenseCode) {
+                        var revokeBtn = document.createElement('button');
+                        revokeBtn.className = 'revoke-btn';
+                        revokeBtn.textContent = 'Revoke';
+                        revokeBtn.dataset.code = dev.licenseCode;
+                        revokeBtn.onclick = function() { revokeCode(this.dataset.code); };
+                        tdRevoke.appendChild(revokeBtn);
+                    }
+
+                    var tdDel = document.createElement('td');
+                    var delBtn = document.createElement('button');
+                    delBtn.className = 'revoke-btn';
+                    delBtn.textContent = 'Delete';
+                    delBtn.dataset.deviceId = dev.deviceId;
+                    delBtn.onclick = function() { deleteDevice(this.dataset.deviceId); };
+                    tdDel.appendChild(delBtn);
+
+                    tr.appendChild(tdDev);
+                    tr.appendChild(tdLic);
+                    tr.appendChild(tdLoc);
+                    tr.appendChild(tdInstall);
+                    tr.appendChild(tdLicAt);
+                    tr.appendChild(tdRevoke);
+                    tr.appendChild(tdDel);
+                    dbody.appendChild(tr);
+                });
+
+                var unusedBody = document.getElementById('unused-codes-body');
+                unusedBody.textContent = '';
+                var unusedCodes = licenses.filter(function(l) { return !l.used; });
+                unusedCodes.forEach(function(lic) {
+                    var tr = document.createElement('tr');
+                    var tdCode = document.createElement('td');
+                    var codeSpan = document.createElement('span');
+                    codeSpan.className = 'code';
+                    codeSpan.textContent = lic.code;
+                    tdCode.appendChild(codeSpan);
+                    var tdCreated = document.createElement('td');
+                    tdCreated.className = 'date';
+                    tdCreated.textContent = formatDate(lic.createdAt);
+                    var tdAction = document.createElement('td');
+                    var revokeBtn = document.createElement('button');
+                    revokeBtn.className = 'revoke-btn';
+                    revokeBtn.textContent = 'Delete';
+                    revokeBtn.dataset.code = lic.code;
+                    revokeBtn.onclick = function() { revokeCode(this.dataset.code); };
+                    tdAction.appendChild(revokeBtn);
+                    tr.appendChild(tdCode);
+                    tr.appendChild(tdCreated);
+                    tr.appendChild(tdAction);
+                    unusedBody.appendChild(tr);
+                });
+            }).catch(function(err) {
+                alert('Error: ' + err.message);
+            });
+        }
+
+        function showConfirm(message, callback, actionLabel, danger) {
+            document.getElementById('confirm-message').textContent = message;
+            var btn = document.getElementById('confirm-action-btn');
+            btn.textContent = actionLabel || 'Confirm';
+            btn.className = danger ? 'btn-danger' : 'btn-confirm';
+            document.getElementById('confirm-overlay').classList.add('visible');
+            confirmCallback = callback;
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirm-overlay').classList.remove('visible');
+            confirmCallback = null;
+        }
+
+        function execConfirm() {
+            var cb = confirmCallback;
+            closeConfirm();
+            if (cb) cb();
+        }
+
+        function deleteDevice(deviceId) {
+            showConfirm('Delete device ' + deviceId + '?', function() {
+                fetch(API_URL + '?action=admin-device-delete', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deviceId: deviceId })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.ok) loadData();
+                })
+                .catch(function() {});
+            }, 'Delete', true);
+        }
+
+        function revokeCode(code) {
+            showConfirm('Revoke license ' + code + '?', function() {
+                fetch(API_URL + '?action=license-revoke', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.ok) {
+                        loadData();
+                    }
+                })
+                .catch(function() {});
+            }, 'Revoke', true);
+        }
+
+        function licenseDevice(deviceId) {
+            showConfirm('Generate and assign a license to ' + deviceId + '?', function() {
+                fetch(API_URL + '?action=license-generate', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.code) return;
+                    return fetch(API_URL + '?action=admin-license-assign', {
+                        method: 'POST',
+                        headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: data.code, deviceId: deviceId })
+                    });
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.ok) loadData();
+                })
+                .catch(function() {});
+            });
+        }
+
+        function generateCode() {
+            var resultEl = document.getElementById('gen-result');
+            resultEl.textContent = 'Generating...';
+            fetch(API_URL + '?action=license-generate', {
+                method: 'POST',
+                headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.code) {
+                    resultEl.textContent = '';
+                    var box = document.createElement('div');
+                    box.className = 'generated-code';
+                    var codeSpan = document.createElement('span');
+                    codeSpan.className = 'code';
+                    codeSpan.textContent = data.code;
+                    box.appendChild(codeSpan);
+                    resultEl.appendChild(box);
+                    loadData();
+                } else {
+                    resultEl.textContent = 'Error: ' + (data.error || 'unknown');
+                }
+            })
+            .catch(function(err) {
+                resultEl.textContent = 'Error: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>
