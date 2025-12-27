@@ -1,0 +1,372 @@
+{
+  "iso639Codes": [
+    "tur",
+    "turkish",
+    "türkçe",
+    "turkce"
+  ],
+  "localeName": "Türkçe",
+  "localeFlag": "🇹🇷",
+  "providerLangCode": "TR",
+  "contentTypePrefix": [
+    "Filmler",
+    "Film",
+    "Diziler",
+    "Dizi"
+  ],
+  "app": {
+    "title": "Free IPTV",
+    "loading": "Yükleniyor..."
+  },
+  "home": {
+    "live": "Canlı TV",
+    "movies": "Filmler",
+    "series": "Diziler",
+    "favorites": "Favoriler",
+    "sport": "Spor",
+    "concerts": "Konserler",
+    "theater": "Tiyatro",
+    "theatre": "Tiyatro",
+    "shows": "Şovlar",
+    "spectacles": "Şovlar",
+    "blindtest": "Blind Test",
+    "karaoke": "Karaoke",
+    "settings": "Ayarlar",
+    "languageSelection": "Dil seçimi",
+    "continueWatching": "İzlemeye devam et",
+    "noContinue": "Devam eden içerik yok",
+    "noFavorites": "Favori yok",
+    "manga": "Manga",
+    "entertainment": "Eğlence",
+    "games": "Oyunlar",
+    "continue": "Devam et",
+    "tnt": "National TV",
+    "replay": "Catch-up",
+    "tvGuide": "TV Guide",
+    "cacheLoading": "Yükleniyor {name} ({step}/{total})...",
+    "pleaseWait": "Lütfen bekleyin, veriler yükleniyor...",
+    "history": "Geçmiş",
+    "noHistory": "İzleme geçmişi yok"
+  },
+  "guide": {
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "days": ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"],
+    "noProgram": "Program yok"
+  },
+  "languages": {
+    "FR": "Fransızca",
+    "IT": "İtalyanca",
+    "ES": "İspanyolca",
+    "PT": "Portekizce",
+    "DE": "Almanca",
+    "NL": "Hollandaca",
+    "UK": "İngilizce",
+    "GR": "Yunanca",
+    "AR": "Arapça",
+    "TR": "Türkçe",
+    "IND": "Hintçe",
+    "VO": "Orijinal",
+    "ALL": "Tümü"
+  },
+  "filters": {
+    "hideSD": "SD",
+    "hideHI": "HI",
+    "default": "Varsayılan",
+    "aToZ": "A-Z",
+    "zToA": "Z-A",
+    "rating": "Puan",
+    "recent": "En yeni",
+    "old": "En eski",
+    "title": "Title...",
+    "person": "Person...",
+    "year": "Year..."
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "server": "IPTV Sunucusu",
+    "serverUrl": "Sunucu URL",
+    "username": "Kullanıcı adı",
+    "password": "Şifre",
+    "apis": "API'ler (isteğe bağlı)",
+    "tmdbKey": "TMDB API Anahtarı",
+    "tmdbDesc": "Afişler, açıklamalar, oyuncu kadrosu. themoviedb.org/settings/api",
+    "openSubtitlesKey": "OpenSubtitles API Anahtarı",
+    "openSubtitlesDesc": "Altyazılar. opensubtitles.com/consumers",
+    "subDLKey": "SubDL API Anahtarı",
+    "subDLDesc": "Altyazılar (alternatif). subdl.com/panel/api",
+    "display": "Görünüm",
+    "hideSDDefault": "Varsayılan olarak SD gizle",
+    "hide3DDefault": "Varsayılan olarak 3D gizle",
+    "secureSubtitles": "Güvenli altyazılar",
+    "debugMode": "Hata ayıklama modu",
+    "hideHIDefault": "Varsayılan olarak HI gizle",
+    "providerLanguage": "VOD filtresi",
+    "providerAuto": "Otomatik (arayüz)",
+    "providerLanguageDesc": "VOD kategorilerini dile göre filtrele. Otomatik, arayüz dilini kullanır.",
+    "yes": "Evet",
+    "no": "Hayır",
+    "progress": "İlerleme",
+    "minThreshold": "Minimum eşik (dakika)",
+    "watchedThreshold": "İzlendi eşiği (%)",
+    "retention": "Saklama (hafta)",
+    "historyMaxItems": "Geçmiş maksimum",
+    "focusOnCategories": "Kategorilere odaklan",
+    "textSize": "Metin boyutu",
+    "textSmall": "Küçük",
+    "textMedium": "Orta",
+    "textLarge": "Büyük",
+    "subtitles": "Altyazılar",
+    "defaultSize": "Varsayılan boyut",
+    "defaultStyle": "Varsayılan stil",
+    "data": "Veri",
+    "clearAllCaches": "Tüm önbellekleri temizle",
+    "clearCache": "TMDB önbelleğini temizle",
+    "clearProgress": "İlerlemeyi temizle",
+    "clearFavorites": "Favorileri temizle",
+    "dataSource": "Veri kaynağı",
+    "refreshing": "Güncelleniyor...",
+    "playlists": "Oynatma listeleri",
+    "managePlaylists": "Oynatma listelerini yönet",
+    "addPlaylist": "Oynatma listesi ekle",
+    "editPlaylist": "Oynatma listesini düzenle",
+    "newPlaylist": "Yeni oynatma listesi",
+    "playlistName": "Ad (isteğe bağlı)",
+    "playlistType": "Tür",
+    "m3uUrl": "M3U URL",
+    "proxyUrl": "Proxy URL",
+    "proxyDesc": "Ağ kısıtlamalarını aşmak için proxy (isteğe bağlı)",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "active": "Aktif",
+    "noPlaylists": "Yapılandırılmış oynatma listesi yok",
+    "remoteConfig": "Uzaktan Yapılandırma",
+    "remoteConfigDesc": "Bu QR kodunu tarayın veya telefonunuzdan veya bilgisayarınızdan bu URL'yi ziyaret edin:",
+    "importCodeDesc": "Veya yapılandırma kodunu girin:",
+    "import": "İçe aktar",
+    "back": "Geri",
+    "importCodePlaceholder": "Kod...",
+    "importSuccess": "Yapılandırma başarıyla içe aktarıldı!",
+    "importError": "İçe aktarma hatası",
+    "waitingConfig": "Yapılandırma bekleniyor...",
+    "configReceived": "Yapılandırma alındı!",
+    "remoteInstructions": "Telefonunuzda veya bilgisayarınızda QR kodunu tarayın veya aşağıdaki adresi açın, ardından görüntülenen kodu girin.",
+    "player": "Oynatıcı",
+    "preferHtml5": "HTML5 Oynatıcı",
+    "preferHtml5Desc": "Yerel Samsung oynatıcı yerine HTML5 oynatıcı kullanın. Diyalog boost için gereklidir.",
+    "dialogueBoost": "Diyalog boost",
+    "dialogueBoostDesc": "Diyalog netliğini artırır (dinamik sıkıştırma). Sadece HTML5 oynatıcı ile çalışır.",
+    "categoryPatterns": "Kategori kalıpları",
+    "categoryPatternsDesc": "VOD kategorilerini bölüme göre filtrelemek için anahtar kelimeler",
+    "editKeywords": "Düzenle",
+    "addKeyword": "Anahtar kelime ekle...",
+    "addKeywordBtn": "Ekle",
+    "noKeywords": "Anahtar kelime yok",
+    "previewMatched": "Eşleşen kategoriler:",
+    "resetPatterns": "Sıfırla",
+    "noMatchingCategories": "Eşleşen kategori yok",
+    "noApiAvailable": "API kullanılamıyor",
+    "failedToLoadCategories": "Kategoriler yüklenemedi",
+    "confirmDelete": "Silmeyi onayla",
+    "confirmDeletePlaylist": "Bu oynatma listesi silinsin mi?",
+    "addCategory": "Kategori ekle",
+    "categoryName": "Ad",
+    "categoryIcon": "Simge",
+    "iconColors": "Renkler",
+    "useTMDB": "TMDB kullan",
+    "confirmDeleteCategory": "\"{name}\" kategorisi silinsin mi?",
+    "iconEmoji": "Emoji",
+    "iconCustom": "Özel",
+    "iconText": "Metin",
+    "iconTextColor": "Metin rengi",
+    "iconBgColor": "Arka plan",
+    "iconPreview": "Önizleme",
+    "expired": "Süresi dolmuş",
+    "mergePlaylists": "Tümünü birleştir",
+    "validation": {
+      "incomplete": "Incomplete",
+      "auth_failed": "Auth failed",
+      "parse_error": "Parse error",
+      "timeout": "Timeout",
+      "network": "Network error",
+      "invalid_format": "Invalid format",
+      "http_403": "Access denied",
+      "http_404": "Not found",
+      "http_500": "Server error"
+    },
+    "confirmDeleteHistory": "İzleme geçmişi silinsin mi?"
+  },
+  "player": {
+    "play": "Oynat",
+    "continueAt": "Devam et",
+    "fromStart": "Baştan",
+    "markWatched": "İzlendi olarak işaretle",
+    "unavailable": "Kullanılamıyor",
+    "disabled": "Devre dışı",
+    "external": "Harici",
+    "audio": "Ses",
+    "subtitlesLabel": "Altyazılar",
+    "noTracks": "Parça yok",
+    "noEpisodes": "Bölüm yok",
+    "hearingImpaired": "İşitme engelli",
+    "audioDescription": "Sesli betimleme",
+    "commentary": "Yorum",
+    "forced": "Zorunlu",
+    "unknown": "Bilinmiyor",
+    "undetermined": "Belirsiz",
+    "playbackError": "Bu akış oynatılamıyor",
+    "unsupportedCodec": "Codec {codec} bu TV tarafından desteklenmiyor",
+    "tryingHtml5": "Alternatif oynatıcı deneniyor...",
+    "favorite": "Favori",
+    "pauseDuration": "Duraklat",
+    "returnToLive": "→ Canlı",
+    "hourShort": "sa",
+    "minShort": "dk",
+    "replay": "Replay",
+    "displayAuto": "Auto",
+    "displayLetterbox": "Letterbox",
+    "displayStretch": "Stretch",
+    "displayZoom": "Zoom",
+    "tryingNative": "Yerel oynatıcı deneniyor...",
+    "reconnecting": "Yeniden bağlanıyor...",
+    "streamUnavailable": "Yayın kullanılamıyor"
+  },
+  "subtitleOptions": {
+    "title": "Altyazı seçenekleri",
+    "offset": "Kayma",
+    "size": "Boyut",
+    "small": "Küçük",
+    "medium": "Orta",
+    "large": "Büyük",
+    "style": "Stil",
+    "shadow": "Gölge",
+    "background": "Arka plan",
+    "simple": "Basit",
+    "close": "Kapat"
+  },
+  "subtitleSearch": {
+    "searchSubDL": "SubDL ara...",
+    "searchOpenSubtitles": "OpenSubtitles ara...",
+    "back": "Geri"
+  },
+  "details": {
+    "defaultVersion": "Standart",
+    "director": "Yönetmen",
+    "creator": "Yaratıcı",
+    "cast": "Oyuncular",
+    "filmography": "Filmografi",
+    "noDescription": "Açıklama yok",
+    "noBiography": "Biyografi yok",
+    "season": "Sezon",
+    "episode": "Bölüm",
+    "continueCount": "Devam et",
+    "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın."
+  },
+  "series": {
+    "lastWatched": "Son izlenen bölüm:",
+    "newEpisode": "yeni bölüm mevcut",
+    "newEpisodes": "yeni bölüm mevcut",
+    "noNewEpisode": "yeni bölüm yok"
+  },
+  "modal": {
+    "resumeTitle": "Oynatmaya devam et?",
+    "resumeAt": "Devam et",
+    "continue": "Devam et",
+    "fromStart": "Baştan"
+  },
+  "disclaimer": {
+    "title": "Sorumluluk Reddi",
+    "text": "Bu uygulama herhangi bir içerik sağlamaz. Kullanıcılar yapılandırdıkları kaynaklardan yalnızca kendileri sorumludur ve bu tür içeriklere erişmek için yasal hakka sahip olduklarından emin olmalıdırlar. Geliştirici, bu uygulamanın kullanımı için hiçbir sorumluluk kabul etmez.",
+    "accept": "Anladım"
+  },
+  "messages": {
+    "searching": "Aranıyor: \"{title}\"...",
+    "all": "Tümü"
+  },
+  "categoryPatterns": {
+    "sport": [
+      "spor",
+      "sport",
+      "nba",
+      "nfl",
+      "moto gp",
+      "formula 1",
+      "f1",
+      "boks",
+      "gures",
+      "ufc",
+      "dovus"
+    ],
+    "manga": [
+      "manga",
+      "anime",
+      "animasyon"
+    ],
+    "entertainment": {
+      "concerts": [
+        "konser",
+        "concert"
+      ],
+      "theatre": [
+        "tiyatro",
+        "theatre"
+      ],
+      "spectacles": [
+        "gosteri",
+        "show",
+        "tv show",
+        "eglence"
+      ],
+      "blindtest": [
+        "blind test",
+        "bilgi yarismasi"
+      ],
+      "karaoke": [
+        "karaoke"
+      ]
+    }
+  },
+  "cleanupPatterns": {
+    "langTags": [
+      "TURKISH",
+      "TURKCE",
+      "TR"
+    ],
+    "season": [
+      "Sezon"
+    ],
+    "part": [
+      "Bölüm"
+    ],
+    "series": [
+      "Diziler",
+      "Dizi"
+    ]
+  },
+  "favorites": {
+    "edit": "Düzenle",
+    "done": "Tamam",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı"
+  },
+  "catchup": {
+    "today": "Bugün",
+    "yesterday": "Dün"
+  },
+  "errors": {
+    "noData": "Veri yok"
+  },
+  "time": {
+    "now": "şimdi",
+    "minuteAgo": "1 dk önce",
+    "minutesAgo": "{n} dk önce",
+    "hourAgo": "1 saat önce",
+    "hoursAgo": "{n} saat önce",
+    "dayAgo": "1 gün önce",
+    "daysAgo": "{n} gün önce",
+    "monthAgo": "1 ay önce",
+    "monthsAgo": "{n} ay önce"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "free-iptv-app",
+  "version": "1.0.0",
+  "description": "IPTV player for Samsung Smart TV",
+  "author": "Eric Blanquer <eric.blanquer@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericblanquer/free-iptv-app.git"
+  },
+  "scripts": {
+    "build:i18n": "node scripts/build-i18n.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "collectCoverageFrom": [
+      "js/**/*.js",
+      "!js/player.js"
+    ]
+  }
+}
