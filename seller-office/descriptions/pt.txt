@@ -1,0 +1,19 @@
+Free IPTV - Transmita seu conteudo
+
+Transmita seu conteudo IPTV pessoal na sua TV Samsung. Este reprodutor suporta playlists M3U, dando-lhe controle total sobre sua biblioteca de midia.
+
+Recursos:
+- Canais de TV ao vivo com guia EPG
+- Filmes (VOD) com posteres
+- Series de TV com navegacao por temporadas/episodios
+- Suporte a multiplas faixas de audio
+- Suporte a legendas (incorporadas e externas)
+- Continuar assistindo - retome de onde parou
+- Favoritos e historico de visualizacao
+- Modos de visualizacao em grade e lista
+- Opcoes de busca e filtro
+- 11 idiomas de interface
+
+O aplicativo nao fornece nenhum conteudo. Os usuarios devem configurar suas proprias playlists IPTV e sao responsaveis por garantir que tenham o direito legal de acessar tal conteudo.
+
+Requer: Conexao com a Internet, playlist M3U

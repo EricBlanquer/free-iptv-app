@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free IPTV - Configuration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.15); }
+            50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.3); }
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #080810;
+            color: #e0dcd6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .app-logo-img {
+            height: 44px;
+            width: auto;
+        }
+
+        h1 { color: #00d4ff; margin-bottom: 10px; font-size: 28px; font-weight: 600; }
+
+        .subtitle { color: #888; margin-bottom: 30px; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.2s; }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            padding-left: 12px;
+            border-left: 3px solid #00d4ff;
+            font-weight: 600;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input::placeholder { color: #555; }
+
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: #00d4ff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15), 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.35);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #34d058, #28a745);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(52, 208, 88, 0.25);
+        }
+
+        .btn-danger {
+            background: #e05050;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0dcd6;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .type-buttons { display: flex; }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #888;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .type-btn:first-child { border-radius: 10px 0 0 10px; }
+        .type-btn:last-child { border-radius: 0 10px 10px 0; }
+
+        .type-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        .api-desc { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .api-desc a { color: #00d4ff; text-decoration: none; }
+        .api-desc a:hover { text-decoration: underline; }
+
+        .warning-hint {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #ffa500;
+        }
+
+        .playlist-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .playlist-item .info { flex: 1; }
+        .playlist-item .name { font-weight: 600; color: #fff; }
+        .playlist-item .type { color: #666; font-size: 13px; }
+
+        .code-input {
+            font-size: 32px;
+            text-align: center;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            background: rgba(0, 212, 255, 0.04);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .code-input:focus {
+            border-color: #00d4ff;
+            animation: none;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2), 0 0 30px rgba(0, 212, 255, 0.15);
+        }
+
+        .hidden { display: none !important; }
+
+        .success-msg {
+            background: linear-gradient(135deg, #34d058, #28a745);
+            color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(52, 208, 88, 0.25);
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .error-msg {
+            background: rgba(224, 80, 80, 0.15);
+            border: 1px solid rgba(224, 80, 80, 0.4);
+            color: #ff8080;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .category-section { margin-bottom: 20px; }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .category-title .icon { margin-right: 8px; font-size: 20px; }
+
+        .category-toggle {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category-toggle.active {
+            background: rgba(52, 208, 88, 0.25);
+            color: #34d058;
+            border: 1px solid rgba(52, 208, 88, 0.3);
+        }
+
+        .category-toggle.inactive {
+            background: rgba(255, 255, 255, 0.06);
+            color: #666;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .subcategory-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 8px;
+        }
+
+        .subcategory-tab {
+            padding: 6px 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #888;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .subcategory-tab.active {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        .subcategory-tab:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .keyword-chip {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 3px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .keyword-chip .remove {
+            margin-left: 6px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .keyword-chip .remove:hover { opacity: 1; }
+
+        .add-keyword-row {
+            display: flex;
+            margin-top: 5px;
+        }
+
+        .add-keyword-row input {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+        }
+
+        .add-keyword-row button {
+            padding: 8px 15px;
+            border: none;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .custom-categories {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 20px;
+        }
+
+        .custom-category-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .custom-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .custom-category-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+
+        .custom-category-name .icon { margin-right: 8px; }
+
+        .custom-icon-preview {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .add-custom-category {
+            background: rgba(0, 212, 255, 0.06);
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            color: #00d4ff;
+            margin-top: 15px;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .add-custom-category:hover {
+            background: rgba(0, 212, 255, 0.12);
+            border-color: #00d4ff;
+        }
+
+        .new-category-form { margin-top: 15px; }
+
+        .new-category-form .form-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .new-category-form .form-row > * { margin-right: 10px; }
+        .new-category-form .form-row > *:last-child { margin-right: 0; }
+
+        .icon-selector {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .icon-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 3px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-option:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .icon-option.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .icon-type-tabs {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .icon-type-tab {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-type-tab:first-child { border-radius: 8px 0 0 8px; }
+        .icon-type-tab:last-child { border-radius: 0 8px 8px 0; }
+
+        .icon-type-tab.active {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        .custom-icon-inputs {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .custom-icon-inputs input[type="text"] {
+            width: 60px;
+            text-align: center;
+            font-size: 18px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .custom-icon-inputs input[type="color"] {
+            width: 50px;
+            height: 40px;
+            padding: 2px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .custom-icon-inputs .preview {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+            transition: color 0.2s;
+        }
+
+        .collapsible-header h2 { margin: 0; }
+
+        .collapsible-header .arrow {
+            font-size: 18px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #555;
+        }
+
+        .collapsible-header.collapsed .arrow { transform: rotate(-90deg); }
+        .collapsible-header:hover h2 { color: #00d4ff; }
+
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 2000px;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .range-row input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .range-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00d4ff;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+        }
+
+        .range-label {
+            min-width: 50px;
+            text-align: right;
+            color: #00d4ff;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <header class="app-header">
+            <div class="app-logo">
+                <img src="icon.png" alt="Free IPTV" class="app-logo-img">
+            </div>
+            <select id="page-locale" style="width: auto; padding: 8px 12px; font-size: 14px; border-radius: 10px;">
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="it">🇮🇹 Italiano</option>
+                <option value="nl">🇳🇱 Nederlands</option>
+                <option value="pl">🇵🇱 Polski</option>
+                <option value="pt">🇵🇹 Português</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
+        </header>
+
+        <div id="code-step" class="card">
+            <h2 data-i18n="tvCode">TV Code</h2>
+            <p style="color:#aaa; margin-bottom:15px;" data-i18n="enterCode">Enter the code displayed on your TV</p>
+            <div class="form-group">
+                <input type="text" id="tv-code" class="code-input" placeholder="ABCD12" maxlength="6" autocomplete="off" autofocus>
+            </div>
+        </div>
+
+        <div id="config-step" class="hidden">
+            <div class="card hidden">
+                <h2 data-i18n="savedPlaylists">Saved playlists</h2>
+                <div id="playlists-list"></div>
+            </div>
+
+            <div id="add-playlist-form" class="card">
+                <h2 id="form-title" data-i18n="addPlaylist">Add a playlist</h2>
+                <div class="form-group">
+                    <label data-i18n="nameOptional">Name (optional)</label>
+                    <input type="text" id="pl-name" data-i18n-placeholder="myPlaylist">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="type">Type</label>
+                    <div class="type-buttons">
+                        <button type="button" class="type-btn active" data-type="provider" onclick="selectType('provider')">API Server</button>
+                        <button type="button" class="type-btn" data-type="m3u" onclick="selectType('m3u')">URL M3U</button>
+                    </div>
+                </div>
+                <div id="provider-fields">
+                    <div class="form-group">
+                        <label data-i18n="serverUrl">Server URL</label>
+                        <input type="text" id="pl-server" placeholder="http://example.com:8080">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="username">Username</label>
+                        <input type="text" id="pl-username" placeholder="username">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="password">Password</label>
+                        <input type="text" id="pl-password" placeholder="password">
+                    </div>
+                </div>
+                <div id="m3u-fields" class="hidden">
+                    <div class="warning-hint" data-i18n="m3uWarning">Prefer API Server if available. M3U only supports live TV and may have compatibility issues.</div>
+                    <div class="form-group">
+                        <label data-i18n="m3uUrl">URL M3U</label>
+                        <input type="text" id="pl-m3u" placeholder="http://example.com/playlist.m3u">
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="saveAndAddAnother()" style="width:100%;" data-i18n="addAnother">+ Add another playlist</button>
+            </div>
+
+            <!-- VOD Filter - collapsible -->
+            <div id="vod-filter-section" class="card hidden">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('vod-filter')">
+                    <h2 data-i18n="providerFilter">VOD Filter</h2>
+                    <span class="arrow">▼</span>
+                </div>
+                <div id="vod-filter-content" class="collapsible-content collapsed">
+                    <div class="form-group" style="margin-top:15px;">
+                        <div class="api-desc" data-i18n="providerFilterDesc">Filter VOD categories by language. Auto uses interface language.</div>
+                        <select id="pref-provider-lang">
+                            <option value="ALL" data-i18n="allLanguages">All languages</option>
+                            <option value="AUTO" selected data-i18n="autoLanguage">Auto (interface language)</option>
+                            <option value="FR">🇫🇷 Français</option>
+                            <option value="UK">🇬🇧 English</option>
+                            <option value="ES">🇪🇸 Español</option>
+                            <option value="DE">🇩🇪 Deutsch</option>
+                            <option value="IT">🇮🇹 Italiano</option>
+                            <option value="PT">🇵🇹 Português</option>
+                            <option value="TR">🇹🇷 Türkçe</option>
+                            <option value="AR">🇸🇦 العربية</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VOD Categories - collapsible -->
+            <div id="categories-section" class="card hidden">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('categories')">
+                    <h2 data-i18n="categoriesTitle">VOD Categories</h2>
+                    <span class="arrow">▼</span>
+                </div>
+                <div id="categories-content" class="collapsible-content collapsed">
+                    <p style="color:#888; margin-bottom:15px; font-size:13px; margin-top:15px;" data-i18n="categoriesDesc">Configure keywords to filter VOD categories</p>
+
+                <!-- Default categories -->
+                <div id="default-categories">
+                    <!-- Sport -->
+                    <div class="category-section" data-category="sport">
+                        <div class="category-header">
+                            <span class="category-title"><span class="icon">⚽</span><span data-i18n="catSport">Sport</span></span>
+                            <button class="category-toggle active" onclick="toggleCategory('sport')" data-i18n="enabled">Enabled</button>
+                        </div>
+                        <div class="keywords-container" id="keywords-sport"></div>
+                        <div class="add-keyword-row">
+                            <input type="text" id="new-keyword-sport" data-i18n-placeholder="addKeyword">
+                            <button onclick="addKeyword('sport')" data-i18n="add">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Entertainment -->
+                    <div class="category-section" data-category="entertainment">
+                        <div class="category-header">
+                            <span class="category-title"><span class="icon">🎭</span><span data-i18n="catEntertainment">Entertainment</span></span>
+                            <button class="category-toggle active" onclick="toggleCategory('entertainment')" data-i18n="enabled">Enabled</button>
+                        </div>
+                        <div class="subcategory-tabs" id="entertainment-tabs">
+                            <div class="subcategory-tab active" data-subcat="concerts" onclick="selectEntSubcat('concerts')">🎵 <span data-i18n="subConcerts">Concerts</span></div>
+                            <div class="subcategory-tab" data-subcat="theatre" onclick="selectEntSubcat('theatre')">🎭 <span data-i18n="subTheatre">Theatre</span></div>
+                            <div class="subcategory-tab" data-subcat="spectacles" onclick="selectEntSubcat('spectacles')">🎪 <span data-i18n="subSpectacles">Shows</span></div>
+                            <div class="subcategory-tab" data-subcat="blindtest" onclick="selectEntSubcat('blindtest')">🎯 <span data-i18n="subBlindtest">Blind Test</span></div>
+                            <div class="subcategory-tab" data-subcat="karaoke" onclick="selectEntSubcat('karaoke')">🎤 <span data-i18n="subKaraoke">Karaoke</span></div>
+                        </div>
+                        <div class="keywords-container" id="keywords-entertainment"></div>
+                        <div class="add-keyword-row">
+                            <input type="text" id="new-keyword-entertainment" data-i18n-placeholder="addKeyword">
+                            <button onclick="addEntertainmentKeyword()" data-i18n="add">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Manga -->
+                    <div class="category-section" data-category="manga">
+                        <div class="category-header">
+                            <span class="category-title"><span class="icon">🎌</span><span data-i18n="catManga">Manga</span></span>
+                            <button class="category-toggle active" onclick="toggleCategory('manga')" data-i18n="enabled">Enabled</button>
+                        </div>
+                        <div class="keywords-container" id="keywords-manga"></div>
+                        <div class="add-keyword-row">
+                            <input type="text" id="new-keyword-manga" data-i18n-placeholder="addKeyword">
+                            <button onclick="addKeyword('manga')" data-i18n="add">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom categories -->
+                <div class="custom-categories">
+                    <h3 style="font-size:12px; color:#666; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; font-weight:500;" data-i18n="customCategories">Custom categories</h3>
+                    <div id="custom-categories-list"></div>
+
+                    <div id="add-category-btn" class="add-custom-category" onclick="showNewCategoryForm()">
+                        <span data-i18n="addCategory">+ Add category</span>
+                    </div>
+
+                    <div id="new-category-form" class="new-category-form hidden">
+                        <div class="form-group">
+                            <label data-i18n="categoryName">Category name</label>
+                            <input type="text" id="new-cat-name" data-i18n-placeholder="categoryNamePlaceholder">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="categoryIcon">Icon</label>
+                            <div class="icon-type-tabs">
+                                <div class="icon-type-tab active" onclick="selectIconType('emoji')" data-i18n="iconEmoji">Emoji</div>
+                                <div class="icon-type-tab" onclick="selectIconType('custom')" data-i18n="iconCustom">Custom</div>
+                            </div>
+                            <div id="emoji-selector" class="icon-selector">
+                                <span class="icon-option selected" data-icon="🍿" onclick="selectIcon(this)">🍿</span>
+                                <span class="icon-option" data-icon="📻" onclick="selectIcon(this)">📻</span>
+                                <span class="icon-option" data-icon="🎮" onclick="selectIcon(this)">🎮</span>
+                                <span class="icon-option" data-icon="👽" onclick="selectIcon(this)">👽</span>
+                                <span class="icon-option" data-icon="🚀" onclick="selectIcon(this)">🚀</span>
+                                <span class="icon-option" data-icon="💀" onclick="selectIcon(this)">💀</span>
+                                <span class="icon-option" data-icon="💕" onclick="selectIcon(this)">💕</span>
+                                <span class="icon-option" data-icon="🌍" onclick="selectIcon(this)">🌍</span>
+                                <span class="icon-option" data-icon="🎨" onclick="selectIcon(this)">🎨</span>
+                                <span class="icon-option" data-icon="🦁" onclick="selectIcon(this)">🦁</span>
+                                <span class="icon-option" data-icon="👶" onclick="selectIcon(this)">👶</span>
+                                <span class="icon-option" data-icon="📰" onclick="selectIcon(this)">📰</span>
+                                <span class="icon-option" data-icon="🔬" onclick="selectIcon(this)">🔬</span>
+                                <span class="icon-option" data-icon="🏆" onclick="selectIcon(this)">🏆</span>
+                                <span class="icon-option" data-icon="🍕" onclick="selectIcon(this)">🍕</span>
+                                <span class="icon-option" data-icon="🏰" onclick="selectIcon(this)">🏰</span>
+                                <span class="icon-option" data-icon="😂" onclick="selectIcon(this)">😂</span>
+                                <span class="icon-option" data-icon="⚡" onclick="selectIcon(this)">⚡</span>
+                                <span class="icon-option" data-icon="🔮" onclick="selectIcon(this)">🔮</span>
+                                <span class="icon-option" data-icon="🤠" onclick="selectIcon(this)">🤠</span>
+                                <span class="icon-option" data-icon="🥋" onclick="selectIcon(this)">🥋</span>
+                            </div>
+                            <div id="custom-icon-selector" class="custom-icon-inputs hidden">
+                                <input type="text" id="custom-icon-text" maxlength="2" placeholder="" oninput="updateIconPreview()">
+                                <input type="color" id="custom-icon-color" value="#ffffff" oninput="updateIconPreview()">
+                                <input type="color" id="custom-icon-bg" value="#e50914" oninput="updateIconPreview()">
+                                <div class="preview" id="custom-icon-preview"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button class="btn btn-secondary" onclick="hideNewCategoryForm()" data-i18n="cancel">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveNewCategory()" data-i18n="add">Add</button>
+                        </div>
+                    </div>
+                </div>
+                </div><!-- /collapsible-content -->
+            </div>
+
+            <!-- Services (proxy + TTS) - collapsible -->
+            <div id="services-section" class="card">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('services')">
+                    <h2 data-i18n="servicesTitle">Services (optional)</h2>
+                    <span class="arrow">▼</span>
+                </div>
+                <div id="services-content" class="collapsible-content collapsed">
+                    <div class="form-group" style="margin-top:15px;">
+                        <div class="api-desc" data-i18n="servicesDesc">Stream proxy and text-to-speech for your TV app.</div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="proxyUrl">Server URL</label>
+                        <input type="text" id="pref-proxy-url" placeholder="http://192.168.1.x:8889">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="streamProxy">Proxy streams</label>
+                        <div class="type-buttons">
+                            <button type="button" class="type-btn" id="stream-proxy-off-btn" onclick="toggleStreamProxy(false)" data-i18n="no">No</button>
+                            <button type="button" class="type-btn active" id="stream-proxy-on-btn" onclick="toggleStreamProxy(true)" data-i18n="yes">Yes</button>
+                        </div>
+                    </div>
+                    <div id="tts-fields" class="hidden">
+                            <div class="form-group">
+                                <label data-i18n="ttsRate">TTS Speed</label>
+                                <div class="range-row">
+                                    <input type="range" id="pref-tts-rate" min="-50" max="100" value="0" step="10" oninput="updateRangeLabel('tts-rate')">
+                                    <span id="tts-rate-label" class="range-label">0%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="ttsVolume">TTS Volume</label>
+                                <div class="range-row">
+                                    <input type="range" id="pref-tts-volume" min="-50" max="100" value="0" step="10" oninput="updateRangeLabel('tts-volume')">
+                                    <span id="tts-volume-label" class="range-label">0%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="ttsPitch">TTS Pitch</label>
+                                <div class="range-row">
+                                    <input type="range" id="pref-tts-pitch" min="-50" max="50" value="0" step="5" oninput="updateRangeLabel('tts-pitch')">
+                                    <span id="tts-pitch-label" class="range-label">0Hz</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- APIs - collapsible -->
+            <div id="apis-section" class="card">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('apis')">
+                    <h2 data-i18n="apisOptional">APIs (optional)</h2>
+                    <span class="arrow">▼</span>
+                </div>
+                <div id="apis-content" class="collapsible-content collapsed">
+                    <div class="form-group" style="margin-top:15px;">
+                        <label data-i18n="tmdbKey">TMDB API Key</label>
+                        <div class="api-desc"><span data-i18n="tmdbDesc">Posters, descriptions and cast for movies/series.</span> <a href="https://www.themoviedb.org/settings/api" target="_blank" data-i18n="getKey">Get a key</a></div>
+                        <input type="text" id="api-tmdb" placeholder="ex: a1b2c3d4e5f6...">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="openSubtitlesKey">OpenSubtitles API Key</label>
+                        <div class="api-desc"><span data-i18n="openSubtitlesDesc">Automatic subtitles.</span> <a href="https://www.opensubtitles.com/consumers" target="_blank" data-i18n="getKey">Get a key</a></div>
+                        <input type="text" id="api-opensubtitles" placeholder="ex: xyz123...">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subdlKey">SubDL API Key</label>
+                        <div class="api-desc"><span data-i18n="subdlDesc">Subtitles (alternative).</span> <a href="https://subdl.com/panel/api" target="_blank" data-i18n="getKey">Get a key</a></div>
+                        <input type="text" id="api-subdl" placeholder="ex: abc789...">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="sendConfig()" style="width:100%; padding: 16px; font-size: 17px; border-radius: 14px;" data-i18n="sendConfig">
+                Send configuration
+            </button>
+            <div id="error-msg" class="error-msg hidden"></div>
+        </div>
+
+        <div id="success-step" class="hidden">
+            <div class="success-msg">
+                <span data-i18n="configSuccess">Configuration sent successfully!</span><br>
+                <small style="opacity:0.8;" data-i18n="tvWillConfigure">Your TV will configure automatically.</small><br>
+                <small id="reload-countdown" style="opacity:0.6;"></small>
+            </div>
+        </div>
+
+        <!-- Support Section -->
+        <div id="support-section" class="card" style="margin-top: 30px; text-align: center;">
+            <h2 style="color: #ffd700; margin-bottom: 15px; border-left: none; padding-left: 0;" data-i18n="supportTitle">Support Free IPTV</h2>
+            <p style="color: #aaa; margin-bottom: 20px; line-height: 1.6;" data-i18n="supportDesc">Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation (any amount). You'll receive a license code as a thank you.</p>
+            <form id="donate-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin-bottom: 20px;">
+                <input type="hidden" name="cmd" value="_donations">
+                <input type="hidden" name="business" value="eric.blanquer@gmail.com">
+                <input type="hidden" name="item_name" value="Free IPTV - Premium License">
+                <input type="hidden" name="currency_code" value="EUR">
+                <input type="hidden" name="notify_url" value="https://iptv.blanquer.org/premium-api.php?action=paypal-ipn">
+                <input type="hidden" name="return" value="https://iptv.blanquer.org?donated=1">
+                <input type="hidden" name="no_shipping" value="1">
+                <input type="hidden" id="donate-amount" name="amount" value="">
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
+                    <button type="submit" onclick="document.getElementById('donate-amount').value='2'" style="background: rgba(255,215,0,0.12); color: #ffd700; padding: 10px 22px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); font-size: 16px; cursor: pointer; font-weight: 600; margin: 4px;">2 €</button>
+                    <button type="submit" onclick="document.getElementById('donate-amount').value='5'" style="background: rgba(255,215,0,0.12); color: #ffd700; padding: 10px 22px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); font-size: 16px; cursor: pointer; font-weight: 600; margin: 4px;">5 €</button>
+                    <button type="submit" onclick="document.getElementById('donate-amount').value='10'" style="background: rgba(255,215,0,0.12); color: #ffd700; padding: 10px 22px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); font-size: 16px; cursor: pointer; font-weight: 600; margin: 4px;">10 €</button>
+                </div>
+                <button type="submit" onclick="document.getElementById('donate-amount').value=''" style="background: linear-gradient(135deg, #ffd700, #ff9800); color: #000; padding: 14px 40px; border-radius: 12px; border: none; font-weight: 600; font-size: 16px; cursor: pointer;" data-i18n="supportDonateOther">Other amount</button>
+            </form>
+            <p style="color: #666; margin-top: 10px; font-size: 13px;" data-i18n="supportThanks">After your donation, enter your PayPal email below to retrieve your license code.</p>
+
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="color: #00d4ff; margin-bottom: 12px; border-left: none; padding-left: 0;" data-i18n="retrieveTitle">Retrieve your license code</h3>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+                    <input type="email" id="lookup-email" placeholder="your@email.com" style="padding: 12px 16px; border-radius: 8px 0 0 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; width: 260px; outline: none;">
+                    <button onclick="lookupLicense()" style="padding: 12px 24px; border-radius: 0 8px 8px 0; border: 1px solid rgba(255,255,255,0.15); border-left: none; background: rgba(0,212,255,0.15); color: #00d4ff; font-size: 15px; cursor: pointer; font-weight: 500;" data-i18n="retrieveBtn">Retrieve</button>
+                </div>
+                <div id="lookup-result" style="margin-top: 15px; min-height: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var WORKER_URL = 'https://iptv-config.eric-blanquer.workers.dev';
+
+        function lookupLicense() {
+            var email = document.getElementById('lookup-email').value.trim();
+            var resultEl = document.getElementById('lookup-result');
+            if (!email) {
+                resultEl.textContent = '';
+                var errSpan = document.createElement('span');
+                errSpan.style.color = '#ff5252';
+                errSpan.textContent = 'Please enter your PayPal email';
+                resultEl.appendChild(errSpan);
+                return;
+            }
+            resultEl.textContent = '';
+            var loadSpan = document.createElement('span');
+            loadSpan.style.color = '#888';
+            loadSpan.textContent = 'Searching...';
+            resultEl.appendChild(loadSpan);
+            fetch('https://iptv.blanquer.org/premium-api.php?action=license-lookup&email=' + encodeURIComponent(email))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    resultEl.textContent = '';
+                    if (data.codes && data.codes.length > 0) {
+                        var latest = data.codes[data.codes.length - 1];
+                        var box = document.createElement('div');
+                        box.style.cssText = 'background:rgba(76,175,80,0.15);border:1px solid #4CAF50;border-radius:10px;padding:16px;display:inline-block;';
+                        var label = document.createElement('div');
+                        label.style.cssText = 'color:#4CAF50;font-size:13px;margin-bottom:6px;';
+                        label.textContent = 'Your license code:';
+                        var codeDiv = document.createElement('div');
+                        codeDiv.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:28px;letter-spacing:6px;color:#fff;font-weight:700;';
+                        codeDiv.textContent = latest.code;
+                        var hint = document.createElement('div');
+                        hint.style.cssText = 'color:#888;font-size:12px;margin-top:6px;';
+                        box.appendChild(label);
+                        box.appendChild(codeDiv);
+                        if (tvCode) {
+                            var sendBtn = document.createElement('button');
+                            sendBtn.style.cssText = 'margin-top:10px;padding:10px 24px;border-radius:8px;border:none;background:#4CAF50;color:#fff;font-size:14px;cursor:pointer;font-weight:500;';
+                            sendBtn.textContent = t('sendToTV') || 'Send to TV';
+                            sendBtn.onclick = function() { sendLicenseToTV(latest.code); };
+                            box.appendChild(sendBtn);
+                        }
+                        else {
+                            hint.textContent = 'Enter this code in the app Settings > License';
+                            box.appendChild(hint);
+                        }
+                        resultEl.appendChild(box);
+                    } else {
+                        var noCode = document.createElement('span');
+                        noCode.style.color = '#ff9800';
+                        noCode.textContent = 'No license found for this email. Please allow a few minutes after your donation.';
+                        resultEl.appendChild(noCode);
+                    }
+                })
+                .catch(function() {
+                    resultEl.textContent = '';
+                    var netErr = document.createElement('span');
+                    netErr.style.color = '#ff5252';
+                    netErr.textContent = 'Network error, please try again';
+                    resultEl.appendChild(netErr);
+                });
+        }
+
+        function sendLicenseToTV(code) {
+            if (!tvCode) return;
+            fetch(WORKER_URL + '/' + tvCode, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ licenseCode: code })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var resultEl = document.getElementById('lookup-result');
+                    var msg = document.createElement('div');
+                    msg.style.cssText = 'color:#4CAF50;margin-top:10px;font-weight:500;';
+                    msg.textContent = t('licenseSentToTV') || 'License sent to your TV!';
+                    resultEl.appendChild(msg);
+                }
+            })
+            .catch(function() {});
+        }
+
+        // Auto-show lookup section if returning from PayPal
+        if (window.location.search.indexOf('donated=1') !== -1) {
+            setTimeout(function() {
+                var el = document.getElementById('support-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+
+        var tvCode = '';
+        var playlists = [];
+        var editingIndex = -1;
+        var currentType = 'provider';
+        var currentLocale = 'en';
+
+        var translations = {
+            fr: {
+                tvCode: 'Code TV',
+                enterCode: 'Entrez le code affiché sur votre TV',
+                savedPlaylists: 'Playlists enregistrées',
+                addPlaylist: 'Ajouter une playlist',
+                editPlaylist: 'Modifier la playlist',
+                nameOptional: 'Nom (optionnel)',
+                myPlaylist: 'Ma playlist',
+                type: 'Type',
+                serverUrl: 'URL du serveur',
+                username: 'Identifiant',
+                password: 'Mot de passe',
+                m3uWarning: 'Préférez Serveur API si disponible. M3U ne supporte que la TV en direct et peut poser des problèmes de compatibilité.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Ajouter une autre playlist',
+                preferences: 'Préférences',
+                interfaceLanguage: "Langue de l'interface",
+                providerFilter: 'Filtre VOD',
+                providerFilterDesc: "Filtre les catégories VOD par langue. Auto utilise la langue de l'interface.",
+                allLanguages: 'Toutes les langues',
+                autoLanguage: 'Auto (langue interface)',
+                apisOptional: 'APIs (optionnel)',
+                tmdbKey: 'Clé API TMDB',
+                tmdbDesc: 'Affiches, descriptions et casting des films/séries.',
+                getKey: 'Obtenir une clé',
+                openSubtitlesKey: 'Clé API OpenSubtitles',
+                openSubtitlesDesc: 'Sous-titres automatiques.',
+                subdlKey: 'Clé API SubDL',
+                subdlDesc: 'Sous-titres (alternative).',
+                sendConfig: 'Envoyer la configuration',
+                sendToTV: 'Envoyer à la TV',
+                licenseSentToTV: 'Licence envoyée à votre TV\u00A0!',
+                configSuccess: 'Configuration envoyée avec succès !',
+                tvWillConfigure: 'Votre TV va se configurer automatiquement.',
+                reloadIn: 'Rechargement dans {seconds}s...',
+                edit: 'Modifier',
+                delete: 'Supprimer',
+                playlist: 'Playlist',
+                confirmDelete: 'Supprimer cette playlist ?',
+                fillProviderFields: 'Veuillez remplir tous les champs serveur',
+                addAtLeastOne: 'Ajoutez au moins une playlist',
+                errorServer: 'Erreur serveur',
+                errorSending: "Erreur lors de l'envoi",
+                error: 'Erreur',
+                codeLength: 'Le code doit contenir entre 4 et 6 caractères',
+                categoriesTitle: 'Catégories VOD',
+                categoriesDesc: 'Configurez les mots-clés pour filtrer les catégories VOD',
+                catSport: 'Sport',
+                catEntertainment: 'Divertissement',
+                catManga: 'Manga',
+                subConcerts: 'Concerts',
+                subTheatre: 'Théâtre',
+                subSpectacles: 'Spectacles',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoké',
+                enabled: 'Activé',
+                disabled: 'Désactivé',
+                addKeyword: 'Ajouter un mot-clé...',
+                add: 'Ajouter',
+                customCategories: 'Catégories personnalisées',
+                addCategory: '+ Ajouter une catégorie',
+                categoryName: 'Nom de la catégorie',
+                categoryIcon: 'Icône',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Personnalisé',
+                categoryNamePlaceholder: 'Ma catégorie',
+                categoryNameRequired: 'Veuillez entrer un nom de catégorie',
+                confirmDeleteCategory: 'Supprimer cette catégorie ?',
+                servicesTitle: 'Services (optionnel)',
+                servicesDesc: 'Proxy de flux et synthèse vocale pour votre application TV.',
+                proxyUrl: 'URL du serveur',
+                yes: 'Oui',
+                no: 'Non',
+                ttsRate: 'Vitesse TTS',
+                ttsVolume: 'Volume TTS',
+                ttsPitch: 'Tonalité TTS',
+                streamProxy: 'Proxy des flux',
+                supportTitle: 'Soutenir Free IPTV',
+                supportDesc: "Free IPTV est gratuit et sans pub. Si vous appréciez l'app, soutenez son développement par un don (montant libre). Vous recevrez un code de licence en remerciement.",
+                supportDonate: 'Faire un don via PayPal',
+                supportDonateOther: 'Autre montant',
+                supportThanks: "Après votre don, entrez votre email PayPal ci-dessous pour récupérer votre code de licence.",
+                retrieveTitle: 'Récupérer votre code de licence',
+                retrieveBtn: 'Récupérer',
+                yourCode: 'Votre code de licence\u00A0:',
+                enterInSettings: "Entrez ce code dans l'app Paramètres > Licence",
+                noCodeFound: 'Aucune licence trouvée pour cet email. Veuillez patienter quelques minutes après votre don.'
+            },
+            en: {
+                tvCode: 'TV Code',
+                enterCode: 'Enter the code displayed on your TV',
+                savedPlaylists: 'Saved playlists',
+                addPlaylist: 'Add a playlist',
+                editPlaylist: 'Edit playlist',
+                nameOptional: 'Name (optional)',
+                myPlaylist: 'My playlist',
+                type: 'Type',
+                serverUrl: 'Server URL',
+                username: 'Username',
+                password: 'Password',
+                m3uWarning: 'Prefer Serveur API if available. M3U only supports live TV and may have compatibility issues.',
+                m3uUrl: 'M3U URL',
+                addAnother: '+ Add another playlist',
+                preferences: 'Preferences',
+                interfaceLanguage: 'Interface language',
+                providerFilter: 'VOD filter',
+                providerFilterDesc: 'Filter VOD categories by language. Auto uses interface language.',
+                allLanguages: 'All languages',
+                autoLanguage: 'Auto (interface language)',
+                apisOptional: 'APIs (optional)',
+                tmdbKey: 'TMDB API Key',
+                tmdbDesc: 'Posters, descriptions and cast for movies/series.',
+                getKey: 'Get a key',
+                openSubtitlesKey: 'OpenSubtitles API Key',
+                openSubtitlesDesc: 'Automatic subtitles.',
+                subdlKey: 'SubDL API Key',
+                subdlDesc: 'Subtitles (alternative).',
+                sendConfig: 'Send configuration',
+                sendToTV: 'Send to TV',
+                licenseSentToTV: 'License sent to your TV!',
+                configSuccess: 'Configuration sent successfully!',
+                tvWillConfigure: 'Your TV will configure automatically.',
+                reloadIn: 'Reloading in {seconds}s...',
+                edit: 'Edit',
+                delete: 'Delete',
+                playlist: 'Playlist',
+                confirmDelete: 'Delete this playlist?',
+                fillProviderFields: 'Please fill in all server fields',
+                addAtLeastOne: 'Add at least one playlist',
+                errorServer: 'Server error',
+                errorSending: 'Error sending',
+                error: 'Error',
+                codeLength: 'The code must be between 4 and 6 characters',
+                categoriesTitle: 'VOD Categories',
+                categoriesDesc: 'Configure keywords to filter VOD categories',
+                catSport: 'Sport',
+                catEntertainment: 'Entertainment',
+                catManga: 'Manga',
+                subConcerts: 'Concerts',
+                subTheatre: 'Theatre',
+                subSpectacles: 'Shows',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Enabled',
+                disabled: 'Disabled',
+                addKeyword: 'Add keyword...',
+                add: 'Add',
+                customCategories: 'Custom categories',
+                addCategory: '+ Add category',
+                categoryName: 'Category name',
+                categoryIcon: 'Icon',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Custom',
+                categoryNamePlaceholder: 'My category',
+                categoryNameRequired: 'Please enter a category name',
+                confirmDeleteCategory: 'Delete this category?',
+                servicesTitle: 'Services (optional)',
+                servicesDesc: 'Stream proxy and text-to-speech for your TV app.',
+                proxyUrl: 'Server URL',
+                yes: 'Yes',
+                no: 'No',
+                ttsRate: 'TTS Speed',
+                ttsVolume: 'TTS Volume',
+                ttsPitch: 'TTS Pitch',
+                streamProxy: 'Proxy streams',
+                supportTitle: 'Support Free IPTV',
+                supportDesc: 'Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation (any amount). You\'ll receive a license code as a thank you.',
+                supportDonate: 'Donate via PayPal',
+                supportDonateOther: 'Other amount',
+                supportThanks: 'After your donation, enter your PayPal email below to retrieve your license code.',
+                retrieveTitle: 'Retrieve your license code',
+                retrieveBtn: 'Retrieve',
+                yourCode: 'Your license code:',
+                enterInSettings: 'Enter this code in the app Settings > License',
+                noCodeFound: 'No license found for this email. Please allow a few minutes after your donation.'
+            },
+            es: {
+                tvCode: 'Código TV',
+                enterCode: 'Ingrese el código mostrado en su TV',
+                savedPlaylists: 'Playlists guardadas',
+                addPlaylist: 'Agregar una playlist',
+                editPlaylist: 'Editar playlist',
+                nameOptional: 'Nombre (opcional)',
+                myPlaylist: 'Mi playlist',
+                type: 'Tipo',
+                serverUrl: 'URL del servidor',
+                username: 'Usuario',
+                password: 'Contraseña',
+                m3uWarning: 'Prefiera Serveur API si está disponible. M3U solo soporta TV en vivo y puede tener problemas de compatibilidad.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Agregar otra playlist',
+                preferences: 'Preferencias',
+                interfaceLanguage: 'Idioma de la interfaz',
+                providerFilter: 'Filtro VOD',
+                providerFilterDesc: 'Filtra categorías VOD por idioma. Auto usa el idioma de la interfaz.',
+                allLanguages: 'Todos los idiomas',
+                autoLanguage: 'Auto (idioma interfaz)',
+                apisOptional: 'APIs (opcional)',
+                tmdbKey: 'Clave API TMDB',
+                tmdbDesc: 'Pósters, descripciones y reparto de películas/series.',
+                getKey: 'Obtener una clave',
+                openSubtitlesKey: 'Clave API OpenSubtitles',
+                openSubtitlesDesc: 'Subtítulos automáticos.',
+                subdlKey: 'Clave API SubDL',
+                subdlDesc: 'Subtítulos (alternativa).',
+                sendConfig: 'Enviar configuración',
+                sendToTV: 'Enviar a la TV',
+                licenseSentToTV: '¡Licencia enviada a tu TV!',
+                configSuccess: '¡Configuración enviada con éxito!',
+                tvWillConfigure: 'Su TV se configurará automáticamente.',
+                reloadIn: 'Recargando en {seconds}s...',
+                edit: 'Editar',
+                delete: 'Eliminar',
+                playlist: 'Playlist',
+                confirmDelete: '¿Eliminar esta playlist?',
+                fillProviderFields: 'Por favor complete todos los campos del servidor',
+                addAtLeastOne: 'Agregue al menos una playlist',
+                errorServer: 'Error del servidor',
+                errorSending: 'Error al enviar',
+                error: 'Error',
+                codeLength: 'El código debe tener entre 4 y 6 caracteres',
+                categoriesTitle: 'Categorías VOD',
+                categoriesDesc: 'Configure palabras clave para filtrar categorías VOD',
+                catSport: 'Deporte',
+                catEntertainment: 'Entretenimiento',
+                catManga: 'Manga',
+                subConcerts: 'Conciertos',
+                subTheatre: 'Teatro',
+                subSpectacles: 'Shows',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Activado',
+                disabled: 'Desactivado',
+                addKeyword: 'Agregar palabra clave...',
+                add: 'Agregar',
+                customCategories: 'Categorías personalizadas',
+                addCategory: '+ Agregar categoría',
+                categoryName: 'Nombre de categoría',
+                categoryIcon: 'Icono',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Personalizado',
+                categoryNamePlaceholder: 'Mi categoría',
+                categoryNameRequired: 'Por favor ingrese un nombre de categoría',
+                confirmDeleteCategory: '¿Eliminar esta categoría?',
+                servicesTitle: 'Servicios (opcional)',
+                servicesDesc: 'Proxy de transmisión y síntesis de voz para tu aplicación TV.',
+                proxyUrl: 'URL del servidor',
+                yes: 'Sí',
+                no: 'No',
+                ttsRate: 'Velocidad TTS',
+                ttsVolume: 'Volumen TTS',
+                ttsPitch: 'Tono TTS',
+                streamProxy: 'Proxy de flujos',
+                supportTitle: 'Apoya Free IPTV',
+                supportDesc: 'Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación (cualquier cantidad). Recibirás un código de licencia como agradecimiento.',
+                supportDonate: 'Donar vía PayPal',
+                supportDonateOther: 'Otro monto',
+                supportThanks: 'Después de tu donación, ingresa tu email de PayPal abajo para recuperar tu código de licencia.',
+                retrieveTitle: 'Recuperar tu código de licencia',
+                retrieveBtn: 'Recuperar',
+                yourCode: 'Tu código de licencia:',
+                enterInSettings: 'Ingresa este código en la app Ajustes > Licencia',
+                noCodeFound: 'No se encontró licencia para este email. Espera unos minutos después de tu donación.'
+            },
+            de: {
+                tvCode: 'TV-Code',
+                enterCode: 'Geben Sie den auf Ihrem TV angezeigten Code ein',
+                savedPlaylists: 'Gespeicherte Playlists',
+                addPlaylist: 'Playlist hinzufügen',
+                editPlaylist: 'Playlist bearbeiten',
+                nameOptional: 'Name (optional)',
+                myPlaylist: 'Meine Playlist',
+                type: 'Typ',
+                serverUrl: 'Server-URL',
+                username: 'Benutzername',
+                password: 'Passwort',
+                m3uWarning: 'Bevorzugen Sie Serveur API, falls verfügbar. M3U unterstützt nur Live-TV und kann Kompatibilitätsprobleme haben.',
+                m3uUrl: 'M3U-URL',
+                addAnother: '+ Weitere Playlist hinzufügen',
+                preferences: 'Einstellungen',
+                interfaceLanguage: 'Oberflächensprache',
+                providerFilter: 'VOD-Filter',
+                providerFilterDesc: 'VOD-Kategorien nach Sprache filtern. Auto verwendet die Oberflächensprache.',
+                allLanguages: 'Alle Sprachen',
+                autoLanguage: 'Auto (Oberfläche)',
+                apisOptional: 'APIs (optional)',
+                tmdbKey: 'TMDB API-Schlüssel',
+                tmdbDesc: 'Poster, Beschreibungen und Besetzung für Filme/Serien.',
+                getKey: 'Schlüssel erhalten',
+                openSubtitlesKey: 'OpenSubtitles API-Schlüssel',
+                openSubtitlesDesc: 'Automatische Untertitel.',
+                subdlKey: 'SubDL API-Schlüssel',
+                subdlDesc: 'Untertitel (Alternative).',
+                sendConfig: 'Konfiguration senden',
+                sendToTV: 'An TV senden',
+                licenseSentToTV: 'Lizenz an Ihren TV gesendet!',
+                configSuccess: 'Konfiguration erfolgreich gesendet!',
+                tvWillConfigure: 'Ihr TV wird automatisch konfiguriert.',
+                reloadIn: 'Neuladen in {seconds}s...',
+                edit: 'Bearbeiten',
+                delete: 'Löschen',
+                playlist: 'Playlist',
+                confirmDelete: 'Diese Playlist löschen?',
+                fillProviderFields: 'Bitte füllen Sie alle Server-Felder aus',
+                addAtLeastOne: 'Fügen Sie mindestens eine Playlist hinzu',
+                errorServer: 'Serverfehler',
+                errorSending: 'Fehler beim Senden',
+                error: 'Fehler',
+                codeLength: 'Der Code muss zwischen 4 und 6 Zeichen haben',
+                categoriesTitle: 'VOD-Kategorien',
+                categoriesDesc: 'Schlüsselwörter zum Filtern von VOD-Kategorien konfigurieren',
+                catSport: 'Sport',
+                catEntertainment: 'Unterhaltung',
+                catManga: 'Manga',
+                subConcerts: 'Konzerte',
+                subTheatre: 'Theater',
+                subSpectacles: 'Shows',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Aktiviert',
+                disabled: 'Deaktiviert',
+                addKeyword: 'Schlüsselwort hinzufügen...',
+                add: 'Hinzufügen',
+                customCategories: 'Benutzerdefinierte Kategorien',
+                addCategory: '+ Kategorie hinzufügen',
+                categoryName: 'Kategoriename',
+                categoryIcon: 'Symbol',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Benutzerdefiniert',
+                categoryNamePlaceholder: 'Meine Kategorie',
+                categoryNameRequired: 'Bitte geben Sie einen Kategorienamen ein',
+                confirmDeleteCategory: 'Diese Kategorie löschen?',
+                servicesTitle: 'Dienste (optional)',
+                servicesDesc: 'Stream-Proxy und Text-to-Speech für Ihre TV-App.',
+                proxyUrl: 'Server-URL',
+                yes: 'Ja',
+                no: 'Nein',
+                ttsRate: 'TTS-Geschwindigkeit',
+                ttsVolume: 'TTS-Lautstärke',
+                ttsPitch: 'TTS-Tonhöhe',
+                streamProxy: 'Streams proxen',
+                supportTitle: 'Free IPTV unterstützen',
+                supportDesc: 'Free IPTV ist kostenlos und werbefrei. Wenn Ihnen die App gefällt, unterstützen Sie die Entwicklung mit einer Spende (beliebiger Betrag). Sie erhalten einen Lizenzcode als Dankeschön.',
+                supportDonate: 'Über PayPal spenden',
+                supportDonateOther: 'Anderer Betrag',
+                supportThanks: 'Geben Sie nach Ihrer Spende Ihre PayPal-E-Mail unten ein, um Ihren Lizenzcode abzurufen.',
+                retrieveTitle: 'Lizenzcode abrufen',
+                retrieveBtn: 'Abrufen',
+                yourCode: 'Ihr Lizenzcode:',
+                enterInSettings: 'Geben Sie diesen Code in der App unter Einstellungen > Lizenz ein',
+                noCodeFound: 'Keine Lizenz für diese E-Mail gefunden. Bitte warten Sie einige Minuten nach Ihrer Spende.'
+            },
+            it: {
+                tvCode: 'Codice TV',
+                enterCode: 'Inserisci il codice visualizzato sulla tua TV',
+                savedPlaylists: 'Playlist salvate',
+                addPlaylist: 'Aggiungi una playlist',
+                editPlaylist: 'Modifica playlist',
+                nameOptional: 'Nome (opzionale)',
+                myPlaylist: 'La mia playlist',
+                type: 'Tipo',
+                serverUrl: 'URL del server',
+                username: 'Nome utente',
+                password: 'Password',
+                m3uWarning: 'Preferisci Serveur API se disponibile. M3U supporta solo TV in diretta e potrebbe avere problemi di compatibilità.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Aggiungi un\'altra playlist',
+                preferences: 'Preferenze',
+                interfaceLanguage: "Lingua dell'interfaccia",
+                providerFilter: 'Filtro VOD',
+                providerFilterDesc: "Filtra le categorie VOD per lingua. Auto usa la lingua dell'interfaccia.",
+                allLanguages: 'Tutte le lingue',
+                autoLanguage: 'Auto (interfaccia)',
+                apisOptional: 'APIs (opzionale)',
+                tmdbKey: 'Chiave API TMDB',
+                tmdbDesc: 'Poster, descrizioni e cast per film/serie.',
+                getKey: 'Ottieni una chiave',
+                openSubtitlesKey: 'Chiave API OpenSubtitles',
+                openSubtitlesDesc: 'Sottotitoli automatici.',
+                subdlKey: 'Chiave API SubDL',
+                subdlDesc: 'Sottotitoli (alternativa).',
+                sendConfig: 'Invia configurazione',
+                sendToTV: 'Invia alla TV',
+                licenseSentToTV: 'Licenza inviata alla tua TV!',
+                configSuccess: 'Configurazione inviata con successo!',
+                tvWillConfigure: 'La tua TV si configurerà automaticamente.',
+                reloadIn: 'Ricaricamento tra {seconds}s...',
+                edit: 'Modifica',
+                delete: 'Elimina',
+                playlist: 'Playlist',
+                confirmDelete: 'Eliminare questa playlist?',
+                fillProviderFields: 'Compila tutti i campi del server',
+                addAtLeastOne: 'Aggiungi almeno una playlist',
+                errorServer: 'Errore del server',
+                errorSending: "Errore durante l'invio",
+                error: 'Errore',
+                codeLength: 'Il codice deve avere tra 4 e 6 caratteri',
+                categoriesTitle: 'Categorie VOD',
+                categoriesDesc: 'Configura parole chiave per filtrare le categorie VOD',
+                catSport: 'Sport',
+                catEntertainment: 'Intrattenimento',
+                catManga: 'Manga',
+                subConcerts: 'Concerti',
+                subTheatre: 'Teatro',
+                subSpectacles: 'Spettacoli',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Abilitato',
+                disabled: 'Disabilitato',
+                addKeyword: 'Aggiungi parola chiave...',
+                add: 'Aggiungi',
+                customCategories: 'Categorie personalizzate',
+                addCategory: '+ Aggiungi categoria',
+                categoryName: 'Nome categoria',
+                categoryIcon: 'Icona',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Personalizzato',
+                categoryNamePlaceholder: 'La mia categoria',
+                categoryNameRequired: 'Inserisci un nome per la categoria',
+                confirmDeleteCategory: 'Eliminare questa categoria?',
+                servicesTitle: 'Servizi (opzionale)',
+                servicesDesc: 'Proxy streaming e sintesi vocale per la tua app TV.',
+                proxyUrl: 'URL del server',
+                yes: 'Sì',
+                no: 'No',
+                ttsRate: 'Velocità TTS',
+                ttsVolume: 'Volume TTS',
+                ttsPitch: 'Tonalità TTS',
+                streamProxy: 'Proxy dei flussi',
+                supportTitle: 'Supporta Free IPTV',
+                supportDesc: 'Free IPTV è gratuito e senza pubblicità. Se ti piace l\'app, supporta lo sviluppo con una donazione (qualsiasi importo). Riceverai un codice di licenza come ringraziamento.',
+                supportDonate: 'Dona tramite PayPal',
+                supportDonateOther: 'Altro importo',
+                supportThanks: 'Dopo la tua donazione, inserisci la tua email PayPal qui sotto per recuperare il tuo codice di licenza.',
+                retrieveTitle: 'Recupera il tuo codice di licenza',
+                retrieveBtn: 'Recupera',
+                yourCode: 'Il tuo codice di licenza:',
+                enterInSettings: 'Inserisci questo codice nell\'app Impostazioni > Licenza',
+                noCodeFound: 'Nessuna licenza trovata per questa email. Attendi qualche minuto dopo la donazione.'
+            },
+            pt: {
+                tvCode: 'Código TV',
+                enterCode: 'Insira o código exibido na sua TV',
+                savedPlaylists: 'Playlists salvas',
+                addPlaylist: 'Adicionar uma playlist',
+                editPlaylist: 'Editar playlist',
+                nameOptional: 'Nome (opcional)',
+                myPlaylist: 'Minha playlist',
+                type: 'Tipo',
+                serverUrl: 'URL do servidor',
+                username: 'Usuário',
+                password: 'Senha',
+                m3uWarning: 'Prefira Serveur API se disponível. M3U suporta apenas TV ao vivo e pode ter problemas de compatibilidade.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Adicionar outra playlist',
+                preferences: 'Preferências',
+                interfaceLanguage: 'Idioma da interface',
+                providerFilter: 'Filtro VOD',
+                providerFilterDesc: 'Filtra categorias VOD por idioma. Auto usa o idioma da interface.',
+                allLanguages: 'Todos os idiomas',
+                autoLanguage: 'Auto (interface)',
+                apisOptional: 'APIs (opcional)',
+                tmdbKey: 'Chave API TMDB',
+                tmdbDesc: 'Pôsteres, descrições e elenco de filmes/séries.',
+                getKey: 'Obter uma chave',
+                openSubtitlesKey: 'Chave API OpenSubtitles',
+                openSubtitlesDesc: 'Legendas automáticas.',
+                subdlKey: 'Chave API SubDL',
+                subdlDesc: 'Legendas (alternativa).',
+                sendConfig: 'Enviar configuração',
+                sendToTV: 'Enviar para a TV',
+                licenseSentToTV: 'Licença enviada para sua TV!',
+                configSuccess: 'Configuração enviada com sucesso!',
+                tvWillConfigure: 'Sua TV será configurada automaticamente.',
+                reloadIn: 'Recarregando em {seconds}s...',
+                edit: 'Editar',
+                delete: 'Excluir',
+                playlist: 'Playlist',
+                confirmDelete: 'Excluir esta playlist?',
+                fillProviderFields: 'Preencha todos os campos del servidor',
+                addAtLeastOne: 'Adicione pelo menos uma playlist',
+                errorServer: 'Erro do servidor',
+                errorSending: 'Erro ao enviar',
+                error: 'Erro',
+                codeLength: 'O código deve ter entre 4 e 6 caracteres',
+                categoriesTitle: 'Categorias VOD',
+                categoriesDesc: 'Configure palavras-chave para filtrar categorias VOD',
+                catSport: 'Esporte',
+                catEntertainment: 'Entretenimento',
+                catManga: 'Manga',
+                subConcerts: 'Concertos',
+                subTheatre: 'Teatro',
+                subSpectacles: 'Espetáculos',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Ativado',
+                disabled: 'Desativado',
+                addKeyword: 'Adicionar palavra-chave...',
+                add: 'Adicionar',
+                customCategories: 'Categorias personalizadas',
+                addCategory: '+ Adicionar categoria',
+                categoryName: 'Nome da categoria',
+                categoryIcon: 'Ícone',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Personalizado',
+                categoryNamePlaceholder: 'Minha categoria',
+                categoryNameRequired: 'Por favor insira um nome de categoria',
+                confirmDeleteCategory: 'Excluir esta categoria?',
+                servicesTitle: 'Serviços (opcional)',
+                servicesDesc: 'Proxy de streaming e síntese de voz para seu aplicativo de TV.',
+                proxyUrl: 'URL do servidor',
+                yes: 'Sim',
+                no: 'Não',
+                ttsRate: 'Velocidade TTS',
+                ttsVolume: 'Volume TTS',
+                ttsPitch: 'Tom TTS',
+                streamProxy: 'Proxy de fluxos',
+                supportTitle: 'Apoie Free IPTV',
+                supportDesc: 'Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação (qualquer valor). Você receberá um código de licença como agradecimento.',
+                supportDonate: 'Doar via PayPal',
+                supportDonateOther: 'Outro valor',
+                supportThanks: 'Após sua doação, insira seu email do PayPal abaixo para recuperar seu código de licença.',
+                retrieveTitle: 'Recuperar seu código de licença',
+                retrieveBtn: 'Recuperar',
+                yourCode: 'Seu código de licença:',
+                enterInSettings: 'Insira este código no app Configurações > Licença',
+                noCodeFound: 'Nenhuma licença encontrada para este email. Aguarde alguns minutos após sua doação.'
+            },
+            nl: {
+                tvCode: 'TV-code',
+                enterCode: 'Voer de code in die op uw TV wordt weergegeven',
+                savedPlaylists: 'Opgeslagen afspeellijsten',
+                addPlaylist: 'Afspeellijst toevoegen',
+                editPlaylist: 'Afspeellijst bewerken',
+                nameOptional: 'Naam (optioneel)',
+                myPlaylist: 'Mijn afspeellijst',
+                type: 'Type',
+                serverUrl: 'Server-URL',
+                username: 'Gebruikersnaam',
+                password: 'Wachtwoord',
+                m3uWarning: 'Geef de voorkeur aan Serveur API indien beschikbaar. M3U ondersteunt alleen live TV en kan compatibiliteitsproblemen hebben.',
+                m3uUrl: 'M3U-URL',
+                addAnother: '+ Nog een afspeellijst toevoegen',
+                preferences: 'Voorkeuren',
+                interfaceLanguage: 'Interfacetaal',
+                providerFilter: 'VOD-filter',
+                providerFilterDesc: 'Filter VOD-categorieën op taal. Auto gebruikt de interfacetaal.',
+                allLanguages: 'Alle talen',
+                autoLanguage: 'Auto (interface)',
+                apisOptional: 'APIs (optioneel)',
+                tmdbKey: 'TMDB API-sleutel',
+                tmdbDesc: 'Posters, beschrijvingen en cast voor films/series.',
+                getKey: 'Sleutel verkrijgen',
+                openSubtitlesKey: 'OpenSubtitles API-sleutel',
+                openSubtitlesDesc: 'Automatische ondertitels.',
+                subdlKey: 'SubDL API-sleutel',
+                subdlDesc: 'Ondertitels (alternatief).',
+                sendConfig: 'Configuratie verzenden',
+                sendToTV: 'Naar TV sturen',
+                licenseSentToTV: 'Licentie naar uw TV gestuurd!',
+                configSuccess: 'Configuratie succesvol verzonden!',
+                tvWillConfigure: 'Uw TV wordt automatisch geconfigureerd.',
+                reloadIn: 'Herladen over {seconds}s...',
+                edit: 'Bewerken',
+                delete: 'Verwijderen',
+                playlist: 'Afspeellijst',
+                confirmDelete: 'Deze afspeellijst verwijderen?',
+                fillProviderFields: 'Vul alle servervelden in',
+                addAtLeastOne: 'Voeg ten minste één afspeellijst toe',
+                errorServer: 'Serverfout',
+                errorSending: 'Fout bij verzenden',
+                error: 'Fout',
+                codeLength: 'De code moet tussen 4 en 6 tekens hebben',
+                categoriesTitle: 'VOD-categorieën',
+                categoriesDesc: 'Configureer trefwoorden om VOD-categorieën te filteren',
+                catSport: 'Sport',
+                catEntertainment: 'Entertainment',
+                catManga: 'Manga',
+                subConcerts: 'Concerten',
+                subTheatre: 'Theater',
+                subSpectacles: 'Shows',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Ingeschakeld',
+                disabled: 'Uitgeschakeld',
+                addKeyword: 'Trefwoord toevoegen...',
+                add: 'Toevoegen',
+                customCategories: 'Aangepaste categorieën',
+                addCategory: '+ Categorie toevoegen',
+                categoryName: 'Categorienaam',
+                categoryIcon: 'Pictogram',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Aangepast',
+                categoryNamePlaceholder: 'Mijn categorie',
+                categoryNameRequired: 'Voer een categorienaam in',
+                confirmDeleteCategory: 'Deze categorie verwijderen?',
+                servicesTitle: 'Diensten (optioneel)',
+                servicesDesc: 'Streamproxy en tekst-naar-spraak voor uw TV-app.',
+                proxyUrl: 'Server URL',
+                yes: 'Ja',
+                no: 'Nee',
+                ttsRate: 'TTS-snelheid',
+                ttsVolume: 'TTS-volume',
+                ttsPitch: 'TTS-toonhoogte',
+                streamProxy: 'Streams proxyen',
+                supportTitle: 'Steun Free IPTV',
+                supportDesc: 'Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie (elk bedrag). Je ontvangt een licentiecode als bedankje.',
+                supportDonate: 'Doneer via PayPal',
+                supportDonateOther: 'Ander bedrag',
+                supportThanks: 'Voer na je donatie hieronder je PayPal-e-mail in om je licentiecode op te halen.',
+                retrieveTitle: 'Licentiecode ophalen',
+                retrieveBtn: 'Ophalen',
+                yourCode: 'Je licentiecode:',
+                enterInSettings: 'Voer deze code in de app in bij Instellingen > Licentie',
+                noCodeFound: 'Geen licentie gevonden voor dit e-mailadres. Wacht een paar minuten na je donatie.'
+            },
+            pl: {
+                tvCode: 'Kod TV',
+                enterCode: 'Wprowadź kod wyświetlany na telewizorze',
+                savedPlaylists: 'Zapisane playlisty',
+                addPlaylist: 'Dodaj playlistę',
+                editPlaylist: 'Edytuj playlistę',
+                nameOptional: 'Nazwa (opcjonalnie)',
+                myPlaylist: 'Moja playlista',
+                type: 'Typ',
+                serverUrl: 'URL serwera',
+                username: 'Nazwa użytkownika',
+                password: 'Hasło',
+                m3uWarning: 'Preferuj Serveur API, jeśli dostępne. M3U obsługuje tylko telewizję na żywo i może mieć problemy z kompatybilnością.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Dodaj kolejną playlistę',
+                preferences: 'Preferencje',
+                interfaceLanguage: 'Język interfejsu',
+                providerFilter: 'Filtr VOD',
+                providerFilterDesc: 'Filtruj kategorie VOD według języka. Auto używa języka interfejsu.',
+                allLanguages: 'Wszystkie języki',
+                autoLanguage: 'Auto (interfejs)',
+                apisOptional: 'APIs (opcjonalnie)',
+                tmdbKey: 'Klucz API TMDB',
+                tmdbDesc: 'Plakaty, opisy i obsada filmów/seriali.',
+                getKey: 'Uzyskaj klucz',
+                openSubtitlesKey: 'Klucz API OpenSubtitles',
+                openSubtitlesDesc: 'Automatyczne napisy.',
+                subdlKey: 'Klucz API SubDL',
+                subdlDesc: 'Napisy (alternatywa).',
+                sendConfig: 'Wyślij konfigurację',
+                sendToTV: 'Wyślij do TV',
+                licenseSentToTV: 'Licencja wysłana na Twój TV!',
+                configSuccess: 'Konfiguracja wysłana pomyślnie!',
+                tvWillConfigure: 'Twój telewizor skonfiguruje się automatycznie.',
+                reloadIn: 'Przeładowanie za {seconds}s...',
+                edit: 'Edytuj',
+                delete: 'Usuń',
+                playlist: 'Playlista',
+                confirmDelete: 'Usunąć tę playlistę?',
+                fillProviderFields: 'Wypełnij wszystkie pola serwera',
+                addAtLeastOne: 'Dodaj co najmniej jedną playlistę',
+                errorServer: 'Błąd serwera',
+                errorSending: 'Błąd podczas wysyłania',
+                error: 'Błąd',
+                codeLength: 'Kod musi mieć od 4 do 6 znaków',
+                categoriesTitle: 'Kategorie VOD',
+                categoriesDesc: 'Skonfiguruj słowa kluczowe do filtrowania kategorii VOD',
+                catSport: 'Sport',
+                catEntertainment: 'Rozrywka',
+                catManga: 'Manga',
+                subConcerts: 'Koncerty',
+                subTheatre: 'Teatr',
+                subSpectacles: 'Pokazy',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Włączone',
+                disabled: 'Wyłączone',
+                addKeyword: 'Dodaj słowo kluczowe...',
+                add: 'Dodaj',
+                customCategories: 'Kategorie niestandardowe',
+                addCategory: '+ Dodaj kategorię',
+                categoryName: 'Nazwa kategorii',
+                categoryIcon: 'Ikona',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Niestandardowa',
+                categoryNamePlaceholder: 'Moja kategoria',
+                categoryNameRequired: 'Proszę wprowadzić nazwę kategorii',
+                confirmDeleteCategory: 'Usunąć tę kategorię?',
+                servicesTitle: 'Usługi (opcjonalne)',
+                servicesDesc: 'Proxy strumieniowy i synteza mowy dla aplikacji TV.',
+                proxyUrl: 'URL serwera',
+                yes: 'Tak',
+                no: 'Nie',
+                ttsRate: 'Szybkość TTS',
+                ttsVolume: 'Głośność TTS',
+                ttsPitch: 'Ton TTS',
+                streamProxy: 'Proxy strumieni',
+                supportTitle: 'Wesprzyj Free IPTV',
+                supportDesc: 'Free IPTV jest darmowe i bez reklam. Jeśli podoba Ci się aplikacja, wesprzyj jej rozwój darowizną (dowolna kwota). Otrzymasz kod licencji w podziękowaniu.',
+                supportDonate: 'Wpłać przez PayPal',
+                supportDonateOther: 'Inna kwota',
+                supportThanks: 'Po dokonaniu wpłaty wpisz poniżej swój email PayPal, aby pobrać kod licencji.',
+                retrieveTitle: 'Pobierz kod licencji',
+                retrieveBtn: 'Pobierz',
+                yourCode: 'Twój kod licencji:',
+                enterInSettings: 'Wpisz ten kod w aplikacji Ustawienia > Licencja',
+                noCodeFound: 'Nie znaleziono licencji dla tego emaila. Poczekaj kilka minut po dokonaniu wpłaty.'
+            },
+            ru: {
+                tvCode: 'Код ТВ',
+                enterCode: 'Введите код, отображаемый на вашем ТВ',
+                savedPlaylists: 'Сохраненные плейлисты',
+                addPlaylist: 'Добавить плейлист',
+                editPlaylist: 'Редактировать плейлист',
+                nameOptional: 'Название (необязательно)',
+                myPlaylist: 'Мой плейлист',
+                type: 'Тип',
+                serverUrl: 'URL сервера',
+                username: 'Имя пользователя',
+                password: 'Пароль',
+                m3uWarning: 'Предпочтительно Serveur API, если доступно. M3U поддерживает только прямой эфир и может иметь проблемы совместимости.',
+                m3uUrl: 'URL M3U',
+                addAnother: '+ Добавить еще плейлист',
+                preferences: 'Настройки',
+                interfaceLanguage: 'Язык интерфейса',
+                providerFilter: 'Фильтр VOD',
+                providerFilterDesc: 'Фильтр категорий VOD по языку. Авто использует язык интерфейса.',
+                allLanguages: 'Все языки',
+                autoLanguage: 'Авто (интерфейс)',
+                apisOptional: 'APIs (необязательно)',
+                tmdbKey: 'Ключ API TMDB',
+                tmdbDesc: 'Постеры, описания и актеры для фильмов/сериалов.',
+                getKey: 'Получить ключ',
+                openSubtitlesKey: 'Ключ API OpenSubtitles',
+                openSubtitlesDesc: 'Автоматические субтитры.',
+                subdlKey: 'Ключ API SubDL',
+                subdlDesc: 'Субтитры (альтернатива).',
+                sendConfig: 'Отправить конфигурацию',
+                sendToTV: 'Отправить на ТВ',
+                licenseSentToTV: 'Лицензия отправлена на ваш ТВ!',
+                configSuccess: 'Конфигурация успешно отправлена!',
+                tvWillConfigure: 'Ваш ТВ настроится автоматически.',
+                reloadIn: 'Перезагрузка через {seconds}с...',
+                edit: 'Редактировать',
+                delete: 'Удалить',
+                playlist: 'Плейлист',
+                confirmDelete: 'Удалить этот плейлист?',
+                fillProviderFields: 'Заполните все поля сервера',
+                addAtLeastOne: 'Добавьте хотя бы один плейлист',
+                errorServer: 'Ошибка сервера',
+                errorSending: 'Ошибка отправки',
+                error: 'Ошибка',
+                codeLength: 'Код должен содержать от 4 до 6 символов',
+                categoriesTitle: 'Категории VOD',
+                categoriesDesc: 'Настройте ключевые слова для фильтрации категорий VOD',
+                catSport: 'Спорт',
+                catEntertainment: 'Развлечения',
+                catManga: 'Манга',
+                subConcerts: 'Концерты',
+                subTheatre: 'Театр',
+                subSpectacles: 'Шоу',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Караоке',
+                enabled: 'Включено',
+                disabled: 'Отключено',
+                addKeyword: 'Добавить ключевое слово...',
+                add: 'Добавить',
+                customCategories: 'Пользовательские категории',
+                addCategory: '+ Добавить категорию',
+                categoryName: 'Название категории',
+                categoryIcon: 'Иконка',
+                iconEmoji: 'Эмодзи',
+                iconCustom: 'Настраиваемая',
+                categoryNamePlaceholder: 'Моя категория',
+                categoryNameRequired: 'Пожалуйста, введите название категории',
+                confirmDeleteCategory: 'Удалить эту категорию?',
+                servicesTitle: 'Сервисы (необязательно)',
+                servicesDesc: 'Прокси потоков и синтез речи для вашего TV-приложения.',
+                proxyUrl: 'URL сервера',
+                yes: 'Да',
+                no: 'Нет',
+                ttsRate: 'Скорость TTS',
+                ttsVolume: 'Громкость TTS',
+                ttsPitch: 'Тон TTS',
+                streamProxy: 'Прокси потоков',
+                supportTitle: 'Поддержите Free IPTV',
+                supportDesc: 'Free IPTV бесплатно и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием (любая сумма). Вы получите код лицензии для разблокировки всех премиум функций навсегда.',
+                supportDonate: 'Пожертвовать через PayPal',
+                supportDonateOther: 'Другая сумма',
+                supportThanks: 'После пожертвования введите ваш email PayPal ниже, чтобы получить код лицензии.',
+                retrieveTitle: 'Получить код лицензии',
+                retrieveBtn: 'Получить',
+                yourCode: 'Ваш код лицензии:',
+                enterInSettings: 'Введите этот код в приложении Настройки > Лицензия',
+                noCodeFound: 'Лицензия для этого email не найдена. Подождите несколько минут после пожертвования.'
+            },
+            tr: {
+                tvCode: 'TV Kodu',
+                enterCode: "TV'nizde görüntülenen kodu girin",
+                savedPlaylists: 'Kayıtlı oynatma listeleri',
+                addPlaylist: 'Oynatma listesi ekle',
+                editPlaylist: 'Oynatma listesini düzenle',
+                nameOptional: 'Ad (isteğe bağlı)',
+                myPlaylist: 'Oynatma listem',
+                type: 'Tür',
+                serverUrl: 'Sunucu URL',
+                username: 'Kullanıcı adı',
+                password: 'Şifre',
+                m3uWarning: 'Varsa Serveur API tercih edin. M3U yalnızca canlı TV destekler ve uyumluluk sorunları olabilir.',
+                m3uUrl: 'M3U URL',
+                addAnother: '+ Başka oynatma listesi ekle',
+                preferences: 'Tercihler',
+                interfaceLanguage: 'Arayüz dili',
+                providerFilter: 'VOD filtresi',
+                providerFilterDesc: 'VOD kategorilerini dile göre filtrele. Otomatik, arayüz dilini kullanır.',
+                allLanguages: 'Tüm diller',
+                autoLanguage: 'Otomatik (arayüz)',
+                apisOptional: 'APIs (isteğe bağlı)',
+                tmdbKey: 'TMDB API Anahtarı',
+                tmdbDesc: 'Film/dizi için posterler, açıklamalar ve oyuncular.',
+                getKey: 'Anahtar al',
+                openSubtitlesKey: 'OpenSubtitles API Anahtarı',
+                openSubtitlesDesc: 'Otomatik altyazılar.',
+                subdlKey: 'SubDL API Anahtarı',
+                subdlDesc: 'Altyazılar (alternatif).',
+                sendConfig: 'Yapılandırmayı gönder',
+                sendToTV: 'TV\'ye gönder',
+                licenseSentToTV: 'Lisans TV\'nize gönderildi!',
+                configSuccess: 'Yapılandırma başarıyla gönderildi!',
+                tvWillConfigure: "TV'niz otomatik olarak yapılandırılacak.",
+                reloadIn: '{seconds}s içinde yeniden yükleniyor...',
+                edit: 'Düzenle',
+                delete: 'Sil',
+                playlist: 'Oynatma listesi',
+                confirmDelete: 'Bu oynatma listesini sil?',
+                fillProviderFields: 'Tüm sunucu alanlarını doldurun',
+                addAtLeastOne: 'En az bir oynatma listesi ekleyin',
+                errorServer: 'Sunucu hatası',
+                errorSending: 'Gönderme hatası',
+                error: 'Hata',
+                codeLength: 'Kod 4 ile 6 karakter arasında olmalıdır',
+                categoriesTitle: 'VOD Kategorileri',
+                categoriesDesc: 'VOD kategorilerini filtrelemek için anahtar kelimeler yapılandırın',
+                catSport: 'Spor',
+                catEntertainment: 'Eğlence',
+                catManga: 'Manga',
+                subConcerts: 'Konserler',
+                subTheatre: 'Tiyatro',
+                subSpectacles: 'Gösteriler',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'Karaoke',
+                enabled: 'Etkin',
+                disabled: 'Devre dışı',
+                addKeyword: 'Anahtar kelime ekle...',
+                add: 'Ekle',
+                customCategories: 'Özel kategoriler',
+                addCategory: '+ Kategori ekle',
+                categoryName: 'Kategori adı',
+                categoryIcon: 'Simge',
+                iconEmoji: 'Emoji',
+                iconCustom: 'Özel',
+                categoryNamePlaceholder: 'Kategorim',
+                categoryNameRequired: 'Lütfen bir kategori adı girin',
+                confirmDeleteCategory: 'Bu kategoriyi sil?',
+                servicesTitle: 'Hizmetler (isteğe bağlı)',
+                servicesDesc: 'TV uygulamanız için akış proxy ve metin-konuşma.',
+                proxyUrl: 'Sunucu URL',
+                yes: 'Evet',
+                no: 'Hayır',
+                ttsRate: 'TTS Hızı',
+                ttsVolume: 'TTS Ses Düzeyi',
+                ttsPitch: 'TTS Tonu',
+                streamProxy: 'Akış proxy',
+                supportTitle: 'Free IPTV\'yi Destekle',
+                supportDesc: 'Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, geliştirmeyi bir bağışla destekleyin (herhangi bir miktar). Teşekkür olarak bir lisans kodu alacaksınız.',
+                supportDonate: 'PayPal ile Bağış Yap',
+                supportDonateOther: 'Başka miktar',
+                supportThanks: 'Bağışınızdan sonra lisans kodunuzu almak için PayPal e-postanızı aşağıya girin.',
+                retrieveTitle: 'Lisans kodunuzu alın',
+                retrieveBtn: 'Al',
+                yourCode: 'Lisans kodunuz:',
+                enterInSettings: 'Bu kodu uygulamada Ayarlar > Lisans bölümüne girin',
+                noCodeFound: 'Bu e-posta için lisans bulunamadı. Bağışınızdan sonra birkaç dakika bekleyin.'
+            },
+            ar: {
+                tvCode: 'رمز التلفزيون',
+                enterCode: 'أدخل الرمز المعروض على التلفزيون',
+                savedPlaylists: 'قوائم التشغيل المحفوظة',
+                addPlaylist: 'إضافة قائمة تشغيل',
+                editPlaylist: 'تعديل قائمة التشغيل',
+                nameOptional: 'الاسم (اختياري)',
+                myPlaylist: 'قائمة تشغيلي',
+                type: 'النوع',
+                serverUrl: 'رابط الخادم',
+                username: 'اسم المستخدم',
+                password: 'كلمة المرور',
+                m3uWarning: 'يفضل استخدام Serveur API إذا كان متاحاً. M3U يدعم فقط البث المباشر وقد يواجه مشاكل توافق.',
+                m3uUrl: 'رابط M3U',
+                addAnother: '+ إضافة قائمة تشغيل أخرى',
+                preferences: 'التفضيلات',
+                interfaceLanguage: 'لغة الواجهة',
+                providerFilter: 'فلتر VOD',
+                providerFilterDesc: 'تصفية فئات VOD حسب اللغة. تلقائي يستخدم لغة الواجهة.',
+                allLanguages: 'جميع اللغات',
+                autoLanguage: 'تلقائي (الواجهة)',
+                apisOptional: 'APIs (اختياري)',
+                tmdbKey: 'مفتاح API TMDB',
+                tmdbDesc: 'ملصقات وأوصاف وممثلين للأفلام/المسلسلات.',
+                getKey: 'الحصول على مفتاح',
+                openSubtitlesKey: 'مفتاح API OpenSubtitles',
+                openSubtitlesDesc: 'ترجمات تلقائية.',
+                subdlKey: 'مفتاح API SubDL',
+                subdlDesc: 'ترجمات (بديل).',
+                sendConfig: 'إرسال التكوين',
+                sendToTV: 'إرسال إلى التلفاز',
+                licenseSentToTV: 'تم إرسال الترخيص إلى تلفازك!',
+                configSuccess: 'تم إرسال التكوين بنجاح!',
+                tvWillConfigure: 'سيتم تكوين التلفزيون تلقائياً.',
+                reloadIn: 'إعادة التحميل خلال {seconds} ثانية...',
+                edit: 'تعديل',
+                delete: 'حذف',
+                playlist: 'قائمة تشغيل',
+                confirmDelete: 'حذف قائمة التشغيل هذه؟',
+                fillProviderFields: 'يرجى ملء جميع حقول الخادم',
+                addAtLeastOne: 'أضف قائمة تشغيل واحدة على الأقل',
+                errorServer: 'خطأ في الخادم',
+                errorSending: 'خطأ في الإرسال',
+                error: 'خطأ',
+                codeLength: 'يجب أن يكون الرمز بين 4 و 6 أحرف',
+                categoriesTitle: 'فئات VOD',
+                categoriesDesc: 'تكوين الكلمات المفتاحية لتصفية فئات VOD',
+                catSport: 'رياضة',
+                catEntertainment: 'ترفيه',
+                catManga: 'مانغا',
+                subConcerts: 'حفلات',
+                subTheatre: 'مسرح',
+                subSpectacles: 'عروض',
+                subBlindtest: 'Blind Test',
+                subKaraoke: 'كاريوكي',
+                enabled: 'مفعّل',
+                disabled: 'معطّل',
+                addKeyword: 'إضافة كلمة مفتاحية...',
+                add: 'إضافة',
+                customCategories: 'فئات مخصصة',
+                addCategory: '+ إضافة فئة',
+                categoryName: 'اسم الفئة',
+                categoryIcon: 'أيقونة',
+                iconEmoji: 'إيموجي',
+                iconCustom: 'مخصص',
+                categoryNamePlaceholder: 'فئتي',
+                categoryNameRequired: 'الرجاء إدخال اسم الفئة',
+                confirmDeleteCategory: 'حذف هذه الفئة؟',
+                servicesTitle: 'الخدمات (اختياري)',
+                servicesDesc: 'وكيل البث وتحويل النص إلى كلام لتطبيق التلفزيون.',
+                proxyUrl: 'رابط الخادم',
+                yes: 'نعم',
+                no: 'لا',
+                ttsRate: 'سرعة TTS',
+                ttsVolume: 'مستوى صوت TTS',
+                ttsPitch: 'نغمة TTS',
+                streamProxy: 'وكيل البث',
+                supportTitle: 'ادعم Free IPTV',
+                supportDesc: 'Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم التطوير بتبرع (أي مبلغ). ستحصل على رمز ترخيص لفتح جميع الميزات المميزة بشكل دائم.',
+                supportDonate: 'تبرع عبر PayPal',
+                supportDonateOther: 'مبلغ آخر',
+                supportThanks: 'بعد تبرعك، أدخل بريدك الإلكتروني في PayPal أدناه لاسترداد رمز الترخيص.',
+                retrieveTitle: 'استرداد رمز الترخيص',
+                retrieveBtn: 'استرداد',
+                yourCode: 'رمز الترخيص الخاص بك:',
+                enterInSettings: 'أدخل هذا الرمز في التطبيق الإعدادات > الترخيص',
+                noCodeFound: 'لم يتم العثور على ترخيص لهذا البريد الإلكتروني. يرجى الانتظار بضع دقائق بعد التبرع.'
+            }
+        };
+
+        function t(key, params) {
+            var text = (translations[currentLocale] && translations[currentLocale][key]) || translations.en[key] || key;
+            if (params) {
+                for (var k in params) {
+                    text = text.replace('{' + k + '}', params[k]);
+                }
+            }
+            return text;
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+            document.documentElement.lang = currentLocale;
+        }
+
+        function syncVodFilterLang(locale) {
+            document.getElementById('pref-provider-lang').value = 'AUTO';
+        }
+
+        function initLocale() {
+            var params = new URLSearchParams(window.location.search);
+            var lang = params.get('l');
+            if (lang && translations[lang]) {
+                currentLocale = lang;
+            }
+            document.getElementById('page-locale').value = currentLocale;
+            applyTranslations();
+            syncVodFilterLang(currentLocale);
+            document.getElementById('page-locale').addEventListener('change', function() {
+                currentLocale = this.value;
+                applyTranslations();
+                syncVodFilterLang(currentLocale);
+            });
+        }
+
+        function validateCode() {
+            var code = document.getElementById('tv-code').value.trim().toUpperCase();
+            if (code.length < 4 || code.length > 6) {
+                alert(t('codeLength'));
+                return;
+            }
+            tvCode = code;
+            document.getElementById('code-step').classList.add('hidden');
+            document.getElementById('config-step').classList.remove('hidden');
+        }
+
+        document.getElementById('tv-code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') validateCode();
+        });
+        document.getElementById('tv-code').addEventListener('input', function(e) {
+            var code = this.value.trim();
+            if (code.length >= 6) {
+                validateCode();
+            }
+        });
+
+        var urlCode = new URLSearchParams(window.location.search).get('code');
+        if (urlCode) {
+            document.getElementById('tv-code').value = urlCode;
+            validateCode();
+        }
+
+        function selectType(type) {
+            currentType = type;
+            document.querySelectorAll('.type-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            document.getElementById('provider-fields').classList.toggle('hidden', type !== 'provider');
+            document.getElementById('m3u-fields').classList.toggle('hidden', type !== 'm3u');
+        }
+
+        function editPlaylist(index) {
+            editingIndex = index;
+            var p = playlists[index];
+            document.getElementById('form-title').textContent = t('editPlaylist');
+            document.getElementById('pl-name').value = p.name || '';
+            if (p.type === 'provider') {
+                document.getElementById('pl-server').value = p.serverUrl || '';
+                document.getElementById('pl-username').value = p.username || '';
+                document.getElementById('pl-password').value = p.password || '';
+                document.getElementById('pl-m3u').value = '';
+            } else {
+                document.getElementById('pl-m3u').value = p.url || '';
+                document.getElementById('pl-server').value = '';
+                document.getElementById('pl-username').value = '';
+                document.getElementById('pl-password').value = '';
+            }
+            selectType(p.type);
+            document.getElementById('add-playlist-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deletePlaylist(index) {
+            if (confirm(t('confirmDelete'))) {
+                playlists.splice(index, 1);
+                renderPlaylists();
+            }
+        }
+
+        function saveCurrentPlaylist(silent) {
+            var type = currentType;
+            var name = document.getElementById('pl-name').value.trim();
+            var serverUrl = document.getElementById('pl-server').value.trim();
+            var username = document.getElementById('pl-username').value.trim();
+            var password = document.getElementById('pl-password').value.trim();
+            var m3uUrl = document.getElementById('pl-m3u').value.trim();
+
+            var hasData = false;
+            if (type === 'provider') {
+                hasData = serverUrl || username || password;
+                if (hasData && (!serverUrl || !username || !password)) {
+                    if (!silent) alert(t('fillProviderFields'));
+                    return false;
+                }
+            } else {
+                hasData = !!m3uUrl;
+            }
+
+            if (!hasData) {
+                return true;
+            }
+
+            var playlist = {
+                id: editingIndex >= 0 ? playlists[editingIndex].id : Date.now(),
+                name: name,
+                type: type
+            };
+
+            if (type === 'provider') {
+                playlist.serverUrl = serverUrl;
+                playlist.username = username;
+                playlist.password = password;
+            } else {
+                playlist.url = m3uUrl;
+            }
+
+            if (editingIndex >= 0) {
+                playlists[editingIndex] = playlist;
+            } else {
+                playlists.push(playlist);
+            }
+            return true;
+        }
+
+        function saveAndAddAnother() {
+            if (!saveCurrentPlaylist(false)) return;
+            resetForm();
+            renderPlaylists();
+        }
+
+        function resetForm() {
+            editingIndex = -1;
+            document.getElementById('form-title').textContent = t('addPlaylist');
+            document.getElementById('pl-name').value = '';
+            document.getElementById('pl-server').value = '';
+            document.getElementById('pl-username').value = '';
+            document.getElementById('pl-password').value = '';
+            document.getElementById('pl-m3u').value = '';
+            selectType('provider');
+        }
+
+        function renderPlaylists() {
+            var html = '';
+            var listCard = document.getElementById('playlists-list').parentElement;
+            if (playlists.length === 0) {
+                listCard.classList.add('hidden');
+            } else {
+                listCard.classList.remove('hidden');
+                playlists.forEach(function(p, i) {
+                    var typeLabel = p.type === 'provider' ? 'Serveur API' : 'M3U';
+                    html += '<div class="playlist-item">';
+                    html += '<div class="info"><div class="name">' + (p.name || t('playlist') + ' ' + (i+1)) + '</div>';
+                    html += '<div class="type">' + typeLabel + '</div></div>';
+                    html += '<button class="btn btn-secondary" onclick="editPlaylist(' + i + ')">' + t('edit') + '</button>';
+                    html += '<button class="btn btn-danger" onclick="deletePlaylist(' + i + ')">' + t('delete') + '</button>';
+                    html += '</div>';
+                });
+                document.getElementById('playlists-list').innerHTML = html;
+            }
+            // Update categories section visibility
+            initCategories();
+        }
+
+        var streamProxy = true;
+
+        function toggleStreamProxy(enabled) {
+            streamProxy = enabled;
+            document.getElementById('stream-proxy-on-btn').classList.toggle('active', enabled);
+            document.getElementById('stream-proxy-off-btn').classList.toggle('active', !enabled);
+        }
+
+        function checkTTSAvailability() {
+            var url = document.getElementById('pref-proxy-url').value.trim();
+            if (!url) {
+                document.getElementById('tts-fields').classList.add('hidden');
+                return;
+            }
+            var voicesUrl = url.replace(/\/+$/, '') + '/voices?lang=en';
+            fetch(voicesUrl, { signal: AbortSignal.timeout(5000) })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.voices) {
+                        document.getElementById('tts-fields').classList.remove('hidden');
+                    }
+                })
+                .catch(function() {
+                    document.getElementById('tts-fields').classList.add('hidden');
+                });
+        }
+
+        document.getElementById('pref-proxy-url').addEventListener('change', checkTTSAvailability);
+
+        function updateRangeLabel(id) {
+            var input = document.getElementById('pref-' + id);
+            var label = document.getElementById(id + '-label');
+            var unit = id === 'tts-pitch' ? 'Hz' : '%';
+            var val = parseInt(input.value);
+            label.textContent = (val > 0 ? '+' : '') + val + unit;
+        }
+
+        function sendConfig() {
+            if (!saveCurrentPlaylist(false)) return;
+
+            if (playlists.length === 0) {
+                alert(t('addAtLeastOne'));
+                return;
+            }
+            var config = {
+                playlists: playlists,
+                activePlaylistId: playlists[0].id,
+                locale: document.getElementById('page-locale').value,
+                providerLanguage: document.getElementById('pref-provider-lang').value,
+                tmdbApiKey: document.getElementById('api-tmdb').value.trim(),
+                openSubtitlesApiKey: document.getElementById('api-opensubtitles').value.trim(),
+                subDLApiKey: document.getElementById('api-subdl').value.trim(),
+                categoryPatterns: categoryPatterns,
+                hiddenDefaultCategories: hiddenDefaultCategories,
+                customCategories: customCategories,
+                proxyEnabled: !!document.getElementById('pref-proxy-url').value.trim(),
+                streamProxy: document.getElementById('pref-proxy-url').value.trim() ? streamProxy : true,
+                proxyUrl: document.getElementById('pref-proxy-url').value.trim(),
+                ttsRate: parseInt(document.getElementById('pref-tts-rate').value) || 0,
+                ttsVolume: parseInt(document.getElementById('pref-tts-volume').value) || 0,
+                ttsPitch: parseInt(document.getElementById('pref-tts-pitch').value) || 0
+            };
+
+            document.getElementById('error-msg').classList.add('hidden');
+
+            fetch(WORKER_URL + '/' + tvCode, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error(t('errorServer'));
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.ok) {
+                    document.getElementById('config-step').classList.add('hidden');
+                    document.getElementById('success-step').classList.remove('hidden');
+                    startReloadCountdown(5);
+                } else {
+                    throw new Error(t('errorSending'));
+                }
+            })
+            .catch(function(err) {
+                var errorDiv = document.getElementById('error-msg');
+                errorDiv.textContent = t('error') + ': ' + err.message;
+                errorDiv.classList.remove('hidden');
+            });
+        }
+
+        function startReloadCountdown(seconds) {
+            var countdown = seconds;
+            var countdownEl = document.getElementById('reload-countdown');
+            function updateCountdown() {
+                countdownEl.textContent = t('reloadIn', { seconds: countdown });
+                if (countdown <= 0) {
+                    window.location.reload();
+                } else {
+                    countdown--;
+                    setTimeout(updateCountdown, 1000);
+                }
+            }
+            updateCountdown();
+        }
+
+        // Category management
+        var defaultKeywords = {
+            sport: ['baseball', 'boxing', 'combat', 'f1', 'football', 'formule 1', 'golf', 'hockey', 'moto gp', 'nba', 'nfl', 'racing', 'rugby', 'sport', 'tennis', 'ufc', 'wwe'],
+            entertainment: {
+                concerts: ['concert', 'live'],
+                theatre: ['theatre', 'théâtre'],
+                spectacles: ['spectacle', 'tv show', 'show'],
+                blindtest: ['blind test'],
+                karaoke: ['karaoke', 'karaoké']
+            },
+            manga: ['manga', 'anime', 'animation', 'japanimation']
+        };
+        var categoryPatterns = JSON.parse(JSON.stringify(defaultKeywords));
+        var hiddenDefaultCategories = [];
+        var customCategories = [];
+        var selectedIconType = 'emoji';
+        var selectedEmoji = '⚽';
+        var currentEntSubcat = 'concerts';
+
+        function toggleCollapsible(section) {
+            var header = document.querySelector('#' + section + '-section .collapsible-header') ||
+                         document.querySelector('#' + section + '-content').previousElementSibling;
+            var content = document.getElementById(section + '-content');
+            if (header && content) {
+                header.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        function initCategories() {
+            var categoriesSection = document.getElementById('categories-section');
+            var vodFilterSection = document.getElementById('vod-filter-section');
+            var hasProviderPlaylist = playlists.find(function(p) { return p.type === 'provider'; });
+            // Show VOD sections if current type is provider OR if a provider playlist exists
+            var showVod = currentType === 'provider' || hasProviderPlaylist;
+            if (showVod) {
+                categoriesSection.classList.remove('hidden');
+                vodFilterSection.classList.remove('hidden');
+            } else {
+                categoriesSection.classList.add('hidden');
+                vodFilterSection.classList.add('hidden');
+            }
+            renderAllKeywords();
+            renderCustomCategories();
+        }
+
+        function renderAllKeywords() {
+            ['sport', 'entertainment', 'manga'].forEach(function(cat) {
+                renderKeywords(cat);
+            });
+        }
+
+        function renderKeywords(category) {
+            var container = document.getElementById('keywords-' + category);
+            if (!container) return;
+            var keywords;
+            if (category === 'entertainment') {
+                var ent = categoryPatterns.entertainment || {};
+                keywords = (ent[currentEntSubcat] || []).slice().sort();
+                container.innerHTML = keywords.map(function(kw) {
+                    return '<span class="keyword-chip">' + kw + '<span class="remove" onclick="removeEntKeyword(\'' + kw.replace(/'/g, "\\'") + '\')">×</span></span>';
+                }).join('');
+            } else {
+                keywords = (categoryPatterns[category] || []).slice().sort();
+                container.innerHTML = keywords.map(function(kw) {
+                    return '<span class="keyword-chip">' + kw + '<span class="remove" onclick="removeKeyword(\'' + category + '\', \'' + kw.replace(/'/g, "\\'") + '\')">×</span></span>';
+                }).join('');
+            }
+        }
+
+        function selectEntSubcat(subcat) {
+            currentEntSubcat = subcat;
+            // Update tabs
+            var tabs = document.querySelectorAll('#entertainment-tabs .subcategory-tab');
+            tabs.forEach(function(tab) {
+                tab.classList.toggle('active', tab.dataset.subcat === subcat);
+            });
+            renderKeywords('entertainment');
+        }
+
+        function addEntertainmentKeyword() {
+            var input = document.getElementById('new-keyword-entertainment');
+            var keyword = input.value.trim().toLowerCase();
+            if (!keyword) return;
+            if (!categoryPatterns.entertainment) categoryPatterns.entertainment = {};
+            if (!categoryPatterns.entertainment[currentEntSubcat]) categoryPatterns.entertainment[currentEntSubcat] = [];
+            if (categoryPatterns.entertainment[currentEntSubcat].indexOf(keyword) === -1) {
+                categoryPatterns.entertainment[currentEntSubcat].push(keyword);
+                renderKeywords('entertainment');
+            }
+            input.value = '';
+        }
+
+        function removeEntKeyword(keyword) {
+            if (!categoryPatterns.entertainment || !categoryPatterns.entertainment[currentEntSubcat]) return;
+            var idx = categoryPatterns.entertainment[currentEntSubcat].indexOf(keyword);
+            if (idx !== -1) {
+                categoryPatterns.entertainment[currentEntSubcat].splice(idx, 1);
+                renderKeywords('entertainment');
+            }
+        }
+
+        function addKeyword(category) {
+            var input = document.getElementById('new-keyword-' + category);
+            var keyword = input.value.trim().toLowerCase();
+            if (!keyword) return;
+            if (!categoryPatterns[category]) categoryPatterns[category] = [];
+            if (categoryPatterns[category].indexOf(keyword) === -1) {
+                categoryPatterns[category].push(keyword);
+                renderKeywords(category);
+            }
+            input.value = '';
+        }
+
+        function removeKeyword(category, keyword) {
+            var idx = categoryPatterns[category].indexOf(keyword);
+            if (idx !== -1) {
+                categoryPatterns[category].splice(idx, 1);
+                renderKeywords(category);
+            }
+        }
+
+        function toggleCategory(category) {
+            var section = document.querySelector('.category-section[data-category="' + category + '"]');
+            var btn = section.querySelector('.category-toggle');
+            var idx = hiddenDefaultCategories.indexOf(category);
+            if (idx === -1) {
+                hiddenDefaultCategories.push(category);
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
+                btn.textContent = t('disabled');
+            } else {
+                hiddenDefaultCategories.splice(idx, 1);
+                btn.classList.remove('inactive');
+                btn.classList.add('active');
+                btn.textContent = t('enabled');
+            }
+        }
+
+        function showNewCategoryForm() {
+            document.getElementById('add-category-btn').classList.add('hidden');
+            document.getElementById('new-category-form').classList.remove('hidden');
+        }
+
+        function hideNewCategoryForm() {
+            document.getElementById('add-category-btn').classList.remove('hidden');
+            document.getElementById('new-category-form').classList.add('hidden');
+            document.getElementById('new-cat-name').value = '';
+            selectIconType('emoji');
+        }
+
+        function selectIconType(type) {
+            selectedIconType = type;
+            document.querySelectorAll('.icon-type-tab').forEach(function(tab) {
+                tab.classList.toggle('active', tab.textContent.toLowerCase().indexOf(type) !== -1 || tab.getAttribute('data-i18n') === 'icon' + type.charAt(0).toUpperCase() + type.slice(1));
+            });
+            document.getElementById('emoji-selector').classList.toggle('hidden', type !== 'emoji');
+            document.getElementById('custom-icon-selector').classList.toggle('hidden', type !== 'custom');
+            if (type === 'custom') updateIconPreview();
+        }
+
+        function selectIcon(el) {
+            document.querySelectorAll('.icon-option').forEach(function(opt) {
+                opt.classList.remove('selected');
+            });
+            el.classList.add('selected');
+            selectedEmoji = el.dataset.icon;
+        }
+
+        function updateIconPreview() {
+            var text = document.getElementById('custom-icon-text').value || 'X';
+            var color = document.getElementById('custom-icon-color').value;
+            var bg = document.getElementById('custom-icon-bg').value;
+            var preview = document.getElementById('custom-icon-preview');
+            preview.textContent = text;
+            preview.style.color = color;
+            preview.style.background = bg;
+        }
+
+        function saveNewCategory() {
+            var name = document.getElementById('new-cat-name').value.trim();
+            if (!name) {
+                alert(t('categoryNameRequired'));
+                return;
+            }
+            var icon;
+            if (selectedIconType === 'emoji') {
+                icon = selectedEmoji;
+            } else {
+                icon = {
+                    type: 'custom',
+                    text: document.getElementById('custom-icon-text').value || 'X',
+                    color: document.getElementById('custom-icon-color').value,
+                    bg: document.getElementById('custom-icon-bg').value
+                };
+            }
+            customCategories.push({
+                id: 'custom_' + Date.now(),
+                name: name,
+                icon: icon,
+                keywords: [],
+                useTMDB: true
+            });
+            hideNewCategoryForm();
+            renderCustomCategories();
+        }
+
+        function renderCustomCategories() {
+            var container = document.getElementById('custom-categories-list');
+            container.innerHTML = customCategories.map(function(cat, idx) {
+                var iconHtml;
+                if (typeof cat.icon === 'object' && cat.icon.type === 'custom') {
+                    iconHtml = '<span class="custom-icon-preview" style="color:' + cat.icon.color + ';background:' + cat.icon.bg + ';">' + (cat.icon.text || 'X') + '</span>';
+                } else {
+                    iconHtml = '<span class="icon">' + (cat.icon || '📁') + '</span>';
+                }
+                var keywordsHtml = (cat.keywords || []).map(function(kw) {
+                    return '<span class="keyword-chip">' + kw + '<span class="remove" onclick="removeCustomKeyword(' + idx + ', \'' + kw.replace(/'/g, "\\'") + '\')">×</span></span>';
+                }).join('');
+                return '<div class="custom-category-item">' +
+                    '<div class="custom-category-header">' +
+                        '<span class="custom-category-name">' + iconHtml + cat.name + '</span>' +
+                        '<button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteCustomCategory(' + idx + ')">' + t('delete') + '</button>' +
+                    '</div>' +
+                    '<div class="keywords-container">' + keywordsHtml + '</div>' +
+                    '<div class="add-keyword-row">' +
+                        '<input type="text" id="new-keyword-custom-' + idx + '" placeholder="' + t('addKeyword') + '">' +
+                        '<button onclick="addCustomKeyword(' + idx + ')">' + t('add') + '</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function addCustomKeyword(idx) {
+            var input = document.getElementById('new-keyword-custom-' + idx);
+            var keyword = input.value.trim().toLowerCase();
+            if (!keyword) return;
+            if (!customCategories[idx].keywords) customCategories[idx].keywords = [];
+            if (customCategories[idx].keywords.indexOf(keyword) === -1) {
+                customCategories[idx].keywords.push(keyword);
+                renderCustomCategories();
+            }
+        }
+
+        function removeCustomKeyword(idx, keyword) {
+            var kidx = customCategories[idx].keywords.indexOf(keyword);
+            if (kidx !== -1) {
+                customCategories[idx].keywords.splice(kidx, 1);
+                renderCustomCategories();
+            }
+        }
+
+        function deleteCustomCategory(idx) {
+            if (confirm(t('confirmDeleteCategory'))) {
+                customCategories.splice(idx, 1);
+                renderCustomCategories();
+            }
+        }
+
+        // Override selectType to show/hide categories section
+        var originalSelectType = selectType;
+        selectType = function(type) {
+            originalSelectType(type);
+            initCategories();
+        };
+
+        // Keyboard handling for keyword inputs
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('new-keyword-')) {
+                var category = e.target.id.replace('new-keyword-', '');
+                if (category.startsWith('custom-')) {
+                    addCustomKeyword(parseInt(category.replace('custom-', '')));
+                } else if (category === 'entertainment') {
+                    addEntertainmentKeyword();
+                } else {
+                    addKeyword(category);
+                }
+            }
+        });
+
+        initLocale();
+        renderPlaylists();
+        initCategories();
+    </script>
+</body>
+</html>
