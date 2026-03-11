@@ -65,6 +65,9 @@ IPTVApp.prototype.bindKeys = function() {
                 } else if (self.currentScreen === 'player') {
                     if (self.playerTracksFocused) {
                         self.navigatePlayerTracks(-1);
+                    } else if (self.currentPlayingType === 'live') {
+                        self.showPlayerOverlay();
+                        self.focusPlayerTracks();
                     } else {
                         self.startSeek(-1);
                     }
@@ -87,6 +90,9 @@ IPTVApp.prototype.bindKeys = function() {
                 } else if (self.currentScreen === 'player') {
                     if (self.playerTracksFocused) {
                         self.unfocusPlayerTracks();
+                    } else if (self.currentPlayingType === 'live') {
+                        self.showPlayerOverlay();
+                        self.focusPlayerTracks();
                     } else {
                         self.showPlayerOverlay();
                     }
@@ -106,8 +112,9 @@ IPTVApp.prototype.bindKeys = function() {
                 } else if (self.currentScreen === 'player') {
                     if (self.playerTracksFocused) {
                         self.navigatePlayerTracks(1);
-                    } else if (self.currentPlayingType === 'live' && self.player.isInTimeshift) {
-                        self.returnToLive();
+                    } else if (self.currentPlayingType === 'live') {
+                        self.showPlayerOverlay();
+                        self.focusPlayerTracks();
                     } else {
                         self.startSeek(1);
                     }
@@ -151,7 +158,14 @@ IPTVApp.prototype.bindKeys = function() {
                     } else {
                         self.stopSeek();
                         self.player.togglePlayPause();
-                        self.showPlayerOverlay();
+                        if (self.currentPlayingType === 'live') {
+                            self.updatePlayerStateIndicator();
+                            self.showPlayerOverlay();
+                            self.focusPlayerTracks();
+                        }
+                        else {
+                            self.showPlayerOverlay();
+                        }
                     }
                 } else {
                     self.select();

@@ -883,7 +883,10 @@ IPTVApp.prototype.updateRefreshProgress = function(playlistId, step, total, name
     while (existing.firstChild) existing.removeChild(existing.firstChild);
     var hg = document.createElement('span');
     hg.className = 'hourglass';
-    hg.textContent = '⏳';
+    var hgIcon = document.createElement('span');
+    hgIcon.className = 'material-symbols-outlined';
+    hgIcon.textContent = 'hourglass_empty';
+    hg.appendChild(hgIcon);
     existing.appendChild(hg);
     existing.appendChild(document.createTextNode(' ' + step + '/' + total + ' ' + name));
 };

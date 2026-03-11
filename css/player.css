@@ -133,6 +133,32 @@
     flex-direction: column;
 }
 
+#player-status-btn {
+    pointer-events: none;
+}
+
+#player-status-btn.status-playing {
+    background: rgba(40, 167, 69, 0.8);
+    border-color: rgba(40, 167, 69, 0.9);
+}
+
+#player-status-btn.status-paused {
+    background: rgba(229, 9, 20, 0.8);
+    border-color: rgba(229, 9, 20, 0.9);
+}
+
+#player-status-icon {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 1;
+    margin-right: 10px;
+    font-size: 32px;
+    line-height: 1;
+}
+
 #player-progress-row {
     display: flex;
     align-items: center;

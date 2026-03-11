@@ -253,8 +253,19 @@ IPTVApp.prototype.backHandlers = {
         }
         if (this.currentPlayingType === 'catchup' && this.catchupParams && this.catchupParams.stream) {
             var stream = this.catchupParams.stream;
+            var fromPlayer = this._catchupFromPlayer;
+            var savedDay = this.catchupParams.daysAgo || 0;
+            var savedIndex = this.catchupPlaylistIndex || 0;
+            this._catchupFromPlayer = false;
             this.returnToLiveAfterCatchup = true;
             this.player.stop();
+            if (fromPlayer) {
+                this._catchupFromPlayer = true;
+                this._catchupRestoreDay = savedDay;
+                this._catchupRestoreIndex = savedIndex;
+                this.playStream(stream.stream_id, 'live', stream);
+                return;
+            }
             this.showScreen('browse');
             this.currentScreen = 'browse';
             this.showCatchupModal(stream);

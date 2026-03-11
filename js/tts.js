@@ -45,7 +45,7 @@ IPTVApp.prototype.buildTTSUrl = function(ttsUrl, text, lang, engine) {
         url += '&pitch=' + encodeURIComponent((this.settings.ttsPitch >= 0 ? '+' : '') + this.settings.ttsPitch + 'Hz');
     }
     if (this._ttsPadFirstChunk) {
-        url += '&pad=100';
+        url += '&pad=200';
         this._ttsPadFirstChunk = false;
     }
     return url;

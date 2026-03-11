@@ -1424,13 +1424,18 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
     document.getElementById('details-description').textContent = I18n.t('messages.searching', 'Searching...', { title: cleanTitle });
     // Get tmdb_id from stream data if available
     var tmdbId = null;
-    if (this.selectedStream && this.selectedStream.data && this.selectedStream.data.tmdb_id) {
-        tmdbId = this.selectedStream.data.tmdb_id;
+    var streamData = this.selectedStream ? this.selectedStream.data : null;
+    if (streamData) {
+        tmdbId = streamData.tmdb_id || streamData._tmdbId || null;
+        if (streamData._tmdbType && tmdbId) {
+            type = streamData._tmdbType;
+        }
     }
     this.fetchTMDBCached(title, type, function(result) {
         if (result) {
             self.tmdbInfo = result;
             self.tmdbInfo._type = type;
+            self.updateWatchHistoryTmdbId();
             if (result.poster_path) {
                 var posterEl = document.getElementById('details-poster');
                 var currentBg = posterEl ? posterEl.style.backgroundImage : '';
@@ -2329,7 +2334,13 @@ IPTVApp.prototype.updateDownloadButton = function() {
     btn.classList.toggle('is-downloading', state === 'downloading');
     btn.classList.toggle('is-queued', state === 'queued');
     btn.classList.toggle('is-paused', state === 'paused');
-    if (state === 'downloading' || state === 'queued') btn.textContent = '✕';
+    if (state === 'downloading' || state === 'queued') {
+        btn.textContent = '';
+        var cancelIcon = document.createElement('span');
+        cancelIcon.className = 'material-symbols-outlined';
+        cancelIcon.textContent = 'close';
+        btn.appendChild(cancelIcon);
+    }
     else if (state === 'paused') btn.textContent = '\u275A\u275A';
     else btn.textContent = '';
 };

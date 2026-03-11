@@ -251,7 +251,11 @@ class IPTVApp {
             if (ts) {
                 var ageSpan = document.createElement('span');
                 ageSpan.className = 'playlist-age';
-                ageSpan.textContent = '🔄 ' + formatTimeAgo(ts);
+                var ageIcon = document.createElement('span');
+                ageIcon.className = 'material-symbols-outlined';
+                ageIcon.textContent = 'schedule';
+                ageSpan.appendChild(ageIcon);
+                ageSpan.appendChild(document.createTextNode(' ' + formatTimeAgo(ts)));
                 tab.appendChild(ageSpan);
             }
             container.appendChild(tab);
@@ -260,7 +264,11 @@ class IPTVApp {
             var mergeTab = document.createElement('div');
             mergeTab.className = 'playlist-tab playlist-tab-merge focusable' + (!activeId ? ' active' : '');
             mergeTab.dataset.playlistId = 'merge';
-            mergeTab.textContent = '⚡ ' + I18n.t('settings.mergePlaylists', 'Merge all');
+            var mergeIcon = document.createElement('span');
+            mergeIcon.className = 'material-symbols-outlined';
+            mergeIcon.textContent = 'bolt';
+            mergeTab.appendChild(mergeIcon);
+            mergeTab.appendChild(document.createTextNode(' ' + I18n.t('settings.mergePlaylists', 'Merge all')));
             container.appendChild(mergeTab);
         }
     }

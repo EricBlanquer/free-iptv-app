@@ -112,6 +112,10 @@ IPTVApp.prototype.addToWatchHistory = function(stream, type, position) {
         date: Date.now(),
         playlistId: stream._playlistId || this.settings.activePlaylistId || null
     };
+    if (this.tmdbInfo && this.tmdbInfo.id) {
+        historyItem.tmdbId = this.tmdbInfo.id;
+        historyItem.tmdbType = this.tmdbInfo._type || (type === 'series' || type === 'episode' ? 'tv' : 'movie');
+    }
     if (seriesId) {
         historyItem.seriesId = seriesId;
         historyItem.episodeId = stream.stream_id;
@@ -126,6 +130,29 @@ IPTVApp.prototype.addToWatchHistory = function(stream, type, position) {
     });
     this.watchHistory.unshift(historyItem);
     this.saveWatchHistory();
+};
+
+IPTVApp.prototype.updateWatchHistoryTmdbId = function() {
+    if (!this.tmdbInfo || !this.tmdbInfo.id || !this.selectedStream) return;
+    var streamId = this.selectedStream.id;
+    var playlistId = this.selectedStream._playlistId;
+    var tmdbId = this.tmdbInfo.id;
+    var tmdbType = this.tmdbInfo._type || 'movie';
+    var changed = false;
+    for (var i = 0; i < this.watchHistory.length; i++) {
+        var item = this.watchHistory[i];
+        if (item.id == streamId && (!playlistId || item.playlistId == playlistId)) {
+            if (!item.tmdbId || item.tmdbId !== tmdbId) {
+                item.tmdbId = tmdbId;
+                item.tmdbType = tmdbType;
+                changed = true;
+            }
+            break;
+        }
+    }
+    if (changed) {
+        this.saveWatchHistory();
+    }
 };
 
 IPTVApp.prototype.removeFromWatchHistory = function(id, playlistId) {
@@ -175,7 +202,9 @@ IPTVApp.prototype.showContinueInGrid = function() {
             _season: item.season,
             _episode: item.episode,
             _episodeTitle: item.episodeTitle,
-            _playlistId: item.playlistId || null
+            _playlistId: item.playlistId || null,
+            _tmdbId: item.tmdbId || null,
+            _tmdbType: item.tmdbType || null
         };
     });
     this.showStreamGrid(streams, 'history');
@@ -198,7 +227,9 @@ IPTVApp.prototype.showContinueScreen = function() {
                 percent: item.percent || 0,
                 position: item.position || 0,
                 timestamp: item.date || 0,
-                playlistId: item.playlistId
+                playlistId: item.playlistId,
+                tmdbId: item.tmdbId,
+                tmdbType: item.tmdbType
             });
         }
     }
@@ -277,7 +308,9 @@ IPTVApp.prototype.showContinueScreen = function() {
             _episode: item.episode,
             _episodeId: item.episodeId,
             _isHistory: true,
-            _playlistId: item.playlistId || null
+            _playlistId: item.playlistId || null,
+            _tmdbId: item.tmdbId || null,
+            _tmdbType: item.tmdbType || null
         };
     });
     if (streams.length === 0) {

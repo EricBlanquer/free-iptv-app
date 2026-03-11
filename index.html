@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/continue.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0..1,0">
 </head>
 <body>
     <!-- Home Screen - 4 big buttons -->
@@ -428,9 +429,9 @@
         <div id="filters-bar">
             <div id="sidebar-title" data-i18n="home.categories">Categories</div>
             <div id="view-mode-filters">
-                <button id="view-grid-btn" class="view-btn focusable selected" data-view="grid" title="Thumbnails">▦</button>
-                <button id="view-list-btn" class="view-btn focusable" data-view="list" title="List">☰</button>
-                <button id="edit-favorites-btn" class="view-btn focusable hidden" title="Edit">✏️</button>
+                <button id="view-grid-btn" class="view-btn focusable selected" data-view="grid" title="Thumbnails"><span class="material-symbols-outlined">grid_view</span></button>
+                <button id="view-list-btn" class="view-btn focusable" data-view="list" title="List"><span class="material-symbols-outlined">view_list</span></button>
+                <button id="edit-favorites-btn" class="view-btn focusable hidden" title="Edit"><span class="material-symbols-outlined">edit</span></button>
             </div>
             <div id="search-filters">
                 <input type="text" id="search-title" class="filter-input focusable" placeholder="Title..." data-i18n-placeholder="filters.title">
@@ -567,28 +568,36 @@
                 <div id="player-meta">
                     <span id="player-buffer" class="hidden">Buffer: 0s</span>
                     <div id="player-tracks" class="hidden">
+                        <div id="player-status-btn" class="player-track-btn focusable hidden">
+                            <span id="player-status-icon">▶</span>
+                            <span id="player-status-label"></span>
+                        </div>
                         <div id="player-audio-btn" class="player-track-btn focusable">
-                            <span class="track-icon">🔊</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">volume_up</span></span>
                             <span id="player-audio-label" data-i18n="player.audio">Audio</span>
                         </div>
                         <div id="player-subtitle-btn" class="player-track-btn focusable">
-                            <span class="track-icon">💬</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">subtitles</span></span>
                             <span id="player-subtitle-label" data-i18n="player.subtitlesLabel">Subtitles</span>
                         </div>
                         <div id="player-sub-options-btn" class="player-track-btn focusable hidden">
-                            <span class="track-icon">⚙️</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">settings</span></span>
                             <span data-i18n="player.options">Options</span>
                         </div>
                         <div id="player-speed-btn" class="player-track-btn focusable">
-                            <span class="track-icon">▶▶</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">speed</span></span>
                             <span id="player-speed-label">×1</span>
                         </div>
                         <div id="player-display-btn" class="player-track-btn focusable">
-                            <span class="track-icon">📺</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">tv</span></span>
                             <span id="player-display-label" data-i18n="player.displayAuto">Auto</span>
                         </div>
+                        <div id="player-live-btn" class="player-track-btn focusable hidden">
+                            <span class="track-icon"><span class="material-symbols-outlined">live_tv</span></span>
+                            <span>Direct</span>
+                        </div>
                         <div id="player-replay-btn" class="player-track-btn focusable hidden">
-                            <span class="track-icon">⏪</span>
+                            <span class="track-icon"><span class="material-symbols-outlined">replay</span></span>
                             <span data-i18n="player.replay">Replay</span>
                         </div>
                     </div>
@@ -686,11 +695,11 @@
     <div id="tracks-modal" class="modal hidden">
         <div class="modal-content tracks-modal-content">
             <div class="tracks-section">
-                <div class="tracks-title">🔊 <span data-i18n="player.audio">Audio</span></div>
+                <div class="tracks-title"><span class="material-symbols-outlined">volume_up</span> <span data-i18n="player.audio">Audio</span></div>
                 <div id="audio-tracks-list"></div>
             </div>
             <div class="tracks-section">
-                <div class="tracks-title">💬 <span data-i18n="player.subtitlesLabel">Subtitles</span></div>
+                <div class="tracks-title"><span class="material-symbols-outlined">subtitles</span> <span data-i18n="player.subtitlesLabel">Subtitles</span></div>
                 <div id="subtitle-tracks-list"></div>
             </div>
         </div>

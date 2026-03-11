@@ -595,6 +595,18 @@ IPTVApp.prototype.toggleSettingsCollapse = function(section) {
     content.classList.toggle('collapsed', !isCollapsed);
     var arrow = header.querySelector('.collapse-arrow');
     if (arrow) arrow.classList.toggle('collapsed', !isCollapsed);
+    if (isCollapsed) {
+        content.addEventListener('transitionend', function onEnd(e) {
+            if (e.propertyName !== 'max-height') return;
+            content.removeEventListener('transitionend', onEnd);
+            var contentRect = content.getBoundingClientRect();
+            var overflow = contentRect.bottom - window.innerHeight;
+            if (overflow > 0) {
+                var settingsScreen = document.getElementById('settings-screen');
+                settingsScreen.scrollTop += overflow + 20;
+            }
+        });
+    }
 };
 
 IPTVApp.prototype.handleSettingsSelect = function() {
@@ -923,7 +935,10 @@ IPTVApp.prototype.renderPlaylistsList = function() {
         item.dataset.action = 'select';
         var iconEl = document.createElement('div');
         iconEl.className = 'playlist-icon';
-        iconEl.textContent = p.type === 'provider' ? '📡' : '📋';
+        var iconSpan = document.createElement('span');
+        iconSpan.className = 'material-symbols-outlined';
+        iconSpan.textContent = p.type === 'provider' ? 'satellite_alt' : 'list_alt';
+        iconEl.appendChild(iconSpan);
         item.appendChild(iconEl);
         var info = document.createElement('div');
         info.className = 'playlist-info';
@@ -939,7 +954,10 @@ IPTVApp.prototype.renderPlaylistsList = function() {
         // Add checking indicator (will be updated by validation)
         var statusEl = document.createElement('span');
         statusEl.className = 'playlist-status checking hourglass';
-        statusEl.textContent = '⏳';
+        var hgIcon = document.createElement('span');
+        hgIcon.className = 'material-symbols-outlined';
+        hgIcon.textContent = 'hourglass_empty';
+        statusEl.appendChild(hgIcon);
         item.appendChild(statusEl);
         if (isActive) {
             var badge = document.createElement('span');
@@ -952,19 +970,28 @@ IPTVApp.prototype.renderPlaylistsList = function() {
         editBtn.className = 'playlist-action-btn focusable';
         editBtn.dataset.playlistId = p.id;
         editBtn.dataset.action = 'edit';
-        editBtn.textContent = '✏️';
+        var editIcon = document.createElement('span');
+        editIcon.className = 'material-symbols-outlined';
+        editIcon.textContent = 'edit';
+        editBtn.appendChild(editIcon);
         row.appendChild(editBtn);
         var visBtn = document.createElement('div');
         visBtn.className = 'playlist-action-btn visibility focusable' + (p.showOnHome === false ? ' hidden-playlist' : '');
         visBtn.dataset.playlistId = p.id;
         visBtn.dataset.action = 'toggleVisibility';
-        visBtn.textContent = '👁';
+        var visIcon = document.createElement('span');
+        visIcon.className = 'material-symbols-outlined';
+        visIcon.textContent = 'visibility';
+        visBtn.appendChild(visIcon);
         row.appendChild(visBtn);
         var deleteBtn = document.createElement('div');
         deleteBtn.className = 'playlist-action-btn delete focusable';
         deleteBtn.dataset.playlistId = p.id;
         deleteBtn.dataset.action = 'delete';
-        deleteBtn.textContent = '🗑️';
+        var deleteIcon = document.createElement('span');
+        deleteIcon.className = 'material-symbols-outlined';
+        deleteIcon.textContent = 'delete';
+        deleteBtn.appendChild(deleteIcon);
         row.appendChild(deleteBtn);
         container.appendChild(row);
     }
@@ -1407,7 +1434,10 @@ IPTVApp.prototype.updatePlaylistValidationUI = function(playlistId, result) {
     status.className = 'playlist-status';
     if (result.valid) {
         status.classList.add('valid');
-        status.textContent = '✓';
+        var checkIcon = document.createElement('span');
+        checkIcon.className = 'material-symbols-outlined';
+        checkIcon.textContent = 'check_circle';
+        status.appendChild(checkIcon);
         status.title = result.streamCount ? I18n.t('settings.streamCount', result.streamCount + ' streams', { count: result.streamCount }) : 'OK';
         // Add account info for provider playlists
         if (result.info) {
@@ -1458,7 +1488,10 @@ IPTVApp.prototype.updatePlaylistValidationUI = function(playlistId, result) {
     }
     else {
         status.classList.add('invalid');
-        status.textContent = '✗';
+        var errorIcon = document.createElement('span');
+        errorIcon.className = 'material-symbols-outlined';
+        errorIcon.textContent = 'cancel';
+        status.appendChild(errorIcon);
         status.title = I18n.t('settings.validation.' + result.error, result.error);
     }
     item.insertBefore(status, item.querySelector('.playlist-active-badge') || null);
@@ -1525,7 +1558,10 @@ IPTVApp.prototype.renderPatternCategories = function() {
         var delBtn = document.createElement('div');
         delBtn.className = 'pattern-delete-btn focusable';
         delBtn.dataset.deleteCategory = cat.id;
-        delBtn.textContent = '✕';
+        var delIcon = document.createElement('span');
+        delIcon.className = 'material-symbols-outlined';
+        delIcon.textContent = 'close';
+        delBtn.appendChild(delIcon);
         row.appendChild(delBtn);
         container.appendChild(row);
     }
@@ -1579,11 +1615,11 @@ IPTVApp.prototype.openPatternEditor = function(section) {
         this.patternEditorSubcategory = 'concerts';
         // Create subcategory tabs
         var subcatLabels = {
-            concerts: '🎵 ' + I18n.t('home.concerts', 'Concerts'),
-            theatre: '🎭 ' + I18n.t('home.theatre', 'Theatre'),
-            spectacles: '🎪 ' + I18n.t('home.spectacles', 'Shows'),
-            blindtest: '🎯 ' + I18n.t('home.blindtest', 'Blind Test'),
-            karaoke: '🎤 ' + I18n.t('home.karaoke', 'Karaoke')
+            concerts: I18n.t('home.concerts', 'Concerts'),
+            theatre: I18n.t('home.theatre', 'Theatre'),
+            spectacles: I18n.t('home.spectacles', 'Shows'),
+            blindtest: I18n.t('home.blindtest', 'Blind Test'),
+            karaoke: I18n.t('home.karaoke', 'Karaoke')
         };
         tabsContainer.innerHTML = '';
         var subcats = ['concerts', 'theatre', 'spectacles', 'blindtest', 'karaoke'];

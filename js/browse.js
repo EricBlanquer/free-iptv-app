@@ -1267,7 +1267,10 @@ IPTVApp.prototype.renderGrid = function(streams, type) {
     gridLoader.id = 'grid-loader';
     var hg = document.createElement('span');
     hg.className = 'hourglass';
-    hg.textContent = '⏳';
+    var hgIcon = document.createElement('span');
+    hgIcon.className = 'material-symbols-outlined';
+    hgIcon.textContent = 'hourglass_empty';
+    hg.appendChild(hgIcon);
     gridLoader.appendChild(hg);
     container.appendChild(gridLoader);
     this.originalStreams = streams.slice();
@@ -2362,7 +2365,10 @@ IPTVApp.prototype.loadMoreItems = function() {
             if (stream._statusLabel === '⏳') {
                 var hg = document.createElement('span');
                 hg.className = 'hourglass';
-                hg.textContent = '⏳';
+                var hgIcon = document.createElement('span');
+                hgIcon.className = 'material-symbols-outlined';
+                hgIcon.textContent = 'hourglass_empty';
+                hg.appendChild(hgIcon);
                 dlStatus.appendChild(hg);
             }
             else {

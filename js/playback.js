@@ -359,7 +359,7 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     document.getElementById('player-time').textContent = initialTime;
     document.getElementById('player-remaining').textContent = initialRemaining;
     document.getElementById('player-duration').textContent = initialDuration;
-    // Hide progress bar and time for live streams
+    // Hide progress bar and time for live streams, but keep state indicator visible
     var isLive = type === 'live';
     document.getElementById('player-progress-row').style.display = isLive ? 'none' : '';
     document.getElementById('player-duration').style.display = isLive ? 'none' : '';
@@ -408,6 +408,20 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             self.updatePlayerStateIndicator();
             self.showLoading(false);
             self.showPlayerOverlay();
+            if (type === 'live') {
+                self.focusPlayerTracks();
+                if (self._catchupFromPlayer) {
+                    var restoreDay = self._catchupRestoreDay || 0;
+                    var restoreIndex = self._catchupRestoreIndex || 0;
+                    self._catchupFromPlayer = false;
+                    self._catchupRestoreDay = undefined;
+                    self._catchupRestoreIndex = undefined;
+                    self.returnToLiveAfterCatchup = true;
+                    self._replayFromPlayer = true;
+                    self.unfocusPlayerTracks(true);
+                    self.showCatchupModal(stream, restoreDay, restoreIndex);
+                }
+            }
             // Seek is now done before play() in player.js to avoid double buffering
             if (!subtitlesApplied) {
                 subtitlesApplied = true;
@@ -939,7 +953,9 @@ IPTVApp.prototype.updatePlayerProgress = function(current, total) {
     }
     // Detect near-end after seek: if within 2 seconds of end, trigger completion
     // This handles the case where seek overshoots and player freezes
-    if (total > 0 && current > 0 && (total - current) < 2000 && !this._completionTriggered) {
+    // Skip for live streams (transcoded fragments have short durations)
+    var isLive = this.currentPlayingType === 'live';
+    if (!isLive && total > 0 && current > 0 && (total - current) < 2000 && !this._completionTriggered) {
         window.log('Near end detected: current=' + current + ' total=' + total + ', triggering completion');
         this._completionTriggered = true;
         this.onPlaybackCompleted();
@@ -962,8 +978,8 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
         if (!hourglassSpan) {
             hourglassSpan = document.createElement('span');
             hourglassSpan.className = 'hourglass';
-            hourglassSpan.textContent = '⏳';
-            bufferEl.innerHTML = '';
+            hourglassSpan.textContent = '\u23F3';
+            while (bufferEl.firstChild) bufferEl.removeChild(bufferEl.firstChild);
             bufferEl.appendChild(hourglassSpan);
         }
         // Update percentage text without recreating hourglass
@@ -991,42 +1007,71 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
     else {
         this.setHidden(bufferEl, true);
     }
-    // Live pause duration display
+    // Live status button and pause duration
     var isLive = this.currentPlayingType === 'live' || (this.selectedStream && this.selectedStream.type === 'live');
-    var progressRowEl = document.getElementById('player-progress-row');
+    var statusBtn = document.getElementById('player-status-btn');
+    var statusIcon = document.getElementById('player-status-icon');
+    var statusLabel = document.getElementById('player-status-label');
+    var liveBtnEl = document.getElementById('player-live-btn');
     var durationEl = document.getElementById('player-duration');
     if (isLive) {
-        // Always hide progress bar for live
+        // Hide progress row for live (status shown in tracks)
+        var progressRowEl = document.getElementById('player-progress-row');
         if (progressRowEl) progressRowEl.style.display = 'none';
         if (durationEl) durationEl.style.display = 'none';
-        // Show pause duration if in timeshift
-        if (this.player.isInTimeshift && liveBufferEl) {
-            var bufferInfo = this.player.getBufferInfo();
-            if (bufferInfo.available && bufferInfo.seconds > 0) {
-                var colon = I18n.getLocale() === 'fr' ? '\u00A0: ' : ': ';
-                liveBufferEl.textContent = I18n.t('player.pauseDuration', 'Pause') + colon + this.player.formatTime(bufferInfo.seconds * 1000) + ' (' + I18n.t('player.returnToLive', '→ Live') + ')';
-                this.setHidden(liveBufferEl, false);
+        // Update status button
+        if (statusBtn) {
+            this.setHidden(statusBtn, false);
+            if (this.player.isPaused) {
+                statusBtn.className = 'player-track-btn focusable status-paused';
+                statusIcon.textContent = 'pause';
+                var pauseText = I18n.t('player.pauseDuration', 'Pause');
+                if (this.player.isInTimeshift) {
+                    var bufferInfo = this.player.getBufferInfo();
+                    if (bufferInfo.available && bufferInfo.seconds > 0) {
+                        var colon = I18n.getLocale() === 'fr' ? '\u00A0: ' : ': ';
+                        pauseText += colon + this.player.formatTime(bufferInfo.seconds * 1000);
+                    }
+                }
+                statusLabel.textContent = pauseText;
+                if (liveBtnEl) this.setHidden(liveBtnEl, false);
+            }
+            else if (this.player.isInTimeshift) {
+                statusBtn.className = 'player-track-btn focusable status-playing';
+                statusIcon.textContent = 'play_arrow';
+                var bufferInfo = this.player.getBufferInfo();
+                var timeshiftText = I18n.t('player.live', 'En direct');
+                if (bufferInfo.available && bufferInfo.seconds > 0) {
+                    var colon = I18n.getLocale() === 'fr' ? '\u00A0: ' : ': ';
+                    timeshiftText = I18n.t('player.timeshift', 'Diff\u00e9r\u00e9') + colon + this.player.formatTime(bufferInfo.seconds * 1000);
+                }
+                statusLabel.textContent = timeshiftText;
+                if (liveBtnEl) this.setHidden(liveBtnEl, false);
             }
             else {
-                this.setHidden(liveBufferEl, true);
+                statusBtn.className = 'player-track-btn focusable status-playing';
+                statusIcon.textContent = 'play_arrow';
+                statusLabel.textContent = I18n.t('player.live', 'En direct');
+                if (liveBtnEl) this.setHidden(liveBtnEl, true);
             }
         }
-        else if (liveBufferEl) {
-            this.setHidden(liveBufferEl, true);
-        }
-    }
-    else if (liveBufferEl) {
-        this.setHidden(liveBufferEl, true);
-    }
-    // Playback state indicator (in overlay)
-    if (this.seekDirection !== 0 || this.seekDebounceTimer) {
-        stateEl.textContent = this.wasPlaying ? '▶' : '❚❚';
-    }
-    else if (this.player.isPaused) {
-        stateEl.textContent = '❚❚';
+        // Hide old buffer element for live
+        if (liveBufferEl) this.setHidden(liveBufferEl, true);
     }
     else {
-        stateEl.textContent = '▶';
+        if (statusBtn) this.setHidden(statusBtn, true);
+        if (liveBtnEl) this.setHidden(liveBtnEl, true);
+        if (liveBufferEl) this.setHidden(liveBufferEl, true);
+    }
+    // Playback state indicator (in overlay, for non-live)
+    if (this.seekDirection !== 0 || this.seekDebounceTimer) {
+        stateEl.textContent = this.wasPlaying ? '\u25B6' : '\u275A\u275A';
+    }
+    else if (this.player.isPaused) {
+        stateEl.textContent = '\u275A\u275A';
+    }
+    else {
+        stateEl.textContent = '\u25B6';
         this.bufferPercent = undefined;
     }
 };
@@ -1045,7 +1090,7 @@ IPTVApp.prototype.showPlayerOverlay = function(extendedDelay) {
     this.setHidden(overlay, false);
     if (topRightEl) this.setHidden(topRightEl, false);
     this.setHidden(titleEl, false);
-    // Hide progress bar and time for live streams
+    // Hide progress row for live streams (status is shown via status-btn in tracks)
     if (progressRowEl) progressRowEl.style.display = isLive ? 'none' : '';
     if (durationEl) durationEl.style.display = isLive ? 'none' : '';
     var streamData = this.currentPlayingStream || (this.selectedStream && this.selectedStream.data);
@@ -1187,6 +1232,11 @@ IPTVApp.prototype.updatePlayerTracks = function() {
     }
     else if (replayBtn) {
         this.setHidden(replayBtn, true);
+    }
+    // Status btn and Direct btn are managed by updatePlayerStateIndicator
+    // Count them as visible for live
+    if (isLive) {
+        visibleButtons++;
     }
     // Hide speed button for live streams (speed control doesn't work on live)
     var speedBtn = document.getElementById('player-speed-btn');
@@ -1414,7 +1464,7 @@ IPTVApp.prototype.unfocusPlayerTracks = function(hideOverlay) {
 };
 
 IPTVApp.prototype.updatePlayerTracksFocus = function() {
-    var btns = document.querySelectorAll('#player-tracks .player-track-btn:not(.hidden)');
+    var btns = document.querySelectorAll('#player-tracks .player-track-btn.focusable:not(.hidden)');
     btns.forEach(function(el) { el.classList.remove('focused'); });
     if (btns[this.playerTrackIndex]) {
         btns[this.playerTrackIndex].classList.add('focused');
@@ -1486,15 +1536,16 @@ IPTVApp.prototype.handlePlayerDown = function() {
 };
 
 IPTVApp.prototype.navigatePlayerTracks = function(direction) {
-    var btns = document.querySelectorAll('#player-tracks .player-track-btn:not(.hidden)');
+    var btns = document.querySelectorAll('#player-tracks .player-track-btn.focusable:not(.hidden)');
     if (btns.length === 0) return;
     var newIndex = this.playerTrackIndex + direction;
+    var isLive = this.currentPlayingType === 'live';
     if (newIndex < 0) {
-        this.startSeek(-1);
+        if (!isLive) this.startSeek(-1);
         return;
     }
     if (newIndex >= btns.length) {
-        this.startSeek(1);
+        if (!isLive) this.startSeek(1);
         return;
     }
     this.playerTrackIndex = newIndex;
@@ -1503,10 +1554,13 @@ IPTVApp.prototype.navigatePlayerTracks = function(direction) {
 };
 
 IPTVApp.prototype.selectPlayerTrack = function() {
-    var btns = document.querySelectorAll('#player-tracks .player-track-btn:not(.hidden)');
+    var btns = document.querySelectorAll('#player-tracks .player-track-btn.focusable:not(.hidden)');
     if (!btns[this.playerTrackIndex]) return;
     var btn = btns[this.playerTrackIndex];
-    if (btn.id === 'player-audio-btn') {
+    if (btn.id === 'player-status-btn') {
+        this.player.togglePlayPause();
+    }
+    else if (btn.id === 'player-audio-btn') {
         this.showTrackSelectionModal('audio');
     }
     else if (btn.id === 'player-subtitle-btn') {
@@ -1522,6 +1576,9 @@ IPTVApp.prototype.selectPlayerTrack = function() {
     else if (btn.id === 'player-replay-btn') {
         this.openReplayFromPlayer();
     }
+    else if (btn.id === 'player-live-btn') {
+        this.returnToLive();
+    }
     else if (btn.id === 'player-speed-btn') {
         this.cyclePlaybackSpeed();
     }
@@ -1536,9 +1593,8 @@ IPTVApp.prototype.openReplayFromPlayer = function() {
     var stream = this.currentPlayingStream;
     if (!stream || this.currentPlayingType !== 'live') return;
     this.returnToLiveAfterCatchup = true;
-    this.player.stop();
-    this.showScreen('browse');
-    this.currentScreen = 'browse';
+    this._replayFromPlayer = true;
+    this.unfocusPlayerTracks(true);
     this.showCatchupModal(stream);
 };
 
@@ -1641,7 +1697,11 @@ IPTVApp.prototype.showTrackSelectionModal = function(type) {
             var sdItem = document.createElement('div');
             sdItem.className = 'track-item focusable';
             sdItem.dataset.type = 'subdl';
-            sdItem.textContent = '🔍 ' + I18n.t('subtitleSearch.searchSubDL', 'Search SubDL...');
+            var sdIcon = document.createElement('span');
+            sdIcon.className = 'material-symbols-outlined';
+            sdIcon.textContent = 'search';
+            sdItem.appendChild(sdIcon);
+            sdItem.appendChild(document.createTextNode(' ' + I18n.t('subtitleSearch.searchSubDL', 'Search SubDL...')));
             subtitleList.appendChild(sdItem);
             this.trackModalItems.push(sdItem);
         }
@@ -1649,7 +1709,11 @@ IPTVApp.prototype.showTrackSelectionModal = function(type) {
             var osItem = document.createElement('div');
             osItem.className = 'track-item focusable opensubtitles-item';
             osItem.dataset.type = 'opensubtitles';
-            osItem.textContent = '🔍 ' + I18n.t('subtitleSearch.searchOpenSubtitles', 'Search OpenSubtitles...');
+            var osIcon = document.createElement('span');
+            osIcon.className = 'material-symbols-outlined';
+            osIcon.textContent = 'search';
+            osItem.appendChild(osIcon);
+            osItem.appendChild(document.createTextNode(' ' + I18n.t('subtitleSearch.searchOpenSubtitles', 'Search OpenSubtitles...')));
             subtitleList.appendChild(osItem);
             this.trackModalItems.push(osItem);
         }
@@ -2195,12 +2259,13 @@ IPTVApp.prototype.resetSubtitlePosition = function(el) {
 };
 
 // Catchup/Replay Modal
-IPTVApp.prototype.showCatchupModal = function(stream) {
+IPTVApp.prototype.showCatchupModal = function(stream, restoreDay, restoreIndex) {
     var self = this;
     this.catchupStream = stream;
-    this.catchupSelectedDay = 0;
-    this.catchupFocusArea = 'days';
-    this.catchupFocusIndex = 0;
+    this.catchupSelectedDay = restoreDay || 0;
+    this.catchupFocusArea = restoreIndex ? 'programs' : 'days';
+    this.catchupFocusIndex = restoreIndex || 0;
+    this._catchupRestoreProgramIndex = restoreIndex;
     this.catchupPrograms = [];
     var archiveDuration = parseInt(stream.tv_archive_duration, 10) || 5;
     var modal = document.getElementById('catchup-modal');
@@ -2208,7 +2273,12 @@ IPTVApp.prototype.showCatchupModal = function(stream) {
     var daysSelector = document.getElementById('catchup-days-selector');
     var loading = document.getElementById('catchup-loading');
     var programsList = document.getElementById('catchup-programs-list');
-    channelName.textContent = '⏪ ' + this.stripCategoryPrefix(this.getStreamTitle(stream));
+    channelName.textContent = '';
+    var replayIcon = document.createElement('span');
+    replayIcon.className = 'material-symbols-outlined';
+    replayIcon.textContent = 'replay';
+    channelName.appendChild(replayIcon);
+    channelName.appendChild(document.createTextNode(' ' + this.stripCategoryPrefix(this.getStreamTitle(stream))));
     daysSelector.innerHTML = '';
     var locale = this.settings.locale || I18n.getLocale() || 'en';
     var dayLabels = [I18n.t('catchup.today', 'Today'), I18n.t('catchup.yesterday', 'Yesterday')];
@@ -2219,7 +2289,7 @@ IPTVApp.prototype.showCatchupModal = function(stream) {
     }
     for (var i = 0; i < Math.min(archiveDuration, dayLabels.length); i++) {
         var btn = document.createElement('div');
-        btn.className = 'catchup-day-btn focusable' + (i === 0 ? ' selected' : '');
+        btn.className = 'catchup-day-btn focusable' + (i === this.catchupSelectedDay ? ' selected' : '');
         btn.dataset.day = i;
         btn.textContent = dayLabels[i];
         daysSelector.appendChild(btn);
@@ -2229,7 +2299,7 @@ IPTVApp.prototype.showCatchupModal = function(stream) {
     this.setHidden(modal, false);
     this.currentScreen = 'catchup-modal';
     this.focusArea = 'catchup-modal';
-    this.loadCatchupPrograms(stream.stream_id, 0);
+    this.loadCatchupPrograms(stream.stream_id, this.catchupSelectedDay);
 };
 
 IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
@@ -2304,7 +2374,13 @@ IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
             programsList.appendChild(item);
         });
         self.catchupFocusArea = 'programs';
-        self.catchupFocusIndex = 0;
+        if (self._catchupRestoreProgramIndex !== undefined && self._catchupRestoreProgramIndex < filteredPrograms.length) {
+            self.catchupFocusIndex = self._catchupRestoreProgramIndex;
+        }
+        else {
+            self.catchupFocusIndex = 0;
+        }
+        self._catchupRestoreProgramIndex = undefined;
         self.updateCatchupFocus();
     }).catch(function(e) {
         self.setHidden(loading, true);
@@ -2316,9 +2392,19 @@ IPTVApp.prototype.hideCatchupModal = function() {
     this.setHidden('catchup-modal', true);
     var stream = this.catchupStream;
     var returnToLive = this.returnToLiveAfterCatchup;
+    var fromPlayer = this._replayFromPlayer;
     this.catchupStream = null;
     this.catchupPrograms = [];
     this.returnToLiveAfterCatchup = false;
+    this._replayFromPlayer = false;
+    // If opened from player overlay, return to player
+    if (fromPlayer) {
+        this.currentScreen = 'player';
+        this.focusArea = 'player';
+        this.playerTracksFocused = false;
+        this.showPlayerOverlay();
+        return;
+    }
     // Return to live playback if we came from catchup
     if (returnToLive && stream) {
         this.playStream(stream.stream_id, 'live', stream);
@@ -2404,6 +2490,12 @@ IPTVApp.prototype.selectCatchupItem = function() {
             return;
         }
         window.log('selectCatchupItem: stream=' + stream.stream_id + ' ' + stream.name);
+        // Stop live player if replay was opened from player overlay
+        if (this._replayFromPlayer) {
+            this.player.stop();
+            this._replayFromPlayer = false;
+            this._catchupFromPlayer = true;
+        }
         // Just hide the modal visually, don't reset focus (playCatchup will set it)
         this.setHidden('catchup-modal', true);
         var daysAgo = this.catchupSelectedDay || 0;

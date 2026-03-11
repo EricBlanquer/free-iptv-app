@@ -284,6 +284,10 @@ class TVPlayer {
         if (typeof tizen !== 'undefined' && navigator.userAgent.indexOf('Chrome') === -1) {
             return false;
         }
+        // Android WebView cannot play MPEG-TS via <video src> even if MediaSource claims support
+        if (navigator.userAgent.indexOf('Android') !== -1) {
+            return true;
+        }
         if (typeof MediaSource !== 'undefined' && MediaSource.isTypeSupported) {
             return !MediaSource.isTypeSupported('video/mp2t');
         }
@@ -1037,10 +1041,10 @@ class TVPlayer {
                 label += ' #' + langIndex[lang];
             }
             var tags = [];
-            if (t.hearingImpaired) tags.push('🦻 ' + I18n.t('player.hearingImpaired', 'HI'));
-            if (t.visualImpaired) tags.push('👁️ ' + I18n.t('player.audioDescription', 'AD'));
-            if (t.commentary) tags.push('🎬 ' + I18n.t('player.commentary', 'Commentary'));
-            if (t.forced) tags.push('⚡ ' + I18n.t('player.forced', 'Forced'));
+            if (t.hearingImpaired) tags.push(I18n.t('player.hearingImpaired', 'HI'));
+            if (t.visualImpaired) tags.push(I18n.t('player.audioDescription', 'AD'));
+            if (t.commentary) tags.push(I18n.t('player.commentary', 'Commentary'));
+            if (t.forced) tags.push(I18n.t('player.forced', 'Forced'));
             if (tags.length > 0) {
                 label += ' [' + tags.join(', ') + ']';
             }
