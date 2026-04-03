@@ -46,10 +46,13 @@ IPTVApp.prototype.showDetails = function(item) {
         _playlistId: streamData ? streamData._playlistId : null
     };
     this._resetDetailsUI(imageUrl, title, streamData);
+    if (streamData) this._ensureDuplicateVersions(streamData);
     var isSeries = actualType === 'series' || seriesId;
     var versionResult = this._setupVersionSelector(streamData, isSeries);
     if (versionResult.seriesId !== undefined) seriesId = versionResult.seriesId;
-    this.setHidden('play-btn', false);
+    if (!versionResult.hasVersions && actualType === 'vod' && streamData) {
+        this._loadSingleStreamBitrate(streamData);
+    }
     this.updateFavoriteButton();
     this.updateDownloadButton();
     this._setupDetailsButtons(streamId, streamData, actualType, isFromHistory, historyPosition);
@@ -152,16 +155,14 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     this.clearElement('details-season-selector');
     this.clearElement('details-episodes-grid');
     this.setHidden('series-status', true);
-    this.setHidden('details-duplicates', true);
+    this._versionInfosPromise = null;
     this.currentSeriesInfo = null;
-    this.showDuplicatesInfo(streamData);
     var actionsEl = document.getElementById('details-actions');
     var oldVersionBtns = actionsEl.querySelectorAll('.version-btn');
     for (var vi = 0; vi < oldVersionBtns.length; vi++) {
         oldVersionBtns[vi].parentNode.removeChild(oldVersionBtns[vi]);
     }
-    var oldVersionSelector = document.getElementById('version-selector');
-    if (oldVersionSelector) oldVersionSelector.parentNode.removeChild(oldVersionSelector);
+    this.setHidden('play-btn', false);
 };
 
 IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
@@ -176,24 +177,17 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
     var preferredIdx = savedPref !== null
         ? this._findVersionByTag(streamData._duplicateVersions, savedPref)
         : this._findBestQualityVersion(streamData._duplicateVersions);
-    var versionSelector = document.createElement('div');
-    versionSelector.id = 'version-selector';
-    versionSelector.className = 'version-selector';
+    this.setHidden('play-btn', true);
+    var actionsEl = document.getElementById('details-actions');
+    var playBtn = document.getElementById('play-btn');
     streamData._duplicateVersions.forEach(function(version, idx) {
         var btn = document.createElement('button');
-        btn.className = 'version-btn focusable' + (idx === preferredIdx ? ' selected' : '');
+        btn.className = 'version-btn focusable action-btn';
         btn.dataset.versionId = version.id;
         btn.dataset.versionIndex = idx;
-        btn.textContent = version.tag || I18n.t('details.defaultVersion', 'Standard');
-        versionSelector.appendChild(btn);
+        btn.textContent = '▶ ' + (version.tag || I18n.t('details.defaultVersion', 'Standard'));
+        actionsEl.insertBefore(btn, playBtn);
     });
-    var detailsInfo = document.getElementById('details-info');
-    var genresEl = document.getElementById('details-genres');
-    if (genresEl && genresEl.nextSibling) {
-        detailsInfo.insertBefore(versionSelector, genresEl.nextSibling);
-    } else {
-        detailsInfo.appendChild(versionSelector);
-    }
     if (preferredIdx > 0) {
         var preferredVersion = streamData._duplicateVersions[preferredIdx];
         var newData = preferredVersion.data;
@@ -207,7 +201,94 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
         };
         if (isSeries) result.seriesId = preferredVersion.id;
     }
+    result.hasVersions = true;
+    this._versionInfosPromise = this._loadVersionInfos(streamData._duplicateVersions);
     return result;
+};
+
+IPTVApp.prototype._loadSingleStreamBitrate = function(streamData) {
+    var self = this;
+    var streamId = streamData.stream_id || streamData.series_id;
+    if (!streamId) return;
+    var api = this._getApiForPlaylist(streamData._playlistId);
+    if (!api || !api.getVodInfo) return;
+    api.getVodInfo(streamId).then(function(data) {
+        if (!data || !data.info || !data.info.bitrate) return;
+        var playBtn = document.getElementById('play-btn');
+        if (!playBtn || playBtn.classList.contains('hidden')) return;
+        var bitrateLabel = self._formatBitrate(parseInt(data.info.bitrate));
+        if (!bitrateLabel) return;
+        var existing = playBtn.querySelector('.version-bitrate');
+        if (existing) existing.remove();
+        playBtn.appendChild(document.createTextNode(' '));
+        var span = document.createElement('span');
+        span.className = 'version-bitrate';
+        span.textContent = bitrateLabel;
+        playBtn.appendChild(span);
+        if (data.info.tmdb_id && self.selectedStream && self.selectedStream.data) {
+            self.selectedStream.data.tmdb_id = data.info.tmdb_id;
+        }
+    }).catch(function() {});
+};
+
+IPTVApp.prototype._getApiForPlaylist = function(playlistId) {
+    if (playlistId && this.apis && this.apis.length > 1) {
+        for (var i = 0; i < this.apis.length; i++) {
+            if (this.sameId(this.apis[i].playlistId, playlistId)) {
+                return this.apis[i];
+            }
+        }
+    }
+    return this.api;
+};
+
+IPTVApp.prototype._formatBitrate = function(bitrate) {
+    if (!bitrate) return '';
+    var mbps = (bitrate / 1000).toFixed(1);
+    return mbps.replace(/\.0$/, '') + 'Mbps';
+};
+
+IPTVApp.prototype._loadVersionInfos = function(versions) {
+    if (!versions || versions.length <= 1) return Promise.resolve();
+    var self = this;
+    var promises = versions.map(function(version) {
+        var api = self._getApiForPlaylist(version.data._playlistId);
+        if (!api || !api.getVodInfo) return Promise.resolve(null);
+        return api.getVodInfo(version.id).then(function(data) {
+            return { version: version, info: data && data.info ? data.info : null };
+        }).catch(function() {
+            return null;
+        });
+    });
+    return Promise.all(promises).then(function(results) {
+        var btns = document.querySelectorAll('#details-actions .version-btn');
+        var tmdbId = null;
+        for (var i = 0; i < results.length; i++) {
+            if (!results[i] || !results[i].info) continue;
+            var info = results[i].info;
+            var version = results[i].version;
+            if (!tmdbId && info.tmdb_id) tmdbId = info.tmdb_id;
+            var bitrate = parseInt(info.bitrate);
+            if (!bitrate) continue;
+            var bitrateLabel = self._formatBitrate(bitrate);
+            var tag = version.tag || I18n.t('details.defaultVersion', 'Standard');
+            for (var b = 0; b < btns.length; b++) {
+                if (btns[b].dataset.versionId == version.id) {
+                    btns[b].textContent = '▶ ' + tag + ' ';
+                    var span = document.createElement('span');
+                    span.className = 'version-bitrate';
+                    span.textContent = bitrateLabel;
+                    btns[b].appendChild(span);
+                    break;
+                }
+            }
+        }
+        if (tmdbId && self.selectedStream && self.selectedStream.data) {
+            self.selectedStream.data.tmdb_id = tmdbId;
+        }
+        window.log('DEDUP', '_loadVersionInfos: tmdb_id=' + tmdbId + ' versions=' + results.filter(function(r) { return r && r.info && r.info.bitrate; }).length);
+        return tmdbId;
+    });
 };
 
 IPTVApp.prototype._findVersionByTag = function(versions, tag) {
@@ -215,6 +296,59 @@ IPTVApp.prototype._findVersionByTag = function(versions, tag) {
         if (versions[pi].tag === tag) return pi;
     }
     return 0;
+};
+
+IPTVApp.prototype._ensureDuplicateVersions = function(streamData) {
+    if (!streamData || streamData._duplicateVersions) return;
+    var dedupKey = streamData._dedupKey;
+    if (!dedupKey) return;
+    var section = this.currentSection;
+    var vodSubsections = ['sport', 'manga', 'entertainment'];
+    var isCustom = section && section.indexOf('custom_') === 0;
+    var dataSection = (vodSubsections.indexOf(section) !== -1 || isCustom) ? 'vod' : section;
+    var sectionData = this.data[dataSection];
+    if (!sectionData || !sectionData._dedupGroups) return;
+    var group = sectionData._dedupGroups[dedupKey];
+    if (!group || group.length <= 1) return;
+    var tags = [];
+    for (var gi = 0; gi < group.length; gi++) {
+        tags.push(group[gi]._dedupTag);
+    }
+    var uniqueTags = tags.filter(function(t, idx) { return tags.indexOf(t) === idx; });
+    if (uniqueTags.length <= 1 && (uniqueTags.length === 0 || uniqueTags[0] === '')) return;
+    var versions = [];
+    var seenTags = {};
+    for (var gi = 0; gi < group.length; gi++) {
+        var tag = group[gi]._dedupTag || '';
+        if (seenTags[tag]) continue;
+        seenTags[tag] = true;
+        versions.push({
+            id: group[gi].stream_id || group[gi].series_id,
+            tag: tag,
+            data: group[gi]
+        });
+    }
+    if (this.hideSD && versions.length > 1) {
+        var hasNonSD = versions.some(function(v) { return !v.data._isSD; });
+        if (hasNonSD) versions = versions.filter(function(v) { return !v.data._isSD; });
+    }
+    if (this.hide3D && versions.length > 1) {
+        versions = versions.filter(function(v) { return !v.data._is3D; });
+    }
+    versions.sort(function(a, b) {
+        var qualDiff = (b.data._dedupQualityScore || 0) - (a.data._dedupQualityScore || 0);
+        if (qualDiff !== 0) return qualDiff;
+        var aTag = (a.tag || '').toUpperCase();
+        var bTag = (b.tag || '').toUpperCase();
+        var aIsVostfr = aTag.indexOf('VOSTFR') !== -1 || aTag.indexOf('VOST') !== -1 || aTag.indexOf('VO') !== -1;
+        var bIsVostfr = bTag.indexOf('VOSTFR') !== -1 || bTag.indexOf('VOST') !== -1 || bTag.indexOf('VO') !== -1;
+        if (aIsVostfr !== bIsVostfr) return aIsVostfr ? 1 : -1;
+        return 0;
+    });
+    if (versions.length > 1) {
+        streamData._duplicateVersions = versions;
+        window.log('DEDUP', '_ensureDuplicateVersions: found ' + versions.length + ' versions for key=' + dedupKey + ' => ' + versions.map(function(v) { return '[' + v.id + '] tag=' + v.tag + ' name=' + (v.data.name || v.data.title || ''); }).join(' | '));
+    }
 };
 
 IPTVApp.prototype._findBestQualityVersion = function(versions) {
@@ -301,6 +435,21 @@ IPTVApp.prototype._showDetailsLive = function(streamId, streamData) {
 };
 
 IPTVApp.prototype._showDetailsVod = function(streamId, streamData) {
+    var self = this;
+    if (this._versionInfosPromise) {
+        this._versionInfosPromise.then(function(tmdbId) {
+            if (tmdbId && self.selectedStream && self.selectedStream.data) {
+                self.selectedStream.data.tmdb_id = tmdbId;
+            }
+            self._doShowDetailsVod(streamId, streamData);
+        });
+    }
+    else {
+        this._doShowDetailsVod(streamId, streamData);
+    }
+};
+
+IPTVApp.prototype._doShowDetailsVod = function(streamId, streamData) {
     if (TMDB.isEnabled()) {
         this.loadVodInfo(streamId);
     }
@@ -720,6 +869,7 @@ IPTVApp.prototype.updateVodButtons = function() {
     if (!this.selectedStream) return;
     var streamId = this.selectedStream.id;
     if (!streamId) return;
+    var hasVersionBtns = document.querySelectorAll('#details-actions .version-btn').length > 0;
     var playBtn = document.getElementById('play-btn');
     var continueBtn = document.getElementById('continue-btn');
     var markWatchedBtn = document.getElementById('mark-watched-btn');
@@ -728,12 +878,14 @@ IPTVApp.prototype.updateVodButtons = function() {
     if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
         playBtn.textContent = I18n.t('player.play', 'Play') + ' ' + I18n.t('player.fromStart', 'from start').toLowerCase();
         continueBtn.textContent = I18n.t('player.continueAt', 'Continue at') + ' ' + this.formatPosition(vodProg.position);
+        this.setHidden(playBtn, hasVersionBtns);
         this.setHidden(continueBtn, false);
         this.setHidden(markWatchedBtn, false);
         this.selectedStream.historyPosition = vodProg.position;
     }
     else {
         playBtn.textContent = I18n.t('player.play', 'Play');
+        this.setHidden(playBtn, hasVersionBtns);
         this.setHidden(continueBtn, true);
         this.setHidden(markWatchedBtn, true);
     }
@@ -1470,12 +1622,15 @@ IPTVApp.prototype.getCleanTitleForTMDB = function() {
     }
     var title = this.getStreamTitle(streamData);
     title = this.stripCategoryPrefix(title);
-    title = title
-        .replace(Regex.removeYearParens, '')
-        .replace(Regex.removeYearEnd, '')
-        .replace(Regex.trailingDash, '')
-        .trim();
-    return this.formatDisplayTitle(title);
+    var year = this.extractYear(title);
+    if (!year && streamData.year) {
+        title = title + ' (' + streamData.year + ')';
+    }
+    if (!year && !streamData.year && streamData.release_date) {
+        var y = String(streamData.release_date).substring(0, 4);
+        if (y && y.length === 4) title = title + ' (' + y + ')';
+    }
+    return title;
 };
 
 IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
@@ -1615,8 +1770,6 @@ IPTVApp.prototype.displayDirector = function(director, label) {
         this.setHidden(directorSection, true);
     }
 };
-
-
 IPTVApp.prototype.fetchRandomBackdrop = function(tmdbId, type) {
     var self = this;
     window.log('fetchRandomBackdrop: tmdbId=' + tmdbId + ' type=' + type);
@@ -1734,6 +1887,14 @@ IPTVApp.prototype.playVersion = function(versionIndex) {
     }
     var version = versions[versionIndex];
     window.log('ACTION', 'playVersion index=' + versionIndex + ' id=' + version.id + ' tag=' + version.tag);
+    var cleanTitle = this.cleanTitle(this.getStreamTitle(version.data)).toLowerCase();
+    var isSeries = this.selectedStream.type === 'series';
+    if (isSeries) {
+        this.saveSeriesVersionPref(cleanTitle, version.tag);
+    }
+    else {
+        this.saveMovieVersionPref(cleanTitle, version.tag);
+    }
     this.playStream(version.id, this.selectedStream.type, version.data, 0);
 };
 
@@ -2316,27 +2477,6 @@ IPTVApp.prototype.findFavoriteStream = function(streamId) {
     }
     return null;
 };
-
-IPTVApp.prototype.showDuplicatesInfo = function(streamData) {
-    var dupEl = document.getElementById('details-duplicates');
-    if (!dupEl) return;
-    dupEl.innerHTML = '';
-    if (!streamData || !streamData._duplicateInfos) return;
-    var self = this;
-    var currentId = streamData.stream_id || streamData.series_id;
-    var infos = streamData._duplicateInfos;
-    if (infos.length <= 1) return;
-    infos.forEach(function(info) {
-        var span = document.createElement('span');
-        span.className = 'dup-title';
-        var isCurrent = self.sameId(info.id, currentId);
-        if (isCurrent) span.classList.add('dup-current');
-        span.textContent = '#' + info.num + ' [' + info.id + '] ' + info.name;
-        dupEl.appendChild(span);
-    });
-    this.setHidden(dupEl, false);
-};
-
 IPTVApp.prototype.updateHomeDownloadButton = function() {
     var dlBtn = document.getElementById('home-downloads-btn');
     if (!dlBtn) return;

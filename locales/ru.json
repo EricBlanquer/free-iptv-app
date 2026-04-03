@@ -37,7 +37,7 @@
         "live": "Прямой эфир",
         "movies": "Фильмы",
         "series": "Сериалы",
-        "favorites": "Избранное",
+        "favorites": "Мой список",
         "sport": "Спорт",
         "concerts": "Концерты",
         "theatre": "Театр",
@@ -47,7 +47,7 @@
         "settings": "Настройки",
         "continueWatching": "Продолжить просмотр",
         "noContinue": "Нет текущего контента",
-        "noFavorites": "Нет избранного",
+        "noFavorites": "Список пуст",
         "manga": "Manga",
         "entertainment": "Развлечения",
         "continue": "Продолжить",
@@ -131,7 +131,7 @@
         "clearAllCaches": "Очистить все кэши",
         "clearCache": "Очистить кэш TMDB",
         "clearProgress": "Очистить прогресс",
-        "clearFavorites": "Очистить избранное",
+        "clearFavorites": "Очистить список",
         "factoryReset": "Сброс",
         "factoryResetConfirm": "Сбросить приложение? Все данные будут потеряны.",
         "playlists": "Плейлисты",
@@ -225,7 +225,14 @@
         "freeboxDownloadVia": "Скачивание через",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Формат ТВ"
+        "liveFormat": "Формат ТВ",
+        "remoteDebug": "Удалённая отладка",
+        "textXLarge": "Очень крупный",
+        "cacheCleared": "Кэш очищен",
+        "progressCleared": "Прогресс очищен",
+        "favoritesCleared": "Список очищен",
+        "tmdbCacheCleared": "Кэш TMDB очищен",
+        "textXXLarge": "Максимальный"
     },
     "player": {
         "play": "Воспроизвести",
@@ -285,7 +292,7 @@
         "back": "Назад"
     },
     "details": {
-        "defaultVersion": "Стандартная",
+        "defaultVersion": "По умолчанию",
         "director": "Режиссёр",
         "creator": "Создатель",
         "filmography": "Фильмография",
@@ -336,7 +343,7 @@
         "status": "Статус",
         "licenseCode": "Код лицензии",
         "validate": "Подтвердить",
-        "licenseDesc": "Free IPTV — бесплатное и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием на iptv.blanquer.org. Вы получите код лицензии в благодарность.",
+        "licenseDesc": "Free IPTV — бесплатное и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием на iptv.blanquer.org — вы получите код лицензии в благодарность",
         "statusTrial": "Пробный период ({days} дней осталось)",
         "statusGrace": "Оценочный период ({days} дней осталось)",
         "statusExpired": "Истёк",
@@ -347,7 +354,9 @@
         "later": "Позже",
         "validationSuccess": "Лицензия активирована!",
         "validationError": "Неверный код лицензии",
-        "validationNetwork": "Ошибка сети, попробуйте позже"
+        "validationNetwork": "Ошибка сети, попробуйте позже",
+        "featureTitle": "Премиум-функция",
+        "continueAnyway": "Продолжить всё равно"
     },
     "categoryPatterns": {
         "sport": [

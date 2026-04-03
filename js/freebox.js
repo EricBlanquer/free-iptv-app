@@ -1,7 +1,7 @@
 var FreeboxAPI = (function() {
     var APP_ID = 'org.nicefree.iptv';
     var APP_NAME = 'Free IPTV';
-    var APP_VERSION = '1.0.0';
+    var FREEBOX_APP_VERSION = window.APP_VERSION || '1.0.0';
     var DEVICE_NAME = /Android/.test(navigator.userAgent) ? 'Android TV' : /Tizen/.test(navigator.userAgent) ? 'Samsung TV' : 'Smart TV';
     var POLL_INTERVAL = 5000;
 
@@ -119,7 +119,7 @@ var FreeboxAPI = (function() {
         return xhr('POST', apiUrl('/api/v4/login/authorize/'), {
             app_id: APP_ID,
             app_name: APP_NAME,
-            app_version: APP_VERSION,
+            app_version: FREEBOX_APP_VERSION,
             device_name: DEVICE_NAME
         }).then(function(resp) {
             if (!resp.success) {

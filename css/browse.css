@@ -330,20 +330,6 @@
 }
 
 /* Favorite icon on grid items */
-.grid-item .favorite-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    color: #ffd700;
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
-    z-index: 10;
-}
-
-#content-grid.list-view .grid-item .favorite-icon {
-    position: static;
-    margin-left: auto;
-    margin-right: 15px;
-}
 
 .grid-download-bar {
     position: absolute;

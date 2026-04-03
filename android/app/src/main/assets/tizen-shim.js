@@ -7,7 +7,7 @@
         meta.name = 'viewport';
         (document.head || document.documentElement).appendChild(meta);
     }
-    meta.content = 'width=1920';
+    meta.content = 'width=1920, initial-scale=1.0, user-scalable=no';
 
     function addTouchClass() {
         if (document.body) {
@@ -164,38 +164,7 @@
         'playlist-edit': '#playlist-edit-screen .focusable',
         'confirm-modal': '#confirm-modal .modal-btn'
     };
-    document.addEventListener('click', function(e) {
-        if (!window.app) return;
-        var el = e.target;
-        while (el && el !== document.body) {
-            if (el.classList.contains('focusable') || el.classList.contains('grid-item') ||
-                el.classList.contains('category-item') || el.classList.contains('continue-item') ||
-                el.classList.contains('modal-btn') || el.classList.contains('episode-item') ||
-                el.classList.contains('season-btn') || el.classList.contains('action-btn') ||
-                el.classList.contains('cast-card') || el.classList.contains('filmography-item')) {
-                break;
-            }
-            el = el.parentElement;
-        }
-        if (!el || el === document.body) {
-            if (window.app.currentScreen === 'player') {
-                window.app.showPlayerOverlay();
-            }
-            return;
-        }
-        for (var area in areaSelectors) {
-            var items = document.querySelectorAll(areaSelectors[area]);
-            for (var i = 0; i < items.length; i++) {
-                if (items[i] === el) {
-                    window.app.focusArea = area;
-                    window.app.focusIndex = i;
-                    window.app.updateFocus();
-                    window.app.select();
-                    return;
-                }
-            }
-        }
-    });
+    // Click handling is done by focus.js and screen.js click handlers
     document.addEventListener('DOMContentLoaded', function() {
         var style = document.createElement('style');
         style.textContent = 'video::-webkit-media-controls { display: none !important; } video::-webkit-media-controls-enclosure { display: none !important; } video::-webkit-media-controls-overlay-play-button { display: none !important; } video { object-fit: contain; background: black !important; } #html5-video { display: none !important; } body.native-player-active, body.native-player-active #player-screen, body.native-player-active #player-container, body.native-player-active #av-player { background: transparent !important; }';

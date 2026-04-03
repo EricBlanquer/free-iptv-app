@@ -1166,7 +1166,8 @@
 .tts-voice-modal-content {
     max-width: 500px;
     max-height: 80vh;
-    overflow-y: auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tts-voice-modal-content .modal-title {
@@ -1212,4 +1213,9 @@
     background: rgba(52, 208, 88, 0.35);
     border-color: rgba(52, 208, 88, 0.5);
     box-shadow: 0 0 0 2px rgba(52, 208, 88, 0.3);
+}
+
+#settings-version {
+    color: rgba(255, 255, 255, 0.3);
+    margin-left: 15px;
 }

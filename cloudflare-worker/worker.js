@@ -40,6 +40,16 @@ export default {
       return new Response(null, { headers });
     }
 
+    try {
+      return await handleRequest(request, env, url, path, headers);
+    }
+    catch (ex) {
+      return new Response(JSON.stringify({ error: 'internal', message: ex.message }), { status: 500, headers });
+    }
+  }
+};
+
+async function handleRequest(request, env, url, path, headers) {
     // Premium state endpoints
     if (path.startsWith('/premium/')) {
       const deviceId = decodeURIComponent(path.slice('/premium/'.length));
@@ -312,5 +322,4 @@ export default {
     }
 
     return new Response('{"error":"method not allowed"}', { status: 405, headers });
-  }
 }

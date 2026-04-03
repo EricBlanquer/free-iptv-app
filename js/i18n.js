@@ -91,7 +91,7 @@ var I18n = (function() {
             var elements = document.querySelectorAll('[data-i18n]');
             elements.forEach(function(el) {
                 var key = el.getAttribute('data-i18n');
-                el.textContent = self.t(key);
+                el.textContent = self.t(key, el.textContent);
             });
             var attrElements = document.querySelectorAll('[data-i18n-placeholder]');
             attrElements.forEach(function(el) {

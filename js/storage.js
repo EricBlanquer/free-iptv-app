@@ -1025,30 +1025,32 @@ IPTVApp.prototype.startCacheRefreshTimer = function(playlistsOrId) {
 IPTVApp.prototype.updateCacheInfoDisplay = function() {};
 
 IPTVApp.prototype.updateRefreshProgress = function(playlistId, step, total, name) {
-    var tab = document.querySelector('.playlist-tab[data-playlist-id="' + playlistId + '"]');
-    if (!tab) return;
-    var existing = tab.querySelector('.playlist-progress');
-    var ageSpan = tab.querySelector('.playlist-age');
+    var providerAgeEl = document.getElementById('home-provider-age');
+    if (!providerAgeEl) return;
+    var isActiveProvider = !this.settings.activePlaylistId || this.sameId(playlistId, this.settings.activePlaylistId);
+    var playlists = this.settings.playlists || [];
+    var isSingleProvider = playlists.filter(function(p) { return p.showOnHome !== false; }).length < 2;
+    if (!isActiveProvider && !isSingleProvider) return;
     if (!name || (step === 0 && total === 0)) {
-        if (existing) existing.remove();
-        if (ageSpan) ageSpan.style.display = '';
-        return;
+        var ts = (this.playlistCacheTimestamps || {})[playlistId];
+        while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
+        var doneIcon = document.createElement('span');
+        doneIcon.className = 'material-symbols-outlined';
+        doneIcon.textContent = 'schedule';
+        providerAgeEl.appendChild(doneIcon);
+        providerAgeEl.appendChild(document.createTextNode(' ' + (ts ? formatTimeAgo(ts) : '')));
+    } else {
+        while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
+        var hg2 = document.createElement('span');
+        hg2.className = 'hourglass';
+        var hgIcon2 = document.createElement('span');
+        hgIcon2.className = 'material-symbols-outlined';
+        hgIcon2.textContent = 'hourglass_empty';
+        hg2.appendChild(hgIcon2);
+        providerAgeEl.appendChild(hg2);
+        providerAgeEl.appendChild(document.createTextNode(' ' + step + '/' + total + ' ' + name));
+        this.setHidden(providerAgeEl, false);
     }
-    if (ageSpan) ageSpan.style.display = 'none';
-    if (!existing) {
-        existing = document.createElement('span');
-        existing.className = 'playlist-progress';
-        var hg = document.createElement('span');
-        hg.className = 'hourglass';
-        var hgIcon = document.createElement('span');
-        hgIcon.className = 'material-symbols-outlined';
-        hgIcon.textContent = 'hourglass_empty';
-        hg.appendChild(hgIcon);
-        existing.appendChild(hg);
-        existing.appendChild(document.createTextNode(''));
-        tab.appendChild(existing);
-    }
-    existing.lastChild.textContent = ' ' + step + '/' + total + ' ' + name;
 };
 
 IPTVApp.prototype.getPlaylistCacheTimestamp = function(playlistId) {
@@ -1495,20 +1497,6 @@ IPTVApp.prototype.toggleFavoriteAtIndex = function(index) {
     var stream = this.currentStreams[index];
     var type = this.currentStreamType || this.currentSection;
     this.toggleFavorite(stream, type);
-    // Update visual indicator on the item
-    var isFav = this.isFavorite(stream);
-    var favIcon = item.querySelector('.favorite-icon');
-    if (isFav) {
-        if (!favIcon) {
-            favIcon = document.createElement('span');
-            favIcon.className = 'favorite-icon';
-            favIcon.textContent = '★';
-            item.appendChild(favIcon);
-        }
-    }
-    else {
-        if (favIcon) favIcon.remove();
-    }
 };
 
 // Remove item from history by ID and playlistId
@@ -1587,20 +1575,6 @@ IPTVApp.prototype.updateGridFavoriteIcon = function(streamId, isFavorite, playli
     if (items.length === 0 && playlistId) {
         items = grid.querySelectorAll('.grid-item[data-stream-id="' + streamId + '"]');
     }
-    items.forEach(function(item) {
-        var favIcon = item.querySelector('.favorite-icon');
-        if (isFavorite) {
-            if (!favIcon) {
-                favIcon = document.createElement('span');
-                favIcon.className = 'favorite-icon';
-                favIcon.textContent = '★';
-                item.appendChild(favIcon);
-            }
-        }
-        else {
-            if (favIcon) favIcon.remove();
-        }
-    });
 };
 
 // Device ID

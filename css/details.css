@@ -57,8 +57,6 @@
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
 }
-
-
 #details-info {
     flex: 1;
     display: flex;
@@ -93,26 +91,6 @@
 .vote-count {
     color: #777;
 }
-
-#details-duplicates {
-    color: #ff9800;
-    margin: 8px 0;
-    padding: 8px 12px;
-    background: rgba(255, 152, 0, 0.15);
-    border-radius: 6px;
-    border-left: 3px solid #ff9800;
-}
-
-#details-duplicates .dup-title {
-    display: block;
-    margin: 4px 0;
-}
-
-#details-duplicates .dup-current {
-    font-weight: bold;
-    color: #fff;
-}
-
 #details-genres {
     display: flex;
     flex-wrap: wrap;
@@ -360,39 +338,19 @@
     font-weight: bold;
 }
 
-.version-selector {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
-}
-
-.version-btn {
-    padding: 8px 20px;
-    background: #444;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-bottom: 10px;
-}
-
-.version-btn:focus,
-.version-btn.focused {
-    background: #555;
-    transform: scale(1.05);
-    outline: none;
-    box-shadow: 0 0 0 3px #fff;
-}
-
-.version-btn.selected {
+.version-btn.action-btn {
     background: #0077cc;
+    margin-left: 0;
+    margin-right: 15px;
 }
 
-.version-btn.selected:focus,
-.version-btn.selected.focused {
+.version-btn.action-btn:focus,
+.version-btn.action-btn.focused {
     background: #0099ff;
-    box-shadow: 0 0 0 3px #fff;
+}
+
+.version-btn .version-bitrate {
+    opacity: 0.7;
 }
 
 #details-episodes-grid {
@@ -608,6 +566,7 @@
     justify-content: center;
     line-height: 1;
     transition: all 0.2s;
+    font-family: 'Material Symbols Outlined';
 }
 
 .favorite-star:focus,

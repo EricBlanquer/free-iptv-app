@@ -41,7 +41,7 @@
         "live": "TV en vivo",
         "movies": "Películas",
         "series": "Series",
-        "favorites": "Favoritos",
+        "favorites": "Mi lista",
         "sport": "Deporte",
         "concerts": "Conciertos",
         "theatre": "Teatro",
@@ -51,7 +51,7 @@
         "settings": "Ajustes",
         "continueWatching": "Continuar viendo",
         "noContinue": "Sin contenido en curso",
-        "noFavorites": "Sin favoritos",
+        "noFavorites": "Tu lista está vacía",
         "manga": "Manga",
         "entertainment": "Entretenimiento",
         "continue": "Continuar",
@@ -135,7 +135,7 @@
         "clearAllCaches": "Vaciar todas las cachés",
         "clearCache": "Vaciar caché TMDB",
         "clearProgress": "Borrar progreso",
-        "clearFavorites": "Borrar favoritos",
+        "clearFavorites": "Borrar mi lista",
         "factoryReset": "Restablecer",
         "factoryResetConfirm": "¿Restablecer la aplicación? Se perderán todos los datos.",
         "playlists": "Playlists",
@@ -229,7 +229,14 @@
         "freeboxDownloadVia": "Descarga vía",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Formato TV en vivo"
+        "liveFormat": "Formato TV en vivo",
+        "remoteDebug": "Depuración remota",
+        "textXLarge": "Extra grande",
+        "cacheCleared": "Cachés borrados",
+        "progressCleared": "Progreso borrado",
+        "favoritesCleared": "Lista borrada",
+        "tmdbCacheCleared": "Caché TMDB borrado",
+        "textXXLarge": "Máximo"
     },
     "player": {
         "play": "Reproducir",
@@ -289,7 +296,7 @@
         "back": "Volver"
     },
     "details": {
-        "defaultVersion": "Estándar",
+        "defaultVersion": "Predeterminado",
         "director": "Director",
         "creator": "Creador",
         "filmography": "Filmografía",
@@ -340,7 +347,7 @@
         "status": "Estado",
         "licenseCode": "Código de licencia",
         "validate": "Validar",
-        "licenseDesc": "Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación en iptv.blanquer.org. Recibirás un código de licencia como agradecimiento.",
+        "licenseDesc": "Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación en iptv.blanquer.org — recibirás un código de licencia como agradecimiento",
         "statusTrial": "Prueba ({days} días restantes)",
         "statusGrace": "Evaluación ({days} días restantes)",
         "statusExpired": "Expirado",
@@ -351,7 +358,9 @@
         "later": "Más tarde",
         "validationSuccess": "¡Licencia activada!",
         "validationError": "Código de licencia inválido",
-        "validationNetwork": "Error de red, intente más tarde"
+        "validationNetwork": "Error de red, intente más tarde",
+        "featureTitle": "Función Premium",
+        "continueAnyway": "Continuar de todos modos"
     },
     "categoryPatterns": {
         "sport": [

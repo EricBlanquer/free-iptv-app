@@ -11,6 +11,19 @@ function cssUrl(url) {
     return 'url("' + url.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '")';
 }
 
+var APP_VERSION = '';
+(function() {
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'config.xml', false);
+        xhr.send();
+        if (xhr.status === 200 || xhr.status === 0) {
+            var match = xhr.responseText.match(/<widget[^>]+version="([^"]+)"/);
+            if (match) APP_VERSION = match[1];
+        }
+    } catch (e) {}
+})();
+
 class IPTVApp {
     /**
      * Initialize the IPTV application
@@ -147,6 +160,7 @@ class IPTVApp {
         // Set deviceId early so logs have the correct device
         this.deviceId = this.getDeviceId();
         window.deviceId = this.deviceId;
+        this.setupRemoteDebug();
         Premium.init(this.deviceId);
         window._sendCrashLogs();
         window.log('INIT', 'deviceId=' + this.deviceId);
@@ -161,6 +175,9 @@ class IPTVApp {
         this.player.setPreferHtml5(this.settings.preferHtml5Player);
         this.player.setDialogueBoost(this.settings.dialogueBoost);
         this.player.setProxyUrl(this.getStreamProxyUrl());
+        if (!this.settings.textSize && document.body.classList.contains('touch')) {
+            this.settings.textSize = 'xlarge';
+        }
         this.applyTextSize(this.settings.textSize);
         this.preloadBackdropImages();
         this.initAPIs();
@@ -239,10 +256,41 @@ class IPTVApp {
         var container = document.getElementById('playlist-selector');
         var playlists = this.settings.playlists || [];
         var visiblePlaylists = playlists.filter(function(p) { return p.showOnHome !== false; });
+        var providerAgeEl = document.getElementById('home-provider-age');
         if (visiblePlaylists.length < 2) {
             this.setHidden(container, true);
             container.innerHTML = '';
+            if (providerAgeEl && visiblePlaylists.length === 1) {
+                var ts = (this.playlistCacheTimestamps || {})[visiblePlaylists[0].id];
+                if (ts) {
+                    while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
+                    var icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined';
+                    icon.textContent = 'schedule';
+                    providerAgeEl.appendChild(icon);
+                    providerAgeEl.appendChild(document.createTextNode(' ' + formatTimeAgo(ts)));
+                    this.setHidden(providerAgeEl, false);
+                } else {
+                    this.setHidden(providerAgeEl, true);
+                }
+            } else if (providerAgeEl) {
+                this.setHidden(providerAgeEl, true);
+            }
             return;
+        }
+        if (providerAgeEl) {
+            var activeTs = (this.playlistCacheTimestamps || {})[this.settings.activePlaylistId];
+            if (activeTs) {
+                while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
+                var ageIcon = document.createElement('span');
+                ageIcon.className = 'material-symbols-outlined';
+                ageIcon.textContent = 'schedule';
+                providerAgeEl.appendChild(ageIcon);
+                providerAgeEl.appendChild(document.createTextNode(' ' + formatTimeAgo(activeTs)));
+                this.setHidden(providerAgeEl, false);
+            } else {
+                this.setHidden(providerAgeEl, true);
+            }
         }
         this.setHidden(container, false);
         container.innerHTML = '';
@@ -256,40 +304,13 @@ class IPTVApp {
             nameSpan.className = 'playlist-name';
             nameSpan.textContent = p.name || I18n.t('settings.playlistDefault', 'Playlist ' + p.id, { id: p.id });
             tab.appendChild(nameSpan);
-            var ts = timestamps[p.id];
-            if (ts) {
-                var ageSpan = document.createElement('span');
-                ageSpan.className = 'playlist-age';
-                var ageIcon = document.createElement('span');
-                ageIcon.className = 'material-symbols-outlined';
-                ageIcon.textContent = 'schedule';
-                ageSpan.appendChild(ageIcon);
-                ageSpan.appendChild(document.createTextNode(' ' + formatTimeAgo(ts)));
-                tab.appendChild(ageSpan);
-            }
             container.appendChild(tab);
         });
-        if (visiblePlaylists.length >= 2) {
-            var mergeTab = document.createElement('div');
-            mergeTab.className = 'playlist-tab playlist-tab-merge focusable' + (!activeId ? ' active' : '');
-            mergeTab.dataset.playlistId = 'merge';
-            var mergeIcon = document.createElement('span');
-            mergeIcon.className = 'material-symbols-outlined';
-            mergeIcon.textContent = 'bolt';
-            mergeTab.appendChild(mergeIcon);
-            mergeTab.appendChild(document.createTextNode(' ' + I18n.t('settings.mergePlaylists', 'Merge all')));
-            container.appendChild(mergeTab);
-        }
         this.invalidateFocusables();
     }
 
     switchPlaylist(playlistId) {
-        if (playlistId === 'merge') {
-            this.settings.activePlaylistId = null;
-        }
-        else {
-            this.settings.activePlaylistId = playlistId;
-        }
+        this.settings.activePlaylistId = playlistId;
         this.saveSettings();
         this.data = {
             live: { categories: [], streams: [] },

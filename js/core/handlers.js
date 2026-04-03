@@ -213,8 +213,8 @@ IPTVApp.prototype.selectHandlers = {
             this.showDetailsFromTMDB(current);
         }
     },
-    settings: function() {
-        this.handleSettingsSelect();
+    settings: function(current) {
+        this.handleSettingsSelect(current);
     },
     playlists: function() {
         this.handlePlaylistsSelect();
@@ -392,15 +392,18 @@ IPTVApp.prototype.backHandlers = {
     },
     'screen:home': function() {
         window.log('ACTION', 'exit');
-        if (typeof tizen !== 'undefined') {
+        if (typeof Android !== 'undefined' && Android.exitApp) {
+            Android.exitApp();
+        }
+        else if (typeof tizen !== 'undefined') {
             tizen.application.getCurrentApplication().exit();
         }
     }
 };
 
-IPTVApp.prototype.select = function() {
+IPTVApp.prototype.select = function(clickedElement) {
     var focusables = this.getFocusables();
-    var current = focusables[this.focusIndex];
+    var current = clickedElement || focusables[this.focusIndex];
     if (!current) return;
     var selectInfo = current.id || current.dataset.action || current.dataset.streamId || current.className.split(' ')[0];
     window.log('ACTION', 'select ' + selectInfo);

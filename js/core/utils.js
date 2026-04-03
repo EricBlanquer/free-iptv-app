@@ -283,3 +283,17 @@ IPTVApp.prototype.getElementCenter = function(element) {
         rect: rect
     };
 };
+
+IPTVApp.prototype._showToast = function(message) {
+    var existing = document.getElementById('toast-message');
+    if (existing) existing.remove();
+    var toast = document.createElement('div');
+    toast.id = 'toast-message';
+    toast.textContent = message;
+    toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(76,175,80,0.9);color:#fff;padding:16px 40px;border-radius:10px;font-size:24px;z-index:10000;transition:opacity 0.5s;';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { toast.remove(); }, 500);
+    }, 2000);
+};

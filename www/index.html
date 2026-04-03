@@ -663,6 +663,14 @@
             </select>
         </header>
 
+        <div id="android-install" style="display:none; text-align:center; margin-bottom:20px;">
+            <a href="app.apk" style="display:inline-flex; align-items:center; gap:10px; padding:14px 28px; background:#3ddc84; color:#000; text-decoration:none; border-radius:12px; font-weight:600; font-size:16px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#000"><path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V7H6v11zM3.5 7C2.67 7 2 7.67 2 8.5v7c0 .83.67 1.5 1.5 1.5S5 16.33 5 15.5v-7C5 7.67 4.33 7 3.5 7zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zm-4.97-5.84l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48A5.84 5.84 0 0012 0c-.9 0-1.75.22-2.51.62L8.02.13c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31A5.97 5.97 0 006 6h12c0-2.28-1.28-4.26-3.47-5.84zM10 4H9V3h1v1zm5 0h-1V3h1v1z"/></svg>
+                <span data-i18n="installAndroid">Install on Android</span>
+            </a>
+        </div>
+        <script>if (/Android/i.test(navigator.userAgent)) document.getElementById('android-install').style.display = '';</script>
+
         <div id="code-step" class="card">
             <h2 data-i18n="tvCode">TV Code</h2>
             <p style="color:#aaa; margin-bottom:15px;" data-i18n="enterCode">Enter the code displayed on your TV</p>
@@ -966,9 +974,9 @@
 
             <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <h3 style="color: #00d4ff; margin-bottom: 12px; border-left: none; padding-left: 0;" data-i18n="retrieveTitle">Retrieve your license code</h3>
-                <div style="display: flex; justify-content: center; flex-wrap: wrap;">
-                    <input type="email" id="lookup-email" placeholder="your@email.com" style="padding: 12px 16px; border-radius: 8px 0 0 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; width: 260px; outline: none;">
-                    <button onclick="lookupLicense()" style="padding: 12px 24px; border-radius: 0 8px 8px 0; border: 1px solid rgba(255,255,255,0.15); border-left: none; background: rgba(0,212,255,0.15); color: #00d4ff; font-size: 15px; cursor: pointer; font-weight: 500;" data-i18n="retrieveBtn">Retrieve</button>
+                <div style="display: flex; justify-content: center;">
+                    <input type="email" id="lookup-email" placeholder="your@email.com" style="padding: 12px 16px; border-radius: 8px 0 0 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; min-width: 0; flex: 1; max-width: 260px; outline: none;">
+                    <button onclick="lookupLicense()" style="padding: 12px 24px; border-radius: 0 8px 8px 0; border: 1px solid rgba(255,255,255,0.15); border-left: none; background: rgba(0,212,255,0.15); color: #00d4ff; font-size: 15px; cursor: pointer; font-weight: 500; white-space: nowrap;" data-i18n="retrieveBtn">Retrieve</button>
                 </div>
                 <div id="lookup-result" style="margin-top: 15px; min-height: 20px;"></div>
             </div>
@@ -1159,6 +1167,7 @@
                 supportThanks: "Après votre don, entrez votre email PayPal ci-dessous pour récupérer votre code de licence.",
                 retrieveTitle: 'Récupérer votre code de licence',
                 retrieveBtn: 'Récupérer',
+                installAndroid: 'Installer sur Android',
                 yourCode: 'Votre code de licence\u00A0:',
                 enterInSettings: "Entrez ce code dans l'app Paramètres > Licence",
                 noCodeFound: 'Aucune licence trouvée pour cet email. Veuillez patienter quelques minutes après votre don.'
@@ -1247,6 +1256,7 @@
                 supportThanks: 'After your donation, enter your PayPal email below to retrieve your license code.',
                 retrieveTitle: 'Retrieve your license code',
                 retrieveBtn: 'Retrieve',
+                installAndroid: 'Install on Android',
                 yourCode: 'Your license code:',
                 enterInSettings: 'Enter this code in the app Settings > License',
                 noCodeFound: 'No license found for this email. Please allow a few minutes after your donation.'
@@ -1335,6 +1345,7 @@
                 supportThanks: 'Después de tu donación, ingresa tu email de PayPal abajo para recuperar tu código de licencia.',
                 retrieveTitle: 'Recuperar tu código de licencia',
                 retrieveBtn: 'Recuperar',
+                installAndroid: 'Instalar en Android',
                 yourCode: 'Tu código de licencia:',
                 enterInSettings: 'Ingresa este código en la app Ajustes > Licencia',
                 noCodeFound: 'No se encontró licencia para este email. Espera unos minutos después de tu donación.'
@@ -1423,6 +1434,7 @@
                 supportThanks: 'Geben Sie nach Ihrer Spende Ihre PayPal-E-Mail unten ein, um Ihren Lizenzcode abzurufen.',
                 retrieveTitle: 'Lizenzcode abrufen',
                 retrieveBtn: 'Abrufen',
+                installAndroid: 'Auf Android installieren',
                 yourCode: 'Ihr Lizenzcode:',
                 enterInSettings: 'Geben Sie diesen Code in der App unter Einstellungen > Lizenz ein',
                 noCodeFound: 'Keine Lizenz für diese E-Mail gefunden. Bitte warten Sie einige Minuten nach Ihrer Spende.'
@@ -1511,6 +1523,7 @@
                 supportThanks: 'Dopo la tua donazione, inserisci la tua email PayPal qui sotto per recuperare il tuo codice di licenza.',
                 retrieveTitle: 'Recupera il tuo codice di licenza',
                 retrieveBtn: 'Recupera',
+                installAndroid: 'Installa su Android',
                 yourCode: 'Il tuo codice di licenza:',
                 enterInSettings: 'Inserisci questo codice nell\'app Impostazioni > Licenza',
                 noCodeFound: 'Nessuna licenza trovata per questa email. Attendi qualche minuto dopo la donazione.'
@@ -1599,6 +1612,7 @@
                 supportThanks: 'Após sua doação, insira seu email do PayPal abaixo para recuperar seu código de licença.',
                 retrieveTitle: 'Recuperar seu código de licença',
                 retrieveBtn: 'Recuperar',
+                installAndroid: 'Instalar no Android',
                 yourCode: 'Seu código de licença:',
                 enterInSettings: 'Insira este código no app Configurações > Licença',
                 noCodeFound: 'Nenhuma licença encontrada para este email. Aguarde alguns minutos após sua doação.'
@@ -1687,6 +1701,7 @@
                 supportThanks: 'Voer na je donatie hieronder je PayPal-e-mail in om je licentiecode op te halen.',
                 retrieveTitle: 'Licentiecode ophalen',
                 retrieveBtn: 'Ophalen',
+                installAndroid: 'Installeren op Android',
                 yourCode: 'Je licentiecode:',
                 enterInSettings: 'Voer deze code in de app in bij Instellingen > Licentie',
                 noCodeFound: 'Geen licentie gevonden voor dit e-mailadres. Wacht een paar minuten na je donatie.'
@@ -1775,6 +1790,7 @@
                 supportThanks: 'Po dokonaniu wpłaty wpisz poniżej swój email PayPal, aby pobrać kod licencji.',
                 retrieveTitle: 'Pobierz kod licencji',
                 retrieveBtn: 'Pobierz',
+                installAndroid: 'Zainstaluj na Androidzie',
                 yourCode: 'Twój kod licencji:',
                 enterInSettings: 'Wpisz ten kod w aplikacji Ustawienia > Licencja',
                 noCodeFound: 'Nie znaleziono licencji dla tego emaila. Poczekaj kilka minut po dokonaniu wpłaty.'
@@ -1863,6 +1879,7 @@
                 supportThanks: 'После пожертвования введите ваш email PayPal ниже, чтобы получить код лицензии.',
                 retrieveTitle: 'Получить код лицензии',
                 retrieveBtn: 'Получить',
+                installAndroid: 'Установить на Android',
                 yourCode: 'Ваш код лицензии:',
                 enterInSettings: 'Введите этот код в приложении Настройки > Лицензия',
                 noCodeFound: 'Лицензия для этого email не найдена. Подождите несколько минут после пожертвования.'
@@ -1951,6 +1968,7 @@
                 supportThanks: 'Bağışınızdan sonra lisans kodunuzu almak için PayPal e-postanızı aşağıya girin.',
                 retrieveTitle: 'Lisans kodunuzu alın',
                 retrieveBtn: 'Al',
+                installAndroid: "Android'a yükle",
                 yourCode: 'Lisans kodunuz:',
                 enterInSettings: 'Bu kodu uygulamada Ayarlar > Lisans bölümüne girin',
                 noCodeFound: 'Bu e-posta için lisans bulunamadı. Bağışınızdan sonra birkaç dakika bekleyin.'
@@ -2039,6 +2057,7 @@
                 supportThanks: 'بعد تبرعك، أدخل بريدك الإلكتروني في PayPal أدناه لاسترداد رمز الترخيص.',
                 retrieveTitle: 'استرداد رمز الترخيص',
                 retrieveBtn: 'استرداد',
+                installAndroid: 'تثبيت على أندرويد',
                 yourCode: 'رمز الترخيص الخاص بك:',
                 enterInSettings: 'أدخل هذا الرمز في التطبيق الإعدادات > الترخيص',
                 noCodeFound: 'لم يتم العثور على ترخيص لهذا البريد الإلكتروني. يرجى الانتظار بضع دقائق بعد التبرع.'

@@ -1039,7 +1039,7 @@ var I18nData = {
                             "live": "البث المباشر",
                             "movies": "أفلام",
                             "series": "مسلسلات",
-                            "favorites": "المفضلة",
+                            "favorites": "قائمتي",
                             "sport": "رياضة",
                             "concerts": "حفلات",
                             "theatre": "مسرح",
@@ -1049,7 +1049,7 @@ var I18nData = {
                             "settings": "الإعدادات",
                             "continueWatching": "متابعة المشاهدة",
                             "noContinue": "لا يوجد محتوى قيد التشغيل",
-                            "noFavorites": "لا توجد مفضلات",
+                            "noFavorites": "القائمة فارغة",
                             "manga": "Manga",
                             "entertainment": "ترفيه",
                             "continue": "متابعة",
@@ -1133,7 +1133,7 @@ var I18nData = {
                             "clearAllCaches": "مسح جميع الذاكرات المؤقتة",
                             "clearCache": "مسح ذاكرة TMDB",
                             "clearProgress": "مسح التقدم",
-                            "clearFavorites": "مسح المفضلة",
+                            "clearFavorites": "مسح القائمة",
                             "factoryReset": "إعادة ضبط",
                             "factoryResetConfirm": "إعادة ضبط التطبيق؟ سيتم فقدان جميع البيانات.",
                             "playlists": "قوائم التشغيل",
@@ -1227,7 +1227,14 @@ var I18nData = {
                             "freeboxDownloadVia": "التحميل عبر",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "صيغة البث المباشر"
+                            "liveFormat": "صيغة البث المباشر",
+                            "remoteDebug": "تصحيح عن بعد",
+                            "textXLarge": "كبير جداً",
+                            "cacheCleared": "تم مسح ذاكرة التخزين",
+                            "progressCleared": "تم مسح التقدم",
+                            "favoritesCleared": "تم مسح القائمة",
+                            "tmdbCacheCleared": "تم مسح ذاكرة TMDB",
+                            "textXXLarge": "الأقصى"
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1287,7 +1294,7 @@ var I18nData = {
                             "back": "رجوع"
                     },
                     "details": {
-                            "defaultVersion": "الإصدار الأصلي",
+                            "defaultVersion": "افتراضي",
                             "director": "المخرج",
                             "creator": "المبدع",
                             "filmography": "الأعمال السينمائية",
@@ -1338,7 +1345,7 @@ var I18nData = {
                             "status": "الحالة",
                             "licenseCode": "رمز الترخيص",
                             "validate": "تحقق",
-                            "licenseDesc": "Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم تطويره بتبرع على iptv.blanquer.org. ستحصل على رمز ترخيص كشكر.",
+                            "licenseDesc": "Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم تطويره بتبرع على iptv.blanquer.org — ستحصل على رمز ترخيص كشكر",
                             "statusTrial": "تجريبي ({days} يوم متبقي)",
                             "statusGrace": "فترة تقييم ({days} يوم متبقي)",
                             "statusExpired": "منتهي",
@@ -1349,7 +1356,9 @@ var I18nData = {
                             "later": "لاحقاً",
                             "validationSuccess": "تم تفعيل الترخيص!",
                             "validationError": "رمز ترخيص غير صالح",
-                            "validationNetwork": "خطأ في الشبكة، حاول لاحقاً"
+                            "validationNetwork": "خطأ في الشبكة، حاول لاحقاً",
+                            "featureTitle": "ميزة مميزة",
+                            "continueAnyway": "متابعة على أي حال"
                     },
                     "catchup": {
                             "today": "اليوم",
@@ -1425,7 +1434,7 @@ var I18nData = {
                             "live": "Live-TV",
                             "movies": "Filme",
                             "series": "Serien",
-                            "favorites": "Favoriten",
+                            "favorites": "Meine Liste",
                             "sport": "Sport",
                             "concerts": "Konzerte",
                             "theatre": "Theater",
@@ -1435,7 +1444,7 @@ var I18nData = {
                             "settings": "Einstellungen",
                             "continueWatching": "Weiterschauen",
                             "noContinue": "Keine laufenden Inhalte",
-                            "noFavorites": "Keine Favoriten",
+                            "noFavorites": "Liste leer",
                             "manga": "Manga",
                             "entertainment": "Unterhaltung",
                             "continue": "Fortsetzen",
@@ -1519,7 +1528,7 @@ var I18nData = {
                             "clearAllCaches": "Alle Caches leeren",
                             "clearCache": "TMDB-Cache leeren",
                             "clearProgress": "Fortschritt löschen",
-                            "clearFavorites": "Favoriten löschen",
+                            "clearFavorites": "Liste löschen",
                             "factoryReset": "Werkseinstellungen",
                             "factoryResetConfirm": "App auf Werkseinstellungen zurücksetzen? Alle Daten gehen verloren.",
                             "playlists": "Playlists",
@@ -1613,7 +1622,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Download über",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Live-TV-Format"
+                            "liveFormat": "Live-TV-Format",
+                            "remoteDebug": "Remote-Debug",
+                            "textXLarge": "Sehr groß",
+                            "cacheCleared": "Caches geleert",
+                            "progressCleared": "Fortschritt gelöscht",
+                            "favoritesCleared": "Liste gelöscht",
+                            "tmdbCacheCleared": "TMDB-Cache geleert",
+                            "textXXLarge": "Maximum"
                     },
                     "player": {
                             "play": "Abspielen",
@@ -1724,7 +1740,7 @@ var I18nData = {
                             "status": "Status",
                             "licenseCode": "Lizenzcode",
                             "validate": "Validieren",
-                            "licenseDesc": "Free IPTV ist kostenlos und werbefrei. Wenn Ihnen die App gefällt, unterstützen Sie die Entwicklung mit einer Spende auf iptv.blanquer.org. Sie erhalten einen Lizenzcode als Dankeschön.",
+                            "licenseDesc": "Free IPTV ist kostenlos und werbefrei. Wenn Ihnen die App gefällt, unterstützen Sie die Entwicklung mit einer Spende auf iptv.blanquer.org — Sie erhalten einen Lizenzcode als Dankeschön",
                             "statusTrial": "Testphase ({days} Tage übrig)",
                             "statusGrace": "Evaluierung ({days} Tage übrig)",
                             "statusExpired": "Abgelaufen",
@@ -1735,7 +1751,9 @@ var I18nData = {
                             "later": "Später",
                             "validationSuccess": "Lizenz aktiviert!",
                             "validationError": "Ungültiger Lizenzcode",
-                            "validationNetwork": "Netzwerkfehler, versuchen Sie es später erneut"
+                            "validationNetwork": "Netzwerkfehler, versuchen Sie es später erneut",
+                            "featureTitle": "Premium-Funktion",
+                            "continueAnyway": "Trotzdem fortfahren"
                     },
                     "catchup": {
                             "today": "Heute",
@@ -1813,7 +1831,7 @@ var I18nData = {
                             "tvGuide": "TV Guide",
                             "movies": "Movies",
                             "series": "Series",
-                            "favorites": "Favorites",
+                            "favorites": "My List",
                             "sport": "Sport",
                             "concerts": "Concerts",
                             "theatre": "Theater",
@@ -1823,7 +1841,7 @@ var I18nData = {
                             "settings": "Settings",
                             "continueWatching": "Continue watching",
                             "noContinue": "No content in progress",
-                            "noFavorites": "No favorites",
+                            "noFavorites": "Your list is empty",
                             "manga": "Manga",
                             "entertainment": "Entertainment",
                             "continue": "Continue",
@@ -1906,7 +1924,7 @@ var I18nData = {
                             "clearAllCaches": "Clear all caches",
                             "clearCache": "Clear TMDB cache",
                             "clearProgress": "Clear progress",
-                            "clearFavorites": "Clear favorites",
+                            "clearFavorites": "Clear my list",
                             "factoryReset": "Factory reset",
                             "factoryResetConfirm": "Reset the app to factory settings? All data will be lost.",
                             "playlists": "Playlists",
@@ -1999,7 +2017,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Download via",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Live TV format"
+                            "liveFormat": "Live TV format",
+                            "remoteDebug": "Remote debug",
+                            "textXLarge": "Extra Large",
+                            "cacheCleared": "Caches cleared",
+                            "progressCleared": "Progress cleared",
+                            "favoritesCleared": "List cleared",
+                            "tmdbCacheCleared": "TMDB cache cleared",
+                            "textXXLarge": "Maximum"
                     },
                     "player": {
                             "play": "Play",
@@ -2059,7 +2084,7 @@ var I18nData = {
                             "back": "Back"
                     },
                     "details": {
-                            "defaultVersion": "Standard",
+                            "defaultVersion": "Default",
                             "director": "Director",
                             "creator": "Creator",
                             "filmography": "Filmography",
@@ -2153,7 +2178,7 @@ var I18nData = {
                             "status": "Status",
                             "licenseCode": "License code",
                             "validate": "Validate",
-                            "licenseDesc": "Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation at iptv.blanquer.org. You'll receive a license code as a thank you.",
+                            "licenseDesc": "Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation at iptv.blanquer.org — you'll receive a license code as a thank you",
                             "statusTrial": "Trial ({days} days left)",
                             "statusGrace": "Evaluation ({days} days left)",
                             "statusExpired": "Expired",
@@ -2164,7 +2189,9 @@ var I18nData = {
                             "later": "Later",
                             "validationSuccess": "License activated!",
                             "validationError": "Invalid license code",
-                            "validationNetwork": "Network error, try again later"
+                            "validationNetwork": "Network error, try again later",
+                            "featureTitle": "Premium Feature",
+                            "continueAnyway": "Continue anyway"
                     },
                     "tips": {
                             "clickToListen": "🔊 Click to listen",
@@ -2197,7 +2224,7 @@ var I18nData = {
                             "live": "TV en vivo",
                             "movies": "Películas",
                             "series": "Series",
-                            "favorites": "Favoritos",
+                            "favorites": "Mi lista",
                             "sport": "Deporte",
                             "concerts": "Conciertos",
                             "theatre": "Teatro",
@@ -2207,7 +2234,7 @@ var I18nData = {
                             "settings": "Ajustes",
                             "continueWatching": "Continuar viendo",
                             "noContinue": "Sin contenido en curso",
-                            "noFavorites": "Sin favoritos",
+                            "noFavorites": "Tu lista está vacía",
                             "manga": "Manga",
                             "entertainment": "Entretenimiento",
                             "continue": "Continuar",
@@ -2291,7 +2318,7 @@ var I18nData = {
                             "clearAllCaches": "Vaciar todas las cachés",
                             "clearCache": "Vaciar caché TMDB",
                             "clearProgress": "Borrar progreso",
-                            "clearFavorites": "Borrar favoritos",
+                            "clearFavorites": "Borrar mi lista",
                             "factoryReset": "Restablecer",
                             "factoryResetConfirm": "¿Restablecer la aplicación? Se perderán todos los datos.",
                             "playlists": "Playlists",
@@ -2385,7 +2412,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Descarga vía",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Formato TV en vivo"
+                            "liveFormat": "Formato TV en vivo",
+                            "remoteDebug": "Depuración remota",
+                            "textXLarge": "Extra grande",
+                            "cacheCleared": "Cachés borrados",
+                            "progressCleared": "Progreso borrado",
+                            "favoritesCleared": "Lista borrada",
+                            "tmdbCacheCleared": "Caché TMDB borrado",
+                            "textXXLarge": "Máximo"
                     },
                     "player": {
                             "play": "Reproducir",
@@ -2445,7 +2479,7 @@ var I18nData = {
                             "back": "Volver"
                     },
                     "details": {
-                            "defaultVersion": "Estándar",
+                            "defaultVersion": "Predeterminado",
                             "director": "Director",
                             "creator": "Creador",
                             "filmography": "Filmografía",
@@ -2496,7 +2530,7 @@ var I18nData = {
                             "status": "Estado",
                             "licenseCode": "Código de licencia",
                             "validate": "Validar",
-                            "licenseDesc": "Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación en iptv.blanquer.org. Recibirás un código de licencia como agradecimiento.",
+                            "licenseDesc": "Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación en iptv.blanquer.org — recibirás un código de licencia como agradecimiento",
                             "statusTrial": "Prueba ({days} días restantes)",
                             "statusGrace": "Evaluación ({days} días restantes)",
                             "statusExpired": "Expirado",
@@ -2507,7 +2541,9 @@ var I18nData = {
                             "later": "Más tarde",
                             "validationSuccess": "¡Licencia activada!",
                             "validationError": "Código de licencia inválido",
-                            "validationNetwork": "Error de red, intente más tarde"
+                            "validationNetwork": "Error de red, intente más tarde",
+                            "featureTitle": "Función Premium",
+                            "continueAnyway": "Continuar de todos modos"
                     },
                     "catchup": {
                             "today": "Hoy",
@@ -2585,7 +2621,7 @@ var I18nData = {
                             "tvGuide": "Guide TV",
                             "movies": "Films",
                             "series": "Séries",
-                            "favorites": "Favoris",
+                            "favorites": "Ma liste",
                             "sport": "Sport",
                             "concerts": "Concerts",
                             "theatre": "Théâtre",
@@ -2595,7 +2631,7 @@ var I18nData = {
                             "settings": "Paramètres",
                             "continueWatching": "Continuer à regarder",
                             "noContinue": "Aucun contenu en cours",
-                            "noFavorites": "Aucun favori",
+                            "noFavorites": "Votre liste est vide",
                             "manga": "Manga",
                             "entertainment": "Divertissement",
                             "continue": "Continuer",
@@ -2678,7 +2714,7 @@ var I18nData = {
                             "clearAllCaches": "Vider tous les caches",
                             "clearCache": "Vider le cache TMDB",
                             "clearProgress": "Effacer les progressions",
-                            "clearFavorites": "Effacer les favoris",
+                            "clearFavorites": "Effacer ma liste",
                             "factoryReset": "Réinitialisation",
                             "factoryResetConfirm": "Réinitialiser l'application ? Toutes les données seront perdues.",
                             "playlists": "Playlists",
@@ -2771,7 +2807,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Téléchargement via",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Format TV en direct"
+                            "liveFormat": "Format TV en direct",
+                            "remoteDebug": "Débogage distant",
+                            "textXLarge": "Très grand",
+                            "cacheCleared": "Caches vidés",
+                            "progressCleared": "Progressions effacées",
+                            "favoritesCleared": "Liste effacée",
+                            "tmdbCacheCleared": "Cache TMDB vidé",
+                            "textXXLarge": "Maximum"
                     },
                     "player": {
                             "play": "Lecture",
@@ -2831,7 +2874,7 @@ var I18nData = {
                             "back": "Retour"
                     },
                     "details": {
-                            "defaultVersion": "Standard",
+                            "defaultVersion": "Défaut",
                             "director": "Réalisateur",
                             "creator": "Créateur",
                             "filmography": "Filmographie",
@@ -2925,7 +2968,7 @@ var I18nData = {
                             "status": "Statut",
                             "licenseCode": "Code de licence",
                             "validate": "Valider",
-                            "licenseDesc": "Free IPTV est gratuit et sans pub. Si vous appréciez l'app, soutenez son développement par un don sur iptv.blanquer.org. Vous recevrez un code de licence en remerciement.",
+                            "licenseDesc": "Free IPTV est gratuit et sans pub. Si vous appréciez l'app, soutenez son développement par un don sur iptv.blanquer.org — vous recevrez un code de licence en remerciement",
                             "statusTrial": "Essai ({days} jours restants)",
                             "statusGrace": "Évaluation ({days} jours restants)",
                             "statusExpired": "Expiré",
@@ -2936,7 +2979,9 @@ var I18nData = {
                             "later": "Plus tard",
                             "validationSuccess": "Licence activée !",
                             "validationError": "Code de licence invalide",
-                            "validationNetwork": "Erreur réseau, réessayez plus tard"
+                            "validationNetwork": "Erreur réseau, réessayez plus tard",
+                            "featureTitle": "Fonctionnalité Premium",
+                            "continueAnyway": "Continuer quand même"
                     },
                     "tips": {
                             "clickToListen": "🔊 Cliquez pour écouter",
@@ -2969,7 +3014,7 @@ var I18nData = {
                             "live": "TV in diretta",
                             "movies": "Film",
                             "series": "Serie",
-                            "favorites": "Preferiti",
+                            "favorites": "La mia lista",
                             "sport": "Sport",
                             "concerts": "Concerti",
                             "theatre": "Teatro",
@@ -2979,7 +3024,7 @@ var I18nData = {
                             "settings": "Impostazioni",
                             "continueWatching": "Continua a guardare",
                             "noContinue": "Nessun contenuto in corso",
-                            "noFavorites": "Nessun preferito",
+                            "noFavorites": "La lista è vuota",
                             "manga": "Manga",
                             "entertainment": "Intrattenimento",
                             "continue": "Continua",
@@ -3063,7 +3108,7 @@ var I18nData = {
                             "clearAllCaches": "Svuota tutte le cache",
                             "clearCache": "Svuota cache TMDB",
                             "clearProgress": "Cancella progresso",
-                            "clearFavorites": "Cancella preferiti",
+                            "clearFavorites": "Cancella la lista",
                             "factoryReset": "Ripristino",
                             "factoryResetConfirm": "Ripristinare l'applicazione? Tutti i dati saranno persi.",
                             "playlists": "Playlist",
@@ -3157,7 +3202,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Download tramite",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Formato TV in diretta"
+                            "liveFormat": "Formato TV in diretta",
+                            "remoteDebug": "Debug remoto",
+                            "textXLarge": "Extra grande",
+                            "cacheCleared": "Cache svuotate",
+                            "progressCleared": "Progressi cancellati",
+                            "favoritesCleared": "Lista cancellata",
+                            "tmdbCacheCleared": "Cache TMDB svuotata",
+                            "textXXLarge": "Massimo"
                     },
                     "player": {
                             "play": "Riproduci",
@@ -3217,7 +3269,7 @@ var I18nData = {
                             "back": "Indietro"
                     },
                     "details": {
-                            "defaultVersion": "Standard",
+                            "defaultVersion": "Predefinito",
                             "director": "Regista",
                             "creator": "Creatore",
                             "filmography": "Filmografia",
@@ -3268,7 +3320,7 @@ var I18nData = {
                             "status": "Stato",
                             "licenseCode": "Codice di licenza",
                             "validate": "Convalidare",
-                            "licenseDesc": "Free IPTV è gratuito e senza pubblicità. Se ti piace l'app, supporta lo sviluppo con una donazione su iptv.blanquer.org. Riceverai un codice di licenza come ringraziamento.",
+                            "licenseDesc": "Free IPTV è gratuito e senza pubblicità. Se ti piace l'app, supporta lo sviluppo con una donazione su iptv.blanquer.org — riceverai un codice di licenza come ringraziamento",
                             "statusTrial": "Prova ({days} giorni rimanenti)",
                             "statusGrace": "Valutazione ({days} giorni rimanenti)",
                             "statusExpired": "Scaduto",
@@ -3279,7 +3331,9 @@ var I18nData = {
                             "later": "Più tardi",
                             "validationSuccess": "Licenza attivata!",
                             "validationError": "Codice di licenza non valido",
-                            "validationNetwork": "Errore di rete, riprova più tardi"
+                            "validationNetwork": "Errore di rete, riprova più tardi",
+                            "featureTitle": "Funzione Premium",
+                            "continueAnyway": "Continua comunque"
                     },
                     "catchup": {
                             "today": "Oggi",
@@ -3355,7 +3409,7 @@ var I18nData = {
                             "live": "Live TV",
                             "movies": "Films",
                             "series": "Series",
-                            "favorites": "Favorieten",
+                            "favorites": "Mijn lijst",
                             "sport": "Sport",
                             "concerts": "Concerten",
                             "theatre": "Theater",
@@ -3365,7 +3419,7 @@ var I18nData = {
                             "settings": "Instellingen",
                             "continueWatching": "Verder kijken",
                             "noContinue": "Geen lopende inhoud",
-                            "noFavorites": "Geen favorieten",
+                            "noFavorites": "Lijst is leeg",
                             "manga": "Manga",
                             "entertainment": "Entertainment",
                             "continue": "Doorgaan",
@@ -3449,7 +3503,7 @@ var I18nData = {
                             "clearAllCaches": "Alle caches wissen",
                             "clearCache": "TMDB cache wissen",
                             "clearProgress": "Voortgang wissen",
-                            "clearFavorites": "Favorieten wissen",
+                            "clearFavorites": "Lijst wissen",
                             "factoryReset": "Fabrieksinstellingen",
                             "factoryResetConfirm": "App terugzetten naar fabrieksinstellingen? Alle gegevens gaan verloren.",
                             "playlists": "Afspeellijsten",
@@ -3543,7 +3597,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Download via",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Live TV-formaat"
+                            "liveFormat": "Live TV-formaat",
+                            "remoteDebug": "Externe debug",
+                            "textXLarge": "Extra groot",
+                            "cacheCleared": "Caches gewist",
+                            "progressCleared": "Voortgang gewist",
+                            "favoritesCleared": "Lijst gewist",
+                            "tmdbCacheCleared": "TMDB-cache gewist",
+                            "textXXLarge": "Maximum"
                     },
                     "player": {
                             "play": "Afspelen",
@@ -3654,7 +3715,7 @@ var I18nData = {
                             "status": "Status",
                             "licenseCode": "Licentiecode",
                             "validate": "Valideren",
-                            "licenseDesc": "Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie op iptv.blanquer.org. Je ontvangt een licentiecode als bedankje.",
+                            "licenseDesc": "Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie op iptv.blanquer.org — je ontvangt een licentiecode als bedankje",
                             "statusTrial": "Proefperiode ({days} dagen over)",
                             "statusGrace": "Evaluatie ({days} dagen over)",
                             "statusExpired": "Verlopen",
@@ -3665,7 +3726,9 @@ var I18nData = {
                             "later": "Later",
                             "validationSuccess": "Licentie geactiveerd!",
                             "validationError": "Ongeldige licentiecode",
-                            "validationNetwork": "Netwerkfout, probeer het later opnieuw"
+                            "validationNetwork": "Netwerkfout, probeer het later opnieuw",
+                            "featureTitle": "Premium-functie",
+                            "continueAnyway": "Toch doorgaan"
                     },
                     "catchup": {
                             "today": "Vandaag",
@@ -3741,7 +3804,7 @@ var I18nData = {
                             "live": "TV na żywo",
                             "movies": "Filmy",
                             "series": "Seriale",
-                            "favorites": "Ulubione",
+                            "favorites": "Moja lista",
                             "sport": "Sport",
                             "concerts": "Koncerty",
                             "theatre": "Teatr",
@@ -3751,7 +3814,7 @@ var I18nData = {
                             "settings": "Ustawienia",
                             "continueWatching": "Kontynuuj oglądanie",
                             "noContinue": "Brak treści w trakcie",
-                            "noFavorites": "Brak ulubionych",
+                            "noFavorites": "Lista jest pusta",
                             "manga": "Manga",
                             "entertainment": "Rozrywka",
                             "continue": "Kontynuuj",
@@ -3835,7 +3898,7 @@ var I18nData = {
                             "clearAllCaches": "Wyczyść wszystkie pamięci",
                             "clearCache": "Wyczyść pamięć TMDB",
                             "clearProgress": "Wyczyść postęp",
-                            "clearFavorites": "Wyczyść ulubione",
+                            "clearFavorites": "Wyczyść listę",
                             "factoryReset": "Resetuj",
                             "factoryResetConfirm": "Zresetować aplikację? Wszystkie dane zostaną utracone.",
                             "playlists": "Playlisty",
@@ -3929,7 +3992,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Pobieranie przez",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Format TV na żywo"
+                            "liveFormat": "Format TV na żywo",
+                            "remoteDebug": "Zdalne debugowanie",
+                            "textXLarge": "Bardzo duży",
+                            "cacheCleared": "Pamięci podręczne wyczyszczone",
+                            "progressCleared": "Postęp wyczyszczony",
+                            "favoritesCleared": "Lista wyczyszczona",
+                            "tmdbCacheCleared": "Pamięć TMDB wyczyszczona",
+                            "textXXLarge": "Maksymalny"
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -3989,7 +4059,7 @@ var I18nData = {
                             "back": "Wstecz"
                     },
                     "details": {
-                            "defaultVersion": "Standardowa",
+                            "defaultVersion": "Domyślna",
                             "director": "Reżyser",
                             "creator": "Twórca",
                             "filmography": "Filmografia",
@@ -4040,7 +4110,7 @@ var I18nData = {
                             "status": "Status",
                             "licenseCode": "Kod licencji",
                             "validate": "Zatwierdź",
-                            "licenseDesc": "Free IPTV jest darmowe i bez reklam. Jeśli podoba Ci się aplikacja, wesprzyj jej rozwój darowizną na iptv.blanquer.org. Otrzymasz kod licencji w podziękowaniu.",
+                            "licenseDesc": "Free IPTV jest darmowe i bez reklam. Jeśli podoba Ci się aplikacja, wesprzyj jej rozwój darowizną na iptv.blanquer.org — otrzymasz kod licencji w podziękowaniu",
                             "statusTrial": "Okres próbny ({days} dni pozostało)",
                             "statusGrace": "Ocena ({days} dni pozostało)",
                             "statusExpired": "Wygasła",
@@ -4051,7 +4121,9 @@ var I18nData = {
                             "later": "Później",
                             "validationSuccess": "Licencja aktywowana!",
                             "validationError": "Nieprawidłowy kod licencji",
-                            "validationNetwork": "Błąd sieci, spróbuj ponownie później"
+                            "validationNetwork": "Błąd sieci, spróbuj ponownie później",
+                            "featureTitle": "Funkcja Premium",
+                            "continueAnyway": "Kontynuuj mimo to"
                     },
                     "catchup": {
                             "today": "Dzisiaj",
@@ -4127,7 +4199,7 @@ var I18nData = {
                             "live": "TV ao vivo",
                             "movies": "Filmes",
                             "series": "Séries",
-                            "favorites": "Favoritos",
+                            "favorites": "Minha lista",
                             "sport": "Esporte",
                             "concerts": "Concertos",
                             "theatre": "Teatro",
@@ -4137,7 +4209,7 @@ var I18nData = {
                             "settings": "Configurações",
                             "continueWatching": "Continuar assistindo",
                             "noContinue": "Nenhum conteúdo em andamento",
-                            "noFavorites": "Sem favoritos",
+                            "noFavorites": "Sua lista está vazia",
                             "manga": "Manga",
                             "entertainment": "Entretenimento",
                             "continue": "Continuar",
@@ -4221,7 +4293,7 @@ var I18nData = {
                             "clearAllCaches": "Limpar todos os caches",
                             "clearCache": "Limpar cache TMDB",
                             "clearProgress": "Limpar progresso",
-                            "clearFavorites": "Limpar favoritos",
+                            "clearFavorites": "Limpar minha lista",
                             "factoryReset": "Redefinir",
                             "factoryResetConfirm": "Redefinir o aplicativo? Todos os dados serão perdidos.",
                             "playlists": "Playlists",
@@ -4315,7 +4387,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Download via",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Formato TV ao vivo"
+                            "liveFormat": "Formato TV ao vivo",
+                            "remoteDebug": "Depuração remota",
+                            "textXLarge": "Extra grande",
+                            "cacheCleared": "Caches limpos",
+                            "progressCleared": "Progresso limpo",
+                            "favoritesCleared": "Lista limpa",
+                            "tmdbCacheCleared": "Cache TMDB limpo",
+                            "textXXLarge": "Máximo"
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -4426,7 +4505,7 @@ var I18nData = {
                             "status": "Estado",
                             "licenseCode": "Código de licença",
                             "validate": "Validar",
-                            "licenseDesc": "Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação em iptv.blanquer.org. Você receberá um código de licença como agradecimento.",
+                            "licenseDesc": "Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação em iptv.blanquer.org — você receberá um código de licença como agradecimento",
                             "statusTrial": "Teste ({days} dias restantes)",
                             "statusGrace": "Avaliação ({days} dias restantes)",
                             "statusExpired": "Expirado",
@@ -4437,7 +4516,9 @@ var I18nData = {
                             "later": "Mais tarde",
                             "validationSuccess": "Licença ativada!",
                             "validationError": "Código de licença inválido",
-                            "validationNetwork": "Erro de rede, tente novamente mais tarde"
+                            "validationNetwork": "Erro de rede, tente novamente mais tarde",
+                            "featureTitle": "Recurso Premium",
+                            "continueAnyway": "Continuar mesmo assim"
                     },
                     "catchup": {
                             "today": "Hoje",
@@ -4513,7 +4594,7 @@ var I18nData = {
                             "live": "Прямой эфир",
                             "movies": "Фильмы",
                             "series": "Сериалы",
-                            "favorites": "Избранное",
+                            "favorites": "Мой список",
                             "sport": "Спорт",
                             "concerts": "Концерты",
                             "theatre": "Театр",
@@ -4523,7 +4604,7 @@ var I18nData = {
                             "settings": "Настройки",
                             "continueWatching": "Продолжить просмотр",
                             "noContinue": "Нет текущего контента",
-                            "noFavorites": "Нет избранного",
+                            "noFavorites": "Список пуст",
                             "manga": "Manga",
                             "entertainment": "Развлечения",
                             "continue": "Продолжить",
@@ -4607,7 +4688,7 @@ var I18nData = {
                             "clearAllCaches": "Очистить все кэши",
                             "clearCache": "Очистить кэш TMDB",
                             "clearProgress": "Очистить прогресс",
-                            "clearFavorites": "Очистить избранное",
+                            "clearFavorites": "Очистить список",
                             "factoryReset": "Сброс",
                             "factoryResetConfirm": "Сбросить приложение? Все данные будут потеряны.",
                             "playlists": "Плейлисты",
@@ -4701,7 +4782,14 @@ var I18nData = {
                             "freeboxDownloadVia": "Скачивание через",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Формат ТВ"
+                            "liveFormat": "Формат ТВ",
+                            "remoteDebug": "Удалённая отладка",
+                            "textXLarge": "Очень крупный",
+                            "cacheCleared": "Кэш очищен",
+                            "progressCleared": "Прогресс очищен",
+                            "favoritesCleared": "Список очищен",
+                            "tmdbCacheCleared": "Кэш TMDB очищен",
+                            "textXXLarge": "Максимальный"
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -4761,7 +4849,7 @@ var I18nData = {
                             "back": "Назад"
                     },
                     "details": {
-                            "defaultVersion": "Стандартная",
+                            "defaultVersion": "По умолчанию",
                             "director": "Режиссёр",
                             "creator": "Создатель",
                             "filmography": "Фильмография",
@@ -4812,7 +4900,7 @@ var I18nData = {
                             "status": "Статус",
                             "licenseCode": "Код лицензии",
                             "validate": "Подтвердить",
-                            "licenseDesc": "Free IPTV — бесплатное и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием на iptv.blanquer.org. Вы получите код лицензии в благодарность.",
+                            "licenseDesc": "Free IPTV — бесплатное и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием на iptv.blanquer.org — вы получите код лицензии в благодарность",
                             "statusTrial": "Пробный период ({days} дней осталось)",
                             "statusGrace": "Оценочный период ({days} дней осталось)",
                             "statusExpired": "Истёк",
@@ -4823,7 +4911,9 @@ var I18nData = {
                             "later": "Позже",
                             "validationSuccess": "Лицензия активирована!",
                             "validationError": "Неверный код лицензии",
-                            "validationNetwork": "Ошибка сети, попробуйте позже"
+                            "validationNetwork": "Ошибка сети, попробуйте позже",
+                            "featureTitle": "Премиум-функция",
+                            "continueAnyway": "Продолжить всё равно"
                     },
                     "catchup": {
                             "today": "Сегодня",
@@ -4899,7 +4989,7 @@ var I18nData = {
                             "live": "Canlı TV",
                             "movies": "Filmler",
                             "series": "Diziler",
-                            "favorites": "Favoriler",
+                            "favorites": "Listem",
                             "sport": "Spor",
                             "concerts": "Konserler",
                             "theatre": "Tiyatro",
@@ -4909,7 +4999,7 @@ var I18nData = {
                             "settings": "Ayarlar",
                             "continueWatching": "İzlemeye devam et",
                             "noContinue": "Devam eden içerik yok",
-                            "noFavorites": "Favori yok",
+                            "noFavorites": "Listen boş",
                             "manga": "Manga",
                             "entertainment": "Eğlence",
                             "continue": "Devam et",
@@ -4993,7 +5083,7 @@ var I18nData = {
                             "clearAllCaches": "Tüm önbellekleri temizle",
                             "clearCache": "TMDB önbelleğini temizle",
                             "clearProgress": "İlerlemeyi temizle",
-                            "clearFavorites": "Favorileri temizle",
+                            "clearFavorites": "Listeyi temizle",
                             "factoryReset": "Sıfırla",
                             "factoryResetConfirm": "Uygulamayı sıfırlansın mı? Tüm veriler kaybolacak.",
                             "playlists": "Oynatma listeleri",
@@ -5087,7 +5177,14 @@ var I18nData = {
                             "freeboxDownloadVia": "İndirme yolu",
                             "freeboxViaFreebox": "Freebox",
                             "freeboxViaProxy": "VM Proxy",
-                            "liveFormat": "Canlı TV formatı"
+                            "liveFormat": "Canlı TV formatı",
+                            "remoteDebug": "Uzaktan hata ayıklama",
+                            "textXLarge": "Çok büyük",
+                            "cacheCleared": "Önbellekler temizlendi",
+                            "progressCleared": "İlerleme temizlendi",
+                            "favoritesCleared": "Liste temizlendi",
+                            "tmdbCacheCleared": "TMDB önbelleği temizlendi",
+                            "textXXLarge": "Maksimum"
                     },
                     "player": {
                             "play": "Oynat",
@@ -5147,7 +5244,7 @@ var I18nData = {
                             "back": "Geri"
                     },
                     "details": {
-                            "defaultVersion": "Standart",
+                            "defaultVersion": "Varsayılan",
                             "director": "Yönetmen",
                             "creator": "Yaratıcı",
                             "filmography": "Filmografi",
@@ -5198,7 +5295,7 @@ var I18nData = {
                             "status": "Durum",
                             "licenseCode": "Lisans kodu",
                             "validate": "Doğrula",
-                            "licenseDesc": "Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, iptv.blanquer.org üzerinden bir bağışla geliştirmeyi destekleyin. Teşekkür olarak bir lisans kodu alacaksınız.",
+                            "licenseDesc": "Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, iptv.blanquer.org üzerinden bir bağışla geliştirmeyi destekleyin — teşekkür olarak bir lisans kodu alacaksınız",
                             "statusTrial": "Deneme ({days} gün kaldı)",
                             "statusGrace": "Değerlendirme ({days} gün kaldı)",
                             "statusExpired": "Süresi dolmuş",
@@ -5209,7 +5306,9 @@ var I18nData = {
                             "later": "Daha sonra",
                             "validationSuccess": "Lisans etkinleştirildi!",
                             "validationError": "Geçersiz lisans kodu",
-                            "validationNetwork": "Ağ hatası, daha sonra tekrar deneyin"
+                            "validationNetwork": "Ağ hatası, daha sonra tekrar deneyin",
+                            "featureTitle": "Premium Özellik",
+                            "continueAnyway": "Yine de devam et"
                     },
                     "catchup": {
                             "today": "Bugün",
