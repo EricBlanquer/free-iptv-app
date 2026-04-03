@@ -14,7 +14,9 @@ body {
     height: 1080px;
     overflow: hidden;
 }
-
+body.text-xlarge {
+    font-size: 120%;
+}
 .screen {
     display: none;
     width: 100%;
@@ -320,8 +322,6 @@ body.text-small .view-btn { font-size: 16px; }
 body.text-small #content-grid.list-view .grid-item-title { font-size: 22px; }
 body.text-small #content-grid.list-view .grid-item-epg { font-size: 18px; }
 body.text-small #content-grid.list-view .grid-item-date { font-size: 16px; }
-body.text-small .favorite-icon { font-size: 20px; }
-body.text-small #content-grid.list-view .favorite-icon { font-size: 18px; }
 body.text-small .guide-card .grid-title { font-size: 22px; }
 /* Home: small */
 body.text-small #home-title { font-size: 68px; }
@@ -371,6 +371,7 @@ body.text-small #details-title,
 body.text-small #actor-name { font-size: 44px; }
 body.text-small #details-genres span { font-size: 18px; }
 body.text-small .action-btn { font-size: 24px; }
+body.text-small .version-bitrate { font-size: 16px; }
 body.text-small .favorite-star { font-size: 44px; }
 body.text-small .filmography-more-poster { font-size: 68px; }
 body.text-small .filmography-available { font-size: 18px; }
@@ -437,10 +438,7 @@ body.text-small #guide-day-indicator { font-size: 28px; }
 body.text-small #guide-time-indicator-label { font-size: 14px; }
 body.text-small #guide-info-time { font-size: 32px; }
 body.text-small #guide-info-title { font-size: 36px; }
-body.text-small .playlist-age,
-body.text-small .playlist-progress { font-size: 12px; }
 body.text-small .details-format-tag { font-size: 22px; }
-body.text-small #details-duplicates { font-size: 14px; }
 body.text-small .toast-message { font-size: 24px; }
 body.text-small .toast-message.toast-error { font-size: 24px; }
 body.text-small .empty-message { font-size: 24px; }
@@ -454,7 +452,6 @@ body.text-small #premium-status-text { font-size: 18px; }
 body.touch #content-grid.list-view .grid-item-info { font-size: 28px; }
 body.touch #content-grid.list-view .grid-item-epg { font-size: 24px; }
 body.touch #content-grid.list-view .grid-item-date { font-size: 22px; }
-body.touch #content-grid.list-view .favorite-icon { font-size: 28px; }
 body.touch .category-item { font-size: 32px; }
 body.touch #sidebar-title { font-size: 32px; }
 body.touch .playlist-tab { font-size: 24px; }
@@ -515,8 +512,6 @@ body.text-medium .view-btn { font-size: 18px; }
 body.text-medium #content-grid.list-view .grid-item-title { font-size: 24px; }
 body.text-medium #content-grid.list-view .grid-item-epg { font-size: 20px; }
 body.text-medium #content-grid.list-view .grid-item-date { font-size: 18px; }
-body.text-medium .favorite-icon { font-size: 24px; }
-body.text-medium #content-grid.list-view .favorite-icon { font-size: 20px; }
 body.text-medium .guide-card .grid-title { font-size: 24px; }
 /* Home: medium */
 body.text-medium #home-title { font-size: 72px; }
@@ -566,6 +561,7 @@ body.text-medium #details-title,
 body.text-medium #actor-name { font-size: 48px; }
 body.text-medium #details-genres span { font-size: 20px; }
 body.text-medium .action-btn { font-size: 28px; }
+body.text-medium .version-bitrate { font-size: 19px; }
 body.text-medium .favorite-star { font-size: 48px; }
 body.text-medium .filmography-more-poster { font-size: 72px; }
 body.text-medium .filmography-available { font-size: 20px; }
@@ -632,10 +628,7 @@ body.text-medium #guide-day-indicator { font-size: 32px; }
 body.text-medium #guide-time-indicator-label { font-size: 16px; }
 body.text-medium #guide-info-time { font-size: 36px; }
 body.text-medium #guide-info-title { font-size: 40px; }
-body.text-medium .playlist-age,
-body.text-medium .playlist-progress { font-size: 14px; }
 body.text-medium .details-format-tag { font-size: 24px; }
-body.text-medium #details-duplicates { font-size: 16px; }
 body.text-medium .toast-message { font-size: 28px; }
 body.text-medium .toast-message.toast-error { font-size: 28px; }
 body.text-medium .empty-message { font-size: 28px; }
@@ -696,8 +689,6 @@ body.text-large .view-btn { font-size: 22px; }
 body.text-large #content-grid.list-view .grid-item-title { font-size: 28px; }
 body.text-large #content-grid.list-view .grid-item-epg { font-size: 24px; }
 body.text-large #content-grid.list-view .grid-item-date { font-size: 22px; }
-body.text-large .favorite-icon { font-size: 28px; }
-body.text-large #content-grid.list-view .favorite-icon { font-size: 24px; }
 body.text-large .guide-card .grid-title { font-size: 28px; }
 /* Home: large */
 body.text-large #home-title { font-size: 78px; }
@@ -747,6 +738,7 @@ body.text-large #details-title,
 body.text-large #actor-name { font-size: 52px; }
 body.text-large #details-genres span { font-size: 24px; }
 body.text-large .action-btn { font-size: 32px; }
+body.text-large .version-bitrate { font-size: 22px; }
 body.text-large .favorite-star { font-size: 52px; }
 body.text-large .filmography-more-poster { font-size: 76px; }
 body.text-large .filmography-available { font-size: 24px; }
@@ -813,10 +805,7 @@ body.text-large #guide-day-indicator { font-size: 36px; }
 body.text-large #guide-time-indicator-label { font-size: 18px; }
 body.text-large #guide-info-time { font-size: 40px; }
 body.text-large #guide-info-title { font-size: 44px; }
-body.text-large .playlist-age,
-body.text-large .playlist-progress { font-size: 16px; }
 body.text-large .details-format-tag { font-size: 26px; }
-body.text-large #details-duplicates { font-size: 18px; }
 body.text-large .toast-message { font-size: 32px; }
 body.text-large .toast-message.toast-error { font-size: 32px; }
 body.text-large .empty-message { font-size: 32px; }
@@ -860,19 +849,22 @@ body.text-large #premium-status-text { font-size: 22px; }
 .preview-small { font-size: 18px !important; }
 .preview-medium { font-size: 22px !important; }
 .preview-large { font-size: 26px !important; }
+.preview-xlarge { font-size: 31px !important; }
+.preview-xxlarge { font-size: 37px !important; }
 
 /* Android back button */
 #android-back-btn {
     display: none;
     position: fixed;
-    bottom: 30px;
-    left: 30px;
-    width: 60px;
-    height: 60px;
+    bottom: 20px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.3);
     color: #fff;
+    font-size: 36px;
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -887,3 +879,343 @@ body.text-large #premium-status-text { font-size: 22px; }
 #android-back-btn .material-symbols-outlined {
     pointer-events: none;
 }
+
+/* text-xlarge: 20% larger than text-large */
+body.text-xlarge .grid-item-info { font-size: 28px; }
+body.text-xlarge .episode-number,
+body.text-xlarge .episode-info,
+body.text-xlarge .cast-character,
+body.text-xlarge .sort-btn,
+body.text-xlarge .filter-btn,
+body.text-xlarge .sd-tag { font-size: 31px; }
+body.text-xlarge .grid-item-title { font-size: 31px; }
+body.text-xlarge .cast-name,
+body.text-xlarge .filter-input { font-size: 33px; }
+body.text-xlarge .grid-overlay-top .grid-year,
+body.text-xlarge .grid-overlay-top .grid-stars,
+body.text-xlarge .grid-overlay-top .grid-duplicate-id,
+body.text-xlarge .grid-overlay-bottom .grid-genre-provider,
+body.text-xlarge .grid-overlay-bottom .grid-genre-tmdb { font-size: 26px; }
+body.text-xlarge .grid-item-image.no-image .grid-overlay-bottom .grid-title,
+body.text-xlarge .grid-item-image:not([style*="background-image"]) .grid-overlay-bottom .grid-title { font-size: 36px; }
+body.text-xlarge .episode-title,
+body.text-xlarge .genre-tag,
+body.text-xlarge .season-btn,
+body.text-xlarge .filmography-year { font-size: 36px; }
+body.text-xlarge .category-item,
+body.text-xlarge #details-director,
+body.text-xlarge #actor-bio { font-size: 38px; }
+body.text-xlarge #details-cast-title,
+body.text-xlarge #details-director-title,
+body.text-xlarge #actor-meta,
+body.text-xlarge #series-status { font-size: 40px; }
+body.text-xlarge #details-description,
+body.text-xlarge #actor-filmography-title,
+body.text-xlarge .filmography-title { font-size: 43px; }
+body.text-xlarge #details-meta { font-size: 45px; }
+body.text-xlarge .tmdb-match-inline { font-size: 28px; }
+body.text-xlarge .settings-label { font-size: 40px; }
+body.text-xlarge .settings-toggle { font-size: 38px; }
+body.text-xlarge .settings-desc { font-size: 28px; }
+body.text-xlarge .guide-filter { font-size: 31px; }
+body.text-xlarge .guide-channel-number { font-size: 28px; }
+body.text-xlarge .guide-program-time { font-size: 28px; }
+body.text-xlarge .guide-program-title-inner { font-size: 31px; }
+body.text-xlarge #sidebar-title { font-size: 38px; }
+body.text-xlarge .grid-item-epg,
+body.text-xlarge .grid-item-date { font-size: 26px; }
+body.text-xlarge .view-btn { font-size: 26px; }
+body.text-xlarge #content-grid.list-view .grid-item-title { font-size: 33px; }
+body.text-xlarge #content-grid.list-view .grid-item-epg { font-size: 28px; }
+body.text-xlarge #content-grid.list-view .grid-item-date { font-size: 26px; }
+body.text-xlarge .guide-card .grid-title { font-size: 33px; }
+body.text-xlarge #home-title { font-size: 93px; }
+body.text-xlarge #genre-screen h1 { font-size: 64px; }
+body.text-xlarge .genre-letter { font-size: 33px; }
+body.text-xlarge .genre-item { font-size: 28px; }
+body.text-xlarge .home-btn span { font-size: 50px; }
+body.text-xlarge #home-grid.cols-5 .home-btn span { font-size: 40px; }
+body.text-xlarge #home-grid.cols-6 .home-btn span { font-size: 36px; }
+body.text-xlarge #home-grid.cols-7 .home-btn span { font-size: 31px; }
+body.text-xlarge #home-grid.cols-8 .home-btn span { font-size: 26px; }
+body.text-xlarge .playlist-tab { font-size: 26px; }
+body.text-xlarge #player-title,
+body.text-xlarge #player-quality { font-size: 43px; }
+body.text-xlarge #player-duration { font-size: 38px; }
+body.text-xlarge #player-epg { font-size: 33px; }
+body.text-xlarge #player-type,
+body.text-xlarge .player-track-btn { font-size: 26px; }
+body.text-xlarge .tts-voice-item,
+body.text-xlarge #tts-voice-btn { font-size: 33px; }
+body.text-xlarge .tts-voice-group-header { font-size: 31px; }
+body.text-xlarge .tts-voice-modal-content .modal-title { font-size: 38px; }
+body.text-xlarge #player-time,
+body.text-xlarge #player-remaining { font-size: 45px; }
+body.text-xlarge #player-buffer { font-size: 31px; }
+body.text-xlarge #confirm-modal-title,
+body.text-xlarge .sub-options-title,
+body.text-xlarge #catchup-channel-name { font-size: 43px; }
+body.text-xlarge #confirm-modal-message,
+body.text-xlarge .modal-btn,
+body.text-xlarge .tracks-title,
+body.text-xlarge .sub-offset-value { font-size: 38px; }
+body.text-xlarge .disclaimer-title { font-size: 55px; }
+body.text-xlarge .disclaimer-text,
+body.text-xlarge .track-item,
+body.text-xlarge #catchup-loading { font-size: 33px; }
+body.text-xlarge #resume-modal-title { font-size: 48px; }
+body.text-xlarge .sub-options-label { font-size: 31px; }
+body.text-xlarge .sub-option-btn { font-size: 33px; }
+body.text-xlarge .catchup-day-btn,
+body.text-xlarge .catchup-program-time { font-size: 28px; }
+body.text-xlarge .catchup-program-duration { font-size: 26px; }
+body.text-xlarge .catchup-program-title { font-size: 31px; }
+body.text-xlarge #details-title,
+body.text-xlarge #actor-name { font-size: 62px; }
+body.text-xlarge #details-genres span { font-size: 28px; }
+body.text-xlarge .action-btn { font-size: 38px; }
+body.text-xlarge .version-bitrate { font-size: 26px; }
+body.text-xlarge .favorite-star { font-size: 62px; }
+body.text-xlarge .filmography-more-poster { font-size: 91px; }
+body.text-xlarge .filmography-available { font-size: 28px; }
+body.text-xlarge #settings-screen h1,
+body.text-xlarge #playlists-screen h1,
+body.text-xlarge #playlist-edit-screen h1,
+body.text-xlarge #continue-screen h1 { font-size: 62px; }
+body.text-xlarge .settings-title,
+body.text-xlarge .pattern-modal-header { font-size: 38px; }
+body.text-xlarge .settings-option,
+body.text-xlarge .settings-action,
+body.text-xlarge .settings-input,
+body.text-xlarge .settings-info,
+body.text-xlarge .remote-config-instructions,
+body.text-xlarge .pattern-subcategory-tab,
+body.text-xlarge .pattern-chip,
+body.text-xlarge .pattern-subcategory-title { font-size: 28px; }
+body.text-xlarge .toggle-option,
+body.text-xlarge .playlist-type,
+body.text-xlarge .playlist-status,
+body.text-xlarge .playlist-action-btn,
+body.text-xlarge .pattern-count,
+body.text-xlarge .pattern-preview-label,
+body.text-xlarge #pattern-preview-list,
+body.text-xlarge .remote-config-url,
+body.text-xlarge .icon-type-btn,
+body.text-xlarge .pattern-category-icon.custom-icon,
+body.text-xlarge .pattern-delete-btn { font-size: 26px; }
+body.text-xlarge .settings-value span,
+body.text-xlarge .playlist-name,
+body.text-xlarge #continue-empty,
+body.text-xlarge .pattern-icon-input,
+body.text-xlarge .custom-icon-input,
+body.text-xlarge .icon-option,
+body.text-xlarge .pattern-category-icon { font-size: 33px; }
+body.text-xlarge .settings-btn,
+body.text-xlarge button { font-size: 38px; }
+body.text-xlarge .playlist-add-btn,
+body.text-xlarge .playlist-empty,
+body.text-xlarge #pattern-add-input,
+body.text-xlarge .pattern-add-btn,
+body.text-xlarge .settings-title-collapsible,
+body.text-xlarge .pattern-modal-btn { font-size: 31px; }
+body.text-xlarge .playlist-icon,
+body.text-xlarge .pairing-code { font-size: 48px; }
+body.text-xlarge .playlist-add-icon { font-size: 48px; }
+body.text-xlarge .playlist-account-info,
+body.text-xlarge .playlist-active-badge,
+body.text-xlarge .continue-title,
+body.text-xlarge .continue-delete { font-size: 26px; }
+body.text-xlarge .remote-config-inline-url,
+body.text-xlarge .pairing-status { font-size: 21px; }
+body.text-xlarge .color-hex-input { font-size: 19px; }
+body.text-xlarge .custom-icon-preview { font-size: 33px; }
+body.text-xlarge .custom-icon-field .settings-label { font-size: 24px; }
+body.text-xlarge #loading { font-size: 38px; }
+body.text-xlarge #loading-status { font-size: 31px; }
+body.text-xlarge #buffer-indicator,
+body.text-xlarge #seek-indicator { font-size: 62px; }
+body.text-xlarge #buffer-indicator.compact { font-size: 33px; }
+body.text-xlarge .grid-disambig { font-size: 24px; }
+body.text-xlarge #guide-day-indicator { font-size: 43px; }
+body.text-xlarge #guide-time-indicator-label { font-size: 21px; }
+body.text-xlarge #guide-info-time { font-size: 48px; }
+body.text-xlarge #guide-info-title { font-size: 52px; }
+body.text-xlarge .details-format-tag { font-size: 31px; }
+body.text-xlarge .toast-message { font-size: 38px; }
+body.text-xlarge .toast-message.toast-error { font-size: 38px; }
+body.text-xlarge .empty-message { font-size: 38px; }
+body.text-xlarge .premium-title { font-size: 48px; }
+body.text-xlarge .premium-message { font-size: 36px; }
+body.text-xlarge .premium-btn { font-size: 36px; }
+body.text-xlarge .premium-site-info { font-size: 24px; }
+body.text-xlarge #premium-status-text { font-size: 26px; }
+
+/* text-xxlarge: 44% larger than text-large */
+body.text-xxlarge .grid-item-info { font-size: 34px; }
+body.text-xxlarge .episode-number,
+body.text-xxlarge .episode-info,
+body.text-xxlarge .cast-character,
+body.text-xxlarge .sort-btn,
+body.text-xxlarge .filter-btn,
+body.text-xxlarge .sd-tag { font-size: 37px; }
+body.text-xxlarge .grid-item-title { font-size: 37px; }
+body.text-xxlarge .cast-name,
+body.text-xxlarge .filter-input { font-size: 40px; }
+body.text-xxlarge .grid-overlay-top .grid-year,
+body.text-xxlarge .grid-overlay-top .grid-stars,
+body.text-xxlarge .grid-overlay-top .grid-duplicate-id,
+body.text-xxlarge .grid-overlay-bottom .grid-genre-provider,
+body.text-xxlarge .grid-overlay-bottom .grid-genre-tmdb { font-size: 31px; }
+body.text-xxlarge .grid-item-image.no-image .grid-overlay-bottom .grid-title,
+body.text-xxlarge .grid-item-image:not([style*="background-image"]) .grid-overlay-bottom .grid-title { font-size: 43px; }
+body.text-xxlarge .episode-title,
+body.text-xxlarge .genre-tag,
+body.text-xxlarge .season-btn,
+body.text-xxlarge .filmography-year { font-size: 43px; }
+body.text-xxlarge .category-item,
+body.text-xxlarge #details-director,
+body.text-xxlarge #actor-bio { font-size: 46px; }
+body.text-xxlarge #details-cast-title,
+body.text-xxlarge #details-director-title,
+body.text-xxlarge #actor-meta,
+body.text-xxlarge #series-status { font-size: 48px; }
+body.text-xxlarge #details-description,
+body.text-xxlarge #actor-filmography-title,
+body.text-xxlarge .filmography-title { font-size: 51px; }
+body.text-xxlarge #details-meta { font-size: 54px; }
+body.text-xxlarge .tmdb-match-inline { font-size: 34px; }
+body.text-xxlarge .settings-label { font-size: 48px; }
+body.text-xxlarge .settings-toggle { font-size: 46px; }
+body.text-xxlarge .settings-desc { font-size: 34px; }
+body.text-xxlarge .guide-filter { font-size: 37px; }
+body.text-xxlarge .guide-channel-number { font-size: 34px; }
+body.text-xxlarge .guide-program-time { font-size: 34px; }
+body.text-xxlarge .guide-program-title-inner { font-size: 37px; }
+body.text-xxlarge #sidebar-title { font-size: 46px; }
+body.text-xxlarge .grid-item-epg,
+body.text-xxlarge .grid-item-date { font-size: 31px; }
+body.text-xxlarge .view-btn { font-size: 31px; }
+body.text-xxlarge #content-grid.list-view .grid-item-title { font-size: 40px; }
+body.text-xxlarge #content-grid.list-view .grid-item-epg { font-size: 34px; }
+body.text-xxlarge #content-grid.list-view .grid-item-date { font-size: 31px; }
+body.text-xxlarge .guide-card .grid-title { font-size: 40px; }
+body.text-xxlarge #home-title { font-size: 112px; }
+body.text-xxlarge #genre-screen h1 { font-size: 77px; }
+body.text-xxlarge .genre-letter { font-size: 40px; }
+body.text-xxlarge .genre-item { font-size: 34px; }
+body.text-xxlarge .home-btn span { font-size: 60px; }
+body.text-xxlarge #home-grid.cols-5 .home-btn span { font-size: 48px; }
+body.text-xxlarge #home-grid.cols-6 .home-btn span { font-size: 43px; }
+body.text-xxlarge #home-grid.cols-7 .home-btn span { font-size: 37px; }
+body.text-xxlarge #home-grid.cols-8 .home-btn span { font-size: 31px; }
+body.text-xxlarge .playlist-tab { font-size: 31px; }
+body.text-xxlarge #player-title,
+body.text-xxlarge #player-quality { font-size: 51px; }
+body.text-xxlarge #player-duration { font-size: 46px; }
+body.text-xxlarge #player-epg { font-size: 40px; }
+body.text-xxlarge #player-type,
+body.text-xxlarge .player-track-btn { font-size: 31px; }
+body.text-xxlarge .tts-voice-item,
+body.text-xxlarge #tts-voice-btn { font-size: 40px; }
+body.text-xxlarge .tts-voice-group-header { font-size: 37px; }
+body.text-xxlarge .tts-voice-modal-content .modal-title { font-size: 46px; }
+body.text-xxlarge #player-time,
+body.text-xxlarge #player-remaining { font-size: 54px; }
+body.text-xxlarge #player-buffer { font-size: 37px; }
+body.text-xxlarge #confirm-modal-title,
+body.text-xxlarge .sub-options-title,
+body.text-xxlarge #catchup-channel-name { font-size: 51px; }
+body.text-xxlarge #confirm-modal-message,
+body.text-xxlarge .modal-btn,
+body.text-xxlarge .tracks-title,
+body.text-xxlarge .sub-offset-value { font-size: 46px; }
+body.text-xxlarge .disclaimer-title { font-size: 66px; }
+body.text-xxlarge .disclaimer-text,
+body.text-xxlarge .track-item,
+body.text-xxlarge #catchup-loading { font-size: 40px; }
+body.text-xxlarge #resume-modal-title { font-size: 57px; }
+body.text-xxlarge .sub-options-label { font-size: 37px; }
+body.text-xxlarge .sub-option-btn { font-size: 40px; }
+body.text-xxlarge .catchup-day-btn,
+body.text-xxlarge .catchup-program-time { font-size: 34px; }
+body.text-xxlarge .catchup-program-duration { font-size: 31px; }
+body.text-xxlarge .catchup-program-title { font-size: 37px; }
+body.text-xxlarge #details-title,
+body.text-xxlarge #actor-name { font-size: 74px; }
+body.text-xxlarge #details-genres span { font-size: 34px; }
+body.text-xxlarge .action-btn { font-size: 46px; }
+body.text-xxlarge .version-bitrate { font-size: 31px; }
+body.text-xxlarge .favorite-star { font-size: 74px; }
+body.text-xxlarge .filmography-more-poster { font-size: 109px; }
+body.text-xxlarge .filmography-available { font-size: 34px; }
+body.text-xxlarge #settings-screen h1,
+body.text-xxlarge #playlists-screen h1,
+body.text-xxlarge #playlist-edit-screen h1,
+body.text-xxlarge #continue-screen h1 { font-size: 74px; }
+body.text-xxlarge .settings-title,
+body.text-xxlarge .pattern-modal-header { font-size: 46px; }
+body.text-xxlarge .settings-option,
+body.text-xxlarge .settings-action,
+body.text-xxlarge .settings-input,
+body.text-xxlarge .settings-info,
+body.text-xxlarge .remote-config-instructions,
+body.text-xxlarge .pattern-subcategory-tab,
+body.text-xxlarge .pattern-chip,
+body.text-xxlarge .pattern-subcategory-title { font-size: 34px; }
+body.text-xxlarge .toggle-option,
+body.text-xxlarge .playlist-type,
+body.text-xxlarge .playlist-status,
+body.text-xxlarge .playlist-action-btn,
+body.text-xxlarge .pattern-count,
+body.text-xxlarge .pattern-preview-label,
+body.text-xxlarge #pattern-preview-list,
+body.text-xxlarge .remote-config-url,
+body.text-xxlarge .icon-type-btn,
+body.text-xxlarge .pattern-category-icon.custom-icon,
+body.text-xxlarge .pattern-delete-btn { font-size: 31px; }
+body.text-xxlarge .settings-value span,
+body.text-xxlarge .playlist-name,
+body.text-xxlarge #continue-empty,
+body.text-xxlarge .pattern-icon-input,
+body.text-xxlarge .custom-icon-input,
+body.text-xxlarge .icon-option,
+body.text-xxlarge .pattern-category-icon { font-size: 40px; }
+body.text-xxlarge .settings-btn,
+body.text-xxlarge button { font-size: 46px; }
+body.text-xxlarge .playlist-add-btn,
+body.text-xxlarge .playlist-empty,
+body.text-xxlarge #pattern-add-input,
+body.text-xxlarge .pattern-add-btn,
+body.text-xxlarge .settings-title-collapsible,
+body.text-xxlarge .pattern-modal-btn { font-size: 37px; }
+body.text-xxlarge .playlist-icon,
+body.text-xxlarge .pairing-code { font-size: 57px; }
+body.text-xxlarge .playlist-add-icon { font-size: 57px; }
+body.text-xxlarge .playlist-account-info,
+body.text-xxlarge .playlist-active-badge,
+body.text-xxlarge .continue-title,
+body.text-xxlarge .continue-delete { font-size: 31px; }
+body.text-xxlarge .remote-config-inline-url,
+body.text-xxlarge .pairing-status { font-size: 25px; }
+body.text-xxlarge .color-hex-input { font-size: 23px; }
+body.text-xxlarge .custom-icon-preview { font-size: 40px; }
+body.text-xxlarge .custom-icon-field .settings-label { font-size: 28px; }
+body.text-xxlarge #loading { font-size: 46px; }
+body.text-xxlarge #loading-status { font-size: 37px; }
+body.text-xxlarge #buffer-indicator,
+body.text-xxlarge #seek-indicator { font-size: 74px; }
+body.text-xxlarge #buffer-indicator.compact { font-size: 40px; }
+body.text-xxlarge .grid-disambig { font-size: 28px; }
+body.text-xxlarge #guide-day-indicator { font-size: 51px; }
+body.text-xxlarge #guide-time-indicator-label { font-size: 25px; }
+body.text-xxlarge #guide-info-time { font-size: 57px; }
+body.text-xxlarge #guide-info-title { font-size: 63px; }
+body.text-xxlarge .details-format-tag { font-size: 37px; }
+body.text-xxlarge .toast-message { font-size: 46px; }
+body.text-xxlarge .toast-message.toast-error { font-size: 46px; }
+body.text-xxlarge .empty-message { font-size: 46px; }
+body.text-xxlarge .premium-title { font-size: 57px; }
+body.text-xxlarge .premium-message { font-size: 43px; }
+body.text-xxlarge .premium-btn { font-size: 43px; }
+body.text-xxlarge .premium-site-info { font-size: 28px; }
+body.text-xxlarge #premium-status-text { font-size: 31px; }

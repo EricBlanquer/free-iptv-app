@@ -144,11 +144,11 @@ IPTVApp.prototype.stopSeek = function() {
         this.seekDebounceTimer = setTimeout(function() {
             self.seekDebounceTimer = null;
             if (self.seekDirection === 0) {
-                var seekPos = targetPos;
+                var seekPos = self.seekTargetPosition;
                 if (self.currentPlayingType === 'catchup') {
-                    self._catchupSeekTarget = targetPos;
+                    self._catchupSeekTarget = seekPos;
                     self._catchupSeekTime = Date.now();
-                    window.log('Catchup seek: target relative=' + targetPos);
+                    window.log('Catchup seek: target relative=' + seekPos);
                 }
                 if (self.player.isBuffering) {
                     self._pendingSeekPosition = seekPos;
@@ -163,7 +163,7 @@ IPTVApp.prototype.stopSeek = function() {
                     }
                 }
             }
-        }, 150);
+        }, 500);
     }
     this.seekDirection = 0;
     this.hideSeekIndicator();
@@ -180,8 +180,6 @@ IPTVApp.prototype.hideSeekIndicator = function() {
     var indicator = document.getElementById('seek-indicator');
     indicator.classList.remove('visible');
 };
-
-
 // Return to live (exit timeshift)
 IPTVApp.prototype.returnToLive = function() {
     window.log('ACTION', 'returnToLive');
@@ -611,6 +609,7 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             var retryDelay = Math.pow(2, self._errorRetryCount) * 1000;
             var resumePosition = (type !== 'live') ? (self.player.currentTime || 0) : 0;
             window.log('PLAYER', 'Playback error, retry ' + self._errorRetryCount + '/' + maxRetries + ' in ' + retryDelay + 'ms at position ' + resumePosition);
+            self.showLoading(false);
             self.showToast(I18n.t('player.reconnecting', 'Reconnecting...') + ' (' + self._errorRetryCount + '/' + maxRetries + ')');
             self.player.stop();
             setTimeout(function() {
@@ -717,6 +716,7 @@ IPTVApp.prototype.updateWatchPosition = function(stream, type, position, force) 
 };
 
 IPTVApp.prototype.stopPlayback = function() {
+    this.clearTimer('overlayTimer');
     // Stop pause counter timer
     if (this.pauseCounterInterval) {
         clearInterval(this.pauseCounterInterval);
@@ -1050,6 +1050,18 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
     var isSpeedUp = this.player && this.player.playbackSpeed > 1;
     bufferEl.classList.toggle('compact', isSpeedUp);
     var showBuffer = (this.bufferPercent !== undefined && this.bufferPercent < 100) || this.isBuffering;
+    if (showBuffer && !this.isBuffering && this.player && this.player.isPlaying && !this.player.isPaused) {
+        if (!this._bufferStaleStart) {
+            this._bufferStaleStart = Date.now();
+        } else if (Date.now() - this._bufferStaleStart > 2000) {
+            this.bufferPercent = undefined;
+            this._bufferStaleStart = 0;
+            showBuffer = false;
+            window.log('PLAYER', 'Buffer indicator forced hidden (playing normally for 2s)');
+        }
+    } else {
+        this._bufferStaleStart = 0;
+    }
     if (showBuffer) {
         // Preserve hourglass span to avoid resetting CSS animation
         var hourglassSpan = bufferEl.querySelector('.hourglass');
@@ -1172,6 +1184,8 @@ IPTVApp.prototype.showPlayerOverlay = function(extendedDelay) {
     this.setHidden(overlay, false);
     if (topRightEl) this.setHidden(topRightEl, false);
     this.setHidden(titleEl, false);
+    var backBtn = document.getElementById('android-back-btn');
+    if (backBtn) backBtn.style.display = 'flex';
     // Hide progress row for live streams (status is shown via status-btn in tracks)
     if (progressRowEl) progressRowEl.style.display = isLive ? 'none' : '';
     if (durationEl) durationEl.style.display = isLive ? 'none' : '';
@@ -1248,6 +1262,8 @@ IPTVApp.prototype.showPlayerOverlay = function(extendedDelay) {
             self.setHidden(overlay, true);
             self.setHidden(titleEl, true);
             if (topRightEl) self.setHidden(topRightEl, true);
+            var backBtn = document.getElementById('android-back-btn');
+            if (backBtn && self.currentScreen === 'player') backBtn.style.display = 'none';
             self.playerTracksFocused = false;
             var btns = document.querySelectorAll('.player-track-btn');
             for (var i = 0; i < btns.length; i++) {
@@ -1362,60 +1378,68 @@ IPTVApp.prototype.reapplySubtitleTrack = function() {
     }
 };
 
-// Auto-select audio track matching interface language
+// Auto-select audio track matching interface language (prefer most channels)
 IPTVApp.prototype.autoSelectAudioTrack = function(audioTracks) {
     if (!audioTracks || audioTracks.length <= 1) return;
     var locale = this.settings.locale || 'en';
     var langCodes = I18n.getIso639Codes(locale);
     window.log('autoSelectAudioTrack: locale=' + locale + ' codes=' + langCodes.join(',') + ' tracks=' + audioTracks.length);
+    var self = this;
+    var selectBestFromCandidates = function(candidates) {
+        if (candidates.length === 0) return false;
+        candidates.sort(function(a, b) {
+            return (parseInt(b.track.channels) || 2) - (parseInt(a.track.channels) || 2);
+        });
+        var best = candidates[0];
+        window.log('autoSelectAudioTrack: selected index ' + best.i + ' lang=' + (best.track.lang || best.track.language) + ' channels=' + (best.track.channels || '?'));
+        if (best.i !== (self.currentAudioIndex || 0)) {
+            self.currentAudioIndex = best.i;
+            self.player.setAudioTrack(best.track.index);
+        }
+        return true;
+    };
     // First pass: exact match on lang code
+    var candidates = [];
     for (var i = 0; i < audioTracks.length; i++) {
-        var track = audioTracks[i];
-        var trackLang = (track.lang || '').toLowerCase();
+        var trackLang = (audioTracks[i].lang || '').toLowerCase();
         for (var j = 0; j < langCodes.length; j++) {
             if (trackLang === langCodes[j].toLowerCase()) {
-                window.log('autoSelectAudioTrack: exact match at index ' + i + ' lang=' + trackLang);
-                if (i !== (this.currentAudioIndex || 0)) {
-                    this.currentAudioIndex = i;
-                    this.player.setAudioTrack(track.index);
-                }
-                return;
+                candidates.push({ i: i, track: audioTracks[i] });
+                break;
             }
         }
     }
+    if (selectBestFromCandidates(candidates)) return;
     // Second pass: partial match (lang code starts with or contains)
+    candidates = [];
     for (var i = 0; i < audioTracks.length; i++) {
-        var track = audioTracks[i];
-        var trackLang = (track.lang || '').toLowerCase();
+        var trackLang = (audioTracks[i].lang || '').toLowerCase();
         for (var j = 0; j < langCodes.length; j++) {
             var code = langCodes[j].toLowerCase();
             if (trackLang.indexOf(code) !== -1 || code.indexOf(trackLang) !== -1) {
-                window.log('autoSelectAudioTrack: partial match at index ' + i + ' lang=' + trackLang + ' code=' + code);
-                if (i !== (this.currentAudioIndex || 0)) {
-                    this.currentAudioIndex = i;
-                    this.player.setAudioTrack(track.index);
-                }
-                return;
+                candidates.push({ i: i, track: audioTracks[i] });
+                break;
             }
         }
     }
+    if (selectBestFromCandidates(candidates)) return;
     // Third pass: match on formatted language label
     var targetLabels = langCodes.map(function(c) { return c.toLowerCase(); });
+    candidates = [];
     for (var i = 0; i < audioTracks.length; i++) {
-        var track = audioTracks[i];
-        var label = (track.language || '').toLowerCase();
+        var label = (audioTracks[i].language || '').toLowerCase();
         for (var j = 0; j < targetLabels.length; j++) {
             if (label.indexOf(targetLabels[j]) !== -1) {
-                window.log('autoSelectAudioTrack: label match at index ' + i + ' label=' + label);
-                if (i !== (this.currentAudioIndex || 0)) {
-                    this.currentAudioIndex = i;
-                    this.player.setAudioTrack(track.index);
-                }
-                return;
+                candidates.push({ i: i, track: audioTracks[i] });
+                break;
             }
         }
     }
-    window.log('PLAYER', 'autoSelectAudioTrack: no match found, keeping default');
+    if (selectBestFromCandidates(candidates)) return;
+    // No language match: select track with most channels
+    window.log('PLAYER', 'autoSelectAudioTrack: no lang match, selecting best channels');
+    var allCandidates = audioTracks.map(function(t, idx) { return { i: idx, track: t }; });
+    selectBestFromCandidates(allCandidates);
 };
 
 IPTVApp.prototype.getSubtitleLangCodes = function(locale) {
@@ -1654,8 +1678,6 @@ IPTVApp.prototype.toggleSubtitles = function() {
     }
     this.showPlayerOverlay();
 };
-
-
 IPTVApp.prototype.handlePlayerDown = function() {
     this.showPlayerOverlay();
     var tracksDiv = document.getElementById('player-tracks');

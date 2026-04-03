@@ -41,7 +41,7 @@
         "live": "TV ao vivo",
         "movies": "Filmes",
         "series": "Séries",
-        "favorites": "Favoritos",
+        "favorites": "Minha lista",
         "sport": "Esporte",
         "concerts": "Concertos",
         "theatre": "Teatro",
@@ -51,7 +51,7 @@
         "settings": "Configurações",
         "continueWatching": "Continuar assistindo",
         "noContinue": "Nenhum conteúdo em andamento",
-        "noFavorites": "Sem favoritos",
+        "noFavorites": "Sua lista está vazia",
         "manga": "Manga",
         "entertainment": "Entretenimento",
         "continue": "Continuar",
@@ -135,7 +135,7 @@
         "clearAllCaches": "Limpar todos os caches",
         "clearCache": "Limpar cache TMDB",
         "clearProgress": "Limpar progresso",
-        "clearFavorites": "Limpar favoritos",
+        "clearFavorites": "Limpar minha lista",
         "factoryReset": "Redefinir",
         "factoryResetConfirm": "Redefinir o aplicativo? Todos os dados serão perdidos.",
         "playlists": "Playlists",
@@ -229,7 +229,14 @@
         "freeboxDownloadVia": "Download via",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Formato TV ao vivo"
+        "liveFormat": "Formato TV ao vivo",
+        "remoteDebug": "Depuração remota",
+        "textXLarge": "Extra grande",
+        "cacheCleared": "Caches limpos",
+        "progressCleared": "Progresso limpo",
+        "favoritesCleared": "Lista limpa",
+        "tmdbCacheCleared": "Cache TMDB limpo",
+        "textXXLarge": "Máximo"
     },
     "player": {
         "play": "Reproduzir",
@@ -340,7 +347,7 @@
         "status": "Estado",
         "licenseCode": "Código de licença",
         "validate": "Validar",
-        "licenseDesc": "Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação em iptv.blanquer.org. Você receberá um código de licença como agradecimento.",
+        "licenseDesc": "Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação em iptv.blanquer.org — você receberá um código de licença como agradecimento",
         "statusTrial": "Teste ({days} dias restantes)",
         "statusGrace": "Avaliação ({days} dias restantes)",
         "statusExpired": "Expirado",
@@ -351,7 +358,9 @@
         "later": "Mais tarde",
         "validationSuccess": "Licença ativada!",
         "validationError": "Código de licença inválido",
-        "validationNetwork": "Erro de rede, tente novamente mais tarde"
+        "validationNetwork": "Erro de rede, tente novamente mais tarde",
+        "featureTitle": "Recurso Premium",
+        "continueAnyway": "Continuar mesmo assim"
     },
     "categoryPatterns": {
         "sport": [

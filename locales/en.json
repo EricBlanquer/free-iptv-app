@@ -65,7 +65,7 @@
         "tvGuide": "TV Guide",
         "movies": "Movies",
         "series": "Series",
-        "favorites": "Favorites",
+        "favorites": "My List",
         "sport": "Sport",
         "concerts": "Concerts",
         "theatre": "Theater",
@@ -75,7 +75,7 @@
         "settings": "Settings",
         "continueWatching": "Continue watching",
         "noContinue": "No content in progress",
-        "noFavorites": "No favorites",
+        "noFavorites": "Your list is empty",
         "manga": "Manga",
         "entertainment": "Entertainment",
         "continue": "Continue",
@@ -158,7 +158,7 @@
         "clearAllCaches": "Clear all caches",
         "clearCache": "Clear TMDB cache",
         "clearProgress": "Clear progress",
-        "clearFavorites": "Clear favorites",
+        "clearFavorites": "Clear my list",
         "factoryReset": "Factory reset",
         "factoryResetConfirm": "Reset the app to factory settings? All data will be lost.",
         "playlists": "Playlists",
@@ -251,7 +251,14 @@
         "freeboxDownloadVia": "Download via",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Live TV format"
+        "liveFormat": "Live TV format",
+        "remoteDebug": "Remote debug",
+        "textXLarge": "Extra Large",
+        "cacheCleared": "Caches cleared",
+        "progressCleared": "Progress cleared",
+        "favoritesCleared": "List cleared",
+        "tmdbCacheCleared": "TMDB cache cleared",
+        "textXXLarge": "Maximum"
     },
     "player": {
         "play": "Play",
@@ -311,7 +318,7 @@
         "back": "Back"
     },
     "details": {
-        "defaultVersion": "Standard",
+        "defaultVersion": "Default",
         "director": "Director",
         "creator": "Creator",
         "filmography": "Filmography",
@@ -405,7 +412,7 @@
         "status": "Status",
         "licenseCode": "License code",
         "validate": "Validate",
-        "licenseDesc": "Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation at iptv.blanquer.org. You'll receive a license code as a thank you.",
+        "licenseDesc": "Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation at iptv.blanquer.org — you'll receive a license code as a thank you",
         "statusTrial": "Trial ({days} days left)",
         "statusGrace": "Evaluation ({days} days left)",
         "statusExpired": "Expired",
@@ -416,7 +423,9 @@
         "later": "Later",
         "validationSuccess": "License activated!",
         "validationError": "Invalid license code",
-        "validationNetwork": "Network error, try again later"
+        "validationNetwork": "Network error, try again later",
+        "featureTitle": "Premium Feature",
+        "continueAnyway": "Continue anyway"
     },
     "categoryPatterns": {
         "sport": [

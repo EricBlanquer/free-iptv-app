@@ -13,3 +13,4 @@ coverage/
 android/.gradle/
 android/app/build/
 android/build/server/__pycache__/
+android/signing-key-private.pem

@@ -56,6 +56,7 @@
                 <span data-i18n="home.settings">Settings</span>
             </div>
         </div>
+        <div id="home-provider-age" class="hidden"></div>
     </div>
 
     <!-- Continue Watching Screen -->
@@ -325,6 +326,8 @@
                             <div class="settings-option focusable selected preview-small" data-setting="textSize" data-value="small" data-i18n="settings.textSmall">Small</div>
                             <div class="settings-option focusable preview-medium" data-setting="textSize" data-value="medium" data-i18n="settings.textMedium">Medium</div>
                             <div class="settings-option focusable preview-large" data-setting="textSize" data-value="large" data-i18n="settings.textLarge">Large</div>
+                            <div class="settings-option focusable preview-xlarge" data-setting="textSize" data-value="xlarge" data-i18n="settings.textXLarge">Extra Large</div>
+                            <div class="settings-option focusable preview-xxlarge" data-setting="textSize" data-value="xxlarge" data-i18n="settings.textXXLarge">Maximum</div>
                         </div>
                     </div>
                 </div>
@@ -421,11 +424,15 @@
             <div class="settings-section" id="data-section">
                 <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="data"><span data-i18n="settings.data">Data</span><span class="collapse-arrow collapsed">▼</span></div>
                 <div class="collapsible-content collapsed" id="data-content">
-                    <div class="settings-row">
+                    <div class="settings-row" style="flex-wrap: wrap;">
                         <div class="settings-action focusable" data-action="clearAllCaches" data-i18n="settings.clearAllCaches">Clear all caches</div>
                         <div class="settings-action focusable" data-action="clearTMDBCache" data-i18n="settings.clearCache">Clear TMDB cache</div>
                         <div class="settings-action focusable" data-action="clearProgress" data-i18n="settings.clearProgress">Clear progress</div>
                         <div class="settings-action focusable" data-action="clearFavorites" data-i18n="settings.clearFavorites">Clear favorites</div>
+                    </div>
+                    <div class="settings-row" style="margin-top: 15px;">
+                        <span class="settings-label" data-i18n="settings.remoteDebug">Remote debug</span>
+                        <span id="remote-debug-toggle" class="settings-toggle focusable" data-setting="remoteDebug">OFF</span>
                     </div>
                     <div class="settings-row" style="margin-top: 15px;">
                         <div class="settings-action focusable" data-action="factoryReset" data-i18n="settings.factoryReset" style="background: rgba(255,82,82,0.2); border-color: rgba(255,82,82,0.3);">Factory reset</div>
@@ -502,7 +509,6 @@
                 <div id="details-info">
                     <h1 id="details-title">Title</h1>
                     <div id="details-meta"></div>
-                    <div id="details-duplicates" class="hidden"></div>
                     <div id="details-genres"></div>
                     <p id="details-description" class="focusable"></p>
                     <div id="details-actions">

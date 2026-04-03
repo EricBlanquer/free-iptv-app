@@ -11,7 +11,7 @@ IPTVApp.prototype.updateFavoriteButton = function() {
         var playlistId = this.selectedStream._playlistId || this.selectedStream.playlistId || this.settings.activePlaylistId;
         var isFav = this.isFavorite(idToCheck, playlistId);
         window.log('FAV', 'updateBtn id=' + idToCheck + ' playlist=' + playlistId + ' isFav=' + isFav + ' favCount=' + this.favorites.length);
-        favBtn.textContent = isFav ? '★' : '☆';
+        favBtn.textContent = isFav ? 'bookmark' : 'bookmark_border';
         favBtn.classList.toggle('is-favorite', isFav);
     }
 };

@@ -3,6 +3,35 @@
  * Handles app settings, playlist management, remote pairing
  */
 
+IPTVApp.prototype.setupRemoteDebug = function() {
+    if (this.settings.remoteDebug && this.settings.remoteDebugExpiry && Date.now() > this.settings.remoteDebugExpiry) {
+        this.settings.remoteDebug = false;
+        delete this.settings.remoteDebugExpiry;
+        this.saveSettings();
+    }
+    if (this.settings.remoteDebug && !window._remoteDebugEnabled) {
+        window._remoteDebugEnabled = true;
+        var originalLog = window.log;
+        window.log = function() {
+            originalLog.apply(window, arguments);
+            if (!window.deviceId) return;
+            try {
+                var args = Array.prototype.slice.call(arguments);
+                var msg = args.map(function(a) {
+                    if (a === null) return 'null';
+                    if (a === undefined) return 'undefined';
+                    if (typeof a === 'object') { try { return JSON.stringify(a); } catch (e) { return String(a); } }
+                    return String(a);
+                }).join(' ');
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://iptv.blanquer.org/log.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                xhr.send(JSON.stringify({ msg: msg, device: window.deviceId, time: new Date().toISOString() }));
+            } catch (e) {}
+        };
+    }
+};
+
 // Settings screen
 IPTVApp.prototype.showSettings = function() {
     var self = this;
@@ -10,6 +39,15 @@ IPTVApp.prototype.showSettings = function() {
     this.currentScreen = 'settings';
     this.focusArea = 'settings';
     this.initSettingsUI();
+    var titleEl = document.querySelector('#settings-screen > h1');
+    if (titleEl && APP_VERSION) {
+        var oldVersion = document.getElementById('settings-version');
+        if (oldVersion) oldVersion.remove();
+        var versionSpan = document.createElement('span');
+        versionSpan.id = 'settings-version';
+        versionSpan.textContent = 'v' + APP_VERSION;
+        titleEl.parentNode.insertBefore(versionSpan, titleEl.nextSibling);
+    }
     this.focusIndex = 0;
     setTimeout(function() {
         self.updateFocus();
@@ -624,9 +662,9 @@ IPTVApp.prototype.toggleSettingsCollapse = function(section) {
     }
 };
 
-IPTVApp.prototype.handleSettingsSelect = function() {
+IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
     var focusables = this.getFocusables();
-    var current = focusables[this.focusIndex];
+    var current = clickedElement || focusables[this.focusIndex];
     if (!current) return;
     window.log('handleSettingsSelect: ' + (current.id || current.className));
     if (current.dataset.collapse) {
@@ -717,6 +755,12 @@ IPTVApp.prototype.handleSettingsSelect = function() {
             if (setting === 'freeboxDownloadViaProxy') {
                 current.textContent = this.settings[setting] ? I18n.t('settings.freeboxViaProxy', 'VM Proxy') : I18n.t('settings.freeboxViaFreebox', 'Freebox');
             }
+            if (setting === 'remoteDebug') {
+                if (this.settings.remoteDebug) {
+                    this.settings.remoteDebugExpiry = Date.now() + 86400000;
+                }
+                this.setupRemoteDebug();
+            }
             this.saveSettings();
         }
     }
@@ -752,6 +796,15 @@ IPTVApp.prototype.handleSettingsSelect = function() {
         if (optSetting === 'locale') {
             I18n.setLocale(optValue);
             this.updatePairingQR();
+            this.updatePremiumStatus();
+            this.updateFreeboxStatus();
+            if (this.api && this.api.clearCache) {
+                this.api.clearCache();
+            }
+            this._invalidatePreprocessCache();
+            this.clearProviderCache();
+            this.data = {};
+            this.api = null;
         }
         if (optSetting === 'textSize') {
             this.applyTextSize(optValue);
@@ -773,35 +826,29 @@ IPTVApp.prototype.handleSettingsSelect = function() {
         var actionType = current.dataset.action;
         window.log('ACTION settings-action: ' + actionType);
         if (actionType === 'clearAllCaches') {
-            // Clear TMDB cache
             this.tmdbCache = {};
             this.saveTMDBCache();
-            // Clear API cache
             if (this.api && this.api.clearCache) {
                 this.api.clearCache();
             }
-            // Clear provider cache (local + remote)
             this.clearProviderCache();
-            // Clear merged data
             this.data = {
                 live: { categories: [], streams: [] },
                 vod: { categories: [], streams: [] },
                 series: { categories: [], streams: [] }
             };
-            // Clear IndexedDB caches
             if (window.indexedDB) {
                 indexedDB.deleteDatabase('IPTVProviderCache');
                 indexedDB.deleteDatabase('IPTVTMDBCache');
-                window.log('CACHE', 'IndexedDB caches cleared');
             }
-            window.log('CACHE', 'All caches cleared');
+            this._showToast(I18n.t('settings.cacheCleared', 'Caches cleared'));
         }
         else if (actionType === 'clearTMDBCache') {
             this.tmdbCache = {};
             if (window.indexedDB) {
                 indexedDB.deleteDatabase('IPTVTMDBCache');
             }
-            window.log('CACHE', 'TMDB cache cleared');
+            this._showToast(I18n.t('settings.tmdbCacheCleared', 'TMDB cache cleared'));
         }
         else if (actionType === 'clearProgress') {
             this.watchHistory = [];
@@ -811,10 +858,12 @@ IPTVApp.prototype.handleSettingsSelect = function() {
             this.seriesProgress = {};
             this.saveSeriesProgress();
             this.saveSettings();
+            this._showToast(I18n.t('settings.progressCleared', 'Progress cleared'));
         }
         else if (actionType === 'clearFavorites') {
             this.favorites = [];
             this.saveFavorites();
+            this._showToast(I18n.t('settings.favoritesCleared', 'List cleared'));
         }
         else if (actionType === 'factoryReset') {
             this.showConfirmModal(I18n.t('settings.factoryResetConfirm', 'Reset the app to factory settings? All data will be lost.'), 'factoryReset');
@@ -922,7 +971,7 @@ IPTVApp.prototype.findSimilarPlaylist = function(newPlaylist) {
 };
 
 IPTVApp.prototype.applyTextSize = function(size) {
-    document.body.classList.remove('text-small', 'text-medium', 'text-large');
+    document.body.classList.remove('text-small', 'text-medium', 'text-large', 'text-xlarge', 'text-xxlarge');
     if (size) {
         document.body.classList.add('text-' + size);
     }

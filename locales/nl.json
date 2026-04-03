@@ -39,7 +39,7 @@
         "live": "Live TV",
         "movies": "Films",
         "series": "Series",
-        "favorites": "Favorieten",
+        "favorites": "Mijn lijst",
         "sport": "Sport",
         "concerts": "Concerten",
         "theatre": "Theater",
@@ -49,7 +49,7 @@
         "settings": "Instellingen",
         "continueWatching": "Verder kijken",
         "noContinue": "Geen lopende inhoud",
-        "noFavorites": "Geen favorieten",
+        "noFavorites": "Lijst is leeg",
         "manga": "Manga",
         "entertainment": "Entertainment",
         "continue": "Doorgaan",
@@ -133,7 +133,7 @@
         "clearAllCaches": "Alle caches wissen",
         "clearCache": "TMDB cache wissen",
         "clearProgress": "Voortgang wissen",
-        "clearFavorites": "Favorieten wissen",
+        "clearFavorites": "Lijst wissen",
         "factoryReset": "Fabrieksinstellingen",
         "factoryResetConfirm": "App terugzetten naar fabrieksinstellingen? Alle gegevens gaan verloren.",
         "playlists": "Afspeellijsten",
@@ -227,7 +227,14 @@
         "freeboxDownloadVia": "Download via",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Live TV-formaat"
+        "liveFormat": "Live TV-formaat",
+        "remoteDebug": "Externe debug",
+        "textXLarge": "Extra groot",
+        "cacheCleared": "Caches gewist",
+        "progressCleared": "Voortgang gewist",
+        "favoritesCleared": "Lijst gewist",
+        "tmdbCacheCleared": "TMDB-cache gewist",
+        "textXXLarge": "Maximum"
     },
     "player": {
         "play": "Afspelen",
@@ -338,7 +345,7 @@
         "status": "Status",
         "licenseCode": "Licentiecode",
         "validate": "Valideren",
-        "licenseDesc": "Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie op iptv.blanquer.org. Je ontvangt een licentiecode als bedankje.",
+        "licenseDesc": "Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie op iptv.blanquer.org — je ontvangt een licentiecode als bedankje",
         "statusTrial": "Proefperiode ({days} dagen over)",
         "statusGrace": "Evaluatie ({days} dagen over)",
         "statusExpired": "Verlopen",
@@ -349,7 +356,9 @@
         "later": "Later",
         "validationSuccess": "Licentie geactiveerd!",
         "validationError": "Ongeldige licentiecode",
-        "validationNetwork": "Netwerkfout, probeer het later opnieuw"
+        "validationNetwork": "Netwerkfout, probeer het later opnieuw",
+        "featureTitle": "Premium-functie",
+        "continueAnyway": "Toch doorgaan"
     },
     "categoryPatterns": {
         "sport": [

@@ -258,8 +258,6 @@
     margin-right: 10px;
     font-size: 28px;
 }
-
-
 .player-track-btn.focused {
     background: #0077cc;
     transform: scale(1.05);
@@ -304,6 +302,12 @@
     text-align: center;
     border: 2px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
+    max-height: 90vh;
+}
+
+.modal-content.tts-voice-modal-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #confirm-modal-title {
@@ -682,3 +686,4 @@
     margin-top: 25px;
     color: #555;
 }
+

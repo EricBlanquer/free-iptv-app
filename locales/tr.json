@@ -39,7 +39,7 @@
         "live": "Canlı TV",
         "movies": "Filmler",
         "series": "Diziler",
-        "favorites": "Favoriler",
+        "favorites": "Listem",
         "sport": "Spor",
         "concerts": "Konserler",
         "theatre": "Tiyatro",
@@ -49,7 +49,7 @@
         "settings": "Ayarlar",
         "continueWatching": "İzlemeye devam et",
         "noContinue": "Devam eden içerik yok",
-        "noFavorites": "Favori yok",
+        "noFavorites": "Listen boş",
         "manga": "Manga",
         "entertainment": "Eğlence",
         "continue": "Devam et",
@@ -133,7 +133,7 @@
         "clearAllCaches": "Tüm önbellekleri temizle",
         "clearCache": "TMDB önbelleğini temizle",
         "clearProgress": "İlerlemeyi temizle",
-        "clearFavorites": "Favorileri temizle",
+        "clearFavorites": "Listeyi temizle",
         "factoryReset": "Sıfırla",
         "factoryResetConfirm": "Uygulamayı sıfırlansın mı? Tüm veriler kaybolacak.",
         "playlists": "Oynatma listeleri",
@@ -227,7 +227,14 @@
         "freeboxDownloadVia": "İndirme yolu",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "Canlı TV formatı"
+        "liveFormat": "Canlı TV formatı",
+        "remoteDebug": "Uzaktan hata ayıklama",
+        "textXLarge": "Çok büyük",
+        "cacheCleared": "Önbellekler temizlendi",
+        "progressCleared": "İlerleme temizlendi",
+        "favoritesCleared": "Liste temizlendi",
+        "tmdbCacheCleared": "TMDB önbelleği temizlendi",
+        "textXXLarge": "Maksimum"
     },
     "player": {
         "play": "Oynat",
@@ -287,7 +294,7 @@
         "back": "Geri"
     },
     "details": {
-        "defaultVersion": "Standart",
+        "defaultVersion": "Varsayılan",
         "director": "Yönetmen",
         "creator": "Yaratıcı",
         "filmography": "Filmografi",
@@ -338,7 +345,7 @@
         "status": "Durum",
         "licenseCode": "Lisans kodu",
         "validate": "Doğrula",
-        "licenseDesc": "Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, iptv.blanquer.org üzerinden bir bağışla geliştirmeyi destekleyin. Teşekkür olarak bir lisans kodu alacaksınız.",
+        "licenseDesc": "Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, iptv.blanquer.org üzerinden bir bağışla geliştirmeyi destekleyin — teşekkür olarak bir lisans kodu alacaksınız",
         "statusTrial": "Deneme ({days} gün kaldı)",
         "statusGrace": "Değerlendirme ({days} gün kaldı)",
         "statusExpired": "Süresi dolmuş",
@@ -349,7 +356,9 @@
         "later": "Daha sonra",
         "validationSuccess": "Lisans etkinleştirildi!",
         "validationError": "Geçersiz lisans kodu",
-        "validationNetwork": "Ağ hatası, daha sonra tekrar deneyin"
+        "validationNetwork": "Ağ hatası, daha sonra tekrar deneyin",
+        "featureTitle": "Premium Özellik",
+        "continueAnyway": "Yine de devam et"
     },
     "categoryPatterns": {
         "sport": [

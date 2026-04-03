@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
     private AspectRatioFrameLayout mAspectRatioLayout;
     private SurfaceView mSurfaceView;
     private NativePlayer mNativePlayer;
+    private WebUpdater mWebUpdater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,23 @@ public class MainActivity extends Activity {
         initNativePlayer();
         setupWebView();
         applyImmersiveMode();
-        mWebView.loadUrl("file:///android_asset/index.html");
+        mWebUpdater = new WebUpdater(this);
+        String localWebPath = mWebUpdater.getLocalWebPath();
+        if (localWebPath != null) {
+            mWebView.loadUrl(localWebPath);
+        } else {
+            mWebView.loadUrl("file:///android_asset/index.html");
+        }
+        mWebUpdater.setApkUpdateListener(remoteVersion -> {
+            runOnUiThread(() -> mWebView.evaluateJavascript(
+                "if(window.app && window.app._showToast) window.app._showToast('Mise à jour disponible\u00A0: iptv.blanquer.org/app.apk');", null));
+        });
+        mWebUpdater.checkAndUpdate(() -> {
+            String updatedPath = mWebUpdater.getLocalWebPath();
+            if (updatedPath != null) {
+                runOnUiThread(() -> mWebView.loadUrl(updatedPath));
+            }
+        });
     }
 
     private void initNativePlayer() {
@@ -84,8 +101,14 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setDatabaseEnabled(true);
-        settings.setLoadWithOverviewMode(true);
+        settings.setLoadWithOverviewMode(false);
         settings.setUseWideViewPort(true);
+        // Scale content to fit screen width: device dp width / 1920 * 100
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        float density = getResources().getDisplayMetrics().density;
+        int dpWidth = (int)(screenWidth / density);
+        int scale = (int)(dpWidth * 100.0f / 1920.0f);
+        mWebView.setInitialScale(scale);
         mWebView.setBackgroundColor(Color.TRANSPARENT);
         mWebView.addJavascriptInterface(new AndroidBridge(), "Android");
         mWebView.setWebViewClient(new WebViewClient() {
@@ -141,12 +164,11 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() != KeyEvent.ACTION_DOWN) {
-            return super.dispatchKeyEvent(event);
-        }
         int tizenKeyCode = mapToTizenKeyCode(event.getKeyCode());
         if (tizenKeyCode != -1) {
-            injectKeyEvent(tizenKeyCode);
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                injectKeyEvent(tizenKeyCode);
+            }
             return true;
         }
         return super.dispatchKeyEvent(event);
@@ -249,7 +271,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void exitApp() {
-            runOnUiThread(() -> finishAndRemoveTask());
+            runOnUiThread(() -> moveTaskToBack(true));
         }
 
         @JavascriptInterface

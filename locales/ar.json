@@ -37,7 +37,7 @@
         "live": "البث المباشر",
         "movies": "أفلام",
         "series": "مسلسلات",
-        "favorites": "المفضلة",
+        "favorites": "قائمتي",
         "sport": "رياضة",
         "concerts": "حفلات",
         "theatre": "مسرح",
@@ -47,7 +47,7 @@
         "settings": "الإعدادات",
         "continueWatching": "متابعة المشاهدة",
         "noContinue": "لا يوجد محتوى قيد التشغيل",
-        "noFavorites": "لا توجد مفضلات",
+        "noFavorites": "القائمة فارغة",
         "manga": "Manga",
         "entertainment": "ترفيه",
         "continue": "متابعة",
@@ -131,7 +131,7 @@
         "clearAllCaches": "مسح جميع الذاكرات المؤقتة",
         "clearCache": "مسح ذاكرة TMDB",
         "clearProgress": "مسح التقدم",
-        "clearFavorites": "مسح المفضلة",
+        "clearFavorites": "مسح القائمة",
         "factoryReset": "إعادة ضبط",
         "factoryResetConfirm": "إعادة ضبط التطبيق؟ سيتم فقدان جميع البيانات.",
         "playlists": "قوائم التشغيل",
@@ -225,7 +225,14 @@
         "freeboxDownloadVia": "التحميل عبر",
         "freeboxViaFreebox": "Freebox",
         "freeboxViaProxy": "VM Proxy",
-        "liveFormat": "صيغة البث المباشر"
+        "liveFormat": "صيغة البث المباشر",
+        "remoteDebug": "تصحيح عن بعد",
+        "textXLarge": "كبير جداً",
+        "cacheCleared": "تم مسح ذاكرة التخزين",
+        "progressCleared": "تم مسح التقدم",
+        "favoritesCleared": "تم مسح القائمة",
+        "tmdbCacheCleared": "تم مسح ذاكرة TMDB",
+        "textXXLarge": "الأقصى"
     },
     "player": {
         "play": "تشغيل",
@@ -285,7 +292,7 @@
         "back": "رجوع"
     },
     "details": {
-        "defaultVersion": "الإصدار الأصلي",
+        "defaultVersion": "افتراضي",
         "director": "المخرج",
         "creator": "المبدع",
         "filmography": "الأعمال السينمائية",
@@ -336,7 +343,7 @@
         "status": "الحالة",
         "licenseCode": "رمز الترخيص",
         "validate": "تحقق",
-        "licenseDesc": "Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم تطويره بتبرع على iptv.blanquer.org. ستحصل على رمز ترخيص كشكر.",
+        "licenseDesc": "Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم تطويره بتبرع على iptv.blanquer.org — ستحصل على رمز ترخيص كشكر",
         "statusTrial": "تجريبي ({days} يوم متبقي)",
         "statusGrace": "فترة تقييم ({days} يوم متبقي)",
         "statusExpired": "منتهي",
@@ -347,7 +354,9 @@
         "later": "لاحقاً",
         "validationSuccess": "تم تفعيل الترخيص!",
         "validationError": "رمز ترخيص غير صالح",
-        "validationNetwork": "خطأ في الشبكة، حاول لاحقاً"
+        "validationNetwork": "خطأ في الشبكة، حاول لاحقاً",
+        "featureTitle": "ميزة مميزة",
+        "continueAnyway": "متابعة على أي حال"
     },
     "categoryPatterns": {
         "sport": [

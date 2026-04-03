@@ -210,13 +210,39 @@ IPTVApp.prototype.loadVisibleImages = function(forceFromStart) {
         startIdx = startRow * cols;
         endIdx = Math.min(items.length, endRow * cols);
     }
+    var unloadStart = Math.max(0, startIdx - cols * 3);
+    var unloadEnd = Math.min(items.length, endIdx + cols * 3);
+    var unloaded = 0;
+    for (var u = 0; u < unloadStart; u++) {
+        var uDiv = items[u].firstElementChild;
+        if (!uDiv || !uDiv.dataset.loaded) continue;
+        var loadState = uDiv.dataset.loaded;
+        if (loadState === 'ok' || loadState === 'tmdb') {
+            uDiv.style.backgroundImage = '';
+            delete uDiv.dataset.loaded;
+            unloaded++;
+        }
+    }
+    for (var u = unloadEnd; u < items.length; u++) {
+        var uDiv = items[u].firstElementChild;
+        if (!uDiv || !uDiv.dataset.loaded) continue;
+        var loadState = uDiv.dataset.loaded;
+        if (loadState === 'ok' || loadState === 'tmdb') {
+            uDiv.style.backgroundImage = '';
+            delete uDiv.dataset.loaded;
+            unloaded++;
+        }
+    }
+    if (unloaded > 0) {
+        window.log('MEM', 'Unloaded ' + unloaded + ' off-screen images (keep range ' + unloadStart + '-' + unloadEnd + ')');
+    }
     var queue = [];
     var noUrl = 0;
     var alreadyLoaded = 0;
     for (var i = startIdx; i < endIdx; i++) {
         var item = items[i];
         var imageUrl = item.dataset.imageUrl;
-        var imageDiv = item.querySelector('.grid-item-image');
+        var imageDiv = item.firstElementChild;
         if (!imageDiv || imageDiv.dataset.loaded) {
             alreadyLoaded++;
             continue;
@@ -685,8 +711,6 @@ IPTVApp.prototype.loadCategory = function(section) {
         var onDone = function() {
             loadingText.textContent = loadingBaseText;
             var sectionData = self.data[section];
-            // Cache is saved by background refresh and initial load — no need to save here
-            // (cacheProviderData was overwriting fresh IndexedDB data with stale in-memory data)
             self._renderCategoryContent(sectionData.categories, sectionData.streams, section, isVodSubsection);
         };
         var maybePromise = self._preprocessSection(section, results[0], results[1], onProgress);
@@ -1281,6 +1305,12 @@ IPTVApp.prototype.renderGrid = function(streams, type, keepScroll) {
         this.liveChannelList = streams;
     }
     this.displayedCount = 0;
+    this._domOffset = 0;
+    this._loadingMore = false;
+    this._preloading = false;
+    this._gridRowHeight = 0;
+    var oldTopSpacer = document.getElementById('grid-top-spacer');
+    if (oldTopSpacer) oldTopSpacer.remove();
     this._gridLoading = true;
     // Apply saved view mode for current section
     var section = this.currentSection || 'default';
@@ -1536,7 +1566,7 @@ IPTVApp.prototype.applyFilters = function() {
     }
     window.log('FILTER', 'applyFilters: ' + streams.length + ' streams after filter/sort');
     self.logMemory('applyFilters');
-    if (this.currentSection !== 'downloads' && this.currentSection !== 'history') {
+    if (this.currentSection !== 'downloads' && this.currentSection !== 'history' && !this.searchTitle) {
         streams = this._applyDedup(streams);
     }
     self.logMemory('applyFilters done');
@@ -2126,7 +2156,14 @@ IPTVApp.prototype._applyDedup = function(streams) {
             return true;
         });
         versions.sort(function(a, b) {
-            return b.data._dedupQualityScore - a.data._dedupQualityScore;
+            var qualDiff = b.data._dedupQualityScore - a.data._dedupQualityScore;
+            if (qualDiff !== 0) return qualDiff;
+            var aTag = (a.tag || '').toUpperCase();
+            var bTag = (b.tag || '').toUpperCase();
+            var aIsVostfr = aTag.indexOf('VOSTFR') !== -1 || aTag.indexOf('VOST') !== -1 || aTag.indexOf('VO') !== -1;
+            var bIsVostfr = bTag.indexOf('VOSTFR') !== -1 || bTag.indexOf('VOST') !== -1 || bTag.indexOf('VO') !== -1;
+            if (aIsVostfr !== bIsVostfr) return aIsVostfr ? 1 : -1;
+            return 0;
         });
         if (versions.length > 1) {
             var primaryStream = versions[0].data;
@@ -2294,6 +2331,212 @@ IPTVApp.prototype.renderActorResults = function(actors) {
     }
 };
 
+// Grid item creation
+IPTVApp.prototype._createGridItem = function(stream) {
+    var item = document.createElement('div');
+    item.className = 'grid-item';
+    item.dataset.streamId = this.getStreamId(stream);
+    item.dataset.playlistId = stream._playlistId || '';
+    item.dataset.streamType = stream._type || stream._sourceType || this.currentStreamType;
+    if (stream._isDownload) item.dataset.isDownload = '1';
+    var imageUrl = this.getStreamImage(stream);
+    item.dataset.imageUrl = imageUrl;
+    item.dataset.streamTitle = this.getStreamTitle(stream);
+    var image = document.createElement('div');
+    image.className = 'grid-item-image';
+    if (imageUrl.indexOf('data:') === 0) {
+        image.style.backgroundImage = 'url(\'' + imageUrl + '\')';
+        image.classList.add('local-logo');
+        image.dataset.loaded = 'local';
+    }
+    var originalTitle = this.getStreamTitle(stream) || 'Unknown';
+    var streamTitle = originalTitle;
+    var isStreamSD = stream._isSD !== undefined ? stream._isSD : this.isSD(stream);
+    var hasDisplayTitle = !!stream._displayTitle;
+    streamTitle = hasDisplayTitle ? stream._displayTitle : this.stripCategoryPrefix(streamTitle);
+    var yearMatch = streamTitle.match(Regex.yearInParens) || streamTitle.match(Regex.yearAtEnd);
+    var year = yearMatch ? yearMatch[1] : '';
+    streamTitle = streamTitle
+        .replace(Regex.removeYearParens, '')
+        .replace(Regex.removeYearEnd, '')
+        .replace(Regex.trailingDash, '')
+        .trim();
+    if (!hasDisplayTitle) {
+        streamTitle = this.formatDisplayTitle(streamTitle);
+    }
+    if (stream._isHistory && stream._season && stream._episode) {
+        var s = stream._season < 10 ? '0' + stream._season : stream._season;
+        var e = stream._episode < 10 ? '0' + stream._episode : stream._episode;
+        streamTitle += ' - S' + s + 'E' + e;
+        item.dataset.historySeason = stream._season;
+        item.dataset.historyEpisode = stream._episode;
+    }
+    var rating = parseFloat(stream.rating) || 0;
+    var stars = '';
+    if (rating > 0) {
+        var starCount = this.ratingToStars(rating);
+        for (var j = 0; j < 5; j++) {
+            stars += j < starCount ? '★' : '☆';
+        }
+    }
+    if (!stream._isDownload && (year || stars || (stream._duplicateTag && !stream._duplicateVersions))) {
+        var overlayTop = document.createElement('div');
+        overlayTop.className = 'grid-overlay-top';
+        if (year) {
+            var yearSpan = document.createElement('span');
+            yearSpan.className = 'grid-year';
+            yearSpan.textContent = year;
+            overlayTop.appendChild(yearSpan);
+        }
+        if (stream._duplicateTag && !stream._duplicateVersions) {
+            var titleWords = streamTitle.split(/[\s\-()]+/).filter(Boolean);
+            var tagWords = stream._duplicateTag.split(/\s+/).filter(function(w) {
+                if (w === year) return false;
+                if (/^\d+$/.test(w)) return true;
+                if (titleWords.some(function(tw) { return tw.toLowerCase() === w.toLowerCase(); })) return false;
+                return true;
+            });
+            var filteredTag = tagWords.join(' ').trim();
+            if (filteredTag) {
+                var tagSpan = document.createElement('span');
+                tagSpan.className = 'grid-format-tag';
+                tagSpan.textContent = filteredTag;
+                overlayTop.appendChild(tagSpan);
+            }
+        }
+        if (stars) {
+            var starsSpan = document.createElement('span');
+            starsSpan.className = 'grid-stars';
+            starsSpan.textContent = stars;
+            overlayTop.appendChild(starsSpan);
+        }
+        image.appendChild(overlayTop);
+    }
+    var overlayBottom = document.createElement('div');
+    overlayBottom.className = 'grid-overlay-bottom';
+    var titleSpan = document.createElement('span');
+    titleSpan.className = 'grid-title';
+    titleSpan.textContent = this.formatDisplayTitle(this.cleanTitle(originalTitle));
+    overlayBottom.appendChild(titleSpan);
+    if (stream.genre) {
+        var genreSpan = document.createElement('span');
+        genreSpan.className = 'grid-genre-provider';
+        genreSpan.textContent = this.formatDisplayTitle(stream.genre.split(',')[0].trim());
+        overlayBottom.appendChild(genreSpan);
+    }
+    image.appendChild(overlayBottom);
+    item.appendChild(image);
+    var listInfo = document.createElement('div');
+    listInfo.className = 'grid-item-info';
+    var listTitle = document.createElement('div');
+    listTitle.className = 'list-title';
+    listTitle.textContent = streamTitle;
+    listInfo.appendChild(listTitle);
+    var listMeta = document.createElement('div');
+    listMeta.className = 'list-meta';
+    if (year) {
+        var listYear = document.createElement('span');
+        listYear.className = 'list-year';
+        listYear.textContent = year;
+        listMeta.appendChild(listYear);
+    }
+    if (stars) {
+        var listStars = document.createElement('span');
+        listStars.className = 'list-stars';
+        listStars.textContent = stars;
+        listMeta.appendChild(listStars);
+    }
+    listInfo.appendChild(listMeta);
+    if (stream.genre) {
+        var listGenre = document.createElement('div');
+        listGenre.className = 'list-genre';
+        listGenre.textContent = this.formatDisplayTitle(stream.genre.split(',')[0].trim());
+        listInfo.appendChild(listGenre);
+    }
+    item.appendChild(listInfo);
+    var streamType = stream._type || stream._sourceType || this.currentStreamType;
+    if (streamType === 'live') {
+        var epgSubtitle = document.createElement('div');
+        epgSubtitle.className = 'grid-item-epg';
+        item.appendChild(epgSubtitle);
+    }
+    if (stream._isHistory && stream._timestamp) {
+        var dateSpan = document.createElement('div');
+        dateSpan.className = 'grid-item-date';
+        var dateText = this.formatHistoryDate(stream._timestamp);
+        if (stream._duration && stream._duration > 0) {
+            dateText += ' • ' + this.formatDuration(stream._duration);
+        }
+        dateSpan.textContent = dateText;
+        item.appendChild(dateSpan);
+    }
+    if (stream._isDownload && stream._statusLabel) {
+        var dlStatus = document.createElement('div');
+        dlStatus.className = 'grid-item-date';
+        if (stream._statusLabel === '⏳') {
+            var hg = document.createElement('span');
+            hg.className = 'hourglass';
+            var hgIcon = document.createElement('span');
+            hgIcon.className = 'material-symbols-outlined';
+            hgIcon.textContent = 'hourglass_empty';
+            hg.appendChild(hgIcon);
+            dlStatus.appendChild(hg);
+        }
+        else {
+            dlStatus.textContent = stream._statusLabel;
+        }
+        item.appendChild(dlStatus);
+    }
+    var streamId = this.getStreamId(stream);
+    var streamPlaylistId = stream._playlistId || this.settings.activePlaylistId;
+    var progress = this.getWatchHistoryItem(streamId, streamPlaylistId);
+    var minMs = (this.settings.minProgressMinutes || 2) * 60000;
+    if (progress && progress.position >= minMs && progress.percent > 0 && !progress.watched) {
+        var progressBar = document.createElement('div');
+        progressBar.className = 'grid-progress-bar';
+        var progressFill = document.createElement('div');
+        progressFill.className = 'grid-progress-fill';
+        progressFill.style.width = progress.percent + '%';
+        progressBar.appendChild(progressFill);
+        item.appendChild(progressBar);
+    }
+    return item;
+};
+
+IPTVApp.prototype._prependGridItems = function() {
+    var container = document.getElementById('content-grid');
+    if (!container) return 0;
+    var cols = this.gridColumns;
+    var batchSize = cols * 3;
+    var startIdx = Math.max(0, this._domOffset - batchSize);
+    var endIdx = this._domOffset;
+    var count = endIdx - startIdx;
+    if (count <= 0) return 0;
+    var fragment = document.createDocumentFragment();
+    for (var i = startIdx; i < endIdx; i++) {
+        fragment.appendChild(this._createGridItem(this.currentStreams[i]));
+    }
+    var topSpacer = document.getElementById('grid-top-spacer');
+    var refNode = topSpacer ? topSpacer.nextSibling : container.firstChild;
+    container.insertBefore(fragment, refNode);
+    if (topSpacer) {
+        var items = container.querySelectorAll('.grid-item');
+        var lastPrepended = items[count - 1];
+        var firstPrepended = items[0];
+        var prependedHeight = lastPrepended.offsetTop + lastPrepended.offsetHeight - firstPrepended.offsetTop;
+        var currentSpacerHeight = parseFloat(topSpacer.style.height) || 0;
+        topSpacer.style.height = Math.max(0, currentSpacerHeight - prependedHeight) + 'px';
+        if (parseFloat(topSpacer.style.height) <= 0) {
+            topSpacer.remove();
+        }
+    }
+    this._domOffset = startIdx;
+    this.focusIndex += count;
+    this.invalidateFocusables();
+    window.log('MEM', 'Prepended ' + count + ' DOM items (offset now ' + this._domOffset + ')');
+    return count;
+};
+
 // Grid item loading
 IPTVApp.prototype.loadMoreItems = function() {
     if (this.actorSearchResults) return false;
@@ -2312,191 +2555,14 @@ IPTVApp.prototype.loadMoreItems = function() {
     if (startIndex >= this.currentStreams.length) {
         return false;
     }
+    var fragment = document.createDocumentFragment();
     for (var i = startIndex; i < endIndex; i++) {
-        var stream = this.currentStreams[i];
-        var item = document.createElement('div');
-        item.className = 'grid-item';
-        item.dataset.streamId = this.getStreamId(stream);
-        item.dataset.playlistId = stream._playlistId || '';
-        item.dataset.streamType = stream._type || stream._sourceType || this.currentStreamType;
-        if (stream._isDownload) item.dataset.isDownload = '1';
-        var imageUrl = this.getStreamImage(stream);
-        item.dataset.imageUrl = imageUrl;
-        item.dataset.streamTitle = this.getStreamTitle(stream);
-        var image = document.createElement('div');
-        image.className = 'grid-item-image';
-        if (imageUrl.indexOf('data:') === 0) {
-            image.style.backgroundImage = 'url(\'' + imageUrl + '\')';
-            image.classList.add('local-logo');
-            image.dataset.loaded = 'local';
-        }
-        var originalTitle = this.getStreamTitle(stream) || 'Unknown';
-        var streamTitle = originalTitle;
-        var isStreamSD = stream._isSD !== undefined ? stream._isSD : this.isSD(stream);
-        var hasDisplayTitle = !!stream._displayTitle;
-        streamTitle = hasDisplayTitle ? stream._displayTitle : this.stripCategoryPrefix(streamTitle);
-        var yearMatch = streamTitle.match(Regex.yearInParens) || streamTitle.match(Regex.yearAtEnd);
-        var year = yearMatch ? yearMatch[1] : '';
-        streamTitle = streamTitle
-            .replace(Regex.removeYearParens, '')
-            .replace(Regex.removeYearEnd, '')
-            .replace(Regex.trailingDash, '')
-            .trim();
-        if (!hasDisplayTitle) {
-            streamTitle = this.formatDisplayTitle(streamTitle);
-        }
-        // Add episode info for series from history
-        if (stream._isHistory && stream._season && stream._episode) {
-            var s = stream._season < 10 ? '0' + stream._season : stream._season;
-            var e = stream._episode < 10 ? '0' + stream._episode : stream._episode;
-            streamTitle += ' - S' + s + 'E' + e;
-            // Store in dataset for TMDB update to preserve
-            item.dataset.historySeason = stream._season;
-            item.dataset.historyEpisode = stream._episode;
-        }
-        var rating = parseFloat(stream.rating) || 0;
-        var stars = '';
-        if (rating > 0) {
-            var starCount = this.ratingToStars(rating);
-            for (var j = 0; j < 5; j++) {
-                stars += j < starCount ? '★' : '☆';
-            }
-        }
-        if (!stream._isDownload && (year || stars || (stream._duplicateTag && !stream._duplicateVersions))) {
-            var overlayTop = document.createElement('div');
-            overlayTop.className = 'grid-overlay-top';
-            if (year) {
-                var yearSpan = document.createElement('span');
-                yearSpan.className = 'grid-year';
-                yearSpan.textContent = year;
-                overlayTop.appendChild(yearSpan);
-            }
-            if (stream._duplicateTag && !stream._duplicateVersions) {
-                var titleWords = streamTitle.split(/[\s\-()]+/).filter(Boolean);
-                var tagWords = stream._duplicateTag.split(/\s+/).filter(function(w) {
-                    if (w === year) return false;
-                    if (/^\d+$/.test(w)) return true;
-                    if (titleWords.some(function(tw) { return tw.toLowerCase() === w.toLowerCase(); })) return false;
-                    return true;
-                });
-                var filteredTag = tagWords.join(' ').trim();
-                if (filteredTag) {
-                    var tagSpan = document.createElement('span');
-                    tagSpan.className = 'grid-format-tag';
-                    tagSpan.textContent = filteredTag;
-                    overlayTop.appendChild(tagSpan);
-                }
-            }
-            if (stars) {
-                var starsSpan = document.createElement('span');
-                starsSpan.className = 'grid-stars';
-                starsSpan.textContent = stars;
-                overlayTop.appendChild(starsSpan);
-            }
-            image.appendChild(overlayTop);
-        }
-        var overlayBottom = document.createElement('div');
-        overlayBottom.className = 'grid-overlay-bottom';
-        var titleSpan = document.createElement('span');
-        titleSpan.className = 'grid-title';
-        titleSpan.textContent = this.formatDisplayTitle(this.cleanTitle(originalTitle));
-        overlayBottom.appendChild(titleSpan);
-        if (stream.genre) {
-            var genreSpan = document.createElement('span');
-            genreSpan.className = 'grid-genre-provider';
-            genreSpan.textContent = this.formatDisplayTitle(stream.genre.split(',')[0].trim());
-            overlayBottom.appendChild(genreSpan);
-        }
-        image.appendChild(overlayBottom);
-        item.appendChild(image);
-        var listInfo = document.createElement('div');
-        listInfo.className = 'grid-item-info';
-        var listTitle = document.createElement('div');
-        listTitle.className = 'list-title';
-        listTitle.textContent = streamTitle;
-        listInfo.appendChild(listTitle);
-        var listMeta = document.createElement('div');
-        listMeta.className = 'list-meta';
-        if (year) {
-            var listYear = document.createElement('span');
-            listYear.className = 'list-year';
-            listYear.textContent = year;
-            listMeta.appendChild(listYear);
-        }
-        if (stars) {
-            var listStars = document.createElement('span');
-            listStars.className = 'list-stars';
-            listStars.textContent = stars;
-            listMeta.appendChild(listStars);
-        }
-        listInfo.appendChild(listMeta);
-        if (stream.genre) {
-            var listGenre = document.createElement('div');
-            listGenre.className = 'list-genre';
-            listGenre.textContent = this.formatDisplayTitle(stream.genre.split(',')[0].trim());
-            listInfo.appendChild(listGenre);
-        }
-        item.appendChild(listInfo);
-        // Add EPG subtitle placeholder for live channels
-        var streamType = stream._type || stream._sourceType || this.currentStreamType;
-        if (streamType === 'live') {
-            var epgSubtitle = document.createElement('div');
-            epgSubtitle.className = 'grid-item-epg';
-            item.appendChild(epgSubtitle);
-        }
-        // Add date and duration for history items
-        if (stream._isHistory && stream._timestamp) {
-            var dateSpan = document.createElement('div');
-            dateSpan.className = 'grid-item-date';
-            var dateText = this.formatHistoryDate(stream._timestamp);
-            if (stream._duration && stream._duration > 0) {
-                dateText += ' • ' + this.formatDuration(stream._duration);
-            }
-            dateSpan.textContent = dateText;
-            item.appendChild(dateSpan);
-        }
-        if (stream._isDownload && stream._statusLabel) {
-            var dlStatus = document.createElement('div');
-            dlStatus.className = 'grid-item-date';
-            if (stream._statusLabel === '⏳') {
-                var hg = document.createElement('span');
-                hg.className = 'hourglass';
-                var hgIcon = document.createElement('span');
-                hgIcon.className = 'material-symbols-outlined';
-                hgIcon.textContent = 'hourglass_empty';
-                hg.appendChild(hgIcon);
-                dlStatus.appendChild(hg);
-            }
-            else {
-                dlStatus.textContent = stream._statusLabel;
-            }
-            item.appendChild(dlStatus);
-        }
-        var streamId = this.getStreamId(stream);
-        var streamPlaylistId = stream._playlistId || this.settings.activePlaylistId;
-        var progress = this.getWatchHistoryItem(streamId, streamPlaylistId);
-        var minMs = (this.settings.minProgressMinutes || 2) * 60000;
-        if (progress && progress.position >= minMs && progress.percent > 0 && !progress.watched) {
-            var progressBar = document.createElement('div');
-            progressBar.className = 'grid-progress-bar';
-            var progressFill = document.createElement('div');
-            progressFill.className = 'grid-progress-fill';
-            progressFill.style.width = progress.percent + '%';
-            progressBar.appendChild(progressFill);
-            item.appendChild(progressBar);
-        }
-        // Add favorite icon if stream is in favorites
-        if (this.isFavorite(streamId, streamPlaylistId)) {
-            var favIcon = document.createElement('span');
-            favIcon.className = 'favorite-icon';
-            favIcon.textContent = '★';
-            item.appendChild(favIcon);
-        }
-        if (spacer) {
-            container.insertBefore(item, spacer);
-        } else {
-            container.appendChild(item);
-        }
+        fragment.appendChild(this._createGridItem(this.currentStreams[i]));
+    }
+    if (spacer) {
+        container.insertBefore(fragment, spacer);
+    } else {
+        container.appendChild(fragment);
     }
     var isFirstBatch = (startIndex === 0);
     this.displayedCount = endIndex;
@@ -2506,7 +2572,44 @@ IPTVApp.prototype.loadMoreItems = function() {
         this.loadVisibleImages(true);
         this.loadVisibleEPG();
     }
+    var self = this;
+    setTimeout(function() { self._trimExcessDomItems(); }, 50);
     return true;
+};
+
+IPTVApp.prototype._trimExcessDomItems = function() {
+    var container = document.getElementById('content-grid');
+    if (!container) return;
+    var items = container.querySelectorAll('.grid-item');
+    var maxItems = 100;
+    if (items.length <= maxItems) return;
+    var removeCount = items.length - maxItems;
+    var safeRemoveCount = Math.min(removeCount, Math.max(0, this.focusIndex - this.gridColumns * 5));
+    safeRemoveCount = Math.floor(safeRemoveCount / this.gridColumns) * this.gridColumns;
+    if (safeRemoveCount <= 0) return;
+    var topSpacer = document.getElementById('grid-top-spacer');
+    if (!topSpacer) {
+        topSpacer = document.createElement('div');
+        topSpacer.id = 'grid-top-spacer';
+        container.insertBefore(topSpacer, container.firstChild);
+    }
+    if (!this._gridRowHeight) {
+        var firstItem = items[0];
+        if (firstItem) {
+            this._gridRowHeight = firstItem.offsetHeight + 10;
+        }
+    }
+    var rowHeight = this._gridRowHeight || 300;
+    var removedRows = safeRemoveCount / this.gridColumns;
+    var removedHeight = removedRows * rowHeight;
+    for (var i = 0; i < safeRemoveCount; i++) {
+        items[i].remove();
+    }
+    topSpacer.style.height = (parseFloat(topSpacer.style.height) || 0) + removedHeight + 'px';
+    this.focusIndex -= safeRemoveCount;
+    this._domOffset = (this._domOffset || 0) + safeRemoveCount;
+    this.invalidateFocusables();
+    window.log('MEM', 'Trimmed ' + safeRemoveCount + ' DOM items (DOM now ' + (items.length - safeRemoveCount) + ', offset ' + this._domOffset + ')');
 };
 
 IPTVApp.prototype.getFilteredContinueHistory = function(section) {

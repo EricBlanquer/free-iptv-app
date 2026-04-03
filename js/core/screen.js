@@ -78,7 +78,11 @@ IPTVApp.prototype.bindTouchEvents = function() {
             return;
         }
         // Player overlay tap (not on buttons) = toggle play/pause
-        if (target.closest('#player-screen') && !target.closest('#player-tracks') && !target.closest('.modal')) {
+        var isPlayerTap = target.closest('#player-screen') && !target.closest('#player-tracks') && !target.closest('.modal');
+        if (!isPlayerTap && self.currentScreen === 'player' && target.closest('#loading')) {
+            isPlayerTap = true;
+        }
+        if (isPlayerTap) {
             if (self.currentScreen === 'player') {
                 self.showPlayerOverlay();
                 return;
@@ -146,28 +150,7 @@ IPTVApp.prototype.bindTouchEvents = function() {
                 }
             }
         }
-        // Generic focusable areas
-        for (var a = 0; a < areaMap.length; a++) {
-            var match = target.closest(areaMap[a].selector);
-            if (match) {
-                var area = areaMap[a].area;
-                self.focusArea = area;
-                self.invalidateFocusables();
-                var focusables = self.getFocusables();
-                var foundIndex = -1;
-                for (var f = 0; f < focusables.length; f++) {
-                    if (focusables[f] === match) {
-                        foundIndex = f;
-                        break;
-                    }
-                }
-                if (foundIndex < 0) return;
-                self.focusIndex = foundIndex;
-                self.updateFocus();
-                self.select();
-                return;
-            }
-        }
+        // Generic focusable areas - handled by focus.js click handler
     });
 };
 
@@ -203,6 +186,8 @@ IPTVApp.prototype.showScreen = function(screen) {
     document.getElementById(screen + '-screen').classList.add('active');
     this.currentScreen = screen;
     this.invalidateFocusables();
+    var backBtn = document.getElementById('android-back-btn');
+    if (backBtn) backBtn.style.display = (screen === 'player') ? 'none' : 'flex';
 };
 
 IPTVApp.prototype.showLoading = function(show, posterUrl, message) {

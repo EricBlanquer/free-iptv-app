@@ -8,8 +8,11 @@ android {
         applicationId 'fr.blanquer.freeiptv'
         minSdk 21
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        // Minutes since 2025-01-01 - always increasing at each build
+        versionCode((int) ((System.currentTimeMillis() / 1000 - 1735689600) / 60))
+        def configXml = new File(rootProject.rootDir.parentFile, 'config.xml')
+        def matcher = (configXml.text =~ /widget[^>]+version="([^"]+)"/)
+        versionName matcher ? matcher[0][1] : '1.0.0'
     }
 
     buildTypes {
@@ -22,6 +25,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {
