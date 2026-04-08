@@ -84,6 +84,18 @@ var I18n = (function() {
             return translation;
         },
 
+        plural: function(key, n, fallback) {
+            var suffix = (n === 1 || n === -1) ? '_one' : '_other';
+            var translation = getNestedValue(I18nData.translations[locale], key + suffix);
+            if (!translation) {
+                translation = getNestedValue(I18nData.translations[defaultLocale], key + suffix);
+            }
+            if (!translation) {
+                translation = fallback || key;
+            }
+            return translation.split('{n}').join(n);
+        },
+
         updateDOM: function() {
             document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = locale;

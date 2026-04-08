@@ -118,8 +118,6 @@
         "minThreshold": "Minimum eşik",
         "watchedThreshold": "İzlendi eşiği",
         "retention": "Saklama",
-        "unitMinutes": "dakika",
-        "unitWeeks": "hafta",
         "historyMaxItems": "Geçmiş maksimum",
         "focusOnCategories": "Kategorilere odaklan",
         "textSize": "Metin boyutu",
@@ -209,6 +207,7 @@
         "freeboxPair": "Eşle",
         "freeboxUnpair": "Eşlemeyi kaldır",
         "freeboxPaired": "Eşlendi",
+        "freeboxPairedNoApi": "Eşleştirildi (API bağlı değil)",
         "freeboxNotPaired": "Eşlenmedi",
         "freeboxDesc": "VOD içeriklerini Freebox'a indirin",
         "proxyRequired": "Proxy gerekli",
@@ -234,7 +233,27 @@
         "progressCleared": "İlerleme temizlendi",
         "favoritesCleared": "Liste temizlendi",
         "tmdbCacheCleared": "TMDB önbelleği temizlendi",
-        "textXXLarge": "Maksimum"
+        "textXXLarge": "Maksimum",
+        "checkUpdates": "Güncellemeleri kontrol et",
+        "installUpdate": "Güncellemeyi yükle",
+        "privacyPolicy": "Gizlilik Politikası",
+        "buffer": "Video tamponu",
+        "bufferMode": "Mod",
+        "bufferLow": "Düşük",
+        "bufferStandard": "Standart",
+        "bufferHigh": "Yüksek",
+        "bufferMax": "Maksimum",
+        "bufferCustom": "Gelişmiş",
+        "bufferPlay": "Başlangıç",
+        "bufferRebuffer": "Devam",
+        "bufferMin": "Min",
+        "bufferMaxLabel": "Maks",
+        "unitMinutes_one": "{n} dakika",
+        "unitMinutes_other": "{n} dakika",
+        "unitWeeks_one": "{n} hafta",
+        "unitWeeks_other": "{n} hafta",
+        "unitSeconds_one": "{n} saniye",
+        "unitSeconds_other": "{n} saniye"
     },
     "player": {
         "play": "Oynat",
@@ -273,7 +292,8 @@
         "options": "Seçenekler",
         "liveBtn": "Canlı",
         "live": "Canlı",
-        "timeshift": "Gecikmeli"
+        "timeshift": "Gecikmeli",
+        "switchingQuality": "Daha düşük kaliteye geçiş"
     },
     "subtitleOptions": {
         "title": "Altyazı seçenekleri",
@@ -473,6 +493,56 @@
     },
     "tips": {
         "clickToListen": "🔊 Dinlemek için tıklayın",
-        "subtitleHint": "Devre dışı bırakmak için tıklayın, değiştirmek için tekrar tıklayın"
+        "subtitleHint": "Devre dışı bırakmak için tıklayın, değiştirmek için tekrar tıklayın",
+        "qualityHint": "Çözünürlüğü değiştirmek için tıklayın",
+        "favoriteHint": "Listeme ekle",
+        "downloadHint": "Freebox'a indir",
+        "downloadSeasonHint": "Sezonu Freebox'a indir"
+    },
+    "diagnostic": {
+        "title": "Bağlantı sorunu",
+        "close": "Kapat",
+        "fix": "Otomatik düzelt",
+        "fixProtocol": "Protokolü düzelt",
+        "fixDisableProxy": "Proxy'yi devre dışı bırak",
+        "noInternet": "İnternet bağlantısı algılanmadı.",
+        "dnsFailure": "{host} için DNS çözümlemesi başarısız. Yönlendiricinizde DNS'i 1.1.1.1 veya 8.8.8.8 olarak ayarlayın.",
+        "mixedContent": "Sağlayıcınız HTTP kullanıyor ancak uygulama HTTPS üzerinden yüklendi; tarayıcı isteği engelliyor. Android APK'yı kurun veya sağlayıcınızdan HTTPS URL isteyin.",
+        "shouldBeHttps": "Sağlayıcınız HTTP değil HTTPS kullanıyor. Bunu otomatik olarak düzeltebilirsiniz.",
+        "shouldBeHttp": "Sağlayıcınız HTTPS değil HTTP kullanıyor. Bunu otomatik olarak düzeltebilirsiniz.",
+        "proxyBroken": "CORS proxy'niz yanıt vermiyor ancak sağlayıcıya doğrudan erişilebiliyor. Proxy'yi otomatik olarak devre dışı bırakabilirsiniz.",
+        "endpointSlow": "Sağlayıcıya erişilebiliyor ancak bu endpoint zaman aşımına uğradı. Sunucu aşırı yüklü olabilir, daha sonra tekrar deneyin.",
+        "serverUnreachable": "Sağlayıcı sunucusuna erişilemiyor. İSS'niz engelliyor olabilir veya sunucu kapalı. Bir VPN yardımcı olabilir.",
+        "invalidUrl": "Sağlayıcı URL'si geçersiz.",
+        "unknown": "Bilinmeyen ağ sorunu.",
+        "stepInternet": "İnternet",
+        "stepDns": "DNS",
+        "stepDirect": "Doğrudan bağlantı",
+        "stepSwapped": "Alternatif protokol",
+        "stepNoProxy": "Proxy olmadan",
+        "invalidCredentials": "Kullanıcı adınız veya şifreniz geçersiz, ya da aboneliğiniz sona erdi. Düzeltmek için oynatma listesini düzenleyin.",
+        "fixEditPlaylist": "Oynatma listesini düzenle",
+        "serverError": "Sağlayıcı sunucusu bir hata döndürdü (HTTP {status}). Sunucu aşırı yüklü veya arızalı. Daha sonra tekrar deneyin.",
+        "clientError": "Sağlayıcı sunucusu isteği reddetti (HTTP {status}). URL veya kimlik bilgileri yanlış olabilir.",
+        "stepProvider": "Sağlayıcı"
+    },
+    "apkUpdate": {
+        "title": "Güncelleme mevcut",
+        "message": "Uygulamanın yeni bir sürümü mevcut (yapı {remote}). Şimdi yüklensin mi?",
+        "install": "Yükle",
+        "later": "Daha sonra",
+        "downloading": "Güncelleme indiriliyor... %{percent}",
+        "downloadError": "İndirme başarısız: {msg}",
+        "permissionTitle": "İzin gerekli",
+        "permissionNeeded": "Android, bu uygulamadan yüklemeye izin vermenizi gerektirir. İzin vermek için ayarları açın ve tekrar deneyin.",
+        "openSettings": "Ayarları aç"
+    },
+    "webUpdate": {
+        "title": "Güncelleme hazır",
+        "message": "Uygulamanın yeni bir sürümü hazır. Güncellemeyi uygulamak için şimdi yeniden yüklensin mi?",
+        "reload": "Yeniden yükle",
+        "later": "Daha sonra",
+        "checking": "Güncellemeler kontrol ediliyor...",
+        "upToDate": "Güncelsiniz"
     }
 }

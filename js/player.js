@@ -29,6 +29,7 @@ class TVPlayer {
         this.freezeCheckInterval = null;
         this.lastCheckedTime = 0;
         this.freezeCheckCount = 0;
+        this.bufferingStartTime = 0;
         // Playback speed
         this.playbackSpeed = 1;
         // Display mode: 'auto', 'letterbox', 'stretch', 'zoom'
@@ -39,6 +40,29 @@ class TVPlayer {
 
     setProxyUrl(url) {
         this.proxyUrl = (url || '').trim();
+    }
+
+    setBufferConfig(config) {
+        this.bufferConfig = config;
+        try {
+            if (typeof window.Android !== 'undefined' && window.Android && typeof window.Android.setBufferConfig === 'function') {
+                window.Android.setBufferConfig(config.play, config.rebuffer, config.min, config.max);
+            }
+        }
+        catch (ex) { /* ignore */ }
+    }
+
+    _applyAvplayBuffering() {
+        if (typeof webapis === 'undefined' || !webapis.avplay) return;
+        if (!this.bufferConfig) return;
+        try {
+            webapis.avplay.setBufferingParam('PLAYER_BUFFER_FOR_PLAY', 'PLAYER_BUFFER_TIME', this.bufferConfig.play);
+            webapis.avplay.setBufferingParam('PLAYER_BUFFER_FOR_RESUME', 'PLAYER_BUFFER_TIME', this.bufferConfig.rebuffer);
+            window.log('PLAYER', 'Buffering set: play=' + this.bufferConfig.play + 's resume=' + this.bufferConfig.rebuffer + 's');
+        }
+        catch (ex) {
+            window.log('ERROR', 'setBufferingParam failed: ' + (ex.message || ex));
+        }
     }
 
     init() {
@@ -139,35 +163,118 @@ class TVPlayer {
         catch (ex) { /* cleanup - ignore errors */ }
     }
 
+    _getAvplayDiag() {
+        if (this.useHtml5 || typeof webapis === 'undefined' || !webapis.avplay) return '';
+        var props = ['GET_LIVE_DURATION', 'CURRENT_BANDWIDTH', 'BUFFER_SIZE', 'COMPLETED_RANGE'];
+        var out = [];
+        for (var i = 0; i < props.length; i++) {
+            try {
+                var v = webapis.avplay.getStreamingProperty(props[i]);
+                out.push(props[i] + '=' + v);
+            }
+            catch (ex) {
+                out.push(props[i] + '=ERR');
+            }
+        }
+        try { out.push('dur=' + webapis.avplay.getDuration()); } catch (ex) {}
+        return out.join(' ');
+    }
+
+    _getAvplayBandwidth() {
+        if (this.useHtml5 || typeof webapis === 'undefined' || !webapis.avplay) return -1;
+        try {
+            var v = webapis.avplay.getStreamingProperty('CURRENT_BANDWIDTH');
+            return parseInt(v, 10) || 0;
+        }
+        catch (ex) { return -1; }
+    }
+
+    getBandwidth() {
+        if (typeof window.Android !== 'undefined' && window.Android && typeof window.Android.getBandwidth === 'function') {
+            try {
+                var v = window.Android.getBandwidth();
+                return parseInt(v, 10) || 0;
+            }
+            catch (ex) { return -1; }
+        }
+        return this._getAvplayBandwidth();
+    }
+
     _startFreezeDetection() {
         var self = this;
         this._stopFreezeDetection();
         if (!this.isLiveStream) return;
         this.lastCheckedTime = this.currentTime;
         this.freezeCheckCount = 0;
-        // Check every 2 seconds if currentTime is advancing
+        this.lastBufferPercent = -1;
+        this.bufferStaleCount = 0;
+        this.lastBandwidth = -1;
+        this.bandwidthStaleCount = 0;
+        // Check every 2 seconds: buffer progress (when buffering) OR currentTime progress
         this.freezeCheckInterval = setInterval(function() {
-            if (!self.isPlaying || self.isPaused || self.isBuffering) {
+            if (!self.isPlaying || self.isPaused) {
                 self.lastCheckedTime = self.currentTime;
                 self.freezeCheckCount = 0;
+                self.lastBufferPercent = -1;
+                self.bufferStaleCount = 0;
                 return;
             }
+            // Stuck buffering: trigger only if buffer percent does not advance for 3 checks (6s)
+            if (self.isBuffering) {
+                var p = self.lastBufferPercentSeen;
+                if (p === undefined) p = -1;
+                if (p === self.lastBufferPercent) {
+                    self.bufferStaleCount++;
+                    window.log('PLAYER', 'Buffering stalled (' + self.bufferStaleCount + '/3) percent=' + p + ' [' + self._getAvplayDiag() + ']');
+                    if (self.bufferStaleCount >= 3) {
+                        window.log('ERROR', 'Player stuck buffering (no progress), triggering recovery');
+                        self.bufferStaleCount = 0;
+                        self.lastBufferPercent = -1;
+                        if (self.onFrozen) {
+                            self.onFrozen();
+                        }
+                    }
+                }
+                else {
+                    self.bufferStaleCount = 0;
+                    self.lastBufferPercent = p;
+                }
+                return;
+            }
+            self.lastBufferPercent = -1;
+            self.bufferStaleCount = 0;
             var currentTime = self.currentTime;
-            // For AVPlay, get current time directly
             if (!self.useHtml5 && typeof webapis !== 'undefined' && webapis.avplay) {
                 try {
                     currentTime = webapis.avplay.getCurrentTime();
                 }
                 catch (ex) { /* player may not be ready */ }
             }
-            // Check if time has advanced (at least 500ms in 2 seconds)
-            var timeDiff = Math.abs(currentTime - self.lastCheckedTime);
+            var timeDiff = currentTime - self.lastCheckedTime;
+            var bw = self._getAvplayBandwidth();
+            window.log('PLAYER', 'Heartbeat: dt=' + timeDiff + 'ms ct=' + currentTime + ' bw=' + bw + ' bwStale=' + self.bandwidthStaleCount + ' tStale=' + self.freezeCheckCount);
+            // Bandwidth-based freeze detection (catches frozen video where AVPlay clock keeps ticking)
+            if (bw > 0 && bw === self.lastBandwidth) {
+                self.bandwidthStaleCount++;
+                if (self.bandwidthStaleCount >= 2) {
+                    window.log('ERROR', 'Player frozen (bandwidth stale at ' + bw + '), triggering recovery');
+                    self.bandwidthStaleCount = 0;
+                    self.freezeCheckCount = 0;
+                    if (self.onFrozen) {
+                        self.onFrozen();
+                    }
+                    return;
+                }
+            }
+            else if (bw > 0) {
+                self.bandwidthStaleCount = 0;
+            }
+            self.lastBandwidth = bw;
+            // Time-based freeze detection (fallback for when bandwidth signal isn't available)
             if (timeDiff < 500) {
                 self.freezeCheckCount++;
-                window.log('PLAYER', 'Freeze check: time not advancing (' + self.freezeCheckCount + '/3)');
-                // After 3 consecutive checks (6 seconds), consider frozen
                 if (self.freezeCheckCount >= 3) {
-                    window.log('ERROR', 'Player frozen detected, triggering recovery');
+                    window.log('ERROR', 'Player frozen (time not advancing), triggering recovery');
                     self.freezeCheckCount = 0;
                     if (self.onFrozen) {
                         self.onFrozen();
@@ -187,6 +294,7 @@ class TVPlayer {
             this.freezeCheckInterval = null;
         }
         this.freezeCheckCount = 0;
+        this.bufferingStartTime = 0;
     }
 
     _updatePlayerTypeIndicator() {
@@ -198,7 +306,8 @@ class TVPlayer {
             indicator.classList.add('html5');
         }
         else {
-            indicator.textContent = 'AVPlay';
+            var isAndroid = typeof Android !== 'undefined' && Android;
+            indicator.textContent = isAndroid ? 'ExoPlayer' : 'AVPlay';
             indicator.classList.add('native');
         }
     }
@@ -343,6 +452,7 @@ class TVPlayer {
             webapis.avplay.setDisplayRect(0, 0, 1920, 1080);
             webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_LETTER_BOX');
             webapis.avplay.setTimeoutForBuffering(30000);
+            this._applyAvplayBuffering();
             webapis.avplay.setListener(this._getListeners());
             window.log('PLAYER', 'AVPlay.prepareAsync...');
             webapis.avplay.prepareAsync(() => {
@@ -399,6 +509,7 @@ class TVPlayer {
             webapis.avplay.setDisplayRect(0, 0, 1920, 1080);
             webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_LETTER_BOX');
             webapis.avplay.setTimeoutForBuffering(30000);
+            this._applyAvplayBuffering();
             webapis.avplay.setListener(this._getListeners());
             webapis.avplay.prepareAsync(() => {
                 window.log('PLAYER', 'playNative prepareAsync done, will seek to ' + formatMs(this.startPosition) + ' after play');
@@ -473,12 +584,14 @@ class TVPlayer {
         };
         this.videoElement.onwaiting = function() {
             self.isBuffering = true;
+            self.lastBufferPercentSeen = -1;
             if (self.onStateChange) self.onStateChange('buffering');
             if (!self._bufferTimer) {
                 self._bufferStart = Date.now();
                 self._bufferTimer = setInterval(function() {
                     var elapsed = (Date.now() - self._bufferStart) / 1000;
                     var percent = Math.min(95, Math.round((1 - Math.exp(-elapsed / 8)) * 100));
+                    self.lastBufferPercentSeen = percent;
                     if (self.onBufferProgress) self.onBufferProgress(percent);
                 }, 500);
             }
@@ -736,12 +849,14 @@ class TVPlayer {
         return {
             onbufferingstart: () => {
                 this.isBuffering = true;
+                this.lastBufferPercentSeen = -1;
                 var pos = 0;
                 try { pos = webapis.avplay.getCurrentTime(); } catch (e) {}
                 window.log('PLAYER', 'Buffering started at ' + formatMs(pos));
                 if (this.onStateChange) this.onStateChange('buffering');
             },
             onbufferingprogress: (percent) => {
+                this.lastBufferPercentSeen = percent;
                 if (this.onBufferProgress) this.onBufferProgress(percent);
             },
             onbufferingcomplete: () => {

@@ -116,8 +116,6 @@
         "minThreshold": "الحد الأدنى",
         "watchedThreshold": "حد المشاهدة",
         "retention": "الاحتفاظ",
-        "unitMinutes": "دقائق",
-        "unitWeeks": "أسابيع",
         "historyMaxItems": "الحد الأقصى للسجل",
         "focusOnCategories": "التركيز على الفئات",
         "textSize": "حجم النص",
@@ -207,6 +205,7 @@
         "freeboxPair": "إقران",
         "freeboxUnpair": "إلغاء الإقران",
         "freeboxPaired": "مقترن",
+        "freeboxPairedNoApi": "مقترن (API غير متصل)",
         "freeboxNotPaired": "غير مقترن",
         "freeboxDesc": "تحميل محتوى VOD على Freebox",
         "proxyRequired": "مطلوب بروكسي",
@@ -232,7 +231,27 @@
         "progressCleared": "تم مسح التقدم",
         "favoritesCleared": "تم مسح القائمة",
         "tmdbCacheCleared": "تم مسح ذاكرة TMDB",
-        "textXXLarge": "الأقصى"
+        "textXXLarge": "الأقصى",
+        "checkUpdates": "التحقق من التحديثات",
+        "installUpdate": "تثبيت التحديث",
+        "privacyPolicy": "سياسة الخصوصية",
+        "buffer": "مخزن الفيديو المؤقت",
+        "bufferMode": "الوضع",
+        "bufferLow": "منخفض",
+        "bufferStandard": "قياسي",
+        "bufferHigh": "عالي",
+        "bufferMax": "الحد الأقصى",
+        "bufferCustom": "متقدم",
+        "bufferPlay": "البدء",
+        "bufferRebuffer": "الاستئناف",
+        "bufferMin": "الحد الأدنى",
+        "bufferMaxLabel": "الحد الأقصى",
+        "unitMinutes_one": "دقيقة واحدة",
+        "unitMinutes_other": "{n} دقائق",
+        "unitWeeks_one": "أسبوع واحد",
+        "unitWeeks_other": "{n} أسابيع",
+        "unitSeconds_one": "ثانية واحدة",
+        "unitSeconds_other": "{n} ثوانٍ"
     },
     "player": {
         "play": "تشغيل",
@@ -271,7 +290,8 @@
         "options": "خيارات",
         "liveBtn": "مباشر",
         "live": "مباشر",
-        "timeshift": "مؤجل"
+        "timeshift": "مؤجل",
+        "switchingQuality": "التبديل إلى جودة أقل"
     },
     "subtitleOptions": {
         "title": "خيارات الترجمة",
@@ -475,6 +495,56 @@
     },
     "tips": {
         "clickToListen": "🔊 انقر للاستماع",
-        "subtitleHint": "انقر للتعطيل، انقر مرة أخرى للتغيير"
+        "subtitleHint": "انقر للتعطيل، انقر مرة أخرى للتغيير",
+        "qualityHint": "انقر لتغيير الدقة",
+        "favoriteHint": "إضافة إلى قائمتي",
+        "downloadHint": "تنزيل إلى Freebox",
+        "downloadSeasonHint": "تحميل الموسم إلى Freebox"
+    },
+    "diagnostic": {
+        "title": "مشكلة في الاتصال",
+        "close": "إغلاق",
+        "fix": "إصلاح تلقائي",
+        "fixProtocol": "تصحيح البروتوكول",
+        "fixDisableProxy": "تعطيل البروكسي",
+        "noInternet": "لم يتم اكتشاف اتصال بالإنترنت.",
+        "dnsFailure": "فشل تحليل DNS لـ {host}. اضبط DNS على 1.1.1.1 أو 8.8.8.8 في جهاز التوجيه الخاص بك.",
+        "mixedContent": "يستخدم مزودك HTTP لكن التطبيق تم تحميله عبر HTTPS؛ المتصفح يحظر الطلب. ثبّت APK أندرويد أو اطلب من مزودك عنوان HTTPS.",
+        "shouldBeHttps": "يستخدم مزودك HTTPS وليس HTTP. يمكنك إصلاح ذلك تلقائيًا.",
+        "shouldBeHttp": "يستخدم مزودك HTTP وليس HTTPS. يمكنك إصلاح ذلك تلقائيًا.",
+        "proxyBroken": "بروكسي CORS الخاص بك لا يستجيب لكن المزود يمكن الوصول إليه مباشرة. يمكنك تعطيل البروكسي تلقائيًا.",
+        "endpointSlow": "المزود متاح لكن هذه النقطة انتهت مهلتها. قد يكون الخادم محملاً، حاول لاحقًا.",
+        "serverUnreachable": "خادم المزود غير قابل للوصول. قد يحظره مزود خدمة الإنترنت لديك، أو أن الخادم معطل. قد تساعد VPN.",
+        "invalidUrl": "عنوان URL للمزود غير صالح.",
+        "unknown": "مشكلة شبكة غير معروفة.",
+        "stepInternet": "الإنترنت",
+        "stepDns": "DNS",
+        "stepDirect": "اتصال مباشر",
+        "stepSwapped": "بروتوكول بديل",
+        "stepNoProxy": "بدون بروكسي",
+        "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة، أو انتهى اشتراكك. قم بتحرير قائمة التشغيل لإصلاح ذلك.",
+        "fixEditPlaylist": "تعديل قائمة التشغيل",
+        "serverError": "أرجع خادم المزود خطأ (HTTP {status}). الخادم محمل بشكل زائد أو معطل. حاول لاحقًا.",
+        "clientError": "رفض خادم المزود الطلب (HTTP {status}). قد يكون عنوان URL أو بيانات الاعتماد غير صحيحة.",
+        "stepProvider": "المزود"
+    },
+    "apkUpdate": {
+        "title": "تحديث متاح",
+        "message": "تتوفر إصدار جديد من التطبيق (بناء {remote}). تثبيت الآن؟",
+        "install": "تثبيت",
+        "later": "لاحقًا",
+        "downloading": "تنزيل التحديث... {percent}%",
+        "downloadError": "فشل التنزيل: {msg}",
+        "permissionTitle": "الإذن مطلوب",
+        "permissionNeeded": "يتطلب أندرويد السماح بالتثبيت من هذا التطبيق. افتح الإعدادات لمنح الإذن ثم حاول مرة أخرى.",
+        "openSettings": "فتح الإعدادات"
+    },
+    "webUpdate": {
+        "title": "التحديث جاهز",
+        "message": "إصدار جديد من التطبيق جاهز. إعادة التحميل الآن لتطبيق التحديث؟",
+        "reload": "إعادة تحميل",
+        "later": "لاحقًا",
+        "checking": "جارٍ التحقق من التحديثات...",
+        "upToDate": "أنت محدث"
     }
 }

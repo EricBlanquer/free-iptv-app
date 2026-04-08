@@ -384,6 +384,10 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     document.getElementById('player-duration').style.display = isLive ? 'none' : '';
     var posterUrl = stream ? this.getStreamImage(stream) : null;
     this.showLoading(true, posterUrl, I18n.t('loading.playback', 'Starting playback...'));
+    clearTimeout(this._detailsTooltipTimer);
+    clearTimeout(this._seasonTooltipTimer);
+    this.hideAllButtonTooltips();
+    this.hideTTSTooltip();
     this.showScreen('player');
     this.currentScreen = 'player';
     this.focusArea = 'player';
@@ -395,6 +399,12 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             self.isBuffering = true;
             self.updatePlayerStateIndicator();
             self.showPlayerOverlay();
+            // Re-check after 1.1s to display the small bottom-right indicator if still buffering
+            if (self.streamReady) {
+                setTimeout(function() {
+                    if (self.isBuffering) self.updatePlayerStateIndicator();
+                }, 1100);
+            }
         }
         else if (state === 'playing') {
             self.streamReady = true;
@@ -493,6 +503,12 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
         }
         self.updatePlayerProgress(current, total);
         self.displayExternalSubtitle(current);
+        // Throttle bandwidth display update to ~1Hz
+        var nowMs = Date.now();
+        if (!self._lastBandwidthUpdate || nowMs - self._lastBandwidthUpdate > 1000) {
+            self._lastBandwidthUpdate = nowMs;
+            self.updateBandwidthDisplay();
+        }
         if (stream && type !== 'live') {
             self.updateWatchPosition(stream, type, current);
             if (type === 'episode' || type === 'series') {
@@ -642,16 +658,44 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
         self.bufferPercent = percent;
         self.updatePlayerStateIndicator();
     };
-    // Auto-restart on freeze for live streams
+    // Compute lower-quality variants for live channel (used as freeze fallback)
+    if (type === 'live' && stream) {
+        self._liveVariants = self.findLiveVariants(stream);
+        window.log('PLAYER', 'Live variants for ' + self.getStreamTitle(stream) + ': ' + self._liveVariants.length);
+    }
+    else {
+        self._liveVariants = [];
+    }
+    if (this.player.setBufferConfig) {
+        this.player.setBufferConfig(this.getBufferConfig());
+    }
+    // Auto-restart on freeze for live streams (try lower-quality variant first)
     this.player.onFrozen = function() {
-        if (type === 'live') {
-            window.log('PLAYER', 'Live stream frozen, restarting playback...');
-            self.showToast(I18n.t('player.reconnecting', 'Reconnecting...'));
+        if (type !== 'live') return;
+        window.log('PLAYER', 'Live stream frozen');
+        if (self._liveVariants && self._liveVariants.length > 0) {
+            var nextVariant = self._liveVariants.shift();
+            var variantName = self.getStreamTitle(nextVariant);
+            var ext = nextVariant.container_extension || self.settings.liveFormat || 'ts';
+            var newUrl = apiToUse.getLiveStreamUrl(nextVariant.stream_id, ext);
+            window.log('PLAYER', 'Switching to lower-quality variant: ' + variantName + ' -> ' + newUrl);
+            self.showToast(I18n.t('player.switchingQuality', 'Switching quality') + ': ' + variantName);
+            self.currentPlayingStream = nextVariant;
+            url = newUrl;
+            var titleTextEl = document.getElementById('player-title-text');
+            if (titleTextEl) titleTextEl.textContent = variantName;
             self.player.stop();
             setTimeout(function() {
-                self.player.play(url, true);
-            }, 1000);
+                self.player.play(newUrl, true);
+            }, 300);
+            return;
         }
+        window.log('PLAYER', 'No variants left, restarting same stream');
+        self.showToast(I18n.t('player.reconnecting', 'Reconnecting...'));
+        self.player.stop();
+        setTimeout(function() {
+            self.player.play(url, true);
+        }, 300);
     };
     this.player.play(url, type === 'live', startPosition || 0);
     // Load EPG for live streams
@@ -753,6 +797,19 @@ IPTVApp.prototype.stopPlayback = function() {
         this.showScreen('details');
         this.currentScreen = 'details';
         this.focusArea = 'details';
+        var selfTip = this;
+        this._detailsTooltipTimer = setTimeout(function() {
+            if (selfTip.currentScreen !== 'details') return;
+            selfTip.showButtonTooltip('favorite-btn', 'favoriteTooltipShown', I18n.t('tips.favoriteHint', 'Add to your list'), 'bottom');
+            var dlBtn = document.getElementById('download-btn');
+            if (dlBtn && !dlBtn.classList.contains('hidden')) {
+                selfTip.showButtonTooltip('download-btn', 'downloadTooltipShown', I18n.t('tips.downloadHint', 'Download to Freebox'), 'top');
+            }
+            var dlSeasonBtn = document.getElementById('download-season-btn');
+            if (dlSeasonBtn) {
+                selfTip.showButtonTooltip('download-season-btn', 'downloadSeasonTooltipShown', I18n.t('tips.downloadSeasonHint', 'Download season to Freebox'), 'top');
+            }
+        }, 1000);
         if (isSeries && this.currentSeason) {
             this.selectSeason(this.currentSeason);
         }
@@ -1046,22 +1103,31 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
     var bufferEl = document.getElementById('buffer-indicator');
     var liveBufferEl = document.getElementById('player-buffer');
     if (!stateEl) return;
-    // Buffer indicator (centered on screen, compact when speed > 1x)
+    // Buffer indicator:
+    //  - Initial load (before first playback): centered, large (default style)
+    //  - Mid-playback rebuffer (>1s frozen): small at bottom-right
+    //  - Otherwise: hidden
     var isSpeedUp = this.player && this.player.playbackSpeed > 1;
-    bufferEl.classList.toggle('compact', isSpeedUp);
-    var showBuffer = (this.bufferPercent !== undefined && this.bufferPercent < 100) || this.isBuffering;
-    if (showBuffer && !this.isBuffering && this.player && this.player.isPlaying && !this.player.isPaused) {
-        if (!this._bufferStaleStart) {
-            this._bufferStaleStart = Date.now();
-        } else if (Date.now() - this._bufferStaleStart > 2000) {
-            this.bufferPercent = undefined;
-            this._bufferStaleStart = 0;
-            showBuffer = false;
-            window.log('PLAYER', 'Buffer indicator forced hidden (playing normally for 2s)');
-        }
-    } else {
-        this._bufferStaleStart = 0;
+    var hasStarted = !!this.streamReady;
+    var compactBR = false;
+    var showBuffer = false;
+    if (!hasStarted) {
+        showBuffer = (this.bufferPercent !== undefined && this.bufferPercent < 100) || this.isBuffering;
     }
+    else if (this.isBuffering) {
+        if (!this._rebufferStartTime) {
+            this._rebufferStartTime = Date.now();
+        }
+        if (Date.now() - this._rebufferStartTime >= 1000) {
+            showBuffer = true;
+            compactBR = true;
+        }
+    }
+    else {
+        this._rebufferStartTime = 0;
+    }
+    bufferEl.classList.toggle('compact', isSpeedUp && !compactBR);
+    bufferEl.classList.toggle('compact-br', compactBR);
     if (showBuffer) {
         // Preserve hourglass span to avoid resetting CSS animation
         var hourglassSpan = bufferEl.querySelector('.hourglass');
@@ -1108,6 +1174,7 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
     var durationEl = document.getElementById('player-duration');
     if (formatBtnEl) this.setHidden(formatBtnEl, !isLive);
     if (formatLabelEl) formatLabelEl.textContent = (this.settings.liveFormat || 'ts').toUpperCase();
+    this.updateLiveVariantButton();
     if (isLive) {
         // Hide progress row for live (status shown in tracks)
         var progressRowEl = document.getElementById('player-progress-row');
@@ -1259,6 +1326,7 @@ IPTVApp.prototype.showPlayerOverlay = function(extendedDelay) {
     if (!isBuffering && !isInTracksModal) {
         this.overlayTimer = setTimeout(function() {
             self.hideSubtitleTooltip();
+            self.hideQualityTooltip();
             self.setHidden(overlay, true);
             self.setHidden(titleEl, true);
             if (topRightEl) self.setHidden(topRightEl, true);
@@ -1597,6 +1665,121 @@ IPTVApp.prototype.hideSubtitleTooltip = function() {
     }
 };
 
+IPTVApp.prototype.showQualityTooltip = function() {
+    try {
+        if (localStorage.getItem('qualityTooltipShown')) {
+            window.log('TIP', 'qualityTooltip skipped (already shown)');
+            return;
+        }
+    }
+    catch (ex) { return; }
+    var qBtn = document.getElementById('player-quality-btn');
+    if (!qBtn || qBtn.classList.contains('hidden')) {
+        window.log('TIP', 'qualityTooltip skipped (btn hidden=' + (qBtn ? qBtn.classList.contains('hidden') : 'noBtn') + ')');
+        return;
+    }
+    this.hideQualityTooltip();
+    var tooltip = document.createElement('div');
+    tooltip.className = 'tts-tooltip';
+    tooltip.id = 'quality-tooltip';
+    tooltip.textContent = I18n.t('tips.qualityHint', 'Click to switch resolution');
+    tooltip.style.position = 'fixed';
+    document.body.appendChild(tooltip);
+    this._qualityTooltip = tooltip;
+    var ARROW_OFFSET_FROM_RIGHT = 30;
+    var updatePos = function() {
+        var b = document.getElementById('player-quality-btn');
+        if (!b || b.classList.contains('hidden')) return;
+        var rect = b.getBoundingClientRect();
+        tooltip.style.top = (rect.top - 55) + 'px';
+        tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth + ARROW_OFFSET_FROM_RIGHT) + 'px';
+    };
+    updatePos();
+    this._qualityTooltipPosTimer = setInterval(updatePos, 100);
+    window.log('TIP', 'qualityTooltip shown');
+    setTimeout(function() { tooltip.classList.add('visible'); }, 300);
+};
+
+IPTVApp.prototype.hideQualityTooltip = function(persistDismissed) {
+    if (this._qualityTooltipPosTimer) {
+        clearInterval(this._qualityTooltipPosTimer);
+        this._qualityTooltipPosTimer = null;
+    }
+    if (this._qualityTooltip) {
+        this._qualityTooltip.remove();
+        this._qualityTooltip = null;
+    }
+    if (persistDismissed) {
+        try { localStorage.setItem('qualityTooltipShown', '1'); }
+        catch (ex) { /* ignore */ }
+    }
+};
+
+IPTVApp.prototype.showButtonTooltip = function(buttonId, storageKey, message, placement) {
+    try {
+        if (localStorage.getItem(storageKey)) return;
+    }
+    catch (ex) { return; }
+    var btn = document.getElementById(buttonId);
+    if (!btn || btn.classList.contains('hidden')) return;
+    if (!this._buttonTooltipStorageKeys) this._buttonTooltipStorageKeys = {};
+    this._buttonTooltipStorageKeys[buttonId] = storageKey;
+    this.hideButtonTooltip(buttonId);
+    var below = placement === 'bottom';
+    var tooltip = document.createElement('div');
+    tooltip.className = 'tts-tooltip' + (below ? ' below' : '');
+    tooltip.textContent = message;
+    tooltip.style.position = 'fixed';
+    document.body.appendChild(tooltip);
+    if (!this._buttonTooltips) this._buttonTooltips = {};
+    // Arrow tip is at right:30px + 10px (offset from element edge to triangle apex)
+    var ARROW_CENTER_FROM_RIGHT = 40;
+    var MIN_TOP = 10;
+    var updatePos = function() {
+        var b = document.getElementById(buttonId);
+        if (!b || b.classList.contains('hidden')) return;
+        var r = b.getBoundingClientRect();
+        var top;
+        if (below) {
+            top = r.bottom + 15;
+        }
+        else {
+            top = r.top - tooltip.offsetHeight - 15;
+            if (top < MIN_TOP) top = MIN_TOP;
+        }
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = (r.left + r.width / 2 - tooltip.offsetWidth + ARROW_CENTER_FROM_RIGHT) + 'px';
+    };
+    updatePos();
+    var posTimer = setInterval(updatePos, 100);
+    this._buttonTooltips[buttonId] = { el: tooltip, posTimer: posTimer, storageKey: storageKey, below: below };
+    setTimeout(function() { tooltip.classList.add('visible'); }, 300);
+};
+
+IPTVApp.prototype.hideButtonTooltip = function(buttonId, persistDismissed) {
+    var t = this._buttonTooltips && this._buttonTooltips[buttonId];
+    if (t) {
+        if (t.posTimer) clearInterval(t.posTimer);
+        if (t.el) t.el.remove();
+        delete this._buttonTooltips[buttonId];
+    }
+    if (persistDismissed) {
+        var key = this._buttonTooltipStorageKeys && this._buttonTooltipStorageKeys[buttonId];
+        if (key) {
+            try { localStorage.setItem(key, '1'); }
+            catch (ex) { /* ignore */ }
+        }
+    }
+};
+
+IPTVApp.prototype.hideAllButtonTooltips = function() {
+    if (!this._buttonTooltips) return;
+    var keys = Object.keys(this._buttonTooltips);
+    for (var i = 0; i < keys.length; i++) {
+        this.hideButtonTooltip(keys[i]);
+    }
+};
+
 IPTVApp.prototype.unfocusPlayerTracks = function(hideOverlay) {
     this.playerTracksFocused = false;
     document.querySelectorAll('.player-track-btn').forEach(function(el) {
@@ -1734,6 +1917,10 @@ IPTVApp.prototype.selectPlayerTrack = function() {
     else if (btn.id === 'player-format-btn') {
         this.toggleLiveFormat();
     }
+    else if (btn.id === 'player-quality-btn') {
+        this.hideQualityTooltip(true);
+        this.cycleLiveVariant();
+    }
     else if (btn.id === 'player-speed-btn') {
         this.cyclePlaybackSpeed();
     }
@@ -1774,6 +1961,83 @@ IPTVApp.prototype.updateSpeedLabel = function() {
     }
 };
 
+IPTVApp.prototype.cycleLiveVariant = function() {
+    var stream = this.currentPlayingStream;
+    if (!stream) return;
+    var variants = this._variantsCache && this._variantsCacheKey === (stream.stream_id + '_' + (stream._playlistId || ''))
+        ? this._variantsCache
+        : this.findAllLiveVariants(stream);
+    if (variants.length <= 1) return;
+    var currentIdx = -1;
+    for (var i = 0; i < variants.length; i++) {
+        if (variants[i].stream_id === stream.stream_id && variants[i]._playlistId === stream._playlistId) {
+            currentIdx = i;
+            break;
+        }
+    }
+    var nextIdx = (currentIdx + 1) % variants.length;
+    var next = variants[nextIdx];
+    var nextName = this.getStreamTitle(next);
+    window.log('ACTION', 'cycleLiveVariant: ' + this.getStreamTitle(stream) + ' -> ' + nextName);
+    this.showToast(nextName, 2000);
+    this.playStream(next.stream_id, 'live', next);
+    var self = this;
+    setTimeout(function() {
+        if (self.currentScreen === 'player') self.showPlayerOverlay();
+    }, 500);
+};
+
+IPTVApp.prototype.updateBandwidthDisplay = function() {
+    var el = document.getElementById('player-bandwidth');
+    if (!el) return;
+    if (!this.player || !this.player.getBandwidth) {
+        el.textContent = '';
+        return;
+    }
+    var bps = this.player.getBandwidth();
+    if (!bps || bps <= 0) {
+        el.textContent = '';
+        return;
+    }
+    var label;
+    if (bps >= 1000000) {
+        label = (bps / 1000000).toFixed(1) + ' Mbps';
+    }
+    else {
+        label = Math.round(bps / 1000) + ' kbps';
+    }
+    el.textContent = label;
+};
+
+IPTVApp.prototype.updateLiveVariantButton = function() {
+    var btn = document.getElementById('player-quality-btn');
+    var label = document.getElementById('player-quality-label');
+    if (!btn || !label) return;
+    var stream = this.currentPlayingStream;
+    var isLive = this.currentPlayingType === 'live';
+    if (!isLive || !stream) {
+        this.setHidden(btn, true);
+        return;
+    }
+    var cacheKey = stream.stream_id + '_' + (stream._playlistId || '');
+    if (this._variantsCacheKey !== cacheKey) {
+        this._variantsCacheKey = cacheKey;
+        this._variantsCache = this.findAllLiveVariants(stream);
+    }
+    if (!this._variantsCache || this._variantsCache.length <= 1) {
+        this.setHidden(btn, true);
+        return;
+    }
+    this.setHidden(btn, false);
+    var tag = this.getLiveQualityTag(this.getStreamTitle(stream));
+    label.textContent = tag || 'AUTO';
+    if (!this._qualityTooltipTriggered) {
+        this._qualityTooltipTriggered = true;
+        var self = this;
+        setTimeout(function() { self.showQualityTooltip(); }, 1000);
+    }
+};
+
 // Display mode cycling: auto -> letterbox -> stretch -> zoom
 IPTVApp.prototype.toggleLiveFormat = function() {
     var current = this.settings.liveFormat || 'ts';
@@ -1788,6 +2052,10 @@ IPTVApp.prototype.toggleLiveFormat = function() {
     if (streamId) {
         this.showToast(next.toUpperCase(), 2000);
         this.playStream(streamId, 'live', stream);
+        var self = this;
+        setTimeout(function() {
+            if (self.currentScreen === 'player') self.showPlayerOverlay();
+        }, 500);
     }
 };
 
@@ -2692,6 +2960,10 @@ IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes
     var streamId = stream.stream_id;
     var url = this.api.getCatchupUrl(streamId, startTimestamp, durationMinutes, extension, formatIndex);
     window.log('Playing catchup format ' + formatIndex + ': ' + url);
+    clearTimeout(this._detailsTooltipTimer);
+    clearTimeout(this._seasonTooltipTimer);
+    this.hideAllButtonTooltips();
+    this.hideTTSTooltip();
     this.showScreen('player');
     this.currentScreen = 'player';
     this.focusArea = 'player';

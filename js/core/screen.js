@@ -40,8 +40,12 @@ IPTVApp.prototype.bindDisclaimerButton = function() {
 };
 
 IPTVApp.prototype.bindTouchEvents = function() {
-    if (!document.body.classList.contains('touch')) return;
     var self = this;
+    document.getElementById('details-wrapper').addEventListener('scroll', function() {
+        if (self.hideAllButtonTooltips) self.hideAllButtonTooltips();
+        if (self.hideTTSTooltip) self.hideTTSTooltip();
+    });
+    if (!document.body.classList.contains('touch')) return;
     var areaMap = [
         { selector: '#player-tracks .player-track-btn', area: 'player-tracks' },
         { selector: '#resume-modal .modal-btn', area: 'modal' },
@@ -84,6 +88,12 @@ IPTVApp.prototype.bindTouchEvents = function() {
         }
         if (isPlayerTap) {
             if (self.currentScreen === 'player') {
+                var overlay = document.getElementById('player-overlay');
+                var overlayVisible = overlay && !overlay.classList.contains('hidden');
+                if (overlayVisible && self.player) {
+                    self.stopSeek && self.stopSeek();
+                    self.player.togglePlayPause();
+                }
                 self.showPlayerOverlay();
                 return;
             }
@@ -188,6 +198,10 @@ IPTVApp.prototype.showScreen = function(screen) {
     this.invalidateFocusables();
     var backBtn = document.getElementById('android-back-btn');
     if (backBtn) backBtn.style.display = (screen === 'player') ? 'none' : 'flex';
+    if (screen !== 'player' && this._webUpdatePending && this._tryApplyWebUpdate) {
+        var self = this;
+        setTimeout(function() { self._tryApplyWebUpdate(); }, 500);
+    }
 };
 
 IPTVApp.prototype.showLoading = function(show, posterUrl, message) {

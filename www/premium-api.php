@@ -16,6 +16,34 @@ if (!is_dir(DATA_DIR)) {
     mkdir(DATA_DIR, 0755, true);
 }
 
+function rateLimitCheck($key, $maxPerMinute) {
+    $file = DATA_DIR . '/.rate_' . md5($key) . '.json';
+    $now = time();
+    $data = file_exists($file) ? json_decode(@file_get_contents($file), true) : [];
+    if (!is_array($data)) $data = [];
+    $data = array_values(array_filter($data, function($t) use ($now) { return $t > $now - 60; }));
+    if (count($data) >= $maxPerMinute) return false;
+    $data[] = $now;
+    @file_put_contents($file, json_encode($data), LOCK_EX);
+    return true;
+}
+
+function purgeInactiveDevices($maxAgeDays = 365) {
+    $cutoff = (time() - $maxAgeDays * 86400) * 1000;
+    foreach (glob(DATA_DIR . '/device_*.json') as $file) {
+        $data = json_decode(@file_get_contents($file), true);
+        if (!$data) continue;
+        if (!empty($data['licenseCode'])) continue;
+        $lastSeen = $data['lastSeen'] ?? $data['installDate'] ?? 0;
+        if ($lastSeen > 0 && $lastSeen < $cutoff) {
+            @unlink($file);
+        }
+    }
+    foreach (glob(DATA_DIR . '/.rate_*.json') as $file) {
+        if (filemtime($file) < time() - 3600) @unlink($file);
+    }
+}
+
 function getClientIp() {
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) return $_SERVER['HTTP_CF_CONNECTING_IP'];
     if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
@@ -25,11 +53,14 @@ function getClientIp() {
 function getGeoLocation($ip) {
     if (!$ip || $ip === '127.0.0.1') return null;
     $ctx = stream_context_create(['http' => ['timeout' => 3]]);
-    $json = @file_get_contents("http://ip-api.com/json/{$ip}?fields=country,city,regionName", false, $ctx);
+    $json = @file_get_contents("http://ip-api.com/json/{$ip}?fields=country,city,regionName,isp", false, $ctx);
     if (!$json) return null;
     $data = json_decode($json, true);
     if (!$data || isset($data['fail'])) return null;
-    return trim(($data['city'] ?? '') . ', ' . ($data['regionName'] ?? '') . ', ' . ($data['country'] ?? ''), ', ');
+    return [
+        'location' => trim(($data['city'] ?? '') . ', ' . ($data['regionName'] ?? '') . ', ' . ($data['country'] ?? ''), ', '),
+        'isp' => $data['isp'] ?? null
+    ];
 }
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -41,7 +72,23 @@ switch ($action) {
         if (strlen($deviceId) < 2) {
             jsonResponse(['error' => 'invalid deviceId'], 400);
         }
+        if (!rateLimitCheck('get_' . getClientIp(), 30)) {
+            jsonResponse(['error' => 'rate_limit'], 429);
+        }
         $data = readJson('device_' . safeFilename($deviceId));
+        if ($data) {
+            $ip = getClientIp();
+            if ($ip) {
+                $data['lastIp'] = $ip;
+                $geo = getGeoLocation($ip);
+                if ($geo) {
+                    $data['location'] = $geo['location'];
+                    $data['isp'] = $geo['isp'];
+                }
+                $data['lastSeen'] = round(microtime(true) * 1000);
+                writeJson('device_' . safeFilename($deviceId), $data);
+            }
+        }
         jsonResponse($data);
         break;
 
@@ -58,7 +105,10 @@ switch ($action) {
         if ($ip) {
             $body['lastIp'] = $ip;
             $geo = getGeoLocation($ip);
-            if ($geo) $body['location'] = $geo;
+            if ($geo) {
+                $body['location'] = $geo['location'];
+                $body['isp'] = $geo['isp'];
+            }
         }
         $body['lastSeen'] = round(microtime(true) * 1000);
         writeJson('device_' . safeFilename($deviceId), $body);
@@ -100,7 +150,10 @@ switch ($action) {
             if ($ip) {
                 $premiumData['lastIp'] = $ip;
                 $geo = getGeoLocation($ip);
-                if ($geo) $premiumData['location'] = $geo;
+                if ($geo) {
+                    $premiumData['location'] = $geo['location'];
+                    $premiumData['isp'] = $geo['isp'];
+                }
             }
             writeJson('device_' . safeFilename($deviceId), $premiumData);
         }
@@ -265,6 +318,7 @@ switch ($action) {
 
     case 'admin-devices':
         requireAdmin();
+        purgeInactiveDevices(365);
         $devices = [];
         foreach (glob(DATA_DIR . '/device_*.json') as $file) {
             $data = json_decode(file_get_contents($file), true);
@@ -275,6 +329,24 @@ switch ($action) {
             }
         }
         jsonResponse(['devices' => $devices]);
+        break;
+
+    case 'admin-device-comment':
+        requirePost();
+        requireAdmin();
+        $body = json_decode(file_get_contents('php://input'), true);
+        $deviceId = isset($body['deviceId']) ? $body['deviceId'] : '';
+        $comment = isset($body['comment']) ? $body['comment'] : '';
+        if (!$deviceId) {
+            jsonResponse(['error' => 'deviceId required'], 400);
+        }
+        $devData = readJson('device_' . safeFilename($deviceId));
+        if (!$devData) {
+            jsonResponse(['error' => 'not found'], 404);
+        }
+        $devData['comment'] = mb_substr($comment, 0, 1000);
+        writeJson('device_' . safeFilename($deviceId), $devData);
+        jsonResponse(['ok' => true]);
         break;
 
     case 'admin-device-delete':

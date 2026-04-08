@@ -184,6 +184,25 @@ IPTVApp.prototype.getStreamProxyUrl = function() {
     return this.settings.proxyUrl;
 };
 
+IPTVApp.prototype.getBufferConfig = function() {
+    var presets = {
+        low:      { play: 1, rebuffer: 2,  min: 5,   max: 10  },
+        standard: { play: 2, rebuffer: 5,  min: 30,  max: 60  },
+        high:     { play: 2, rebuffer: 5,  min: 60,  max: 120 },
+        max:      { play: 3, rebuffer: 8,  min: 120, max: 240 }
+    };
+    var preset = this.settings.bufferPreset || 'standard';
+    if (preset === 'custom') {
+        return {
+            play:     Math.max(1, parseInt(this.settings.bufferPlay, 10) || 2),
+            rebuffer: Math.max(1, parseInt(this.settings.bufferRebuffer, 10) || 5),
+            min:      Math.max(1, parseInt(this.settings.bufferMin, 10) || 30),
+            max:      Math.max(1, parseInt(this.settings.bufferMax, 10) || 60)
+        };
+    }
+    return presets[preset] || presets.standard;
+};
+
 IPTVApp.prototype.proxyImageUrl = function(url) {
     if (!url || !this.getStreamProxyUrl()) return url;
     if (url.indexOf('tmdb.org') !== -1) return url;

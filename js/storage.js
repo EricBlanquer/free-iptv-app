@@ -948,12 +948,21 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
         self.updateCacheInfoDisplay();
         self.renderPlaylistSelector();
         if (self.api && self.api.playlistId === playlistId) {
+            var tagRefresh = function(arr) {
+                if (!arr) return;
+                for (var ti = 0; ti < arr.length; ti++) {
+                    if (!arr[ti]._playlistId) arr[ti]._playlistId = playlistId;
+                }
+            };
             self.api.cache.vodCategories = cacheData.vod.categories;
             self.api.cache.vodStreams['_all'] = cacheData.vod.streams || [];
+            tagRefresh(self.api.cache.vodStreams['_all']);
             self.api.cache.seriesCategories = cacheData.series.categories;
             self.api.cache.series['_all'] = cacheData.series.streams || [];
+            tagRefresh(self.api.cache.series['_all']);
             self.api.cache.liveCategories = cacheData.live.categories;
             self.api.cache.liveStreams['_all'] = cacheData.live.streams || [];
+            tagRefresh(self.api.cache.liveStreams['_all']);
             window.log('Background refresh: updated in-memory cache for ' + playlistId);
             var oldStreamIds = {};
             if (self.currentScreen === 'browse' && self.currentSection && self.currentStreams) {
@@ -1202,7 +1211,12 @@ IPTVApp.prototype.loadSettings = function() {
         freeboxAppToken: '',
         freeboxBatchDownload: true,
         freeboxDownloadViaProxy: false,
-        useGenreCategories: true
+        useGenreCategories: true,
+        bufferPreset: 'standard',
+        bufferPlay: 2,
+        bufferRebuffer: 5,
+        bufferMin: 30,
+        bufferMax: 60
     };
     try {
         var data = localStorage.getItem('settings');
