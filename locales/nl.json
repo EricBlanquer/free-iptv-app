@@ -118,8 +118,6 @@
         "minThreshold": "Minimum drempel",
         "watchedThreshold": "Bekeken drempel",
         "retention": "Bewaring",
-        "unitMinutes": "minuten",
-        "unitWeeks": "weken",
         "historyMaxItems": "Geschiedenis max",
         "focusOnCategories": "Focus op categorieën",
         "textSize": "Tekstgrootte",
@@ -209,6 +207,7 @@
         "freeboxPair": "Koppelen",
         "freeboxUnpair": "Ontkoppelen",
         "freeboxPaired": "Gekoppeld",
+        "freeboxPairedNoApi": "Gekoppeld (API niet verbonden)",
         "freeboxNotPaired": "Niet gekoppeld",
         "freeboxDesc": "VOD-inhoud naar uw Freebox downloaden",
         "proxyRequired": "Proxy vereist",
@@ -234,7 +233,27 @@
         "progressCleared": "Voortgang gewist",
         "favoritesCleared": "Lijst gewist",
         "tmdbCacheCleared": "TMDB-cache gewist",
-        "textXXLarge": "Maximum"
+        "textXXLarge": "Maximum",
+        "checkUpdates": "Controleren op updates",
+        "installUpdate": "Update installeren",
+        "privacyPolicy": "Privacybeleid",
+        "buffer": "Videobuffer",
+        "bufferMode": "Modus",
+        "bufferLow": "Laag",
+        "bufferStandard": "Standaard",
+        "bufferHigh": "Hoog",
+        "bufferMax": "Maximum",
+        "bufferCustom": "Geavanceerd",
+        "bufferPlay": "Start",
+        "bufferRebuffer": "Hervatten",
+        "bufferMin": "Min",
+        "bufferMaxLabel": "Max",
+        "unitMinutes_one": "{n} minuut",
+        "unitMinutes_other": "{n} minuten",
+        "unitWeeks_one": "{n} week",
+        "unitWeeks_other": "{n} weken",
+        "unitSeconds_one": "{n} seconde",
+        "unitSeconds_other": "{n} seconden"
     },
     "player": {
         "play": "Afspelen",
@@ -273,7 +292,8 @@
         "options": "Opties",
         "liveBtn": "Live",
         "live": "Live",
-        "timeshift": "Uitgesteld"
+        "timeshift": "Uitgesteld",
+        "switchingQuality": "Schakelen naar lagere kwaliteit"
     },
     "subtitleOptions": {
         "title": "Ondertitel opties",
@@ -470,6 +490,56 @@
     },
     "tips": {
         "clickToListen": "🔊 Klik om te luisteren",
-        "subtitleHint": "Klik om uit te schakelen, klik opnieuw om te wijzigen"
+        "subtitleHint": "Klik om uit te schakelen, klik opnieuw om te wijzigen",
+        "qualityHint": "Klik om resolutie te wisselen",
+        "favoriteHint": "Toevoegen aan mijn lijst",
+        "downloadHint": "Downloaden naar Freebox",
+        "downloadSeasonHint": "Seizoen downloaden naar Freebox"
+    },
+    "diagnostic": {
+        "title": "Verbindingsprobleem",
+        "close": "Sluiten",
+        "fix": "Automatisch oplossen",
+        "fixProtocol": "Protocol corrigeren",
+        "fixDisableProxy": "Proxy uitschakelen",
+        "noInternet": "Geen internetverbinding gedetecteerd.",
+        "dnsFailure": "DNS-resolutie voor {host} mislukt. Stel uw DNS in op 1.1.1.1 of 8.8.8.8 in uw router.",
+        "mixedContent": "Uw provider gebruikt HTTP maar de app is via HTTPS geladen; de browser blokkeert de aanvraag. Installeer de Android-APK of vraag uw provider om een HTTPS-URL.",
+        "shouldBeHttps": "Uw provider gebruikt HTTPS, geen HTTP. U kunt dit automatisch oplossen.",
+        "shouldBeHttp": "Uw provider gebruikt HTTP, geen HTTPS. U kunt dit automatisch oplossen.",
+        "proxyBroken": "Uw CORS-proxy reageert niet, maar de provider is rechtstreeks bereikbaar. U kunt de proxy automatisch uitschakelen.",
+        "endpointSlow": "De provider is bereikbaar maar dit endpoint is verlopen. De server is mogelijk overbelast, probeer het later opnieuw.",
+        "serverUnreachable": "De providerserver is onbereikbaar. Uw ISP blokkeert deze mogelijk, of de server is offline. Een VPN kan helpen.",
+        "invalidUrl": "De provider-URL is ongeldig.",
+        "unknown": "Onbekend netwerkprobleem.",
+        "stepInternet": "Internet",
+        "stepDns": "DNS",
+        "stepDirect": "Directe verbinding",
+        "stepSwapped": "Alternatief protocol",
+        "stepNoProxy": "Zonder proxy",
+        "invalidCredentials": "Uw gebruikersnaam of wachtwoord is ongeldig, of uw abonnement is verlopen. Bewerk de playlist om het te herstellen.",
+        "fixEditPlaylist": "Playlist bewerken",
+        "serverError": "De provider-server gaf een fout (HTTP {status}). De server is overbelast of werkt niet. Probeer later opnieuw.",
+        "clientError": "De provider-server heeft het verzoek afgewezen (HTTP {status}). De URL of inloggegevens zijn mogelijk onjuist.",
+        "stepProvider": "Provider"
+    },
+    "apkUpdate": {
+        "title": "Update beschikbaar",
+        "message": "Een nieuwe versie van de app is beschikbaar (build {remote}). Nu installeren?",
+        "install": "Installeren",
+        "later": "Later",
+        "downloading": "Update downloaden... {percent}%",
+        "downloadError": "Download mislukt: {msg}",
+        "permissionTitle": "Toestemming vereist",
+        "permissionNeeded": "Android vereist dat u de installatie vanuit deze app toestaat. Open de instellingen om de toestemming te verlenen en probeer het opnieuw.",
+        "openSettings": "Instellingen openen"
+    },
+    "webUpdate": {
+        "title": "Update klaar",
+        "message": "Een nieuwe versie van de app is klaar. Nu herladen om de update toe te passen?",
+        "reload": "Herladen",
+        "later": "Later",
+        "checking": "Controleren op updates...",
+        "upToDate": "Je bent up-to-date"
     }
 }

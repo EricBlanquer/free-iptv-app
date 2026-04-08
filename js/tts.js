@@ -169,15 +169,15 @@ IPTVApp.prototype.showTTSTooltip = function(elementId) {
         var text = descEl.textContent || '';
         if (!text || text === I18n.t('details.noDescription', 'No description') || text === I18n.t('details.noBiography', 'No biography')) return;
         var tooltip = document.createElement('div');
-        tooltip.className = 'tts-tooltip';
+        tooltip.className = 'tts-tooltip below';
         tooltip.id = 'tts-tooltip';
         tooltip.textContent = I18n.t('tips.clickToListen', 'Click to listen');
         tooltip.style.position = 'fixed';
-        tooltip.style.top = (rect.top - 55) + 'px';
+        tooltip.style.top = (rect.bottom + 15) + 'px';
         tooltip.style.right = (window.innerWidth - rect.right + 10) + 'px';
         document.body.appendChild(tooltip);
         setTimeout(function() { tooltip.classList.add('visible'); }, 100);
-    }, 500);
+    }, 1000);
 };
 
 IPTVApp.prototype.hideTTSTooltip = function() {

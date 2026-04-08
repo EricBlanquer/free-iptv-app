@@ -167,8 +167,14 @@
     // Click handling is done by focus.js and screen.js click handlers
     document.addEventListener('DOMContentLoaded', function() {
         var style = document.createElement('style');
-        style.textContent = 'video::-webkit-media-controls { display: none !important; } video::-webkit-media-controls-enclosure { display: none !important; } video::-webkit-media-controls-overlay-play-button { display: none !important; } video { object-fit: contain; background: black !important; } #html5-video { display: none !important; } body.native-player-active, body.native-player-active #player-screen, body.native-player-active #player-container, body.native-player-active #av-player { background: transparent !important; }';
+        style.textContent = 'video::-webkit-media-controls { display: none !important; } video::-webkit-media-controls-enclosure { display: none !important; } video::-webkit-media-controls-overlay-play-button { display: none !important; } video { object-fit: contain; background: black !important; } #html5-video { display: none !important; } body.native-player-active, body.native-player-active #player-screen, body.native-player-active #player-container, body.native-player-active #av-player { background: transparent !important; } html, body { overflow: hidden !important; }';
         document.head.appendChild(style);
+        var resetScroll = function() {
+            if (document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
+            if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
+        };
+        document.addEventListener('scroll', resetScroll, true);
+        window.addEventListener('scroll', resetScroll, true);
         var lastScrollTop = -1;
         setInterval(function() {
             if (!window.app || !window.app.currentStreams) return;

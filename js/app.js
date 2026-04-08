@@ -192,9 +192,12 @@ class IPTVApp {
         // Check if disclaimer was accepted
         if (!this.isDisclaimerAccepted()) {
             this.showDisclaimer();
+            this.markWebHealthy();
             return;
         }
         this.startApp();
+        this.markWebHealthy();
+        this.checkPendingApkUpdate();
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 self.forceSaveProgress();
@@ -216,6 +219,16 @@ class IPTVApp {
      * Check if user has accepted the legal disclaimer
      * @returns {boolean} True if disclaimer was accepted
      */
+    markWebHealthy() {
+        try {
+            if (typeof Android !== 'undefined' && Android && typeof Android.markWebHealthy === 'function') {
+                Android.markWebHealthy();
+                window.log('INIT', 'web marked healthy');
+            }
+        }
+        catch (ex) { /* ignore */ }
+    }
+
     isDisclaimerAccepted() {
         try {
             return localStorage.getItem('disclaimerAccepted') === 'true';
@@ -446,17 +459,29 @@ class IPTVApp {
                     self.playlistCacheTimestamps = self.playlistCacheTimestamps || {};
                     self.playlistCacheTimestamps[playlist.id] = cacheTs;
                     // Restore cached data to API memory cache
+                    var tagPlaylistId = function(arr) {
+                        if (!arr) return;
+                        for (var ti = 0; ti < arr.length; ti++) {
+                            if (!arr[ti]._playlistId) arr[ti]._playlistId = playlist.id;
+                        }
+                    };
                     if (providerCache.vod) {
                         self.api.cache.vodCategories = providerCache.vod.categories;
+                        tagPlaylistId(self.api.cache.vodCategories);
                         self.api.cache.vodStreams['_all'] = providerCache.vod.streams || [];
+                        tagPlaylistId(self.api.cache.vodStreams['_all']);
                     }
                     if (providerCache.series) {
                         self.api.cache.seriesCategories = providerCache.series.categories;
+                        tagPlaylistId(self.api.cache.seriesCategories);
                         self.api.cache.series['_all'] = providerCache.series.streams || [];
+                        tagPlaylistId(self.api.cache.series['_all']);
                     }
                     if (providerCache.live) {
                         self.api.cache.liveCategories = providerCache.live.categories;
+                        tagPlaylistId(self.api.cache.liveCategories);
                         self.api.cache.liveStreams['_all'] = providerCache.live.streams || [];
+                        tagPlaylistId(self.api.cache.liveStreams['_all']);
                     }
                     self._cacheFingerprints = self._cacheFingerprints || {};
                     self._cacheFingerprints[playlist.id] = self._computeCacheFingerprint(self.api.cache);
@@ -500,6 +525,18 @@ class IPTVApp {
                                     return self.matchesLanguage(catName);
                                 });
                                 self.cacheLoading = false;
+                                var tagPlaylistId2 = function(arr) {
+                                    if (!arr) return;
+                                    for (var ti = 0; ti < arr.length; ti++) {
+                                        if (!arr[ti]._playlistId) arr[ti]._playlistId = playlist.id;
+                                    }
+                                };
+                                tagPlaylistId2(self.api.cache.vodCategories);
+                                tagPlaylistId2(self.api.cache.seriesCategories);
+                                tagPlaylistId2(self.api.cache.liveCategories);
+                                tagPlaylistId2(self.api.cache.vodStreams['_all']);
+                                tagPlaylistId2(self.api.cache.series['_all']);
+                                tagPlaylistId2(self.api.cache.liveStreams['_all']);
                                 // Save filtered data to IndexedDB cache
                                 var cacheData = {
                                     vod: {
@@ -849,6 +886,145 @@ class IPTVApp {
     }
 
 
+    showWebUpdateReady() {
+        window.log('WebUpdate pending, will reload when safe');
+        this._webUpdatePending = true;
+        this._tryApplyWebUpdate();
+    }
+
+    onUpdateCheckStarted() {
+        if (this._showToast) {
+            this._showToast(I18n.t('webUpdate.checking', 'Checking for updates...'));
+        }
+    }
+
+    onUpdateCheckFinished(hasUpdate) {
+        if (hasUpdate) return;
+        if (this._showToast) {
+            this._showToast(I18n.t('webUpdate.upToDate', 'You are up to date'));
+        }
+    }
+
+    _tryApplyWebUpdate() {
+        if (!this._webUpdatePending) return;
+        if (typeof Android === 'undefined' || !Android.reloadWebAssets) return;
+        if (this.currentScreen === 'player') return;
+        if (this.player && typeof this.player.isPlaying === 'function' && this.player.isPlaying()) return;
+        window.log('WebUpdate applying now (screen=' + this.currentScreen + ')');
+        this._webUpdatePending = false;
+        try { Android.reloadWebAssets(); }
+        catch (ex) { window.log('ERROR reloadWebAssets: ' + (ex.message || ex)); }
+    }
+
+    checkPendingApkUpdate() {
+        if (typeof Android === 'undefined' || !Android || !Android.getRemoteApkVersion) return;
+        var self = this;
+        setTimeout(function() {
+            try {
+                var remoteVersion = Android.getRemoteApkVersion();
+                if (remoteVersion > 0) {
+                    var localVersion = 0;
+                    try {
+                        var v = Android.getAppVersion() || '';
+                        var m = v.match(/\((\d+)\)/);
+                        if (m) localVersion = parseInt(m[1], 10);
+                    }
+                    catch (ex) {}
+                    if (remoteVersion > localVersion) {
+                        self.showApkUpdatePrompt(remoteVersion);
+                    }
+                }
+            }
+            catch (ex) {}
+        }, 3000);
+    }
+
+    showApkUpdatePrompt(remoteVersion) {
+        this._apkUpdateAvailable = remoteVersion;
+        this.updateSettingsUpdateButton();
+        if (this._apkUpdatePromptShown) return;
+        this._apkUpdatePromptShown = true;
+        var existingToast = document.getElementById('toast-message');
+        if (existingToast) existingToast.remove();
+        var self = this;
+        var currentVersion = 0;
+        try {
+            if (typeof Android !== 'undefined' && Android.getAppVersion) {
+                var v = Android.getAppVersion() || '';
+                var m = v.match(/\((\d+)\)/);
+                if (m) currentVersion = parseInt(m[1], 10);
+            }
+        }
+        catch (ex) {}
+        var message = I18n.t('apkUpdate.message', 'A new version of the app is available. Install now?', {
+            current: currentVersion,
+            remote: remoteVersion
+        });
+        this.showConfirmModal(message, function() {
+            self.startApkDownload();
+        }, {
+            title: I18n.t('apkUpdate.title', 'Update available'),
+            yesLabel: I18n.t('apkUpdate.install', 'Install'),
+            noLabel: I18n.t('apkUpdate.later', 'Later'),
+            focusYes: true
+        });
+    }
+
+    startApkDownload() {
+        if (typeof Android === 'undefined' || !Android.downloadAndInstallApk) return;
+        if (Android.canInstallPackages && !Android.canInstallPackages()) {
+            var self = this;
+            this.showConfirmModal(
+                I18n.t('apkUpdate.permissionNeeded', 'Allow installation of unknown apps, then come back and try again.'),
+                function() {
+                    if (Android.requestInstallPermission) Android.requestInstallPermission();
+                },
+                {
+                    title: I18n.t('apkUpdate.permissionTitle', 'Permission required'),
+                    yesLabel: I18n.t('apkUpdate.openSettings', 'Open settings'),
+                    noLabel: I18n.t('apkUpdate.later', 'Later'),
+                    focusYes: true
+                }
+            );
+            return;
+        }
+        this._showApkDownloadToast(0);
+        try { Android.downloadAndInstallApk(); }
+        catch (ex) { window.log('ERROR startApkDownload: ' + (ex.message || ex)); }
+    }
+
+    updateApkDownloadProgress(percent) {
+        this._showApkDownloadToast(percent);
+    }
+
+    onApkDownloadReady() {
+        this._hideApkDownloadToast();
+    }
+
+    onApkDownloadError(message) {
+        this._hideApkDownloadToast();
+        window.log('ERROR ApkDownload: ' + message);
+        if (this._showToast) {
+            this._showToast(I18n.t('apkUpdate.downloadError', 'Download failed: {msg}', { msg: message }));
+        }
+    }
+
+    _showApkDownloadToast(percent) {
+        var el = document.getElementById('apk-download-toast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'apk-download-toast';
+            el.className = 'apk-download-toast';
+            document.body.appendChild(el);
+        }
+        el.textContent = I18n.t('apkUpdate.downloading', 'Downloading update... {percent}%', { percent: percent });
+        el.style.display = 'block';
+    }
+
+    _hideApkDownloadToast() {
+        var el = document.getElementById('apk-download-toast');
+        if (el) el.style.display = 'none';
+    }
 }
 
 // Initialize app when DOM is ready

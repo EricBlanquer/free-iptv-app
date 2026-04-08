@@ -19,7 +19,10 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.OptIn;
 import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.LoadControl;
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter;
 import androidx.media3.ui.AspectRatioFrameLayout;
 
 import java.io.BufferedReader;
@@ -49,11 +52,15 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(Color.TRANSPARENT);
         mAspectRatioLayout = new AspectRatioFrameLayout(this);
         mSurfaceView = new SurfaceView(this);
-        mAspectRatioLayout.addView(mSurfaceView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        FrameLayout.LayoutParams surfaceParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        surfaceParams.gravity = android.view.Gravity.CENTER;
+        mAspectRatioLayout.addView(mSurfaceView, surfaceParams);
         mAspectRatioLayout.setVisibility(View.GONE);
-        root.addView(mAspectRatioLayout, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        FrameLayout.LayoutParams aspectParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        aspectParams.gravity = android.view.Gravity.CENTER;
+        root.addView(mAspectRatioLayout, aspectParams);
         mWebView = new WebView(this);
         root.addView(mWebView, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -67,28 +74,77 @@ public class MainActivity extends Activity {
         setupWebView();
         applyImmersiveMode();
         mWebUpdater = new WebUpdater(this);
+        mWebUpdater.rollbackUnhealthyCacheIfNeeded();
         String localWebPath = mWebUpdater.getLocalWebPath();
         if (localWebPath != null) {
+            mWebUpdater.markPendingLoad();
             mWebView.loadUrl(localWebPath);
         } else {
             mWebView.loadUrl("file:///android_asset/index.html");
         }
         mWebUpdater.setApkUpdateListener(remoteVersion -> {
             runOnUiThread(() -> mWebView.evaluateJavascript(
-                "if(window.app && window.app._showToast) window.app._showToast('Mise à jour disponible\u00A0: iptv.blanquer.org/app.apk');", null));
+                "if(window.app && window.app.showApkUpdatePrompt) window.app.showApkUpdatePrompt(" + remoteVersion + ");", null));
         });
         mWebUpdater.checkAndUpdate(() -> {
+            runOnUiThread(() -> mWebView.evaluateJavascript(
+                "if(window.app && window.app.showWebUpdateReady) window.app.showWebUpdateReady();", null));
+        });
+    }
+
+    public void reloadWebAssets() {
+        runOnUiThread(() -> {
             String updatedPath = mWebUpdater.getLocalWebPath();
             if (updatedPath != null) {
-                runOnUiThread(() -> mWebView.loadUrl(updatedPath));
+                mWebView.clearCache(true);
+                mWebView.loadUrl(updatedPath);
             }
         });
     }
 
+    private DefaultBandwidthMeter mBandwidthMeter;
+
     private void initNativePlayer() {
-        ExoPlayer player = new ExoPlayer.Builder(this).build();
+        android.content.SharedPreferences prefs = getSharedPreferences("buffer_config", MODE_PRIVATE);
+        int playSec = prefs.getInt("play", 2);
+        int rebufferSec = prefs.getInt("rebuffer", 5);
+        int minSec = prefs.getInt("min", 30);
+        int maxSec = prefs.getInt("max", 60);
+        ExoPlayer player = buildExoPlayer(playSec, rebufferSec, minSec, maxSec);
         mNativePlayer = new NativePlayer();
         mNativePlayer.init(player, mSurfaceView, mAspectRatioLayout);
+        mNativePlayer.setBandwidthMeter(mBandwidthMeter);
+        int screenW = getResources().getDisplayMetrics().widthPixels;
+        int screenH = getResources().getDisplayMetrics().heightPixels;
+        float screenRatio = Math.max(screenW, screenH) / (float) Math.min(screenW, screenH);
+        mNativePlayer.setScreenAspectRatio(screenRatio);
+        mNativePlayer.setJsCallback(js -> runOnUiThread(() -> mWebView.evaluateJavascript(js, null)));
+    }
+
+    private ExoPlayer buildExoPlayer(int playSec, int rebufferSec, int minSec, int maxSec) {
+        LoadControl loadControl = new DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                Math.max(minSec, 1) * 1000,
+                Math.max(maxSec, minSec) * 1000,
+                Math.max(playSec, 1) * 1000,
+                Math.max(rebufferSec, 1) * 1000)
+            .build();
+        mBandwidthMeter = new DefaultBandwidthMeter.Builder(this).build();
+        return new ExoPlayer.Builder(this)
+            .setLoadControl(loadControl)
+            .setBandwidthMeter(mBandwidthMeter)
+            .build();
+    }
+
+    private void rebuildNativePlayerIfNeeded(int playSec, int rebufferSec, int minSec, int maxSec) {
+        if (mNativePlayer == null) return;
+        try {
+            mNativePlayer.release();
+        }
+        catch (Exception ex) { /* ignore */ }
+        ExoPlayer player = buildExoPlayer(playSec, rebufferSec, minSec, maxSec);
+        mNativePlayer.init(player, mSurfaceView, mAspectRatioLayout);
+        mNativePlayer.setBandwidthMeter(mBandwidthMeter);
         mNativePlayer.setJsCallback(js -> runOnUiThread(() -> mWebView.evaluateJavascript(js, null)));
     }
 
@@ -263,10 +319,147 @@ public class MainActivity extends Activity {
         return sb.toString();
     }
 
+    private void launchInstaller(java.io.File apkFile) {
+        try {
+            android.net.Uri apkUri = androidx.core.content.FileProvider.getUriForFile(
+                this, getPackageName() + ".fileprovider", apkFile);
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            intent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        catch (Exception ex) {
+            mWebView.evaluateJavascript(
+                "if(window.app && window.app.onApkDownloadError) window.app.onApkDownloadError('" + ex.getMessage().replace("'", "\\'") + "');", null);
+        }
+    }
+
     private class AndroidBridge {
         @JavascriptInterface
         public String getDeviceId() {
             return android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+        }
+
+        @JavascriptInterface
+        public String getAppVersion() {
+            try {
+                android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return pi.versionName + " (" + pi.versionCode + ")";
+            }
+            catch (Exception ex) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public String getWebBuildHash() {
+            if (mWebUpdater == null) return "";
+            String build = mWebUpdater.getInstalledBuild();
+            if (build == null) return "bundled";
+            return build.length() > 8 ? build.substring(0, 8) : build;
+        }
+
+        @JavascriptInterface
+        public void markWebHealthy() {
+            if (mWebUpdater != null) mWebUpdater.clearPendingLoad();
+        }
+
+        @JavascriptInterface
+        public int getRemoteApkVersion() {
+            return mWebUpdater == null ? 0 : mWebUpdater.getRemoteApkVersion();
+        }
+
+        @JavascriptInterface
+        public boolean canInstallPackages() {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                return getPackageManager().canRequestPackageInstalls();
+            }
+            return true;
+        }
+
+        @JavascriptInterface
+        public void requestInstallPermission() {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                runOnUiThread(() -> {
+                    try {
+                        android.content.Intent intent = new android.content.Intent(
+                            android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            android.net.Uri.parse("package:" + getPackageName()));
+                        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                    catch (Exception ex) {
+                        runOnUiThread(() -> mWebView.evaluateJavascript(
+                            "window.log && window.log('ERROR requestInstallPermission: " + ex.getMessage() + "');", null));
+                    }
+                });
+            }
+        }
+
+        @JavascriptInterface
+        public void reloadWebAssets() {
+            MainActivity.this.reloadWebAssets();
+        }
+
+        @JavascriptInterface
+        public void forceCheckUpdates() {
+            if (mWebUpdater == null) return;
+            runOnUiThread(() -> mWebView.evaluateJavascript(
+                "if(window.app && window.app.onUpdateCheckStarted) window.app.onUpdateCheckStarted();", null));
+            mWebUpdater.checkAndUpdate(() -> {
+                runOnUiThread(() -> mWebView.evaluateJavascript(
+                    "if(window.app && window.app.showWebUpdateReady) window.app.showWebUpdateReady();", null));
+            }, true, hasUpdate -> {
+                runOnUiThread(() -> mWebView.evaluateJavascript(
+                    "if(window.app && window.app.onUpdateCheckFinished) window.app.onUpdateCheckFinished(" + hasUpdate + ");", null));
+            });
+        }
+
+        @JavascriptInterface
+        public void downloadAndInstallApk() {
+            if (mWebUpdater == null) return;
+            mWebUpdater.downloadApk(new WebUpdater.ApkDownloadListener() {
+                @Override
+                public void onProgress(int percent) {
+                    runOnUiThread(() -> mWebView.evaluateJavascript(
+                        "if(window.app && window.app.updateApkDownloadProgress) window.app.updateApkDownloadProgress(" + percent + ");", null));
+                }
+                @Override
+                public void onReady(java.io.File apkFile) {
+                    runOnUiThread(() -> {
+                        mWebView.evaluateJavascript(
+                            "if(window.app && window.app.onApkDownloadReady) window.app.onApkDownloadReady();", null);
+                        launchInstaller(apkFile);
+                    });
+                }
+                @Override
+                public void onError(String message) {
+                    runOnUiThread(() -> mWebView.evaluateJavascript(
+                        "if(window.app && window.app.onApkDownloadError) window.app.onApkDownloadError('" + message.replace("'", "\\'") + "');", null));
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public long getBandwidth() {
+            try {
+                if (mNativePlayer != null) return mNativePlayer.getBandwidthBps();
+            }
+            catch (Exception ex) { /* ignore */ }
+            return 0;
+        }
+
+        @JavascriptInterface
+        public void setBufferConfig(int playSec, int rebufferSec, int minSec, int maxSec) {
+            android.content.SharedPreferences prefs = getSharedPreferences("buffer_config", MODE_PRIVATE);
+            prefs.edit()
+                .putInt("play", playSec)
+                .putInt("rebuffer", rebufferSec)
+                .putInt("min", minSec)
+                .putInt("max", maxSec)
+                .apply();
+            runOnUiThread(() -> rebuildNativePlayerIfNeeded(playSec, rebufferSec, minSec, maxSec));
         }
 
         @JavascriptInterface

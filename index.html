@@ -174,10 +174,10 @@
                     <div class="settings-row">
                         <span class="settings-label" data-i18n="premium.licenseCode">License code</span>
                         <input type="text" id="setting-licenseCode" class="settings-input focusable" maxlength="6" placeholder="XXXXXX" style="text-transform: uppercase;">
+                        <div class="settings-action primary focusable" id="validate-license-btn" data-action="validateLicense" data-i18n="premium.validate" style="margin-left: 10px; margin-bottom: 0;">Validate</div>
                     </div>
-                    <div class="settings-row" id="validate-license-row">
-                        <div class="settings-action primary focusable" id="validate-license-btn" data-action="validateLicense" data-i18n="premium.validate">Validate</div>
-                        <span class="settings-desc" data-i18n="premium.licenseDesc" style="margin-left: 15px;">If you enjoy the app, support the project! Enter a license code or visit iptv.blanquer.org</span>
+                    <div class="settings-row" id="license-desc-row">
+                        <span class="settings-desc" data-i18n="premium.licenseDesc">If you enjoy the app, support the project! Enter a license code or visit iptv.blanquer.org</span>
                     </div>
                 </div>
             </div>
@@ -295,6 +295,53 @@
                         <span id="freebox-status-text" class="settings-info" data-i18n="settings.freeboxNotPaired">Not paired</span>
                     </div>
                     <div id="freebox-desc-row" class="settings-desc" style="display: none;" data-i18n="settings.freeboxDesc">Download VOD content to your Freebox</div>
+                </div>
+            </div>
+            <div class="settings-section" id="buffer-section">
+                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="buffer"><span data-i18n="settings.buffer">Video buffer</span><span class="collapse-arrow collapsed">▼</span></div>
+                <div class="collapsible-content collapsed" id="buffer-content">
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.bufferMode">Mode</span>
+                        <div class="settings-options" id="buffer-preset-options">
+                            <div class="settings-option focusable" data-setting="bufferPreset" data-value="low" data-i18n="settings.bufferLow">Low</div>
+                            <div class="settings-option focusable selected" data-setting="bufferPreset" data-value="standard" data-i18n="settings.bufferStandard">Standard</div>
+                            <div class="settings-option focusable" data-setting="bufferPreset" data-value="high" data-i18n="settings.bufferHigh">High</div>
+                            <div class="settings-option focusable" data-setting="bufferPreset" data-value="max" data-i18n="settings.bufferMax">Maximum</div>
+                            <div class="settings-option focusable" data-setting="bufferPreset" data-value="custom" data-i18n="settings.bufferCustom">Advanced</div>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="buffer-play-row">
+                        <span class="settings-label" data-i18n="settings.bufferPlay">Start</span>
+                        <div class="settings-value">
+                            <div class="settings-btn focusable" data-setting="bufferPlay" data-action="decrease">-</div>
+                            <span id="setting-bufferPlay">2</span>
+                            <div class="settings-btn focusable" data-setting="bufferPlay" data-action="increase">+</div>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="buffer-rebuffer-row">
+                        <span class="settings-label" data-i18n="settings.bufferRebuffer">Resume</span>
+                        <div class="settings-value">
+                            <div class="settings-btn focusable" data-setting="bufferRebuffer" data-action="decrease">-</div>
+                            <span id="setting-bufferRebuffer">5</span>
+                            <div class="settings-btn focusable" data-setting="bufferRebuffer" data-action="increase">+</div>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="buffer-min-row">
+                        <span class="settings-label" data-i18n="settings.bufferMin">Min</span>
+                        <div class="settings-value">
+                            <div class="settings-btn focusable" data-setting="bufferMin" data-action="decrease">-</div>
+                            <span id="setting-bufferMin">30</span>
+                            <div class="settings-btn focusable" data-setting="bufferMin" data-action="increase">+</div>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="buffer-max-row">
+                        <span class="settings-label" data-i18n="settings.bufferMaxLabel">Max</span>
+                        <div class="settings-value">
+                            <div class="settings-btn focusable" data-setting="bufferMax" data-action="decrease">-</div>
+                            <span id="setting-bufferMax">60</span>
+                            <div class="settings-btn focusable" data-setting="bufferMax" data-action="increase">+</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="settings-section" id="display-section">
@@ -435,7 +482,8 @@
                         <span id="remote-debug-toggle" class="settings-toggle focusable" data-setting="remoteDebug">OFF</span>
                     </div>
                     <div class="settings-row" style="margin-top: 15px;">
-                        <div class="settings-action focusable" data-action="factoryReset" data-i18n="settings.factoryReset" style="background: rgba(255,82,82,0.2); border-color: rgba(255,82,82,0.3);">Factory reset</div>
+                        <div class="settings-action focusable" data-action="privacyPolicy" data-i18n="settings.privacyPolicy">Privacy Policy</div>
+                        <div class="settings-action focusable" data-action="factoryReset" data-i18n="settings.factoryReset" style="margin-left: 15px; background: rgba(255,82,82,0.2); border-color: rgba(255,82,82,0.3);">Factory reset</div>
                     </div>
                 </div>
             </div>
@@ -512,8 +560,9 @@
                     <div id="details-genres"></div>
                     <p id="details-description" class="focusable"></p>
                     <div id="details-actions">
-                        <button id="continue-btn" class="focusable action-btn hidden" data-i18n="player.continueAt">Continue</button>
                         <button id="play-btn" class="focusable action-btn secondary" data-i18n="player.play">Play</button>
+                        <div class="actions-break"></div>
+                        <button id="continue-btn" class="focusable action-btn hidden" data-i18n="player.continueAt">Continue</button>
                         <button id="mark-watched-btn" class="focusable action-btn tertiary hidden" data-i18n="player.markWatched">Mark as watched</button>
                     </div>
                     <div id="series-status" class="hidden"></div>
@@ -582,7 +631,10 @@
         <div id="player-title" class="hidden"><span id="player-title-text"></span><span id="player-duration"></span><span id="player-epg"></span></div>
         <div id="player-top-right" class="hidden">
             <span id="player-quality"></span>
-            <span id="player-type"></span>
+            <div id="player-engine-info">
+                <span id="player-type"></span>
+                <span id="player-bandwidth"></span>
+            </div>
         </div>
         <div id="player-overlay" class="hidden">
             <div id="player-info">
@@ -632,6 +684,10 @@
                             <span class="track-icon"><span class="material-symbols-outlined">stream</span></span>
                             <span id="player-format-label">TS</span>
                         </div>
+                        <div id="player-quality-btn" class="player-track-btn focusable hidden">
+                            <span class="track-icon"><span class="material-symbols-outlined">high_quality</span></span>
+                            <span id="player-quality-label">HD</span>
+                        </div>
                         <div id="player-replay-btn" class="player-track-btn focusable hidden">
                             <span class="track-icon"><span class="material-symbols-outlined">replay</span></span>
                             <span data-i18n="player.replay">Replay</span>
@@ -656,6 +712,16 @@
 
     <!-- Seek Indicator -->
     <div id="seek-indicator"></div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 900px; width: 90%; height: 85%; padding: 0; display: flex; flex-direction: column;">
+            <iframe id="privacy-iframe" src="" style="flex: 1; width: 100%; border: none; border-radius: 12px 12px 0 0; background: #080810;"></iframe>
+            <div style="padding: 12px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                <button id="privacy-close-btn" class="focusable modal-btn" data-i18n="modal.close">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Disclaimer Modal (first launch) -->
     <div id="disclaimer-modal" class="modal hidden">
@@ -1065,6 +1131,7 @@
     <script src="js/core/screen.js"></script>
     <script src="js/core/focus.js"></script>
     <script src="js/core/handlers.js"></script>
+    <script src="js/core/diagnostic.js"></script>
     <script src="js/features/home.js"></script>
     <script src="js/features/favorites.js"></script>
     <script src="js/features/history.js"></script>

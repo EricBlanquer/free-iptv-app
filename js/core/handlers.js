@@ -180,9 +180,11 @@ IPTVApp.prototype.selectHandlers = {
         } else if (current.id === 'mark-watched-btn') {
             this.markAsWatched();
         } else if (current.id === 'download-btn' || current.classList.contains('download-btn')) {
+            this.hideButtonTooltip('download-btn', true);
             this.triggerFreeboxDownload();
         } else if (current.id === 'favorite-btn' || current.classList.contains('favorite-star')) {
             window.log('ACTION', 'Favorite click: selectedStream=' + JSON.stringify(this.selectedStream ? {id: this.selectedStream.id, type: this.selectedStream.type, hasData: !!this.selectedStream.data} : null));
+            this.hideButtonTooltip('favorite-btn', true);
             this.toggleFavorite(this.selectedStream.data || this.selectedStream, this.selectedStream.type);
         } else if (current.classList.contains('cast-card')) {
             var actorId = current.dataset.actorId;
@@ -323,6 +325,7 @@ IPTVApp.prototype.backHandlers = {
             this.exitEpisodeSelectMode();
             return;
         }
+        this.hideAllButtonTooltips();
         this.stopTTS();
         this.clearTTSPreload();
         if (this.previousScreen === 'actor' && (this.detailsReturnActorId || this.currentActorId)) {

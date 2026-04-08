@@ -41,14 +41,57 @@ IPTVApp.prototype.showSettings = function() {
     this.initSettingsUI();
     var titleEl = document.querySelector('#settings-screen > h1');
     if (titleEl && APP_VERSION) {
-        var oldVersion = document.getElementById('settings-version');
-        if (oldVersion) oldVersion.remove();
+        var oldHeader = document.getElementById('settings-header-right');
+        if (oldHeader) oldHeader.remove();
+        var header = document.createElement('div');
+        header.id = 'settings-header-right';
         var versionSpan = document.createElement('span');
         versionSpan.id = 'settings-version';
-        versionSpan.textContent = 'v' + APP_VERSION;
-        titleEl.parentNode.insertBefore(versionSpan, titleEl.nextSibling);
+        var versionText = 'v' + APP_VERSION;
+        var isAndroid = (typeof Android !== 'undefined' && Android);
+        if (isAndroid && Android.getAppVersion) {
+            try {
+                var nativeVersion = Android.getAppVersion();
+                if (nativeVersion) versionText = 'v' + nativeVersion;
+            }
+            catch (ex) {
+                window.log('ERROR getAppVersion: ' + (ex.message || ex));
+            }
+            if (Android.getWebBuildHash) {
+                try {
+                    var buildHash = Android.getWebBuildHash();
+                    if (buildHash) versionText += ' [' + buildHash + ']';
+                }
+                catch (ex) {}
+            }
+        }
+        versionSpan.textContent = versionText;
+        header.appendChild(versionSpan);
+        if (isAndroid && Android.forceCheckUpdates) {
+            var checkBtn = document.createElement('div');
+            checkBtn.id = 'settings-check-updates-btn';
+            checkBtn.className = 'settings-action focusable';
+            if (this._apkUpdateAvailable) {
+                checkBtn.setAttribute('data-action', 'installUpdate');
+                checkBtn.textContent = I18n.t('settings.installUpdate', 'Install update');
+                checkBtn.style.background = 'rgba(76, 175, 80, 0.8)';
+            }
+            else {
+                checkBtn.setAttribute('data-action', 'checkUpdates');
+                checkBtn.textContent = I18n.t('settings.checkUpdates', 'Check for updates');
+            }
+            header.appendChild(checkBtn);
+        }
+        titleEl.parentNode.insertBefore(header, titleEl.nextSibling);
     }
     this.focusIndex = 0;
+    var focusables = document.querySelectorAll('#settings-screen .focusable');
+    for (var fi = 0; fi < focusables.length; fi++) {
+        if (focusables[fi].dataset && focusables[fi].dataset.action === 'managePlaylistsBtn') {
+            this.focusIndex = fi;
+            break;
+        }
+    }
     setTimeout(function() {
         self.updateFocus();
     }, 50);
@@ -67,6 +110,15 @@ IPTVApp.prototype.updateDialogueBoostVisibility = function() {
     var dialogueBoostSetting = document.getElementById('dialogue-boost-setting');
     if (dialogueBoostSetting) {
         dialogueBoostSetting.style.display = this.settings.preferHtml5Player ? '' : 'none';
+    }
+};
+
+IPTVApp.prototype.updateBufferAdvancedVisibility = function() {
+    var isCustom = this.settings.bufferPreset === 'custom';
+    var rows = ['buffer-play-row', 'buffer-rebuffer-row', 'buffer-min-row', 'buffer-max-row'];
+    for (var i = 0; i < rows.length; i++) {
+        var row = document.getElementById(rows[i]);
+        if (row) row.style.display = isCustom ? '' : 'none';
     }
 };
 
@@ -406,7 +458,7 @@ IPTVApp.prototype.initSettingsUI = function() {
     this.updateProxyUrlVisibility();
     this.updateDialogueBoostVisibility();
     this.initTTSVoiceOptions();
-    var numericSettings = ['minProgressMinutes', 'watchedThreshold', 'retentionWeeks', 'historyMaxItems'];
+    var numericSettings = ['minProgressMinutes', 'watchedThreshold', 'retentionWeeks', 'historyMaxItems', 'bufferPlay', 'bufferRebuffer', 'bufferMin', 'bufferMax'];
     for (var j = 0; j < numericSettings.length; j++) {
         var key = numericSettings[j];
         var el = document.getElementById('setting-' + key);
@@ -414,6 +466,7 @@ IPTVApp.prototype.initSettingsUI = function() {
             el.textContent = this.formatSettingValue(key, this.settings[key]);
         }
     }
+    this.updateBufferAdvancedVisibility();
     var options = document.querySelectorAll('.settings-option');
     for (var k = 0; k < options.length; k++) {
         var opt = options[k];
@@ -772,7 +825,11 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             minProgressMinutes: { min: 1, max: 10 },
             watchedThreshold: { min: 70, max: 99 },
             retentionWeeks: { min: 1, max: 12 },
-            historyMaxItems: { min: 10, max: 200 }
+            historyMaxItems: { min: 10, max: 200 },
+            bufferPlay: { min: 1, max: 60 },
+            bufferRebuffer: { min: 1, max: 60 },
+            bufferMin: { min: 1, max: 600 },
+            bufferMax: { min: 1, max: 600 }
         };
         var lim = limits[btnSetting] || { min: 1, max: 100 };
         if (action === 'increase' && currentVal < lim.max) {
@@ -808,6 +865,12 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
         }
         if (optSetting === 'textSize') {
             this.applyTextSize(optValue);
+        }
+        if (optSetting === 'bufferPreset') {
+            this.updateBufferAdvancedVisibility();
+            if (this.player && this.player.setBufferConfig) {
+                this.player.setBufferConfig(this.getBufferConfig());
+            }
         }
         if (optSetting === 'secureSubtitles') {
             this.secureSubtitles = optValue === 'true';
@@ -867,6 +930,18 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
         }
         else if (actionType === 'factoryReset') {
             this.showConfirmModal(I18n.t('settings.factoryResetConfirm', 'Reset the app to factory settings? All data will be lost.'), 'factoryReset');
+        }
+        else if (actionType === 'privacyPolicy') {
+            this.showPrivacyPolicy();
+        }
+        else if (actionType === 'installUpdate') {
+            this.startApkDownload();
+        }
+        else if (actionType === 'checkUpdates') {
+            if (typeof Android !== 'undefined' && Android && Android.forceCheckUpdates) {
+                try { Android.forceCheckUpdates(); }
+                catch (ex) { window.log('ERROR forceCheckUpdates: ' + (ex.message || ex)); }
+            }
         }
         else if (actionType === 'managePlaylistsBtn') {
             this.showPlaylists();
@@ -2343,17 +2418,87 @@ IPTVApp.prototype.confirmDeleteCategory = function(categoryId) {
 };
 
 // Confirm Modal
-IPTVApp.prototype.showConfirmModal = function(message, action) {
+IPTVApp.prototype.showPrivacyPolicy = function() {
+    var self = this;
+    var modal = document.getElementById('privacy-modal');
+    var iframe = document.getElementById('privacy-iframe');
+    var closeBtn = document.getElementById('privacy-close-btn');
+    if (!modal || !iframe) return;
+    iframe.src = 'https://iptv.blanquer.org/privacy.html?t=' + Date.now();
+    this.setHidden(modal, false);
+    if (closeBtn) {
+        closeBtn.classList.add('focused');
+        closeBtn.focus();
+        closeBtn.onclick = function() { self.hidePrivacyPolicy(); };
+    }
+    this.privacyKeyHandler = function(e) {
+        if (e.keyCode === 13 || e.keyCode === 10009 || e.keyCode === 27 || e.keyCode === 8) {
+            self.hidePrivacyPolicy();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    };
+    document.addEventListener('keydown', this.privacyKeyHandler, true);
+};
+
+IPTVApp.prototype.hidePrivacyPolicy = function() {
+    var modal = document.getElementById('privacy-modal');
+    var iframe = document.getElementById('privacy-iframe');
+    this.setHidden(modal, true);
+    if (iframe) iframe.src = '';
+    if (this.privacyKeyHandler) {
+        document.removeEventListener('keydown', this.privacyKeyHandler, true);
+        this.privacyKeyHandler = null;
+    }
+    this.updateFocus();
+};
+
+IPTVApp.prototype.showConfirmModal = function(message, action, options) {
     var self = this;
     this.confirmModalAction_ = action;
     this.confirmModalPreviousFocusArea = this.focusArea;
     this.confirmModalPreviousFocusIndex = this.focusIndex;
     var modal = document.getElementById('confirm-modal');
+    var titleEl = document.getElementById('confirm-modal-title');
     var messageEl = document.getElementById('confirm-modal-message');
-    messageEl.textContent = message;
+    var yesBtn = document.getElementById('confirm-yes-btn');
+    var noBtn = document.getElementById('confirm-no-btn');
+    var opts = options || {};
+    if (opts.title) {
+        titleEl.textContent = opts.title;
+        titleEl.removeAttribute('data-i18n');
+    }
+    else {
+        titleEl.setAttribute('data-i18n', 'settings.confirmDelete');
+        titleEl.textContent = I18n.t('settings.confirmDelete', 'Confirm deletion');
+    }
+    if (opts.html) {
+        while (messageEl.firstChild) messageEl.removeChild(messageEl.firstChild);
+        messageEl.appendChild(opts.html);
+    }
+    else {
+        messageEl.textContent = message;
+    }
+    if (opts.yesLabel) {
+        yesBtn.textContent = opts.yesLabel;
+        yesBtn.removeAttribute('data-i18n');
+    }
+    else {
+        yesBtn.setAttribute('data-i18n', 'settings.delete');
+        yesBtn.textContent = I18n.t('settings.delete', 'Delete');
+    }
+    if (opts.noLabel) {
+        noBtn.textContent = opts.noLabel;
+        noBtn.removeAttribute('data-i18n');
+    }
+    else {
+        noBtn.setAttribute('data-i18n', 'settings.cancel');
+        noBtn.textContent = I18n.t('settings.cancel', 'Cancel');
+    }
+    yesBtn.style.display = opts.hideYes ? 'none' : '';
     this.setHidden(modal, false);
     this.focusArea = 'confirm-modal';
-    this.focusIndex = 0; // Focus on Cancel for safety
+    this.focusIndex = opts.hideYes ? 0 : (opts.focusYes ? 1 : 0);
     setTimeout(function() {
         self.updateFocus();
     }, 50);
@@ -2411,10 +2556,17 @@ IPTVApp.prototype.updateFreeboxStatus = function() {
     var statusEl = document.getElementById('freebox-status-text');
     var pairBtn = document.getElementById('freebox-pair-btn');
     if (!statusEl || !pairBtn) return;
+    var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
     if (this.settings.freeboxAppToken) {
-        statusEl.textContent = I18n.t('settings.freeboxPaired', 'Paired');
-        statusEl.style.color = '#4CAF50';
         pairBtn.textContent = I18n.t('settings.freeboxUnpair', 'Unpair');
+        if (viaVm || FreeboxAPI.isConfigured()) {
+            statusEl.textContent = I18n.t('settings.freeboxPaired', 'Paired');
+            statusEl.style.color = '#4CAF50';
+        }
+        else {
+            statusEl.textContent = I18n.t('settings.freeboxPairedNoApi', 'Paired (API not connected)');
+            statusEl.style.color = '#ff9800';
+        }
     }
     else {
         statusEl.textContent = I18n.t('settings.freeboxNotPaired', 'Not paired');
@@ -2459,30 +2611,57 @@ IPTVApp.prototype.unpairFreebox = function() {
     this.updateFreeboxStatus();
 };
 
+IPTVApp.prototype.updateSettingsUpdateButton = function() {
+    var btn = document.getElementById('settings-check-updates-btn');
+    if (!btn) return;
+    if (this._apkUpdateAvailable) {
+        btn.setAttribute('data-action', 'installUpdate');
+        btn.textContent = I18n.t('settings.installUpdate', 'Install update');
+        btn.style.background = 'rgba(76, 175, 80, 0.8)';
+    }
+    else {
+        btn.setAttribute('data-action', 'checkUpdates');
+        btn.textContent = I18n.t('settings.checkUpdates', 'Check for updates');
+        btn.style.background = '';
+    }
+};
+
 IPTVApp.prototype.formatSettingValue = function(key, value) {
-    if (key === 'minProgressMinutes') return value + ' ' + I18n.t('settings.unitMinutes', 'minutes');
+    if (key === 'minProgressMinutes') return I18n.plural('settings.unitMinutes', value, '{n} minutes');
     if (key === 'watchedThreshold') return value + '%';
-    if (key === 'retentionWeeks') return value + ' ' + I18n.t('settings.unitWeeks', 'weeks');
+    if (key === 'retentionWeeks') return I18n.plural('settings.unitWeeks', value, '{n} weeks');
+    if (key === 'bufferPlay' || key === 'bufferRebuffer' || key === 'bufferMin' || key === 'bufferMax') {
+        return I18n.plural('settings.unitSeconds', value, '{n} s');
+    }
     return value;
 };
 
 IPTVApp.prototype.updatePremiumStatus = function() {
     var statusEl = document.getElementById('premium-status-text');
     var licenseInput = document.getElementById('setting-licenseCode');
-    var validateRow = document.getElementById('validate-license-row');
+    var validateBtn = document.getElementById('validate-license-btn');
+    var licenseDescRow = document.getElementById('license-desc-row');
     var deviceIdEl = document.getElementById('premium-device-id');
     if (deviceIdEl) deviceIdEl.textContent = this.deviceId || '';
     if (!statusEl) return;
     var state = Premium.getState();
+    var isLicensed = (state === Premium.STATE_LICENSED);
+    if (licenseInput) {
+        licenseInput.readOnly = isLicensed;
+        licenseInput.style.opacity = isLicensed ? '0.6' : '';
+    }
+    if (validateBtn) {
+        validateBtn.style.display = isLicensed ? 'none' : '';
+    }
+    if (licenseDescRow) {
+        licenseDescRow.style.display = isLicensed ? 'none' : '';
+    }
     if (state === Premium.STATE_LICENSED) {
         statusEl.textContent = I18n.t('premium.statusLicensed', 'Licensed');
         statusEl.style.color = '#4CAF50';
         if (licenseInput) {
             licenseInput.value = Premium.getLicenseCode() || '';
-            licenseInput.readOnly = true;
-            licenseInput.style.opacity = '0.6';
         }
-        if (validateRow) validateRow.style.display = 'none';
     }
     else if (state === Premium.STATE_TRIAL) {
         var days = Premium.getTrialDaysLeft();

@@ -380,6 +380,7 @@ body.text-small #settings-screen h1,
 body.text-small #playlists-screen h1,
 body.text-small #playlist-edit-screen h1,
 body.text-small #continue-screen h1 { font-size: 44px; }
+body.text-small #settings-version { font-size: 18px; }
 body.text-small .settings-title,
 body.text-small .pattern-modal-header { font-size: 24px; }
 body.text-small .settings-option,
@@ -570,6 +571,7 @@ body.text-medium #settings-screen h1,
 body.text-medium #playlists-screen h1,
 body.text-medium #playlist-edit-screen h1,
 body.text-medium #continue-screen h1 { font-size: 48px; }
+body.text-medium #settings-version { font-size: 20px; }
 body.text-medium .settings-title,
 body.text-medium .pattern-modal-header { font-size: 28px; }
 body.text-medium .settings-option,
@@ -747,6 +749,7 @@ body.text-large #settings-screen h1,
 body.text-large #playlists-screen h1,
 body.text-large #playlist-edit-screen h1,
 body.text-large #continue-screen h1 { font-size: 52px; }
+body.text-large #settings-version { font-size: 22px; }
 body.text-large .settings-title,
 body.text-large .pattern-modal-header { font-size: 32px; }
 body.text-large .settings-option,
@@ -982,6 +985,7 @@ body.text-xlarge #settings-screen h1,
 body.text-xlarge #playlists-screen h1,
 body.text-xlarge #playlist-edit-screen h1,
 body.text-xlarge #continue-screen h1 { font-size: 62px; }
+body.text-xlarge #settings-version { font-size: 24px; }
 body.text-xlarge .settings-title,
 body.text-xlarge .pattern-modal-header { font-size: 38px; }
 body.text-xlarge .settings-option,
@@ -1152,6 +1156,7 @@ body.text-xxlarge #settings-screen h1,
 body.text-xxlarge #playlists-screen h1,
 body.text-xxlarge #playlist-edit-screen h1,
 body.text-xxlarge #continue-screen h1 { font-size: 74px; }
+body.text-xxlarge #settings-version { font-size: 28px; }
 body.text-xxlarge .settings-title,
 body.text-xxlarge .pattern-modal-header { font-size: 46px; }
 body.text-xxlarge .settings-option,

@@ -18,6 +18,7 @@ import androidx.media3.common.text.CueGroup;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.upstream.BandwidthMeter;
 import androidx.media3.ui.AspectRatioFrameLayout;
 
 import org.json.JSONArray;
@@ -40,6 +41,7 @@ public class NativePlayer {
     private SurfaceView mSurfaceView;
     private AspectRatioFrameLayout mAspectRatioLayout;
     private Consumer<String> mJsCallback;
+    private BandwidthMeter mBandwidthMeter;
 
     private volatile String mState = STATE_NONE;
     private volatile long mCurrentPosition = 0;
@@ -50,6 +52,7 @@ public class NativePlayer {
     private volatile long mSubtitleOffsetMs = 0;
     private boolean mPreparing = false;
     private boolean mBuffering = false;
+    private float mScreenAspectRatio = 16f / 9f;
 
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
@@ -222,6 +225,10 @@ public class NativePlayer {
                     resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT;
                     break;
             }
+            if (resizeMode == AspectRatioFrameLayout.RESIZE_MODE_FIT && mScreenAspectRatio > 1.85f) {
+                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
+            }
+            evalJs("window.log&&window.log('PLAYER','setDisplayMethod: " + method + " -> resizeMode=" + resizeMode + " screenRatio=" + mScreenAspectRatio + "')");
             mAspectRatioLayout.setResizeMode(resizeMode);
         });
     }
@@ -232,6 +239,22 @@ public class NativePlayer {
             mPlayer.release();
             mPlayer = null;
         }
+    }
+
+    public void setScreenAspectRatio(float ratio) {
+        mScreenAspectRatio = ratio;
+    }
+
+    public void setBandwidthMeter(BandwidthMeter meter) {
+        mBandwidthMeter = meter;
+    }
+
+    public long getBandwidthBps() {
+        if (mBandwidthMeter == null) return 0;
+        try {
+            return mBandwidthMeter.getBitrateEstimate();
+        }
+        catch (Exception ex) { return 0; }
     }
 
     private void evalJs(String js) {
@@ -314,6 +337,7 @@ public class NativePlayer {
         mStreamInfoJson = arr.toString();
         if (videoSize.width > 0 && videoSize.height > 0) {
             float ratio = (float) videoSize.width * videoSize.pixelWidthHeightRatio / videoSize.height;
+            evalJs("window.log&&window.log('PLAYER','VideoSize: " + videoSize.width + "x" + videoSize.height + " pixelRatio=" + videoSize.pixelWidthHeightRatio + " aspectRatio=" + ratio + " resizeMode=" + mAspectRatioLayout.getResizeMode() + "')");
             mAspectRatioLayout.setAspectRatio(ratio);
         }
     }

@@ -73,6 +73,13 @@ class ProviderAPI {
                 var errorMsg = error.message === 'Timeout' ? 'Timeout after ' + (timeout/1000) + 's' : error.message;
                 window.log('ERROR', 'HTTP ' + errorMsg + ' ' + ProviderAPI.redactUrl(url));
                 if (attempt === retries) {
+                    if (window.NetworkDiagnostic && window.NetworkDiagnostic.runAndShow && window.app) {
+                        var errorType = 'timeout';
+                        var httpMatch = (error.message || '').match(/^HTTP (\d+)$/);
+                        if (httpMatch) errorType = 'http_' + httpMatch[1];
+                        try { window.NetworkDiagnostic.runAndShow(window.app, url, errorType); }
+                        catch (ex) { window.log('ERROR', 'DIAG launch: ' + (ex.message || ex)); }
+                    }
                     throw error;
                 }
                 const delay = this.retryDelay * attempt;
@@ -91,7 +98,13 @@ class ProviderAPI {
         try {
             const response = await this.fetchWithRetry(url);
             this.authData = await response.json();
-            if (!this.authData.user_info) throw new Error('Invalid credentials');
+            if (!this.authData.user_info) {
+                if (window.NetworkDiagnostic && window.NetworkDiagnostic.runAndShow && window.app) {
+                    try { window.NetworkDiagnostic.runAndShow(window.app, url, 'invalid_credentials'); }
+                    catch (ex) { window.log('ERROR', 'DIAG launch: ' + (ex.message || ex)); }
+                }
+                throw new Error('Invalid credentials');
+            }
             // Calculate server time offset
             if (this.authData.server_info && this.authData.server_info.timestamp_now) {
                 var serverTime = this.authData.server_info.timestamp_now;

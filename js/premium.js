@@ -1,7 +1,7 @@
 /**
  * Premium Module - Donationware monetization
  * Manages trial/grace/expired/licensed states
- * Anti-tamper with server-side sync via PHP API
+ * Server-side sync via PHP API (server installDate is authoritative)
  */
 var Premium = (function() {
     var API_URL = 'https://iptv.blanquer.org/premium-api.php';
@@ -48,23 +48,10 @@ var Premium = (function() {
         catch (ex) {
             window.log('PREMIUM', 'loadLocal error: ' + ex);
         }
-        _detectClockTamper();
         try {
             localStorage.setItem('premiumLastSeen', String(Date.now()));
         }
         catch (ex) { /* ignore */ }
-    }
-
-    function _detectClockTamper() {
-        var now = Date.now();
-        if (_lastSeenDate && now < _lastSeenDate - 86400000) {
-            window.log('PREMIUM', 'clock tamper detected: now=' + now + ' lastSeen=' + _lastSeenDate);
-            _installDate = _installDate - (_lastSeenDate - now);
-            try {
-                localStorage.setItem('premiumInstallDate', String(_installDate));
-            }
-            catch (ex) { /* ignore */ }
-        }
     }
 
     function _todayString() {
@@ -122,7 +109,7 @@ var Premium = (function() {
                 }
                 if (data.installDate) {
                     var serverInstall = parseInt(data.installDate);
-                    if (serverInstall && serverInstall < _installDate) {
+                    if (serverInstall && serverInstall <= Date.now() && serverInstall !== _installDate) {
                         _installDate = serverInstall;
                         try {
                             localStorage.setItem('premiumInstallDate', String(_installDate));

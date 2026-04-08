@@ -700,6 +700,12 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
     var current = ctx.focusables[newIndex];
     var currentZone = this.getDetailsZone(current);
     var zones = this.getDetailsZones(ctx.focusables);
+    if (currentZone === 'versions' || currentZone === 'actions') {
+        var candidate = this.navigate2D(ctx.focusables, newIndex, ctx.direction);
+        if (candidate !== newIndex) {
+            return { index: candidate };
+        }
+    }
     switch (ctx.direction) {
         case 'left':
             if (currentZone === 'episodes' && zones.episodes) {
@@ -987,8 +993,8 @@ IPTVApp.prototype.getFocusables = function() {
 IPTVApp.prototype.getDetailsZone = function(element) {
     if (element.classList.contains('favorite-star')) return 'favorite';
     if (element.classList.contains('download-btn')) return 'download';
-    if (element.classList.contains('action-btn')) return 'actions';
     if (element.classList.contains('version-btn')) return 'versions';
+    if (element.classList.contains('action-btn')) return 'actions';
     if (element.id === 'details-description') return 'description';
     if (element.classList.contains('season-btn') || element.classList.contains('download-season-btn')) return 'seasons';
     if (element.classList.contains('episode-item')) return 'episodes';
@@ -1003,7 +1009,7 @@ IPTVApp.prototype.getDetailsZone = function(element) {
 
 IPTVApp.prototype.getDetailsZones = function(focusables) {
     var zones = {};
-    var zoneOrder = ['favorite', 'download', 'versions', 'description', 'actions', 'seasons', 'episodes', 'cast', 'director'];
+    var zoneOrder = ['favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'director'];
     for (var i = 0; i < focusables.length; i++) {
         var zone = this.getDetailsZone(focusables[i]);
         if (!zones[zone]) {
@@ -1236,6 +1242,19 @@ IPTVApp.prototype.updateFocus = function() {
                 }
             }
         }
+        else if (this.focusArea === 'sidebar') {
+            var container = document.getElementById('categories-list');
+            if (container) {
+                var elRect = el.getBoundingClientRect();
+                var containerRect = container.getBoundingClientRect();
+                if (elRect.top < containerRect.top + 10) {
+                    container.scrollTop -= (containerRect.top + 10 - elRect.top);
+                }
+                else if (elRect.bottom > containerRect.bottom - 10) {
+                    container.scrollTop += (elRect.bottom - containerRect.bottom + 10);
+                }
+            }
+        }
         else if (this.focusArea === 'actor') {
             el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
             this.scrollHorizontalGridToElement(el);
@@ -1243,6 +1262,15 @@ IPTVApp.prototype.updateFocus = function() {
         else {
             el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
         }
+        requestAnimationFrame(function() {
+            var screens = document.querySelectorAll('.screen');
+            for (var s = 0; s < screens.length; s++) {
+                if (screens[s].scrollTop !== 0) screens[s].scrollTop = 0;
+                if (screens[s].scrollLeft !== 0) screens[s].scrollLeft = 0;
+            }
+            if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
+            if (document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
+        });
         if (this.focusArea === 'grid') {
             var self = this;
             clearTimeout(this.imageLoadTimer);
@@ -1307,6 +1335,7 @@ IPTVApp.prototype.scrollSettingsToElement = function(el) {
 IPTVApp.prototype.scrollDetailsToElement = function(el) {
     var existing = document.getElementById('tts-tooltip');
     if (existing) existing.remove();
+    if (this.hideAllButtonTooltips) this.hideAllButtonTooltips();
     var container = document.getElementById('details-wrapper');
     if (!container) return;
     var zone = this.getDetailsZone(el);

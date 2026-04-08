@@ -142,8 +142,6 @@
         "minThreshold": "Minimum threshold",
         "watchedThreshold": "Watched threshold",
         "retention": "Retention",
-        "unitMinutes": "minutes",
-        "unitWeeks": "weeks",
         "historyMaxItems": "History max items",
         "focusOnCategories": "Focus on categories",
         "expired": "Expired",
@@ -233,6 +231,7 @@
         "freeboxPair": "Pair",
         "freeboxUnpair": "Unpair",
         "freeboxPaired": "Paired",
+        "freeboxPairedNoApi": "Paired (API not connected)",
         "freeboxNotPaired": "Not paired",
         "freeboxDesc": "Download VOD content to your Freebox",
         "proxyRequired": "Proxy required",
@@ -258,7 +257,27 @@
         "progressCleared": "Progress cleared",
         "favoritesCleared": "List cleared",
         "tmdbCacheCleared": "TMDB cache cleared",
-        "textXXLarge": "Maximum"
+        "textXXLarge": "Maximum",
+        "checkUpdates": "Check for updates",
+        "installUpdate": "Install update",
+        "privacyPolicy": "Privacy Policy",
+        "buffer": "Video buffer",
+        "bufferMode": "Mode",
+        "bufferLow": "Low",
+        "bufferStandard": "Standard",
+        "bufferHigh": "High",
+        "bufferMax": "Maximum",
+        "bufferCustom": "Advanced",
+        "bufferPlay": "Start",
+        "bufferRebuffer": "Resume",
+        "bufferMin": "Min",
+        "bufferMaxLabel": "Max",
+        "unitMinutes_one": "{n} minute",
+        "unitMinutes_other": "{n} minutes",
+        "unitWeeks_one": "{n} week",
+        "unitWeeks_other": "{n} weeks",
+        "unitSeconds_one": "{n} second",
+        "unitSeconds_other": "{n} seconds"
     },
     "player": {
         "play": "Play",
@@ -297,7 +316,8 @@
         "options": "Options",
         "liveBtn": "Live",
         "live": "Live",
-        "timeshift": "Timeshift"
+        "timeshift": "Timeshift",
+        "switchingQuality": "Switching to lower quality"
     },
     "subtitleOptions": {
         "title": "Subtitle options",
@@ -498,6 +518,56 @@
     },
     "tips": {
         "clickToListen": "🔊 Click to listen",
-        "subtitleHint": "Click to disable, click again to change"
+        "subtitleHint": "Click to disable, click again to change",
+        "qualityHint": "Click to switch resolution",
+        "favoriteHint": "Add to your list",
+        "downloadHint": "Download to Freebox",
+        "downloadSeasonHint": "Download season to Freebox"
+    },
+    "diagnostic": {
+        "title": "Connection problem",
+        "close": "Close",
+        "fix": "Fix automatically",
+        "fixProtocol": "Fix protocol",
+        "fixDisableProxy": "Disable proxy",
+        "noInternet": "No internet connection detected.",
+        "dnsFailure": "DNS resolution failed for {host}. Try setting your DNS to 1.1.1.1 or 8.8.8.8 on your router.",
+        "mixedContent": "Your provider uses HTTP but the app was loaded over HTTPS; browsers block this. Install the Android APK or ask your provider for an HTTPS URL.",
+        "shouldBeHttps": "Your provider uses HTTPS, not HTTP. You can fix this automatically.",
+        "shouldBeHttp": "Your provider uses HTTP, not HTTPS. You can fix this automatically.",
+        "proxyBroken": "Your CORS proxy is not responding but the provider is reachable directly. You can disable the proxy automatically.",
+        "endpointSlow": "The provider is reachable but this specific endpoint timed out. The provider may be overloaded, try again later.",
+        "serverUnreachable": "The provider server is unreachable. Your ISP may be blocking it, or the server is down. A VPN may help.",
+        "invalidUrl": "The provider URL is invalid.",
+        "unknown": "Unknown network issue.",
+        "stepInternet": "Internet",
+        "stepDns": "DNS",
+        "stepDirect": "Direct connection",
+        "stepSwapped": "Alternate protocol",
+        "stepNoProxy": "Without proxy",
+        "invalidCredentials": "Your username or password is invalid, or your subscription has expired. Edit the playlist to fix it.",
+        "fixEditPlaylist": "Edit playlist",
+        "serverError": "The provider server returned an error (HTTP {status}). The server is overloaded or malfunctioning. Try again later.",
+        "clientError": "The provider server rejected the request (HTTP {status}). The URL or credentials may be incorrect.",
+        "stepProvider": "Provider"
+    },
+    "apkUpdate": {
+        "title": "Update available",
+        "message": "A new version of the app is available (build {remote}). Install now?",
+        "install": "Install",
+        "later": "Later",
+        "downloading": "Downloading update... {percent}%",
+        "downloadError": "Download failed: {msg}",
+        "permissionTitle": "Permission required",
+        "permissionNeeded": "Android requires you to allow installation from this app. Open settings to grant permission, then come back and retry.",
+        "openSettings": "Open settings"
+    },
+    "webUpdate": {
+        "title": "Update ready",
+        "message": "A new version of the app is ready. Reload now to apply the update?",
+        "reload": "Reload now",
+        "later": "Later",
+        "checking": "Checking for updates...",
+        "upToDate": "You are up to date"
     }
 }

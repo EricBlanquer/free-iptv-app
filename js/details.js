@@ -55,7 +55,18 @@ IPTVApp.prototype.showDetails = function(item) {
     }
     this.updateFavoriteButton();
     this.updateDownloadButton();
-    this._setupDetailsButtons(streamId, streamData, actualType, isFromHistory, historyPosition);
+    var selfTip = this;
+    this._detailsTooltipTimer = setTimeout(function() {
+        if (selfTip.currentScreen !== 'details') return;
+        selfTip.showButtonTooltip('favorite-btn', 'favoriteTooltipShown', I18n.t('tips.favoriteHint', 'Add to your list'), 'bottom');
+        var dlBtn = document.getElementById('download-btn');
+        if (dlBtn && !dlBtn.classList.contains('hidden')) {
+            selfTip.showButtonTooltip('download-btn', 'downloadTooltipShown', I18n.t('tips.downloadHint', 'Download to Freebox'), 'top');
+        }
+    }, 1000);
+    var effectiveStreamId = this.selectedStream.id || streamId;
+    var effectiveStreamData = this.selectedStream.data || streamData;
+    this._setupDetailsButtons(effectiveStreamId, effectiveStreamData, actualType, isFromHistory, historyPosition);
     if (actualType === 'live' || streamType === 'live' || actualType === 'sport' || streamType === 'sport') {
         this._showDetailsLive(streamId, streamData);
         return;
@@ -162,6 +173,8 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     for (var vi = 0; vi < oldVersionBtns.length; vi++) {
         oldVersionBtns[vi].parentNode.removeChild(oldVersionBtns[vi]);
     }
+    var breakEl = actionsEl.querySelector('.actions-break');
+    if (breakEl) breakEl.style.display = 'none';
     this.setHidden('play-btn', false);
 };
 
@@ -180,6 +193,8 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
     this.setHidden('play-btn', true);
     var actionsEl = document.getElementById('details-actions');
     var playBtn = document.getElementById('play-btn');
+    var breakEl = actionsEl.querySelector('.actions-break');
+    if (breakEl) breakEl.style.display = '';
     streamData._duplicateVersions.forEach(function(version, idx) {
         var btn = document.createElement('button');
         btn.className = 'version-btn focusable action-btn';
@@ -377,6 +392,26 @@ IPTVApp.prototype._findBestQualityVersion = function(versions) {
     return preferredIdx;
 };
 
+IPTVApp.prototype._findBestVersionProgress = function(streamData) {
+    var minMs = (this.settings.minProgressMinutes || 2) * 60000;
+    if (!streamData || !streamData._duplicateVersions || streamData._duplicateVersions.length <= 1) {
+        return null;
+    }
+    var best = null;
+    var versions = streamData._duplicateVersions;
+    for (var vIdx = 0; vIdx < versions.length; vIdx++) {
+        var v = versions[vIdx];
+        var vData = v.data || { stream_id: v.id, _playlistId: streamData._playlistId };
+        var vProg = this.getWatchHistoryItem(vData);
+        if (vProg && !vProg.watched && vProg.position >= minMs) {
+            if (!best || vProg.position > best.prog.position) {
+                best = { version: v, prog: vProg };
+            }
+        }
+    }
+    return best;
+};
+
 IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualType, isFromHistory, historyPosition) {
     var playBtn = document.getElementById('play-btn');
     var continueBtn = document.getElementById('continue-btn');
@@ -408,10 +443,21 @@ IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualTy
         this.setHidden(markWatchedBtn, false);
     }
     else {
-        var vodProg = this.getWatchHistoryItem(streamId);
+        var vodProg = this.getWatchHistoryItem(streamData || streamId);
+        var versionTag = '';
+        var bestVersion = this._findBestVersionProgress(streamData);
+        if (bestVersion) {
+            vodProg = bestVersion.prog;
+            versionTag = bestVersion.version.tag || I18n.t('details.defaultVersion', 'Standard');
+            this.selectedStream.id = bestVersion.version.id;
+            this.selectedStream.data = bestVersion.version.data || this.selectedStream.data;
+            window.log('DETAILS buttons: picked version ' + bestVersion.version.id + ' (tag=' + (bestVersion.version.tag || 'default') + ') pos=' + bestVersion.prog.position);
+        }
         if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
             playBtn.textContent = I18n.t('player.play', 'Play') + ' ' + I18n.t('player.fromStart', 'from start').toLowerCase();
-            continueBtn.textContent = I18n.t('player.continueAt', 'Continue at') + ' ' + this.formatPosition(vodProg.position);
+            var continueLabel = I18n.t('player.continueAt', 'Continue at');
+            if (versionTag) continueLabel += ' ' + versionTag;
+            continueBtn.textContent = continueLabel + ' ' + this.formatPosition(vodProg.position);
             this.setHidden(continueBtn, false);
             this.setHidden(markWatchedBtn, false);
             this.selectedStream.historyPosition = vodProg.position;
@@ -874,10 +920,21 @@ IPTVApp.prototype.updateVodButtons = function() {
     var continueBtn = document.getElementById('continue-btn');
     var markWatchedBtn = document.getElementById('mark-watched-btn');
     var minMs = (this.settings.minProgressMinutes || 2) * 60000;
-    var vodProg = this.getWatchHistoryItem(streamId);
+    var streamData = this.selectedStream.data;
+    var vodProg = this.getWatchHistoryItem(streamData || streamId, this.selectedStream._playlistId);
+    var versionTag = '';
+    var bestVersion = this._findBestVersionProgress(streamData);
+    if (bestVersion) {
+        vodProg = bestVersion.prog;
+        versionTag = bestVersion.version.tag || I18n.t('details.defaultVersion', 'Standard');
+        this.selectedStream.id = bestVersion.version.id;
+        this.selectedStream.data = bestVersion.version.data || streamData;
+    }
     if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
         playBtn.textContent = I18n.t('player.play', 'Play') + ' ' + I18n.t('player.fromStart', 'from start').toLowerCase();
-        continueBtn.textContent = I18n.t('player.continueAt', 'Continue at') + ' ' + this.formatPosition(vodProg.position);
+        var continueLabel = I18n.t('player.continueAt', 'Continue at');
+        if (versionTag) continueLabel += ' ' + versionTag;
+        continueBtn.textContent = continueLabel + ' ' + this.formatPosition(vodProg.position);
         this.setHidden(playBtn, hasVersionBtns);
         this.setHidden(continueBtn, false);
         this.setHidden(markWatchedBtn, false);
@@ -1088,11 +1145,20 @@ IPTVApp.prototype.renderSeasons = function(seriesData) {
         container.appendChild(btn);
     });
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
+    if (!viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
+    }
     if (this.settings.freeboxEnabled && (viaVm || (this.settings.freeboxAppToken && FreeboxAPI.isConfigured()))) {
         var dlBtn = document.createElement('button');
         dlBtn.className = 'download-season-btn focusable';
         dlBtn.id = 'download-season-btn';
         container.appendChild(dlBtn);
+        var selfTip = this;
+        this._seasonTooltipTimer = setTimeout(function() {
+            if (selfTip.currentScreen !== 'details') return;
+            selfTip.showButtonTooltip('download-season-btn', 'downloadSeasonTooltipShown', I18n.t('tips.downloadSeasonHint', 'Download season to Freebox'), 'top');
+        }, 1000);
     }
 };
 
@@ -1403,6 +1469,9 @@ IPTVApp.prototype.hideTracksModal = function() {
         this.updatePlayerTracksFocus();
     }
     this.focusArea = this.previousFocusArea || 'details';
+    if (this.currentScreen === 'player') {
+        this.showPlayerOverlay();
+    }
 };
 
 // Next episode
@@ -1902,7 +1971,7 @@ IPTVApp.prototype.markAsWatched = function() {
     if (this.selectedStream) {
         var streamId = this.selectedStream.id;
         // Mark as watched in watchHistory
-        var historyItem = this.getWatchHistoryItem(streamId);
+        var historyItem = this.getWatchHistoryItem(this.selectedStream.data || streamId, this.selectedStream._playlistId);
         if (historyItem) {
             historyItem.watched = true;
             this.saveWatchHistory();
@@ -2159,7 +2228,7 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     if (available) {
         // Check progress for this movie
         if (available.type === 'vod') {
-            var vodProg = this.getWatchHistoryItem(available.id);
+            var vodProg = this.getWatchHistoryItem(available.stream || available.id);
             if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
                 playBtn.textContent = I18n.t('player.play', 'Play') + ' ' + I18n.t('player.fromStart', 'from start').toLowerCase();
                 continueBtn.textContent = I18n.t('player.continueAt', 'Continue at') + ' ' + this.formatPosition(vodProg.position);
@@ -2327,7 +2396,7 @@ IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, fi
         var minMs = (this.settings.minProgressMinutes || 2) * 60000;
         // Check progress for this movie
         if (streamType === 'vod') {
-            var vodProg = this.getWatchHistoryItem(streamId);
+            var vodProg = this.getWatchHistoryItem(stream || streamId);
             if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
                 playBtn.textContent = I18n.t('player.play', 'Play') + ' ' + I18n.t('player.fromStart', 'from start').toLowerCase();
                 continueBtn.textContent = I18n.t('player.continueAt', 'Continue at') + ' ' + this.formatPosition(vodProg.position);
@@ -2513,6 +2582,10 @@ IPTVApp.prototype.updateDownloadButton = function() {
     var btn = document.getElementById('download-btn');
     if (!btn) return;
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
+    if (!viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
+    }
     if (!viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
         this.setHidden(btn, true);
         return;

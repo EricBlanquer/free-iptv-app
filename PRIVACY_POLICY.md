@@ -1,16 +1,27 @@
 # Privacy Policy
 
-**Last updated: December 25, 2024**
+**Last updated: April 8, 2026**
 
 ## Introduction
 
-Free IPTV ("the App") is a media player application for Samsung Smart TVs. This Privacy Policy explains how we handle your information.
+Free IPTV ("the App") is a media player application for Samsung Smart TVs and Android TV. This Privacy Policy explains how we handle your information and complies with the EU General Data Protection Regulation (GDPR).
 
 ## Data Collection
 
-**We do not collect any personal data.**
+The App is designed to minimize data collection. The only data transmitted to servers we operate is related to the trial / licensing system:
 
-The App operates entirely on your device and does not transmit any user data to external servers owned or operated by us.
+- **Device identifier**: a randomly-generated ID unique to your installation. It does not contain any account, name, email, or hardware serial number.
+- **Install date**: the date the App was first launched, used to compute the trial period.
+- **License code** (if any): the code you entered to unlock the App.
+- **IP address**: automatically logged when your device contacts the licensing server, used for fraud prevention and approximate geolocation.
+- **Approximate location and ISP**: derived from the IP address (city / region / country / Internet provider) using the third-party service ip-api.com. No GPS or precise location data is collected.
+- **Last seen timestamp**: the date of the last contact with the licensing server.
+
+**Legal basis (GDPR Art. 6):** legitimate interest in preventing license fraud and operating the trial system. No advertising, no profiling, no resale of data to any third party.
+
+**Retention:** unlicensed devices that have not contacted the server for 12 months are automatically deleted. Licensed devices are retained for the duration of the license.
+
+**Your rights (GDPR Art. 15-22):** you can request access, correction or deletion of your data, or object to its processing, by emailing eric.blanquer@gmail.com with your device ID. Deletion requests are honored within 30 days.
 
 ## Data Stored Locally
 

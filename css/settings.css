@@ -140,7 +140,9 @@
 .settings-value span {
     color: #fff;
     text-align: center;
-    min-width: 130px;
+    width: 160px;
+    padding: 0 12px;
+    box-sizing: border-box;
 }
 
 .settings-btn {
@@ -226,6 +228,7 @@
     border-radius: 8px;
     color: #fff;
     margin-right: 15px;
+    margin-bottom: 10px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1215,7 +1218,29 @@
     box-shadow: 0 0 0 2px rgba(52, 208, 88, 0.3);
 }
 
+#settings-header-right {
+    position: absolute;
+    top: 60px;
+    right: 60px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
 #settings-version {
-    color: rgba(255, 255, 255, 0.3);
-    margin-left: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-right: 20px;
+}
+
+#settings-check-updates-btn {
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0;
+}
+
+#settings-check-updates-btn.focused {
+    background: rgba(0, 212, 255, 0.3);
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.4);
 }

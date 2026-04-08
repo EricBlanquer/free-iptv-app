@@ -41,6 +41,7 @@
 #details-content {
     display: flex;
     flex-shrink: 0;
+    height: 600px;
 }
 
 #details-poster-wrapper {
@@ -63,6 +64,8 @@
     flex-direction: column;
     justify-content: flex-start;
     margin-left: 60px;
+    min-height: 0;
+    min-width: 0;
 }
 
 #details-info > * {
@@ -115,6 +118,8 @@
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s;
+    flex: 0 1 auto;
+    min-height: 0;
     max-height: 30vh;
     overflow: auto;
 }
@@ -135,11 +140,18 @@
 .tts-tooltip::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -9px;
     right: 30px;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-top: 10px solid rgba(0, 212, 255, 0.95);
+}
+
+.tts-tooltip.below::after {
+    bottom: auto;
+    top: -9px;
+    border-top: none;
+    border-bottom: 10px solid rgba(0, 212, 255, 0.95);
 }
 
 .tts-tooltip.visible {
@@ -496,6 +508,23 @@
 /* Actions */
 #details-actions {
     margin-top: 10px;
+    padding-left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#details-actions > button {
+    margin-bottom: 10px;
+}
+
+.actions-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+#continue-btn {
+    margin-left: 0;
 }
 
 #series-status {
@@ -523,7 +552,7 @@
 
 .action-btn.secondary {
     background: #0077cc;
-    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .action-btn.secondary:focus,

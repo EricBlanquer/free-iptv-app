@@ -120,8 +120,6 @@
         "minThreshold": "Limite mínimo",
         "watchedThreshold": "Limite assistido",
         "retention": "Retenção",
-        "unitMinutes": "minutos",
-        "unitWeeks": "semanas",
         "historyMaxItems": "Histórico máximo",
         "focusOnCategories": "Foco nas categorias",
         "textSize": "Tamanho do texto",
@@ -211,6 +209,7 @@
         "freeboxPair": "Emparelhar",
         "freeboxUnpair": "Desemparelhar",
         "freeboxPaired": "Emparelhado",
+        "freeboxPairedNoApi": "Emparelhado (API não conectada)",
         "freeboxNotPaired": "Não emparelhado",
         "freeboxDesc": "Baixar conteúdo VOD para a sua Freebox",
         "proxyRequired": "Proxy necessário",
@@ -236,7 +235,27 @@
         "progressCleared": "Progresso limpo",
         "favoritesCleared": "Lista limpa",
         "tmdbCacheCleared": "Cache TMDB limpo",
-        "textXXLarge": "Máximo"
+        "textXXLarge": "Máximo",
+        "checkUpdates": "Verificar atualizações",
+        "installUpdate": "Instalar atualização",
+        "privacyPolicy": "Política de privacidade",
+        "buffer": "Buffer de vídeo",
+        "bufferMode": "Modo",
+        "bufferLow": "Baixo",
+        "bufferStandard": "Padrão",
+        "bufferHigh": "Alto",
+        "bufferMax": "Máximo",
+        "bufferCustom": "Avançado",
+        "bufferPlay": "Início",
+        "bufferRebuffer": "Retomar",
+        "bufferMin": "Mín",
+        "bufferMaxLabel": "Máx",
+        "unitMinutes_one": "{n} minuto",
+        "unitMinutes_other": "{n} minutos",
+        "unitWeeks_one": "{n} semana",
+        "unitWeeks_other": "{n} semanas",
+        "unitSeconds_one": "{n} segundo",
+        "unitSeconds_other": "{n} segundos"
     },
     "player": {
         "play": "Reproduzir",
@@ -275,7 +294,8 @@
         "options": "Opções",
         "liveBtn": "Ao vivo",
         "live": "Ao vivo",
-        "timeshift": "Diferido"
+        "timeshift": "Diferido",
+        "switchingQuality": "Mudando para qualidade inferior"
     },
     "subtitleOptions": {
         "title": "Opções de legendas",
@@ -480,6 +500,56 @@
     },
     "tips": {
         "clickToListen": "🔊 Clique para ouvir",
-        "subtitleHint": "Clique para desativar, clique novamente para mudar"
+        "subtitleHint": "Clique para desativar, clique novamente para mudar",
+        "qualityHint": "Clique para mudar a resolução",
+        "favoriteHint": "Adicionar à minha lista",
+        "downloadHint": "Baixar para a Freebox",
+        "downloadSeasonHint": "Baixar temporada para Freebox"
+    },
+    "diagnostic": {
+        "title": "Problema de conexão",
+        "close": "Fechar",
+        "fix": "Corrigir automaticamente",
+        "fixProtocol": "Corrigir protocolo",
+        "fixDisableProxy": "Desativar proxy",
+        "noInternet": "Nenhuma conexão com a internet detectada.",
+        "dnsFailure": "Falha na resolução DNS para {host}. Configure seus DNS para 1.1.1.1 ou 8.8.8.8 no seu roteador.",
+        "mixedContent": "Seu provedor usa HTTP mas o app foi carregado em HTTPS; o navegador bloqueia a requisição. Instale o APK Android ou peça uma URL HTTPS ao provedor.",
+        "shouldBeHttps": "Seu provedor usa HTTPS, não HTTP. Você pode corrigir automaticamente.",
+        "shouldBeHttp": "Seu provedor usa HTTP, não HTTPS. Você pode corrigir automaticamente.",
+        "proxyBroken": "Seu proxy CORS não responde mas o provedor está acessível diretamente. Você pode desativar o proxy automaticamente.",
+        "endpointSlow": "O provedor está acessível mas este endpoint expirou. O servidor pode estar sobrecarregado, tente mais tarde.",
+        "serverUnreachable": "O servidor do provedor está inacessível. Seu ISP pode estar bloqueando, ou o servidor está fora do ar. Uma VPN pode ajudar.",
+        "invalidUrl": "A URL do provedor é inválida.",
+        "unknown": "Problema de rede desconhecido.",
+        "stepInternet": "Internet",
+        "stepDns": "DNS",
+        "stepDirect": "Conexão direta",
+        "stepSwapped": "Protocolo alternativo",
+        "stepNoProxy": "Sem proxy",
+        "invalidCredentials": "Seu nome de usuário ou senha é inválido, ou sua assinatura expirou. Edite a playlist para corrigir.",
+        "fixEditPlaylist": "Editar playlist",
+        "serverError": "O servidor do provedor retornou um erro (HTTP {status}). O servidor está sobrecarregado ou com problemas. Tente mais tarde.",
+        "clientError": "O servidor do provedor rejeitou a solicitação (HTTP {status}). A URL ou credenciais podem estar incorretas.",
+        "stepProvider": "Provedor"
+    },
+    "apkUpdate": {
+        "title": "Atualização disponível",
+        "message": "Uma nova versão do app está disponível (build {remote}). Instalar agora?",
+        "install": "Instalar",
+        "later": "Mais tarde",
+        "downloading": "Baixando atualização... {percent}%",
+        "downloadError": "Falha no download: {msg}",
+        "permissionTitle": "Permissão necessária",
+        "permissionNeeded": "O Android exige que você permita a instalação a partir deste app. Abra as configurações para conceder a permissão e tente novamente.",
+        "openSettings": "Abrir configurações"
+    },
+    "webUpdate": {
+        "title": "Atualização pronta",
+        "message": "Uma nova versão do app está pronta. Recarregar agora para aplicar a atualização?",
+        "reload": "Recarregar",
+        "later": "Mais tarde",
+        "checking": "Verificando atualizações...",
+        "upToDate": "Você está atualizado"
     }
 }

@@ -29,6 +29,72 @@ IPTVApp.prototype.getHistoryDayKey = function(timestamp) {
 };
 
 // Strip category/stream/quality prefix
+IPTVApp.prototype.getLiveChannelBaseName = function(name) {
+    if (!name) return '';
+    var stripped = this.stripCategoryPrefix(name);
+    stripped = stripped.replace(/\b(8K|4320p?|4K|UHD|2160p?|FHD|1080p?|HD|720p?|SD|480p?|HEVC|H[\.\s]?265|H[\.\s]?264|HDR10\+?|HDR|10[Bb]it)\b/gi, ' ');
+    stripped = stripped.replace(/[\s\-|:()]+/g, ' ').trim();
+    return stripped.toLowerCase();
+};
+
+IPTVApp.prototype.getLiveQualityScore = function(name) {
+    var t = (name || '').toUpperCase();
+    if (/\b(8K|4320)\b/.test(t)) return 5;
+    if (/\b(4K|UHD|2160)\b/.test(t)) return 4;
+    if (/\b(FHD|1080)\b/.test(t)) return 3;
+    if (/\b(HD|720)\b/.test(t)) return 2;
+    if (/\b(SD|480)\b/.test(t)) return 1;
+    return 0;
+};
+
+IPTVApp.prototype.findLiveVariants = function(stream) {
+    if (!stream) return [];
+    var all = this.findAllLiveVariants(stream);
+    var currentScore = this.getLiveQualityScore(this.getStreamTitle(stream));
+    var lower = [];
+    for (var i = 0; i < all.length; i++) {
+        if (all[i].stream_id === stream.stream_id && all[i]._playlistId === stream._playlistId) continue;
+        if (this.getLiveQualityScore(this.getStreamTitle(all[i])) >= currentScore) continue;
+        lower.push(all[i]);
+    }
+    return lower;
+};
+
+IPTVApp.prototype.findAllLiveVariants = function(stream) {
+    if (!stream) return [];
+    var allStreams = [];
+    if (this.api && this.api.cache && this.api.cache.liveStreams && this.api.cache.liveStreams['_all']) {
+        allStreams = this.api.cache.liveStreams['_all'];
+    }
+    else if (this.data && this.data.live && this.data.live.streams) {
+        allStreams = this.data.live.streams;
+    }
+    var baseName = this.getLiveChannelBaseName(this.getStreamTitle(stream));
+    if (!baseName) return [stream];
+    var variants = [];
+    var seen = {};
+    for (var i = 0; i < allStreams.length; i++) {
+        var s = allStreams[i];
+        var sBase = this.getLiveChannelBaseName(this.getStreamTitle(s));
+        if (sBase !== baseName) continue;
+        var key = s.stream_id + '_' + (s._playlistId || '');
+        if (seen[key]) continue;
+        seen[key] = true;
+        variants.push(s);
+    }
+    var self = this;
+    variants.sort(function(a, b) {
+        return self.getLiveQualityScore(self.getStreamTitle(b)) - self.getLiveQualityScore(self.getStreamTitle(a));
+    });
+    return variants;
+};
+
+IPTVApp.prototype.getLiveQualityTag = function(name) {
+    var t = (name || '').toUpperCase();
+    var m = t.match(/\b(8K|4K|UHD|2160p?|FHD|1080p?|HD|720p?|SD|480p?|HEVC)\b/);
+    return m ? m[1].replace(/P$/, 'p') : '';
+};
+
 IPTVApp.prototype.stripCategoryPrefix = function(title) {
     if (!title) return '';
     // Remove invisible characters (LTR mark, zero-width chars, etc.) at the start
@@ -1217,6 +1283,11 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
         if (a.isVostfr && !b.isVostfr) return 1;
         return a.sortName.localeCompare(b.sortName);
     });
+    if (!useGenre) {
+        preparedCategories = preparedCategories.filter(function(cat) {
+            return (countByCategory[cat.id] || 0) > 0;
+        });
+    }
     var isFirst = (categories.length === 1 && continueCount === 0 && !useGenre);
     preparedCategories.forEach(function(cat) {
         var item = document.createElement('div');
