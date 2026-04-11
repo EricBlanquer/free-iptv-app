@@ -352,6 +352,10 @@
                         <div class="settings-toggle focusable" data-setting="useGenreCategories" data-value="false" data-i18n="settings.no">No</div>
                     </div>
                     <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.showRecommended">Show "Recommended" category</span>
+                        <div class="settings-toggle focusable" data-setting="showRecommended" data-value="true" data-i18n="settings.yes">Yes</div>
+                    </div>
+                    <div class="settings-row">
                         <span class="settings-label" data-i18n="settings.hideSDDefault">Hide SD by default</span>
                         <div class="settings-toggle focusable" data-setting="hideSD" data-value="true" data-i18n="settings.yes">Yes</div>
                     </div>
@@ -688,6 +692,10 @@
                         <div id="player-format-btn" class="player-track-btn focusable hidden">
                             <span class="track-icon"><span class="material-symbols-outlined">stream</span></span>
                             <span id="player-format-label">TS</span>
+                        </div>
+                        <div id="player-auto-format-btn" class="player-track-btn focusable hidden" data-i18n-title="settings.liveAutoFormatSwitch" title="Auto-switch live format on timeout">
+                            <span class="track-icon"><span class="material-symbols-outlined" id="player-auto-format-icon">sync</span></span>
+                            <span data-i18n="player.autoFormat">Auto</span>
                         </div>
                         <div id="player-quality-btn" class="player-track-btn focusable hidden">
                             <span class="track-icon"><span class="material-symbols-outlined">high_quality</span></span>
@@ -1140,6 +1148,7 @@
     <script src="js/features/home.js"></script>
     <script src="js/features/favorites.js"></script>
     <script src="js/features/history.js"></script>
+    <script src="js/features/recommended.js"></script>
     <script src="js/features/guide.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/playback.js"></script>

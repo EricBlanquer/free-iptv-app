@@ -58,7 +58,10 @@
         "noHistory": "لا يوجد سجل مشاهدة",
         "downloads": "التنزيلات",
         "noDownloads": "لا توجد تنزيلات",
-        "categories": "الفئات"
+        "categories": "الفئات",
+        "recommended": "موصى به",
+        "noRecommendations": "لا توجد توصيات بعد — شاهد أو أضف بعض المفضلات أولاً",
+        "computingRecommendations": "جاري حساب التوصيات..."
     },
     "guide": {
         "today": "اليوم",
@@ -249,7 +252,9 @@
         "unitWeeks_one": "أسبوع واحد",
         "unitWeeks_other": "{n} أسابيع",
         "unitSeconds_one": "ثانية واحدة",
-        "unitSeconds_other": "{n} ثوانٍ"
+        "unitSeconds_other": "{n} ثوانٍ",
+        "showRecommended": "إظهار فئة « موصى به »",
+        "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة"
     },
     "player": {
         "play": "تشغيل",
@@ -289,7 +294,8 @@
         "liveBtn": "مباشر",
         "live": "مباشر",
         "timeshift": "مؤجل",
-        "switchingQuality": "التبديل إلى جودة أقل"
+        "switchingQuality": "التبديل إلى جودة أقل",
+        "autoFormat": "تلقائي"
     },
     "subtitleOptions": {
         "title": "خيارات الترجمة",

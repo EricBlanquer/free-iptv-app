@@ -62,7 +62,10 @@
         "noHistory": "Sem histórico de visualização",
         "downloads": "Downloads",
         "noDownloads": "Sem downloads",
-        "categories": "Categorias"
+        "categories": "Categorias",
+        "recommended": "Recomendado",
+        "noRecommendations": "Sem recomendações ainda — veja ou favorite alguns itens primeiro",
+        "computingRecommendations": "Calculando recomendações..."
     },
     "guide": {
         "today": "Hoje",
@@ -253,7 +256,9 @@
         "unitWeeks_one": "{n} semana",
         "unitWeeks_other": "{n} semanas",
         "unitSeconds_one": "{n} segundo",
-        "unitSeconds_other": "{n} segundos"
+        "unitSeconds_other": "{n} segundos",
+        "showRecommended": "Mostrar categoria \"Recomendado\"",
+        "liveAutoFormatSwitch": "Troca auto de formato live no timeout"
     },
     "player": {
         "play": "Reproduzir",
@@ -293,7 +298,8 @@
         "liveBtn": "Ao vivo",
         "live": "Ao vivo",
         "timeshift": "Diferido",
-        "switchingQuality": "Mudando para qualidade inferior"
+        "switchingQuality": "Mudando para qualidade inferior",
+        "autoFormat": "Auto"
     },
     "subtitleOptions": {
         "title": "Opções de legendas",

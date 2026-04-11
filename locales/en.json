@@ -84,7 +84,10 @@
         "noHistory": "No viewing history",
         "downloads": "Downloads",
         "noDownloads": "No downloads",
-        "categories": "Categories"
+        "categories": "Categories",
+        "recommended": "Recommended",
+        "noRecommendations": "No recommendations yet — watch or favorite a few items first",
+        "computingRecommendations": "Computing recommendations..."
     },
     "guide": {
         "today": "Today",
@@ -280,7 +283,9 @@
         "unitWeeks_one": "{n} week",
         "unitWeeks_other": "{n} weeks",
         "unitSeconds_one": "{n} second",
-        "unitSeconds_other": "{n} seconds"
+        "unitSeconds_other": "{n} seconds",
+        "showRecommended": "Show \"Recommended\" category",
+        "liveAutoFormatSwitch": "Auto-switch live format on timeout"
     },
     "player": {
         "play": "Play",
@@ -320,7 +325,8 @@
         "liveBtn": "Live",
         "live": "Live",
         "timeshift": "Timeshift",
-        "switchingQuality": "Switching to lower quality"
+        "switchingQuality": "Switching to lower quality",
+        "autoFormat": "Auto"
     },
     "subtitleOptions": {
         "title": "Subtitle options",

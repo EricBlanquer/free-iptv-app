@@ -207,6 +207,7 @@
     margin: 0 30px;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 #progress-bar {

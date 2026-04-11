@@ -734,3 +734,91 @@ describe('bug: fetchTMDBInfo type mapping for series with cached tmdb_id', () =>
         expect(resolveTmdbType('vod')).toBe('movie');
     });
 });
+
+describe('Recommendations engine', () => {
+    function buildProviderIndex(streams) {
+        var byTmdb = {};
+        var byCleanKey = {};
+        for (var i = 0; i < streams.length; i++) {
+            var s = streams[i];
+            if (s.tmdb_id != null) byTmdb[String(s.tmdb_id)] = s;
+            if (!byCleanKey[s._dedupKey]) byCleanKey[s._dedupKey] = s;
+        }
+        return { byTmdb: byTmdb, byCleanKey: byCleanKey };
+    }
+
+    function matchTmdbToStream(tmdbResult, type, providerIndex) {
+        var hit = providerIndex.byTmdb[String(tmdbResult.id)];
+        if (hit) return hit;
+        var rawTitle = type === 'tv' ? tmdbResult.name : tmdbResult.title;
+        if (!rawTitle) return null;
+        var clean = rawTitle.toLowerCase();
+        var year = '';
+        if (type === 'tv' && tmdbResult.first_air_date) year = tmdbResult.first_air_date.substring(0, 4);
+        if (type !== 'tv' && tmdbResult.release_date) year = tmdbResult.release_date.substring(0, 4);
+        return providerIndex.byCleanKey[clean + '|' + year]
+            || providerIndex.byCleanKey[clean + '|']
+            || null;
+    }
+
+    it('matches by tmdb_id when present', () => {
+        var streams = [
+            { tmdb_id: 42, _dedupKey: 'movie a|2020', name: 'Movie A' },
+            { tmdb_id: 99, _dedupKey: 'movie b|2021', name: 'Movie B' }
+        ];
+        var idx = buildProviderIndex(streams);
+        var match = matchTmdbToStream({ id: 42, title: 'Different Title' }, 'movie', idx);
+        expect(match).toBe(streams[0]);
+    });
+
+    it('matches by title+year when no tmdb_id', () => {
+        var streams = [
+            { _dedupKey: 'inception|2010', name: 'Inception' }
+        ];
+        var idx = buildProviderIndex(streams);
+        var match = matchTmdbToStream({ id: 27205, title: 'Inception', release_date: '2010-07-16' }, 'movie', idx);
+        expect(match).toBe(streams[0]);
+    });
+
+    it('falls back to title-only when year mismatch', () => {
+        var streams = [
+            { _dedupKey: 'cube|', name: 'Cube' }
+        ];
+        var idx = buildProviderIndex(streams);
+        var match = matchTmdbToStream({ id: 1, title: 'Cube', release_date: '1997-09-09' }, 'movie', idx);
+        expect(match).toBe(streams[0]);
+    });
+
+    it('returns null when no match', () => {
+        var idx = buildProviderIndex([{ _dedupKey: 'foo|2020' }]);
+        var match = matchTmdbToStream({ id: 999, title: 'Bar' }, 'movie', idx);
+        expect(match).toBeNull();
+    });
+
+    it('scores recommendations by frequency across multiple seeds', () => {
+        var allResults = [
+            [{ id: 1 }, { id: 2 }, { id: 3 }],
+            [{ id: 2 }, { id: 4 }],
+            [{ id: 2 }, { id: 3 }, { id: 5 }]
+        ];
+        var scoreById = {};
+        for (var i = 0; i < allResults.length; i++) {
+            for (var j = 0; j < allResults[i].length; j++) {
+                var id = allResults[i][j].id;
+                scoreById[id] = (scoreById[id] || 0) + 1;
+            }
+        }
+        expect(scoreById[2]).toBe(3);
+        expect(scoreById[3]).toBe(2);
+        expect(scoreById[1]).toBe(1);
+        expect(scoreById[4]).toBe(1);
+        expect(scoreById[5]).toBe(1);
+    });
+
+    it('filters out items already in seen set', () => {
+        var seen = { 't:movie:42': true };
+        var candidates = [{ id: 42 }, { id: 43 }];
+        var kept = candidates.filter(function(c) { return !seen['t:movie:' + c.id]; });
+        expect(kept).toEqual([{ id: 43 }]);
+    });
+});

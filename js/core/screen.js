@@ -45,7 +45,6 @@ IPTVApp.prototype.bindTouchEvents = function() {
         if (self.hideAllButtonTooltips) self.hideAllButtonTooltips();
         if (self.hideTTSTooltip) self.hideTTSTooltip();
     });
-    if (!document.body.classList.contains('touch')) return;
     var areaMap = [
         { selector: '#player-tracks .player-track-btn', area: 'player-tracks' },
         { selector: '#resume-modal .modal-btn', area: 'modal' },
@@ -201,6 +200,22 @@ IPTVApp.prototype.showScreen = function(screen) {
     if (screen !== 'player' && this._webUpdatePending && this._tryApplyWebUpdate) {
         var self = this;
         setTimeout(function() { self._tryApplyWebUpdate(); }, 500);
+    }
+    if (screen === 'browse' && (this._sidebarDirty || this._dynamicGridDirty)) {
+        var section = this.currentSection;
+        var data = section ? this.data[section] : null;
+        if (this._sidebarDirty && data && data.categories && data.streams) {
+            this.renderCategories(data.categories, data.streams);
+        }
+        this._sidebarDirty = false;
+        if (this._dynamicGridDirty && section) {
+            var categoryKey = (this.settings.activePlaylistId || '') + '_' + section;
+            var currentCategory = this.selectedCategoryBySection[categoryKey];
+            if (currentCategory === 'favorites' || currentCategory === 'recommended' || currentCategory === 'continue') {
+                this.loadStreams(currentCategory);
+            }
+        }
+        this._dynamicGridDirty = false;
     }
 };
 

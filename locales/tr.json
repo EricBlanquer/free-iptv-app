@@ -60,7 +60,10 @@
         "noHistory": "İzleme geçmişi yok",
         "downloads": "İndirmeler",
         "noDownloads": "İndirme yok",
-        "categories": "Kategoriler"
+        "categories": "Kategoriler",
+        "recommended": "Önerilenler",
+        "noRecommendations": "Henüz öneri yok — önce bir şeyler izleyin veya favorilere ekleyin",
+        "computingRecommendations": "Öneriler hesaplanıyor..."
     },
     "guide": {
         "today": "Bugün",
@@ -251,7 +254,9 @@
         "unitWeeks_one": "{n} hafta",
         "unitWeeks_other": "{n} hafta",
         "unitSeconds_one": "{n} saniye",
-        "unitSeconds_other": "{n} saniye"
+        "unitSeconds_other": "{n} saniye",
+        "showRecommended": "\"Önerilenler\" kategorisini göster",
+        "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme"
     },
     "player": {
         "play": "Oynat",
@@ -291,7 +296,8 @@
         "liveBtn": "Canlı",
         "live": "Canlı",
         "timeshift": "Gecikmeli",
-        "switchingQuality": "Daha düşük kaliteye geçiş"
+        "switchingQuality": "Daha düşük kaliteye geçiş",
+        "autoFormat": "Oto"
     },
     "subtitleOptions": {
         "title": "Altyazı seçenekleri",

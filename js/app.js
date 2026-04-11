@@ -1035,4 +1035,28 @@ document.addEventListener('DOMContentLoaded', function() {
     window.app = new IPTVApp();
     window.app.init();
     window.focus();
+    var resetScroll = function() {
+        if (document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
+        if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
+    };
+    document.addEventListener('scroll', resetScroll, true);
+    window.addEventListener('scroll', resetScroll, true);
+    var progress = document.getElementById('player-progress');
+    if (progress) {
+        progress.addEventListener('click', function(e) {
+            if (!window.app || !window.app.player) return;
+            if (window.app.currentPlayingType === 'live') return;
+            var rect = progress.getBoundingClientRect();
+            var percent = (e.clientX - rect.left) / rect.width;
+            if (percent < 0) percent = 0;
+            if (percent > 1) percent = 1;
+            var duration = window.app.player.duration || 0;
+            if (duration > 0) {
+                var seekMs = Math.round(percent * duration);
+                window.app.seekTargetPosition = seekMs;
+                window.app.player.seekTo(seekMs);
+                window.app.showPlayerOverlay();
+            }
+        });
+    }
 });

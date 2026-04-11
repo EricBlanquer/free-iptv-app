@@ -57,7 +57,10 @@
         "noHistory": "Nessuna cronologia di visualizzazione",
         "downloads": "Download",
         "noDownloads": "Nessun download",
-        "categories": "Categorie"
+        "categories": "Categorie",
+        "recommended": "Consigliati",
+        "noRecommendations": "Nessun suggerimento — guarda o aggiungi qualcosa ai preferiti",
+        "computingRecommendations": "Calcolo dei suggerimenti..."
     },
     "guide": {
         "today": "Oggi",
@@ -248,7 +251,9 @@
         "unitWeeks_one": "{n} settimana",
         "unitWeeks_other": "{n} settimane",
         "unitSeconds_one": "{n} secondo",
-        "unitSeconds_other": "{n} secondi"
+        "unitSeconds_other": "{n} secondi",
+        "showRecommended": "Mostra categoria \"Consigliati\"",
+        "liveAutoFormatSwitch": "Cambio automatico formato live al timeout"
     },
     "player": {
         "play": "Riproduci",
@@ -288,7 +293,8 @@
         "liveBtn": "Diretta",
         "live": "In diretta",
         "timeshift": "Differita",
-        "switchingQuality": "Passaggio a qualità inferiore"
+        "switchingQuality": "Passaggio a qualità inferiore",
+        "autoFormat": "Auto"
     },
     "subtitleOptions": {
         "title": "Opzioni sottotitoli",

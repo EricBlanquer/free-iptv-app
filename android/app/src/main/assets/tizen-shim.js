@@ -150,92 +150,11 @@
             }
         }
     };
-    var areaSelectors = {
-        'modal': '#resume-modal .modal-btn',
-        'home': '#playlist-selector .focusable, #home-grid .focusable',
-        'continue': '#continue-grid .continue-item',
-        'sidebar': '#categories-list .category-item',
-        'filters': '#filters-bar .focusable',
-        'grid': '#content-grid .grid-item',
-        'details': '#details-screen .focusable:not(.hidden)',
-        'actor': '#actor-filmography-grid .filmography-item',
-        'settings': '#settings-screen .focusable',
-        'playlists': '#playlists-screen .focusable',
-        'playlist-edit': '#playlist-edit-screen .focusable',
-        'confirm-modal': '#confirm-modal .modal-btn'
-    };
-    // Click handling is done by focus.js and screen.js click handlers
+    // Android-only CSS: hide #html5-video (Android always uses native player) +
+    // make container backgrounds transparent when native player is visible.
     document.addEventListener('DOMContentLoaded', function() {
         var style = document.createElement('style');
-        style.textContent = 'video::-webkit-media-controls { display: none !important; } video::-webkit-media-controls-enclosure { display: none !important; } video::-webkit-media-controls-overlay-play-button { display: none !important; } video { object-fit: contain; background: black !important; } #html5-video { display: none !important; } body.native-player-active, body.native-player-active #player-screen, body.native-player-active #player-container, body.native-player-active #av-player { background: transparent !important; } html, body { overflow: hidden !important; }';
+        style.textContent = '#html5-video { display: none !important; } body.native-player-active, body.native-player-active #player-screen, body.native-player-active #player-container, body.native-player-active #av-player { background: transparent !important; }';
         document.head.appendChild(style);
-        var resetScroll = function() {
-            if (document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
-            if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
-        };
-        document.addEventListener('scroll', resetScroll, true);
-        window.addEventListener('scroll', resetScroll, true);
-        var lastScrollTop = -1;
-        setInterval(function() {
-            if (!window.app || !window.app.currentStreams) return;
-            var grid = document.getElementById('content-grid');
-            if (!grid) return;
-            var spacer = document.getElementById('grid-spacer');
-            if (spacer) {
-                var viewportBottom = grid.scrollTop + grid.clientHeight;
-                if (viewportBottom >= spacer.offsetTop - 300) {
-                    window.app.loadMoreItems();
-                }
-            }
-            if (Math.abs(grid.scrollTop - lastScrollTop) > 50) {
-                lastScrollTop = grid.scrollTop;
-                var items = grid.querySelectorAll('.grid-item');
-                var cols = window.app.gridColumns || 5;
-                var scrollTop = grid.scrollTop;
-                var scrollBottom = scrollTop + grid.clientHeight;
-                for (var i = 0; i < items.length; i++) {
-                    var item = items[i];
-                    if (item.offsetTop + item.offsetHeight < scrollTop - 200) continue;
-                    if (item.offsetTop > scrollBottom + 200) break;
-                    var imageDiv = item.querySelector('.grid-item-image');
-                    if (!imageDiv || imageDiv.dataset.loaded) continue;
-                    var url = item.dataset.imageUrl;
-                    if (!url) {
-                        imageDiv.dataset.loaded = 'none';
-                        imageDiv.classList.add('no-image');
-                        continue;
-                    }
-                    (function(div, imgUrl) {
-                        div.dataset.loaded = 'loading';
-                        var optimized = window.app.optimizeTmdbImageUrl ? window.app.optimizeTmdbImageUrl(imgUrl, 'w300') : imgUrl;
-                        var img = new Image();
-                        img.onload = function() {
-                            div.style.backgroundImage = 'url(' + optimized + ')';
-                            div.dataset.loaded = 'true';
-                        };
-                        img.onerror = function() {
-                            div.dataset.loaded = 'none';
-                            div.classList.add('no-image');
-                        };
-                        img.src = optimized;
-                    })(imageDiv, url);
-                }
-            }
-        }, 300);
-        var progress = document.getElementById('player-progress');
-        if (progress) {
-            progress.addEventListener('click', function(e) {
-                if (!window.app || !window.app.player) return;
-                var rect = progress.getBoundingClientRect();
-                var percent = (e.clientX - rect.left) / rect.width;
-                var duration = window.app.player.duration || Android.playerGetDuration();
-                if (duration > 0) {
-                    var seekMs = Math.round(percent * duration);
-                    window.app.seekTargetPosition = seekMs;
-                    window.app.player.seekTo(seekMs);
-                    window.app.showPlayerOverlay();
-                }
-            });
-        }
     });
 })();
