@@ -545,7 +545,9 @@ IPTVApp.prototype._navigateSidebar = function(ctx) {
             break;
         case 'right':
             this.lastSidebarIndex = this.focusIndex;
-            this.setFocus('grid', 0);
+            var gridFocusables = document.querySelectorAll('#content-grid .grid-item');
+            var restoreIdx = (this.lastGridIndex && this.lastGridIndex < gridFocusables.length) ? this.lastGridIndex : 0;
+            this.setFocus('grid', restoreIdx);
             return { index: newIndex, handled: true };
     }
     return { index: newIndex };
@@ -593,6 +595,7 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
             }
             if (newIndex % cols === 0) {
                 if (sidebarVisible) {
+                    this.lastGridIndex = this.focusIndex;
                     this.focusArea = 'sidebar';
                     if (this._cameFromFilters && this.lastSidebarIndex !== null && this.lastSidebarIndex !== undefined) {
                         this.focusIndex = this.lastSidebarIndex;
@@ -716,6 +719,8 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
                 }
             } else if (currentZone === 'favorite' && zones.download) {
                 newIndex = zones.download.start;
+            } else if ((currentZone === 'favorite' || currentZone === 'download') && zones.title) {
+                newIndex = zones.title.start;
             } else if (newIndex > 0) {
                 var prev = ctx.focusables[newIndex - 1];
                 if (this.getDetailsZone(prev) === currentZone) {
@@ -732,6 +737,9 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
                 }
             } else if (currentZone === 'download' && zones.favorite) {
                 newIndex = zones.favorite.start;
+            } else if (currentZone === 'title') {
+                if (zones.download) newIndex = zones.download.start;
+                else if (zones.favorite) newIndex = zones.favorite.start;
             } else if (newIndex < ctx.focusables.length - 1) {
                 var next = ctx.focusables[newIndex + 1];
                 if (this.getDetailsZone(next) === currentZone) {
@@ -743,8 +751,13 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             if (current.id === 'details-description' && this.scrollableTextNav(current, 'up')) {
                 return { index: newIndex, handled: true };
             }
-            if (currentZone === 'favorite' || currentZone === 'download') {
+            if (currentZone === 'favorite' || currentZone === 'download' || currentZone === 'title') {
                 break;
+            }
+            if (currentZone === 'description') {
+                if (zones.download) { newIndex = zones.download.start; break; }
+                if (zones.favorite) { newIndex = zones.favorite.start; break; }
+                if (zones.title) { newIndex = zones.title.start; break; }
             }
             if (currentZone === 'episodes') {
                 var episodeCols = this.getEpisodeColumns();
@@ -767,7 +780,7 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             if (current.id === 'details-description' && this.scrollableTextNav(current, 'down')) {
                 return { index: newIndex, handled: true };
             }
-            if (currentZone === 'favorite' || currentZone === 'download') {
+            if (currentZone === 'favorite' || currentZone === 'download' || currentZone === 'title') {
                 var lastTopZone = zones.download ? 'download' : (zones.favorite ? 'favorite' : currentZone);
                 var nextZone = this.getNextDetailsZone(lastTopZone, zones);
                 if (nextZone) newIndex = zones[nextZone].start;
@@ -991,6 +1004,7 @@ IPTVApp.prototype.getFocusables = function() {
 };
 
 IPTVApp.prototype.getDetailsZone = function(element) {
+    if (element.id === 'details-title') return 'title';
     if (element.classList.contains('favorite-star')) return 'favorite';
     if (element.classList.contains('download-btn')) return 'download';
     if (element.classList.contains('version-btn')) return 'versions';
@@ -1009,7 +1023,7 @@ IPTVApp.prototype.getDetailsZone = function(element) {
 
 IPTVApp.prototype.getDetailsZones = function(focusables) {
     var zones = {};
-    var zoneOrder = ['favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'director'];
+    var zoneOrder = ['title', 'favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'director'];
     for (var i = 0; i < focusables.length; i++) {
         var zone = this.getDetailsZone(focusables[i]);
         if (!zones[zone]) {
@@ -1263,11 +1277,6 @@ IPTVApp.prototype.updateFocus = function() {
             el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
         }
         requestAnimationFrame(function() {
-            var screens = document.querySelectorAll('.screen');
-            for (var s = 0; s < screens.length; s++) {
-                if (screens[s].scrollTop !== 0) screens[s].scrollTop = 0;
-                if (screens[s].scrollLeft !== 0) screens[s].scrollLeft = 0;
-            }
             if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
             if (document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
         });

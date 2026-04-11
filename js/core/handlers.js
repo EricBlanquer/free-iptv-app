@@ -98,8 +98,8 @@ IPTVApp.prototype.selectHandlers = {
     },
     filters: function(current) {
         if (current.classList.contains('sort-btn')) {
-            var sortType = current.dataset.sort;
-            this.applySort(sortType);
+            var group = current.dataset.sortGroup;
+            this.applySortGroup(group);
         } else if (current.id === 'edit-favorites-btn') {
             this.toggleFavoritesEditMode();
         } else if (current.classList.contains('view-btn')) {
@@ -179,6 +179,8 @@ IPTVApp.prototype.selectHandlers = {
             this.playCurrentStream(true);
         } else if (current.id === 'mark-watched-btn') {
             this.markAsWatched();
+        } else if (current.id === 'details-title') {
+            current.click();
         } else if (current.id === 'download-btn' || current.classList.contains('download-btn')) {
             this.hideButtonTooltip('download-btn', true);
             this.triggerFreeboxDownload();
@@ -338,12 +340,48 @@ IPTVApp.prototype.backHandlers = {
         } else if (this.currentSection === 'downloads') {
             this.showDownloadsScreen();
         } else {
+            var needsResort = this._titleOverrideDirty;
+            this._titleOverrideDirty = false;
+            var focusedStreamId = this.selectedStream && this.selectedStream.id;
             this.showScreen('browse');
             this.currentScreen = 'browse';
             this.focusArea = 'grid';
             this.focusIndex = this.lastGridIndex;
+            var jumped = false;
+            if (needsResort && this.applyFilters) {
+                window.log('OVERRIDE', 'Re-applying filters after title override');
+                this.applyFilters();
+                if (focusedStreamId && this.currentStreams) {
+                    var targetIndex = -1;
+                    for (var i = 0; i < this.currentStreams.length; i++) {
+                        var s = this.currentStreams[i];
+                        var sid = s.stream_id || s.vod_id || s.series_id;
+                        if (sid == focusedStreamId) {
+                            targetIndex = i;
+                            break;
+                        }
+                    }
+                    if (targetIndex >= 0) {
+                        this.lastGridIndex = targetIndex;
+                        this._jumpToIndex(targetIndex);
+                        var container = document.getElementById('content-grid');
+                        if (container) {
+                            var topSpacer = document.getElementById('grid-top-spacer');
+                            var spacerHeight = topSpacer ? topSpacer.offsetHeight : 0;
+                            container.scrollTop = spacerHeight;
+                        }
+                        jumped = true;
+                    }
+                }
+            }
             this.updateGridProgress();
             this.updateFocus();
+            if (jumped) {
+                var self = this;
+                requestAnimationFrame(function() {
+                    self.updateFocus();
+                });
+            }
         }
     },
     'screen:browse': function() {

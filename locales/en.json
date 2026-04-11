@@ -108,10 +108,8 @@
         "person": "Person...",
         "year": "Year...",
         "default": "Added date",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Year ↓",
-        "yearAsc": "Year ↑"
+        "sortName": "Name",
+        "sortYear": "Year"
     },
     "settings": {
         "title": "Settings",

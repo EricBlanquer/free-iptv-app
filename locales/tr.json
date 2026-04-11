@@ -81,10 +81,8 @@
     },
     "filters": {
         "default": "Eklenme tarihi",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Yıl ↓",
-        "yearAsc": "Yıl ↑",
+        "sortName": "Ad",
+        "sortYear": "Yıl",
         "title": "Başlık...",
         "person": "Kişi...",
         "year": "Yıl..."

@@ -79,10 +79,8 @@
     },
     "filters": {
         "default": "Дата добавления",
-        "aToZ": "А-Я",
-        "zToA": "Я-А",
-        "yearDesc": "Год ↓",
-        "yearAsc": "Год ↑",
+        "sortName": "Имя",
+        "sortYear": "Год",
         "title": "Название...",
         "person": "Человек...",
         "year": "Год..."

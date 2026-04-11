@@ -28,16 +28,6 @@ android {
 
 }
 
-android.applicationVariants.all { variant ->
-    variant.mergeAssetsProvider.configure {
-        doLast {
-            delete fileTree(outputDir).matching {
-                include 'js/config.local.js'
-            }
-        }
-    }
-}
-
 dependencies {
     implementation 'androidx.media3:media3-exoplayer:1.5.1'
     implementation 'androidx.media3:media3-exoplayer-hls:1.5.1'

@@ -120,10 +120,8 @@
         "person": "Personne...",
         "year": "Année...",
         "default": "Date d'ajout",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Année ↓",
-        "yearAsc": "Année ↑"
+        "sortName": "Nom",
+        "sortYear": "Année"
     },
     "settings": {
         "title": "Paramètres",

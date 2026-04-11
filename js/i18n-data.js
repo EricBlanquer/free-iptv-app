@@ -1081,10 +1081,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "تاريخ الإضافة",
-                            "aToZ": "أ-ي",
-                            "zToA": "ي-أ",
-                            "yearDesc": "السنة ↓",
-                            "yearAsc": "السنة ↑",
+                            "sortName": "الاسم",
+                            "sortYear": "السنة",
                             "title": "...العنوان",
                             "person": "شخص...",
                             "year": "...السنة"
@@ -1546,10 +1544,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Hinzugefügt",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Jahr ↓",
-                            "yearAsc": "Jahr ↑",
+                            "sortName": "Name",
+                            "sortYear": "Jahr",
                             "title": "Titel...",
                             "person": "Person...",
                             "year": "Jahr..."
@@ -2014,10 +2010,8 @@ var I18nData = {
                             "person": "Person...",
                             "year": "Year...",
                             "default": "Added date",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Year ↓",
-                            "yearAsc": "Year ↑"
+                            "sortName": "Name",
+                            "sortYear": "Year"
                     },
                     "settings": {
                             "title": "Settings",
@@ -2476,10 +2470,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Fecha de adición",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Año ↓",
-                            "yearAsc": "Año ↑",
+                            "sortName": "Nombre",
+                            "sortYear": "Año",
                             "title": "Título...",
                             "person": "Persona...",
                             "year": "Año..."
@@ -2944,10 +2936,8 @@ var I18nData = {
                             "person": "Personne...",
                             "year": "Année...",
                             "default": "Date d'ajout",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Année ↓",
-                            "yearAsc": "Année ↑"
+                            "sortName": "Nom",
+                            "sortYear": "Année"
                     },
                     "settings": {
                             "title": "Paramètres",
@@ -3406,10 +3396,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Data di aggiunta",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Anno ↓",
-                            "yearAsc": "Anno ↑",
+                            "sortName": "Nome",
+                            "sortYear": "Anno",
                             "title": "Titolo...",
                             "person": "Persona...",
                             "year": "Anno..."
@@ -3871,10 +3859,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Toegevoegd",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Jaar ↓",
-                            "yearAsc": "Jaar ↑",
+                            "sortName": "Naam",
+                            "sortYear": "Jaar",
                             "title": "Titel...",
                             "person": "Persoon...",
                             "year": "Jaar..."
@@ -4336,10 +4322,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Data dodania",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Rok ↓",
-                            "yearAsc": "Rok ↑",
+                            "sortName": "Nazwa",
+                            "sortYear": "Rok",
                             "title": "Tytuł...",
                             "person": "Osoba...",
                             "year": "Rok..."
@@ -4801,10 +4785,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Data de adição",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Ano ↓",
-                            "yearAsc": "Ano ↑",
+                            "sortName": "Nome",
+                            "sortYear": "Ano",
                             "title": "Título...",
                             "person": "Pessoa...",
                             "year": "Ano..."
@@ -5266,10 +5248,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Дата добавления",
-                            "aToZ": "А-Я",
-                            "zToA": "Я-А",
-                            "yearDesc": "Год ↓",
-                            "yearAsc": "Год ↑",
+                            "sortName": "Имя",
+                            "sortYear": "Год",
                             "title": "Название...",
                             "person": "Человек...",
                             "year": "Год..."
@@ -5731,10 +5711,8 @@ var I18nData = {
                     },
                     "filters": {
                             "default": "Eklenme tarihi",
-                            "aToZ": "A-Z",
-                            "zToA": "Z-A",
-                            "yearDesc": "Yıl ↓",
-                            "yearAsc": "Yıl ↑",
+                            "sortName": "Ad",
+                            "sortYear": "Yıl",
                             "title": "Başlık...",
                             "person": "Kişi...",
                             "year": "Yıl..."

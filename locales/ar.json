@@ -79,10 +79,8 @@
     },
     "filters": {
         "default": "تاريخ الإضافة",
-        "aToZ": "أ-ي",
-        "zToA": "ي-أ",
-        "yearDesc": "السنة ↓",
-        "yearAsc": "السنة ↑",
+        "sortName": "الاسم",
+        "sortYear": "السنة",
         "title": "...العنوان",
         "person": "شخص...",
         "year": "...السنة"

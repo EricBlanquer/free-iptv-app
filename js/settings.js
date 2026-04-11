@@ -12,22 +12,43 @@ IPTVApp.prototype.setupRemoteDebug = function() {
     if (this.settings.remoteDebug && !window._remoteDebugEnabled) {
         window._remoteDebugEnabled = true;
         var originalLog = window.log;
-        window.log = function() {
-            originalLog.apply(window, arguments);
-            if (!window.deviceId) return;
+        var lastMsg = null;
+        var dupCount = 0;
+        var buffer = [];
+        var FLUSH_INTERVAL_MS = 1000;
+        var flush = function() {
+            if (!buffer.length || !window.deviceId) return;
+            var entries = buffer.slice();
+            buffer.length = 0;
             try {
-                var args = Array.prototype.slice.call(arguments);
-                var msg = args.map(function(a) {
-                    if (a === null) return 'null';
-                    if (a === undefined) return 'undefined';
-                    if (typeof a === 'object') { try { return JSON.stringify(a); } catch (e) { return String(a); } }
-                    return String(a);
-                }).join(' ');
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', 'https://iptv.blanquer.org/log.php', true);
                 xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-                xhr.send(JSON.stringify({ msg: msg, device: window.deviceId, time: new Date().toISOString() }));
+                xhr.send(JSON.stringify({ entries: entries, device: window.deviceId }));
             } catch (e) {}
+        };
+        setInterval(flush, FLUSH_INTERVAL_MS);
+        window.addEventListener('beforeunload', flush);
+        window.log = function() {
+            originalLog.apply(window, arguments);
+            if (!window.deviceId) return;
+            var args = Array.prototype.slice.call(arguments);
+            var msg = args.map(function(a) {
+                if (a === null) return 'null';
+                if (a === undefined) return 'undefined';
+                if (typeof a === 'object') { try { return JSON.stringify(a); } catch (e) { return String(a); } }
+                return String(a);
+            }).join(' ');
+            if (msg === lastMsg) {
+                dupCount++;
+                return;
+            }
+            if (dupCount > 0 && lastMsg !== null) {
+                buffer.push({ msg: '[x' + (dupCount + 1) + '] ' + lastMsg, time: new Date().toISOString() });
+                dupCount = 0;
+            }
+            lastMsg = msg;
+            buffer.push({ msg: msg, time: new Date().toISOString() });
         };
     }
 };
