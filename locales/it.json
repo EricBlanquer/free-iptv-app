@@ -537,5 +537,10 @@
         "later": "Più tardi",
         "checking": "Verifica aggiornamenti in corso...",
         "upToDate": "Sei aggiornato"
+    },
+    "categorySort": {
+        "alpha": "Ordina alfabeticamente",
+        "count": "Ordina per quantità",
+        "usage": "Ordina per utilizzo"
     }
 }

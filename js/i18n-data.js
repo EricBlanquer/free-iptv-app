@@ -1474,6 +1474,11 @@ var I18nData = {
                             "later": "لاحقًا",
                             "checking": "جارٍ التحقق من التحديثات...",
                             "upToDate": "أنت محدث"
+                    },
+                    "categorySort": {
+                            "alpha": "ترتيب أبجدي",
+                            "count": "الترتيب حسب العدد",
+                            "usage": "الترتيب حسب الاستخدام"
                     }
             },
             "de": {
@@ -1937,6 +1942,11 @@ var I18nData = {
                             "later": "Später",
                             "checking": "Suche nach Updates...",
                             "upToDate": "Sie sind auf dem neuesten Stand"
+                    },
+                    "categorySort": {
+                            "alpha": "Alphabetisch sortieren",
+                            "count": "Nach Anzahl sortieren",
+                            "usage": "Nach Nutzung sortieren"
                     }
             },
             "en": {
@@ -2012,6 +2022,11 @@ var I18nData = {
                             "default": "Added date",
                             "sortName": "Name",
                             "sortYear": "Year"
+                    },
+                    "categorySort": {
+                            "alpha": "Sort alphabetically",
+                            "count": "Sort by item count",
+                            "usage": "Sort by viewing usage"
                     },
                     "settings": {
                             "title": "Settings",
@@ -2863,6 +2878,11 @@ var I18nData = {
                             "later": "Más tarde",
                             "checking": "Buscando actualizaciones...",
                             "upToDate": "Está actualizado"
+                    },
+                    "categorySort": {
+                            "alpha": "Ordenar alfabéticamente",
+                            "count": "Ordenar por cantidad",
+                            "usage": "Ordenar por uso"
                     }
             },
             "fr": {
@@ -2938,6 +2958,11 @@ var I18nData = {
                             "default": "Date d'ajout",
                             "sortName": "Nom",
                             "sortYear": "Année"
+                    },
+                    "categorySort": {
+                            "alpha": "Tri alphabétique",
+                            "count": "Tri par nombre d'éléments",
+                            "usage": "Tri par utilisation"
                     },
                     "settings": {
                             "title": "Paramètres",
@@ -3789,6 +3814,11 @@ var I18nData = {
                             "later": "Più tardi",
                             "checking": "Verifica aggiornamenti in corso...",
                             "upToDate": "Sei aggiornato"
+                    },
+                    "categorySort": {
+                            "alpha": "Ordina alfabeticamente",
+                            "count": "Ordina per quantità",
+                            "usage": "Ordina per utilizzo"
                     }
             },
             "nl": {
@@ -4252,6 +4282,11 @@ var I18nData = {
                             "later": "Later",
                             "checking": "Controleren op updates...",
                             "upToDate": "Je bent up-to-date"
+                    },
+                    "categorySort": {
+                            "alpha": "Alfabetisch sorteren",
+                            "count": "Sorteren op aantal",
+                            "usage": "Sorteren op gebruik"
                     }
             },
             "pl": {
@@ -4715,6 +4750,11 @@ var I18nData = {
                             "later": "Później",
                             "checking": "Sprawdzanie aktualizacji...",
                             "upToDate": "Jesteś na bieżąco"
+                    },
+                    "categorySort": {
+                            "alpha": "Sortuj alfabetycznie",
+                            "count": "Sortuj według liczby",
+                            "usage": "Sortuj według użycia"
                     }
             },
             "pt": {
@@ -5178,6 +5218,11 @@ var I18nData = {
                             "later": "Mais tarde",
                             "checking": "Verificando atualizações...",
                             "upToDate": "Você está atualizado"
+                    },
+                    "categorySort": {
+                            "alpha": "Ordenar alfabeticamente",
+                            "count": "Ordenar por quantidade",
+                            "usage": "Ordenar por uso"
                     }
             },
             "ru": {
@@ -5641,6 +5686,11 @@ var I18nData = {
                             "later": "Позже",
                             "checking": "Проверка обновлений...",
                             "upToDate": "У вас актуальная версия"
+                    },
+                    "categorySort": {
+                            "alpha": "Сортировать по алфавиту",
+                            "count": "Сортировать по количеству",
+                            "usage": "Сортировать по использованию"
                     }
             },
             "tr": {
@@ -6104,6 +6154,11 @@ var I18nData = {
                             "later": "Daha sonra",
                             "checking": "Güncellemeler kontrol ediliyor...",
                             "upToDate": "Güncelsiniz"
+                    },
+                    "categorySort": {
+                            "alpha": "Alfabetik sırala",
+                            "count": "Sayıya göre sırala",
+                            "usage": "Kullanıma göre sırala"
                     }
             }
     }

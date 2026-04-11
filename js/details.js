@@ -1957,7 +1957,8 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
         }
     }
     if (tmdbId) {
-        this.fetchTMDBDetailsById(tmdbId, type === 'series' ? 'tv' : 'movie');
+        var tmdbType = (type === 'series' || type === 'tv') ? 'tv' : 'movie';
+        this.fetchTMDBDetailsById(tmdbId, tmdbType);
         return;
     }
     this.fetchTMDBCached(title, type, function(result) {

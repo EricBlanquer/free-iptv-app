@@ -110,6 +110,11 @@ var I18n = (function() {
                 var key = el.getAttribute('data-i18n-placeholder');
                 el.setAttribute('placeholder', self.t(key));
             });
+            var titleElements = document.querySelectorAll('[data-i18n-title]');
+            titleElements.forEach(function(el) {
+                var key = el.getAttribute('data-i18n-title');
+                el.setAttribute('title', self.t(key, el.getAttribute('title') || ''));
+            });
         }
     };
 })();

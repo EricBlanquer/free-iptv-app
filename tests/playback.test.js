@@ -333,3 +333,56 @@ describe('bug: updateWatchPosition should filter by playlistId', () => {
         expect(app.watchHistory[1].position).toBe(120000);
     });
 });
+
+describe('showButtonTooltip auto-dismiss after N shows', () => {
+    var MAX = 3;
+    var store;
+
+    function showButtonTooltip(storageKey) {
+        var stored = store[storageKey];
+        if (stored === '1' || stored === 'done') return false;
+        var shownCount = 0;
+        if (stored && stored.indexOf('shown:') === 0) {
+            shownCount = parseInt(stored.substring(6), 10) || 0;
+        }
+        if (shownCount >= MAX) {
+            store[storageKey] = 'done';
+            return false;
+        }
+        store[storageKey] = 'shown:' + (shownCount + 1);
+        return true;
+    }
+
+    beforeEach(() => { store = {}; });
+
+    it('shows tooltip exactly MAX times then auto-dismisses', () => {
+        expect(showButtonTooltip('k')).toBe(true);
+        expect(store.k).toBe('shown:1');
+        expect(showButtonTooltip('k')).toBe(true);
+        expect(store.k).toBe('shown:2');
+        expect(showButtonTooltip('k')).toBe(true);
+        expect(store.k).toBe('shown:3');
+        expect(showButtonTooltip('k')).toBe(false);
+        expect(store.k).toBe('done');
+        expect(showButtonTooltip('k')).toBe(false);
+    });
+
+    it('respects legacy "1" sentinel as dismissed', () => {
+        store.k = '1';
+        expect(showButtonTooltip('k')).toBe(false);
+        expect(store.k).toBe('1');
+    });
+
+    it('respects "done" sentinel as dismissed', () => {
+        store.k = 'done';
+        expect(showButtonTooltip('k')).toBe(false);
+    });
+
+    it('handles independent counters per key', () => {
+        showButtonTooltip('a');
+        showButtonTooltip('a');
+        showButtonTooltip('b');
+        expect(store.a).toBe('shown:2');
+        expect(store.b).toBe('shown:1');
+    });
+});

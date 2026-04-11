@@ -539,5 +539,10 @@
         "later": "Later",
         "checking": "Controleren op updates...",
         "upToDate": "Je bent up-to-date"
+    },
+    "categorySort": {
+        "alpha": "Alfabetisch sorteren",
+        "count": "Sorteren op aantal",
+        "usage": "Sorteren op gebruik"
     }
 }

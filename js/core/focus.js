@@ -572,6 +572,11 @@ IPTVApp.prototype._navigateFilters = function(ctx) {
             if (newIndex < filterCount - 1) newIndex++;
             break;
         case 'down':
+            var currentEl = ctx.focusables[ctx.index];
+            if (currentEl && currentEl.classList.contains('cat-sort-btn') && sidebarVisible) {
+                this.setFocus('sidebar', this.getSelectedSidebarIndex());
+                return { index: newIndex, handled: true };
+            }
             var gridItems = document.querySelectorAll('#content-grid .grid-item');
             if (gridItems.length > 0) {
                 this._cameFromFilters = true;
@@ -641,9 +646,37 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
                 break;
             }
             if (newIndex < cols) {
+                this.lastGridIndex = this.focusIndex;
+                var currentEl = ctx.focusables[ctx.index];
                 this.focusArea = 'filters';
-                var col = newIndex % cols;
-                this.focusIndex = (col < 2) ? 0 : 4;
+                this.invalidateFocusables();
+                var visibleFilters = this.getFocusables();
+                var targetIdx = 0;
+                if (visibleFilters.length > 0) {
+                    if (isListView) {
+                        for (var fi = 0; fi < visibleFilters.length; fi++) {
+                            if (visibleFilters[fi].id === 'view-grid-btn') {
+                                targetIdx = fi;
+                                break;
+                            }
+                        }
+                    }
+                    else if (currentEl) {
+                        var rect = currentEl.getBoundingClientRect();
+                        var cx = rect.left + rect.width / 2;
+                        var bestDist = Infinity;
+                        for (var fi = 0; fi < visibleFilters.length; fi++) {
+                            var fRect = visibleFilters[fi].getBoundingClientRect();
+                            var fcx = fRect.left + fRect.width / 2;
+                            var d = Math.abs(fcx - cx);
+                            if (d < bestDist) {
+                                bestDist = d;
+                                targetIdx = fi;
+                            }
+                        }
+                    }
+                }
+                this.focusIndex = targetIdx;
                 this.updateFocus();
                 return { index: newIndex, handled: true };
             }

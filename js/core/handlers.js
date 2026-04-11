@@ -97,6 +97,11 @@ IPTVApp.prototype.selectHandlers = {
         this.loadStreams(categoryId);
     },
     filters: function(current) {
+        if (current.classList.contains('cat-sort-btn')) {
+            var mode = current.dataset.sort;
+            if (mode) this.toggleCategorySort(mode);
+            return;
+        }
         if (current.classList.contains('sort-btn')) {
             var group = current.dataset.sortGroup;
             this.applySortGroup(group);
@@ -194,6 +199,7 @@ IPTVApp.prototype.selectHandlers = {
             this.pushDetailsState();
             this.showActor(actorId);
         } else if (current.id === 'download-season-btn' || current.classList.contains('download-season-btn')) {
+            this.hideButtonTooltip('download-season-btn', true);
             this.triggerFreeboxSeasonDownload();
         } else if (current.classList.contains('season-btn')) {
             var season = parseInt(current.dataset.season);

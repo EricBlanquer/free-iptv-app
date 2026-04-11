@@ -1715,13 +1715,28 @@ IPTVApp.prototype.hideQualityTooltip = function(persistDismissed) {
     }
 };
 
+IPTVApp.MAX_TOOLTIP_AUTO_SHOWS = 3;
+
 IPTVApp.prototype.showButtonTooltip = function(buttonId, storageKey, message, placement) {
+    var stored;
     try {
-        if (localStorage.getItem(storageKey)) return;
+        stored = localStorage.getItem(storageKey);
     }
     catch (ex) { return; }
+    if (stored === '1' || stored === 'done') return;
+    var shownCount = 0;
+    if (stored && stored.indexOf('shown:') === 0) {
+        shownCount = parseInt(stored.substring(6), 10) || 0;
+    }
+    if (shownCount >= IPTVApp.MAX_TOOLTIP_AUTO_SHOWS) {
+        try { localStorage.setItem(storageKey, 'done'); }
+        catch (ex) { /* ignore */ }
+        return;
+    }
     var btn = document.getElementById(buttonId);
     if (!btn || btn.classList.contains('hidden')) return;
+    try { localStorage.setItem(storageKey, 'shown:' + (shownCount + 1)); }
+    catch (ex) { /* ignore */ }
     if (!this._buttonTooltipStorageKeys) this._buttonTooltipStorageKeys = {};
     this._buttonTooltipStorageKeys[buttonId] = storageKey;
     this.hideButtonTooltip(buttonId);
@@ -1766,7 +1781,7 @@ IPTVApp.prototype.hideButtonTooltip = function(buttonId, persistDismissed) {
     if (persistDismissed) {
         var key = this._buttonTooltipStorageKeys && this._buttonTooltipStorageKeys[buttonId];
         if (key) {
-            try { localStorage.setItem(key, '1'); }
+            try { localStorage.setItem(key, 'done'); }
             catch (ex) { /* ignore */ }
         }
     }

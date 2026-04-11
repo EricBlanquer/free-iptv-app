@@ -395,3 +395,122 @@ describe('Category selection persistence', () => {
         });
     });
 });
+
+describe('Category sub-sort (alpha/count/usage)', () => {
+    function buildSorter(mode, dir, countByCategory, usageByCategory) {
+        var dirMult = dir === 'asc' ? 1 : -1;
+        return function(a, b) {
+            var diff = 0;
+            if (mode === 'count') {
+                diff = (countByCategory[a.id] || 0) - (countByCategory[b.id] || 0);
+            }
+            else if (mode === 'usage') {
+                diff = (usageByCategory[a.id] || 0) - (usageByCategory[b.id] || 0);
+            }
+            else {
+                diff = a.sortName.localeCompare(b.sortName);
+            }
+            if (diff !== 0) return diff * dirMult;
+            return a.sortName.localeCompare(b.sortName);
+        };
+    }
+
+    var cats = [
+        { id: 'a', sortName: 'action' },
+        { id: 'c', sortName: 'comedy' },
+        { id: 'd', sortName: 'drama' }
+    ];
+    var counts = { a: 100, c: 30, d: 60 };
+    var usage = { a: 5, c: 0, d: 12 };
+
+    it('sorts alpha asc', () => {
+        var sorted = cats.slice().sort(buildSorter('alpha', 'asc', counts, usage));
+        expect(sorted.map(c => c.id)).toEqual(['a', 'c', 'd']);
+    });
+
+    it('sorts alpha desc', () => {
+        var sorted = cats.slice().sort(buildSorter('alpha', 'desc', counts, usage));
+        expect(sorted.map(c => c.id)).toEqual(['d', 'c', 'a']);
+    });
+
+    it('sorts count desc (largest first)', () => {
+        var sorted = cats.slice().sort(buildSorter('count', 'desc', counts, usage));
+        expect(sorted.map(c => c.id)).toEqual(['a', 'd', 'c']);
+    });
+
+    it('sorts count asc (smallest first)', () => {
+        var sorted = cats.slice().sort(buildSorter('count', 'asc', counts, usage));
+        expect(sorted.map(c => c.id)).toEqual(['c', 'd', 'a']);
+    });
+
+    it('sorts usage desc (most viewed first)', () => {
+        var sorted = cats.slice().sort(buildSorter('usage', 'desc', counts, usage));
+        expect(sorted.map(c => c.id)).toEqual(['d', 'a', 'c']);
+    });
+
+    it('breaks ties alphabetically', () => {
+        var ties = [
+            { id: 'b', sortName: 'banana' },
+            { id: 'a', sortName: 'apple' },
+            { id: 'c', sortName: 'cherry' }
+        ];
+        var equalCounts = { a: 10, b: 10, c: 10 };
+        var sorted = ties.slice().sort(buildSorter('count', 'desc', equalCounts, {}));
+        expect(sorted.map(c => c.id)).toEqual(['a', 'b', 'c']);
+    });
+
+    it('treats missing usage as 0', () => {
+        var sparseUsage = { d: 5 };
+        var sorted = cats.slice().sort(buildSorter('usage', 'desc', counts, sparseUsage));
+        expect(sorted.map(c => c.id)).toEqual(['d', 'a', 'c']);
+    });
+});
+
+describe('toggleCategorySort behavior', () => {
+    function toggle(state, mode) {
+        var current = state || { mode: 'alpha', dir: 'asc' };
+        if (current.mode === mode) {
+            return { mode: mode, dir: current.dir === 'asc' ? 'desc' : 'asc' };
+        }
+        return { mode: mode, dir: mode === 'alpha' ? 'asc' : 'desc' };
+    }
+
+    it('switches mode from alpha to count with desc default', () => {
+        expect(toggle({ mode: 'alpha', dir: 'asc' }, 'count'))
+            .toEqual({ mode: 'count', dir: 'desc' });
+    });
+
+    it('switches mode from count to alpha with asc default', () => {
+        expect(toggle({ mode: 'count', dir: 'desc' }, 'alpha'))
+            .toEqual({ mode: 'alpha', dir: 'asc' });
+    });
+
+    it('toggles direction when re-clicking same mode', () => {
+        var state = { mode: 'count', dir: 'desc' };
+        state = toggle(state, 'count');
+        expect(state).toEqual({ mode: 'count', dir: 'asc' });
+        state = toggle(state, 'count');
+        expect(state).toEqual({ mode: 'count', dir: 'desc' });
+    });
+});
+
+describe('bug: lastGridIndex carries over to new category', () => {
+    function loadStreams(app, options) {
+        options = options || {};
+        if (!options.preserveFilters) {
+            app.lastGridIndex = 0;
+        }
+    }
+
+    it('resets lastGridIndex to 0 when switching category', () => {
+        var app = { lastGridIndex: 50 };
+        loadStreams(app);
+        expect(app.lastGridIndex).toBe(0);
+    });
+
+    it('preserves lastGridIndex when preserveFilters is set', () => {
+        var app = { lastGridIndex: 50 };
+        loadStreams(app, { preserveFilters: true });
+        expect(app.lastGridIndex).toBe(50);
+    });
+});

@@ -549,5 +549,10 @@
         "later": "Mais tarde",
         "checking": "Verificando atualizações...",
         "upToDate": "Você está atualizado"
+    },
+    "categorySort": {
+        "alpha": "Ordenar alfabeticamente",
+        "count": "Ordenar por quantidade",
+        "usage": "Ordenar por uso"
     }
 }

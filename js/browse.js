@@ -1011,6 +1011,7 @@ IPTVApp.prototype.loadStreams = function(categoryId, options) {
     // Reset search filters when changing category (unless preserveFilters is set)
     if (!options.preserveFilters) {
         this.resetFilters();
+        this.lastGridIndex = 0;
     }
     // Hide edit button and reset filtered state when leaving favorites view
     if (categoryId !== 'favorites') {
@@ -1176,6 +1177,94 @@ IPTVApp.prototype.updateCategorySelection = function(categoryId) {
 };
 
 // Category rendering
+IPTVApp.prototype.getCategorySortConfig = function(section) {
+    var key = (this.settings.activePlaylistId || '') + '_' + section;
+    var config = this.categorySortBySection && this.categorySortBySection[key];
+    if (config && config.mode) return config;
+    return { mode: 'alpha', dir: 'asc' };
+};
+
+IPTVApp.prototype._buildCategoryUsage = function(streams, useGenre) {
+    var usage = {};
+    if (!this.watchHistory || !this.watchHistory.length) return usage;
+    var streamLookup = {};
+    var seriesLookup = {};
+    for (var i = 0; i < streams.length; i++) {
+        var s = streams[i];
+        var catKey = s._playlistId ? s.category_id + '_' + s._playlistId : s.category_id;
+        var entry = useGenre ? (s._normalizedGenres || []) : catKey;
+        if (s.stream_id != null) {
+            var sk = s._playlistId ? s.stream_id + '|' + s._playlistId : String(s.stream_id);
+            streamLookup[sk] = entry;
+        }
+        if (s.series_id != null) {
+            var srk = s._playlistId ? s.series_id + '|' + s._playlistId : String(s.series_id);
+            seriesLookup[srk] = entry;
+        }
+    }
+    var seen = {};
+    for (var hi = 0; hi < this.watchHistory.length; hi++) {
+        var h = this.watchHistory[hi];
+        var lookupKey;
+        var entry;
+        if (h.seriesId != null) {
+            lookupKey = 's:' + (h.playlistId ? h.seriesId + '|' + h.playlistId : h.seriesId);
+            entry = seriesLookup[h.playlistId ? h.seriesId + '|' + h.playlistId : String(h.seriesId)];
+        }
+        else {
+            lookupKey = 'v:' + (h.playlistId ? h.id + '|' + h.playlistId : h.id);
+            entry = streamLookup[h.playlistId ? h.id + '|' + h.playlistId : String(h.id)];
+        }
+        if (seen[lookupKey]) continue;
+        seen[lookupKey] = true;
+        if (!entry) continue;
+        if (useGenre) {
+            for (var gi = 0; gi < entry.length; gi++) {
+                var gKey = 'genre:' + entry[gi];
+                usage[gKey] = (usage[gKey] || 0) + 1;
+            }
+        }
+        else {
+            usage[entry] = (usage[entry] || 0) + 1;
+        }
+    }
+    return usage;
+};
+
+IPTVApp.prototype.updateCategorySortButtons = function() {
+    var section = this.currentSection;
+    if (!section) return;
+    var config = this.getCategorySortConfig(section);
+    var btns = document.querySelectorAll('#category-sort-bar .cat-sort-btn');
+    for (var i = 0; i < btns.length; i++) {
+        var btn = btns[i];
+        var isSelected = btn.dataset.sort === config.mode;
+        btn.classList.toggle('selected', isSelected);
+        var arrow = btn.querySelector('.cat-sort-dir');
+        if (arrow) arrow.textContent = config.dir === 'asc' ? '↑' : '↓';
+    }
+};
+
+IPTVApp.prototype.toggleCategorySort = function(mode) {
+    var section = this.currentSection;
+    if (!section) return;
+    var key = (this.settings.activePlaylistId || '') + '_' + section;
+    if (!this.categorySortBySection) this.categorySortBySection = {};
+    var current = this.categorySortBySection[key] || { mode: 'alpha', dir: 'asc' };
+    if (current.mode === mode) {
+        current = { mode: mode, dir: current.dir === 'asc' ? 'desc' : 'asc' };
+    }
+    else {
+        current = { mode: mode, dir: mode === 'alpha' ? 'asc' : 'desc' };
+    }
+    this.categorySortBySection[key] = current;
+    this.saveCategorySort();
+    var data = this.data[section];
+    if (data && data.categories && data.streams) {
+        this.renderCategories(data.categories, data.streams);
+    }
+};
+
 IPTVApp.prototype.renderCategories = function(categories, streams) {
     // Show sidebar and filters for normal browse screens
     this.showElement('sidebar');
@@ -1183,6 +1272,7 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
     this.showElement('search-filters');
     this.showElement('sort-filters');
     this.showElement('rating-filters');
+    this.updateCategorySortButtons();
     // Hide edit favorites button (only shown in favorites category)
     this.setHidden('edit-favorites-btn', true);
     this.inFilteredFavorites = false;
@@ -1314,20 +1404,40 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
             return aName.localeCompare(bName);
         });
     }
-    else preparedCategories.sort(function(a, b) {
-        var aLang = a.langCode || interfaceLang;
-        var bLang = b.langCode || interfaceLang;
-        var aIsInterfaceLang = aLang === interfaceLang;
-        var bIsInterfaceLang = bLang === interfaceLang;
-        if (aIsInterfaceLang && !bIsInterfaceLang) return -1;
-        if (!aIsInterfaceLang && bIsInterfaceLang) return 1;
-        if (aLang !== bLang) {
-            return aLang.localeCompare(bLang);
-        }
-        if (!a.isVostfr && b.isVostfr) return -1;
-        if (a.isVostfr && !b.isVostfr) return 1;
-        return a.sortName.localeCompare(b.sortName);
-    });
+    else {
+        var sortConfig = self.getCategorySortConfig(section);
+        var usageByCategory = sortConfig.mode === 'usage' ? self._buildCategoryUsage(streams, useGenre) : {};
+        var dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+        var getCount = function(cat) {
+            if (cat.isGenre) return cat.genreCount || 0;
+            return countByCategory[cat.id] || 0;
+        };
+        preparedCategories.sort(function(a, b) {
+            var aLang = a.langCode || interfaceLang;
+            var bLang = b.langCode || interfaceLang;
+            var aIsInterfaceLang = aLang === interfaceLang;
+            var bIsInterfaceLang = bLang === interfaceLang;
+            if (aIsInterfaceLang && !bIsInterfaceLang) return -1;
+            if (!aIsInterfaceLang && bIsInterfaceLang) return 1;
+            if (aLang !== bLang) {
+                return aLang.localeCompare(bLang);
+            }
+            if (!a.isVostfr && b.isVostfr) return -1;
+            if (a.isVostfr && !b.isVostfr) return 1;
+            var diff = 0;
+            if (sortConfig.mode === 'count') {
+                diff = getCount(a) - getCount(b);
+            }
+            else if (sortConfig.mode === 'usage') {
+                diff = (usageByCategory[a.id] || 0) - (usageByCategory[b.id] || 0);
+            }
+            else {
+                diff = a.sortName.localeCompare(b.sortName);
+            }
+            if (diff !== 0) return diff * dirMult;
+            return a.sortName.localeCompare(b.sortName);
+        });
+    }
     if (!useGenre) {
         preparedCategories = preparedCategories.filter(function(cat) {
             return (countByCategory[cat.id] || 0) > 0;
