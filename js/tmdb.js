@@ -462,6 +462,22 @@ var TMDB = {
     }
 };
 
+TMDB.searchMulti = function(query, callback) {
+    if (!this.isEnabled() || !query) {
+        callback([]);
+        return;
+    }
+    var url = this.baseUrl + '/search/multi?api_key=' + this.apiKey +
+        '&language=' + this.language +
+        '&query=' + encodeURIComponent(query);
+    this._fetch(url, function(data) {
+        var results = (data && data.results) ? data.results.filter(function(r) {
+            return r.media_type === 'movie' || r.media_type === 'tv';
+        }) : [];
+        callback(results);
+    });
+};
+
 TMDB.searchMovieAsync = function(title, year) {
     var self = this;
     return new Promise(function(resolve) {

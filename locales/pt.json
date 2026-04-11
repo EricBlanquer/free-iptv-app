@@ -83,10 +83,8 @@
     },
     "filters": {
         "default": "Data de adição",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Ano ↓",
-        "yearAsc": "Ano ↑",
+        "sortName": "Nome",
+        "sortYear": "Ano",
         "title": "Título...",
         "person": "Pessoa...",
         "year": "Ano..."

@@ -519,19 +519,17 @@
                 <input type="text" id="search-year" class="filter-input focusable" placeholder="Year..." data-i18n-placeholder="filters.year">
                 <input type="text" id="search-actor" class="filter-input focusable" placeholder="Person..." data-i18n-placeholder="filters.person">
             </div>
+            <div id="sort-filters">
+                <button class="sort-btn focusable selected" data-sort-group="default"><span data-i18n="filters.default">Default</span> <span class="sort-arrow">↓</span></button>
+                <button class="sort-btn focusable" data-sort-group="name"><span data-i18n="filters.sortName">Name</span> <span class="sort-arrow">↓</span></button>
+                <button class="sort-btn focusable" data-sort-group="year"><span data-i18n="filters.sortYear">Year</span> <span class="sort-arrow">↓</span></button>
+            </div>
             <div id="rating-filters">
                 <button class="rating-star focusable" data-rating="1" title="1+ stars">☆</button>
                 <button class="rating-star focusable" data-rating="2" title="2+ stars">☆</button>
                 <button class="rating-star focusable" data-rating="3" title="3+ stars">☆</button>
                 <button class="rating-star focusable" data-rating="4" title="4+ stars">☆</button>
                 <button class="rating-star focusable" data-rating="5" title="5 stars">☆</button>
-            </div>
-            <div id="sort-filters">
-                <button class="sort-btn focusable selected" data-sort="default" data-i18n="filters.default">Default</button>
-                <button class="sort-btn focusable" data-sort="name" data-i18n="filters.aToZ">A-Z</button>
-                <button class="sort-btn focusable" data-sort="name-desc" data-i18n="filters.zToA">Z-A</button>
-                <button class="sort-btn focusable" data-sort="year" data-i18n="filters.yearDesc">Year ↓</button>
-                <button class="sort-btn focusable" data-sort="year-asc" data-i18n="filters.yearAsc">Year ↑</button>
             </div>
         </div>
         <div id="browse-main">
@@ -555,7 +553,7 @@
                     <div id="details-poster"></div>
                 </div>
                 <div id="details-info">
-                    <h1 id="details-title">Title</h1>
+                    <h1 id="details-title" class="focusable" tabindex="0" title="Click to edit and re-search TMDB">Title</h1>
                     <div id="details-meta"></div>
                     <div id="details-genres"></div>
                     <p id="details-description" class="focusable"></p>
@@ -814,6 +812,7 @@
             <div id="tts-voice-list"></div>
         </div>
     </div>
+
 
     <!-- Catchup/Replay Modal -->
     <div id="catchup-modal" class="modal hidden">
@@ -1122,7 +1121,6 @@
     <script src="js/channel-logos.js"></script>
     <script src="js/regex.js"></script>
     <script>Regex.init();</script>
-    <script src="js/config.local.js"></script>
     <script src="js/freebox.js"></script>
     <script src="js/premium.js"></script>
     <script src="js/app.js"></script>

@@ -81,10 +81,8 @@
     },
     "filters": {
         "default": "Hinzugefügt",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Jahr ↓",
-        "yearAsc": "Jahr ↑",
+        "sortName": "Name",
+        "sortYear": "Jahr",
         "title": "Titel...",
         "person": "Person...",
         "year": "Jahr..."

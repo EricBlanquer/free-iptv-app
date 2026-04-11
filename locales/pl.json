@@ -80,10 +80,8 @@
     },
     "filters": {
         "default": "Data dodania",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Rok ↓",
-        "yearAsc": "Rok ↑",
+        "sortName": "Nazwa",
+        "sortYear": "Rok",
         "title": "Tytuł...",
         "person": "Osoba...",
         "year": "Rok..."

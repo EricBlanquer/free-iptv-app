@@ -187,6 +187,8 @@ class IPTVApp {
         this.bindTouchEvents();
         this.initTTS();
         this.initFilterEvents();
+        this.initTitleEditor();
+        this.initGridScrollLoader();
         this.updateHomeMenuVisibility();
         this.bindDisclaimerButton();
         // Check if disclaimer was accepted

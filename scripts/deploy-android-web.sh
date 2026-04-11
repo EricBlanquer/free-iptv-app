@@ -30,7 +30,7 @@ rm -rf "$BUILD_DIR"
     -e "scripts/*" -e "cloudflare-worker/*" -e "seller-office/*" \
     -e "www/*" -e "CLAUDE.md" -e "README.md" -e "PRIVACY_POLICY.md" \
     -e "package.json" -e "package-lock.json" -e ".git/*" \
-    -e "js/config.local.js" -e "tizen-manifest.xml" -e ".gitignore" \
+    -e "tizen-manifest.xml" -e ".gitignore" \
     -- "$PROJECT_DIR"
 
 # Create zip

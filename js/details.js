@@ -129,11 +129,24 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     this.tmdbEpisodes = null;
     this.tmdbInfo = null;
     this.setBackgroundImage('details-poster', imageUrl);
-    var cleanDisplayTitle = this.cleanTitle(title);
-    var year = this.extractYear(title);
-    if (year && cleanDisplayTitle.indexOf('(' + year + ')') === -1) {
-        cleanDisplayTitle += ' (' + year + ')';
+    var streamId = streamData ? (streamData.stream_id || streamData.vod_id) : null;
+    var override = streamId ? this.getTitleOverride(streamId) : null;
+    var cleanDisplayTitle;
+    if (override) {
+        cleanDisplayTitle = override;
+        var overrideYear = this.extractYear(title);
+        if (overrideYear && cleanDisplayTitle.indexOf('(' + overrideYear + ')') === -1) {
+            cleanDisplayTitle += ' (' + overrideYear + ')';
+        }
     }
+    else {
+        cleanDisplayTitle = this.cleanTitle(title);
+        var year = this.extractYear(title);
+        if (year && cleanDisplayTitle.indexOf('(' + year + ')') === -1) {
+            cleanDisplayTitle += ' (' + year + ')';
+        }
+    }
+    window.log('TITLE', 'showDetails: rawTitle="' + title + '" cleaned="' + cleanDisplayTitle + '"' + (override ? ' (override)' : ''));
     var detailsTitle = document.getElementById('details-title');
     detailsTitle.textContent = cleanDisplayTitle;
     if (streamData && streamData._duplicateTag && !streamData._duplicateVersions) {
@@ -241,7 +254,18 @@ IPTVApp.prototype._loadSingleStreamBitrate = function(streamData) {
         span.textContent = bitrateLabel;
         playBtn.appendChild(span);
         if (data.info.tmdb_id && self.selectedStream && self.selectedStream.data) {
-            self.selectedStream.data.tmdb_id = data.info.tmdb_id;
+            var providedId = String(data.info.tmdb_id);
+            self.selectedStream.data.tmdb_id = providedId;
+            var currentId = self.tmdbInfo ? String(self.tmdbInfo.id) : null;
+            var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
+            if (currentId !== providedId) {
+                window.log('TMDB', 'Re-fetching with tmdb_id from get_vod_info: ' + providedId + ' (current=' + currentId + ')');
+                self.fetchTMDBDetailsById(providedId, type);
+            }
+            else if (self.tmdbInfo && !self._titleReplacedByTmdb) {
+                window.log('TMDB', 'Confirming title from get_vod_info tmdb_id=' + providedId);
+                self.displayTMDBDetails(self.tmdbInfo, self.tmdbInfo._type || type);
+            }
         }
     }).catch(function() {});
 };
@@ -883,6 +907,14 @@ IPTVApp.prototype.loadSeriesInfo = function(seriesId) {
     }
     apiToUse.getSeriesInfo(seriesId).then(function(data) {
         self.currentSeriesInfo = data;
+        if (data && data.info && data.info.tmdb && self.selectedStream && self.selectedStream.data) {
+            var hadTmdbId = !!self.selectedStream.data.tmdb_id;
+            self.selectedStream.data.tmdb_id = data.info.tmdb;
+            if (!hadTmdbId && !self.tmdbInfo) {
+                window.log('TMDB', 'Re-fetching with tmdb_id from get_series_info: ' + data.info.tmdb);
+                self.fetchTMDBDetailsById(data.info.tmdb, 'tv');
+            }
+        }
         var episodesSection = document.getElementById('details-episodes-section');
         self.setHidden(episodesSection, false);
         self.renderSeasons(data);
@@ -1160,6 +1192,190 @@ IPTVApp.prototype.renderSeasons = function(seriesData) {
             selfTip.showButtonTooltip('download-season-btn', 'downloadSeasonTooltipShown', I18n.t('tips.downloadSeasonHint', 'Download season to Freebox'), 'top');
         }, 1000);
     }
+};
+
+IPTVApp.prototype.initTitleEditor = function() {
+    var self = this;
+    var titleEl = document.getElementById('details-title');
+    if (!titleEl) return;
+    var commitEdit = function(input, restore) {
+        var newTitle = input.value.trim();
+        if (!self.selectedStream) {
+            restore();
+            return;
+        }
+        var streamData = self.selectedStream.data;
+        var streamId = self.selectedStream.id || (streamData && (streamData.stream_id || streamData.vod_id));
+        if (!streamId) {
+            restore();
+            return;
+        }
+        if (!newTitle) {
+            self.removeTitleOverride(streamId);
+            var rawTitle = self.getStreamTitle(streamData);
+            var clean = self.cleanTitle(rawTitle);
+            var year = self.extractYear(rawTitle);
+            if (year && clean.indexOf('(' + year + ')') === -1) clean += ' (' + year + ')';
+            var titleNode = document.getElementById('details-title');
+            while (titleNode.firstChild) titleNode.removeChild(titleNode.firstChild);
+            titleNode.textContent = clean;
+            titleNode.classList.remove('editing');
+            self.tmdbInfo = null;
+            self._titleReplacedByTmdb = false;
+            self._manualTitleOverride = null;
+            var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
+            self.fetchTMDBInfo(rawTitle, type);
+            return;
+        }
+        var rawTitleForYear = streamData ? self.getStreamTitle(streamData) : '';
+        var cleanRaw = rawTitleForYear ? self.cleanTitle(rawTitleForYear) : '';
+        if (newTitle === cleanRaw) {
+            self.removeTitleOverride(streamId);
+            var titleNode2 = document.getElementById('details-title');
+            while (titleNode2.firstChild) titleNode2.removeChild(titleNode2.firstChild);
+            var displayClean = cleanRaw;
+            var yearClean = rawTitleForYear ? self.extractYear(rawTitleForYear) : null;
+            if (yearClean && displayClean.indexOf('(' + yearClean + ')') === -1) {
+                displayClean += ' (' + yearClean + ')';
+            }
+            titleNode2.textContent = displayClean;
+            titleNode2.classList.remove('editing');
+            self.tmdbInfo = null;
+            self._titleReplacedByTmdb = false;
+            self._manualTitleOverride = null;
+            var type2 = self.selectedStream.type === 'series' ? 'tv' : 'movie';
+            self.fetchTMDBInfo(rawTitleForYear, type2);
+            return;
+        }
+        var titleNode = document.getElementById('details-title');
+        while (titleNode.firstChild) titleNode.removeChild(titleNode.firstChild);
+        var displayTitle = newTitle;
+        var year = rawTitleForYear ? self.extractYear(rawTitleForYear) : null;
+        if (year && displayTitle.indexOf('(' + year + ')') === -1) {
+            displayTitle += ' (' + year + ')';
+        }
+        titleNode.textContent = displayTitle;
+        titleNode.classList.remove('editing');
+        self.tmdbInfo = null;
+        self._titleReplacedByTmdb = false;
+        var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
+        self._manualTitleOverride = newTitle;
+        self.fetchTMDBInfo(newTitle, type);
+        self.saveTitleOverride(streamId, newTitle);
+    };
+    titleEl.addEventListener('click', function(e) {
+        if (!self.selectedStream) return;
+        if (titleEl.querySelector('input')) return;
+        var currentText = titleEl.textContent;
+        var savedChildren = [];
+        for (var i = 0; i < titleEl.childNodes.length; i++) {
+            savedChildren.push(titleEl.childNodes[i]);
+        }
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'details-title-input';
+        input.value = currentText.replace(/\s*\(\d{4}\)\s*$/, '').trim();
+        while (titleEl.firstChild) titleEl.removeChild(titleEl.firstChild);
+        titleEl.appendChild(input);
+        titleEl.classList.add('editing');
+        input.focus();
+        input.select();
+        var restore = function() {
+            while (titleEl.firstChild) titleEl.removeChild(titleEl.firstChild);
+            for (var i = 0; i < savedChildren.length; i++) {
+                titleEl.appendChild(savedChildren[i]);
+            }
+            titleEl.classList.remove('editing');
+        };
+        input.addEventListener('keydown', function(ev) {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                commitEdit(input, restore);
+            }
+            else if (ev.key === 'Escape') {
+                ev.preventDefault();
+                restore();
+            }
+        });
+        input.addEventListener('blur', function() {
+            setTimeout(function() {
+                if (titleEl.contains(input)) restore();
+            }, 100);
+        });
+        e.stopPropagation();
+    });
+};
+
+IPTVApp.prototype._computeSortKey = function(rawTitle, isOverride) {
+    var base = rawTitle.trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return base || '~';
+};
+
+IPTVApp.prototype.saveTitleOverride = function(streamId, title) {
+    try {
+        var overrides = JSON.parse(localStorage.getItem('titleOverrides') || '{}');
+        if (overrides[streamId] === title) return;
+        overrides[streamId] = title;
+        localStorage.setItem('titleOverrides', JSON.stringify(overrides));
+    }
+    catch (ex) { /* ignore */ }
+    var newSortKey = this._computeSortKey(title, true);
+    var updateStream = function(arr) {
+        if (!arr) return;
+        for (var i = 0; i < arr.length; i++) {
+            var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
+            if (sid == streamId) {
+                arr[i]._sortKey = newSortKey;
+            }
+        }
+    };
+    updateStream(this.originalStreams);
+    updateStream(this.currentStreams);
+    this._lastSortKey = null;
+    this._lastSortedStreams = null;
+    this._titleOverrideDirty = true;
+    window.log('OVERRIDE', 'saved title for streamId=' + streamId + ' title="' + title + '" sortKey="' + newSortKey + '"');
+};
+
+IPTVApp.prototype.removeTitleOverride = function(streamId) {
+    try {
+        var overrides = JSON.parse(localStorage.getItem('titleOverrides') || '{}');
+        if (!(streamId in overrides)) return;
+        delete overrides[streamId];
+        localStorage.setItem('titleOverrides', JSON.stringify(overrides));
+    }
+    catch (ex) { /* ignore */ }
+    var rawSortKey = null;
+    var self = this;
+    var updateStream = function(arr) {
+        if (!arr) return;
+        for (var i = 0; i < arr.length; i++) {
+            var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
+            if (sid == streamId) {
+                if (!rawSortKey) {
+                    var raw = self.getStreamTitle(arr[i]);
+                    var clean = self.cleanTitle(raw);
+                    rawSortKey = self._computeSortKey(clean || raw, false);
+                }
+                arr[i]._sortKey = rawSortKey;
+            }
+        }
+    };
+    updateStream(this.originalStreams);
+    updateStream(this.currentStreams);
+    this._lastSortKey = null;
+    this._lastSortedStreams = null;
+    this._titleOverrideDirty = true;
+    window.log('OVERRIDE', 'removed title for streamId=' + streamId);
+};
+
+IPTVApp.prototype.getTitleOverride = function(streamId) {
+    try {
+        var overrides = JSON.parse(localStorage.getItem('titleOverrides') || '{}');
+        return overrides[streamId] || null;
+    }
+    catch (ex) { return null; }
 };
 
 IPTVApp.prototype.formatLocalDate = function(dateStr) {
@@ -1546,8 +1762,10 @@ IPTVApp.prototype.titleSimilarity = function(a, b) {
 };
 
 IPTVApp.prototype.cleanTitle = function(title) {
-    var result = this.stripCategoryPrefix(title);
-    result = result.replace(/\s*\([^)]*\)/g, '');
+    var stripped = this.stripCategoryPrefix(title);
+    var result = stripped;
+    result = result.replace(/\s*\((?:19|20)\d{2}\)/g, '');
+    result = result.replace(/\s*\((?:720p|1080p|2160p|4K|UHD|HDR|HDR10|HDTV|WEB-?DL|BluRay|BDRip|DVDRip|VOSTFR|VO|VF|MULTI)\)/gi, '');
     result = result.replace(Regex.removeYearEnd, '');
     result = result.replace(Regex.qualityTags, '');
     if (Regex.langTags) result = result.replace(Regex.langTags, '');
@@ -1556,6 +1774,7 @@ IPTVApp.prototype.cleanTitle = function(title) {
     if (Regex.saison) result = result.replace(Regex.saison, '');
     if (Regex.part) result = result.replace(Regex.part, '');
     result = result.replace(Regex.trailingDash, '').trim();
+    if (!result) result = stripped.trim();
     return result;
 };
 
@@ -1705,6 +1924,14 @@ IPTVApp.prototype.getCleanTitleForTMDB = function() {
 IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
     var self = this;
     var cleanTitle = this.cleanTitle(title);
+    var streamId = this.selectedStream && this.selectedStream.data ? (this.selectedStream.data.stream_id || this.selectedStream.data.vod_id || '') : '';
+    var streamTmdbId = this.selectedStream && this.selectedStream.data ? (this.selectedStream.data.tmdb_id || this.selectedStream.data._tmdbId || '') : '';
+    window.log('TMDB', 'fetchTMDBInfo: streamId=' + streamId + ' rawTitle="' + title + '" cleanTitle="' + cleanTitle + '" type=' + type + ' tmdbId=' + streamTmdbId);
+    if (!streamTmdbId && /^\s*\(?\s*(?:19|20)\d{2}\s*\)?\s*$/.test(cleanTitle)) {
+        window.log('TMDB', 'fetchTMDBInfo: skipping (title is only a year)');
+        setDescription(I18n.t('details.noDescription', 'No description'), 'fetchTMDBInfo-yearOnly');
+        return;
+    }
     document.getElementById('details-genres').innerHTML = '';
     this.setHidden('details-cast-section', true);
     document.getElementById('details-cast-grid').innerHTML = '';
@@ -1729,6 +1956,10 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
             type = streamData._tmdbType;
         }
     }
+    if (tmdbId) {
+        this.fetchTMDBDetailsById(tmdbId, type === 'series' ? 'tv' : 'movie');
+        return;
+    }
     this.fetchTMDBCached(title, type, function(result) {
         if (result) {
             self.tmdbInfo = result;
@@ -1749,6 +1980,28 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
                 .replace(/\s*\([^)]*\)/g, '')
                 .replace(/\s+\d{4}\b.*$/, '')
                 .trim();
+            self._titleReplacedByTmdb = false;
+            if (tmdbTitle) {
+                var titleEl = document.getElementById('details-title');
+                if (titleEl) {
+                    var currentText = (titleEl.firstChild && titleEl.firstChild.nodeType === 3) ? titleEl.firstChild.nodeValue : titleEl.textContent;
+                    var hasLetter = /[a-z]/i.test(currentText.replace(/\(\d{4}\)/, ''));
+                    if (!hasLetter) {
+                        var year = result.release_date ? result.release_date.substring(0, 4) : (result.first_air_date ? result.first_air_date.substring(0, 4) : '');
+                        var newTitle = year ? tmdbTitle + ' (' + year + ')' : tmdbTitle;
+                        if (titleEl.firstChild && titleEl.firstChild.nodeType === 3) {
+                            titleEl.firstChild.nodeValue = newTitle;
+                        }
+                        else {
+                            titleEl.textContent = newTitle;
+                        }
+                        self._titleReplacedByTmdb = true;
+                        var streamData2 = self.selectedStream && self.selectedStream.data;
+                        var streamId2 = streamData2 && (streamData2.stream_id || streamData2.vod_id || streamData2.series_id);
+                        if (streamId2) self.saveTitleOverride(streamId2, tmdbTitle);
+                    }
+                }
+            }
             // Try full comparison first, then without dashes if low match
             var similarity = self.titleSimilarity(cleanTitle, cleanTmdbTitle);
             if (similarity < 80) {
@@ -1762,7 +2015,10 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
             var descEl = document.getElementById('details-description');
             var overview = result.overview ? self.fixOverviewSpacing(result.overview) : I18n.t('details.noDescription', 'No description');
             setDescription(overview, 'fetchTMDBInfo');
-            if (similarity < 80 && tmdbTitle) {
+            if (self._titleReplacedByTmdb) {
+                self._tmdbMatchText = 'Provider: ' + title;
+            }
+            else if (similarity < 80 && tmdbTitle) {
                 self._tmdbMatchText = 'TMDB: ' + tmdbTitle + ' (' + similarity + '%)';
                 window.log('TMDB', 'similarity: "' + cleanTitle + '" vs "' + cleanTmdbTitle + '" = ' + similarity + '%');
             } else {
@@ -2300,6 +2556,29 @@ IPTVApp.prototype.fetchTMDBDetailsById = function(tmdbId, type) {
 IPTVApp.prototype.displayTMDBDetails = function(result, type) {
     this.tmdbInfo = result;
     this.tmdbInfo._type = type;
+    var tmdbTitle = type === 'movie' ? result.title : result.name;
+    this._titleReplacedByTmdb = false;
+    if (tmdbTitle) {
+        var titleEl = document.getElementById('details-title');
+        if (titleEl) {
+            var year = result.release_date ? result.release_date.substring(0, 4) : (result.first_air_date ? result.first_air_date.substring(0, 4) : '');
+            var newTitle = year ? tmdbTitle + ' (' + year + ')' : tmdbTitle;
+            var streamData = this.selectedStream && this.selectedStream.data;
+            var rawProviderTitle = streamData ? this.getStreamTitle(streamData) : '';
+            var cleanProviderTitle = rawProviderTitle ? this.cleanTitle(rawProviderTitle) : '';
+            var normalize = function(s) {
+                return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '').trim();
+            };
+            var titlesMatch = normalize(cleanProviderTitle) === normalize(tmdbTitle);
+            if (!titlesMatch) {
+                while (titleEl.firstChild) titleEl.removeChild(titleEl.firstChild);
+                titleEl.textContent = newTitle;
+                this._titleReplacedByTmdb = true;
+                var streamId = streamData && (streamData.stream_id || streamData.vod_id || streamData.series_id);
+                if (streamId) this.saveTitleOverride(streamId, tmdbTitle);
+            }
+        }
+    }
     if (result.poster_path) {
         var posterEl = document.getElementById('details-poster');
         var currentBg = posterEl ? posterEl.style.backgroundImage : '';

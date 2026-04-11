@@ -1288,7 +1288,7 @@ IPTVApp.prototype.showPlayerOverlay = function(extendedDelay) {
                 }
             }
             displayTitle = this.cleanTitle(title);
-            if (year) {
+            if (year && displayTitle.indexOf('(' + year + ')') === -1) {
                 displayTitle += ' (' + year + ')';
             }
             // Add season/episode info for series

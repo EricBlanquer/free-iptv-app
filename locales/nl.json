@@ -81,10 +81,8 @@
     },
     "filters": {
         "default": "Toegevoegd",
-        "aToZ": "A-Z",
-        "zToA": "Z-A",
-        "yearDesc": "Jaar ↓",
-        "yearAsc": "Jaar ↑",
+        "sortName": "Naam",
+        "sortYear": "Jaar",
         "title": "Titel...",
         "person": "Persoon...",
         "year": "Jaar..."

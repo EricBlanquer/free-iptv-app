@@ -1233,39 +1233,6 @@ IPTVApp.prototype.loadSettings = function() {
         else {
             settings = defaults;
         }
-        // Apply dev config values if defined
-        if (window.DEV_CONFIG) {
-            var dev = window.DEV_CONFIG;
-            // API keys are always used as fallback (not editable by user)
-            if (dev.tmdbApiKey && !settings.tmdbApiKey) {
-                settings.tmdbApiKey = dev.tmdbApiKey;
-            }
-            if (dev.openSubtitlesApiKey && !settings.openSubtitlesApiKey) {
-                settings.openSubtitlesApiKey = dev.openSubtitlesApiKey;
-            }
-            if (dev.subdlApiKey && !settings.subDLApiKey) {
-                settings.subDLApiKey = dev.subdlApiKey;
-            }
-            if (dev.proxyUrl && !settings.proxyUrl) {
-                settings.proxyUrl = dev.proxyUrl;
-            }
-            // Other DEV_CONFIG values only apply if no saved settings exist
-            if (!hasSavedSettings) {
-                if (dev.providerLanguage) {
-                    settings.providerLanguage = dev.providerLanguage;
-                }
-                if (dev.categoryPatterns) {
-                    settings.categoryPatterns = dev.categoryPatterns;
-                }
-                if (dev.customCategories) {
-                    settings.customCategories = dev.customCategories;
-                }
-                if (dev.playlists && dev.playlists.length > 0) {
-                    settings.playlists = dev.playlists;
-                    settings.activePlaylistId = dev.activePlaylistId || dev.playlists[0].id;
-                }
-            }
-        }
         window.log('Settings loaded, customCategories: ' + (settings.customCategories ? settings.customCategories.length : 0));
         return settings;
     }
