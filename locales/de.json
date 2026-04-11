@@ -540,5 +540,10 @@
         "later": "Später",
         "checking": "Suche nach Updates...",
         "upToDate": "Sie sind auf dem neuesten Stand"
+    },
+    "categorySort": {
+        "alpha": "Alphabetisch sortieren",
+        "count": "Nach Anzahl sortieren",
+        "usage": "Nach Nutzung sortieren"
     }
 }

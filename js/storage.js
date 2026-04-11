@@ -1169,6 +1169,23 @@ IPTVApp.prototype.saveSelectedCategories = function() {
     catch (e) {}
 };
 
+IPTVApp.prototype.loadCategorySort = function() {
+    try {
+        var data = localStorage.getItem('categorySort');
+        return data ? JSON.parse(data) : {};
+    }
+    catch (e) {
+        return {};
+    }
+};
+
+IPTVApp.prototype.saveCategorySort = function() {
+    try {
+        localStorage.setItem('categorySort', JSON.stringify(this.categorySortBySection || {}));
+    }
+    catch (e) {}
+};
+
 // Settings
 IPTVApp.prototype.loadSettings = function() {
     // Detect system language for default

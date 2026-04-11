@@ -542,5 +542,10 @@
         "later": "Daha sonra",
         "checking": "Güncellemeler kontrol ediliyor...",
         "upToDate": "Güncelsiniz"
+    },
+    "categorySort": {
+        "alpha": "Alfabetik sırala",
+        "count": "Sayıya göre sırala",
+        "usage": "Kullanıma göre sırala"
     }
 }

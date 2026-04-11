@@ -95,6 +95,20 @@ signal.signal(signal.SIGINT, _shutdown_handler)
 CPU_CHECK_INTERVAL = 60
 CPU_THRESHOLD_PERCENT = 30
 CPU_ALERT_COOLDOWN = 300
+MEM_LOG_INTERVAL_TICKS = 10
+MEM_ALERT_THRESHOLD_MB = 300
+MEM_ALERT_COOLDOWN = 1800
+
+
+def _read_rss_mb():
+    try:
+        with open('/proc/self/status') as f:
+            for line in f:
+                if line.startswith('VmRSS:'):
+                    return int(line.split()[1]) / 1024
+    except OSError:
+        pass
+    return 0
 
 
 def _cpu_watchdog():
@@ -102,9 +116,12 @@ def _cpu_watchdog():
     prev_cpu = resource.getrusage(resource.RUSAGE_SELF)
     prev_time = time.monotonic()
     last_alert = 0
+    last_mem_alert = 0
     consecutive_high = 0
+    tick = 0
     while True:
         time.sleep(CPU_CHECK_INTERVAL)
+        tick += 1
         now = time.monotonic()
         curr_cpu = resource.getrusage(resource.RUSAGE_SELF)
         dt = now - prev_time
@@ -112,6 +129,19 @@ def _cpu_watchdog():
         cpu_percent = (cpu_used / dt) * 100 if dt > 0 else 0
         prev_cpu = curr_cpu
         prev_time = now
+        rss_mb = _read_rss_mb()
+        thread_count = threading.active_count()
+        with vm_download_lock:
+            dl_active = sum(1 for d in vm_downloads.values() if d['status'] == 'downloading')
+            dl_uploading = sum(1 for d in vm_downloads.values() if d['status'] == 'uploading')
+            dl_total = len(vm_downloads)
+            dl_queued = len(vm_download_queue)
+        if tick % MEM_LOG_INTERVAL_TICKS == 0:
+            print(f'[WATCHDOG] mem={rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued} cpu={cpu_percent:.1f}%')
+        if rss_mb > MEM_ALERT_THRESHOLD_MB and (now - last_mem_alert) > MEM_ALERT_COOLDOWN:
+            print(f'[WATCHDOG] High memory: {rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued}')
+            _thread_dump(reason=f'watchdog: MEM {rss_mb:.0f}MB')
+            last_mem_alert = now
         if cpu_percent > CPU_THRESHOLD_PERCENT:
             consecutive_high += 1
             if consecutive_high >= 3 and (now - last_alert) > CPU_ALERT_COOLDOWN:

@@ -111,6 +111,11 @@
         "sortName": "Name",
         "sortYear": "Year"
     },
+    "categorySort": {
+        "alpha": "Sort alphabetically",
+        "count": "Sort by item count",
+        "usage": "Sort by viewing usage"
+    },
     "settings": {
         "title": "Settings",
         "language": "Language",

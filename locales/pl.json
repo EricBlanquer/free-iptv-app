@@ -542,5 +542,10 @@
         "later": "Później",
         "checking": "Sprawdzanie aktualizacji...",
         "upToDate": "Jesteś na bieżąco"
+    },
+    "categorySort": {
+        "alpha": "Sortuj alfabetycznie",
+        "count": "Sortuj według liczby",
+        "usage": "Sortuj według użycia"
     }
 }

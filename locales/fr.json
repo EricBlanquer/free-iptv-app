@@ -123,6 +123,11 @@
         "sortName": "Nom",
         "sortYear": "Année"
     },
+    "categorySort": {
+        "alpha": "Tri alphabétique",
+        "count": "Tri par nombre d'éléments",
+        "usage": "Tri par utilisation"
+    },
     "settings": {
         "title": "Paramètres",
         "language": "Langue",

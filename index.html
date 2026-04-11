@@ -508,7 +508,14 @@
     <!-- Browse Screen - categories left, content right -->
     <div id="browse-screen" class="screen">
         <div id="filters-bar">
-            <div id="sidebar-title" data-i18n="home.categories">Categories</div>
+            <div id="sidebar-header">
+                <div id="sidebar-title" data-i18n="home.categories">Categories</div>
+                <div id="category-sort-bar">
+                    <button class="cat-sort-btn focusable selected" data-sort="alpha" data-i18n-title="categorySort.alpha" title="Sort alphabetically"><span class="material-symbols-outlined">sort_by_alpha</span><span class="cat-sort-dir">↑</span></button>
+                    <button class="cat-sort-btn focusable" data-sort="count" data-i18n-title="categorySort.count" title="Sort by item count"><span class="material-symbols-outlined">tag</span><span class="cat-sort-dir">↓</span></button>
+                    <button class="cat-sort-btn focusable" data-sort="usage" data-i18n-title="categorySort.usage" title="Sort by viewing usage"><span class="material-symbols-outlined">visibility</span><span class="cat-sort-dir">↓</span></button>
+                </div>
+            </div>
             <div id="view-mode-filters">
                 <button id="view-grid-btn" class="view-btn focusable selected" data-view="grid" title="Thumbnails"><span class="material-symbols-outlined">grid_view</span></button>
                 <button id="view-list-btn" class="view-btn focusable" data-view="list" title="List"><span class="material-symbols-outlined">view_list</span></button>

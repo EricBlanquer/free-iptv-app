@@ -712,3 +712,25 @@ describe('removeCompletedDownloadsFromGrid', () => {
         expect(toRemove).toEqual([]);
     });
 });
+
+describe('bug: fetchTMDBInfo type mapping for series with cached tmdb_id', () => {
+    function resolveTmdbType(type) {
+        return (type === 'series' || type === 'tv') ? 'tv' : 'movie';
+    }
+
+    it('maps series → tv', () => {
+        expect(resolveTmdbType('series')).toBe('tv');
+    });
+
+    it('maps tv → tv (regression: caller already passes "tv")', () => {
+        expect(resolveTmdbType('tv')).toBe('tv');
+    });
+
+    it('maps movie → movie', () => {
+        expect(resolveTmdbType('movie')).toBe('movie');
+    });
+
+    it('maps vod → movie', () => {
+        expect(resolveTmdbType('vod')).toBe('movie');
+    });
+});

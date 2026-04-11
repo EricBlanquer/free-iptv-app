@@ -36,6 +36,7 @@ class IPTVApp {
         this.currentScreen = 'home';
         this.currentSection = null; // live, vod, series
         this.selectedCategoryBySection = this.loadSelectedCategories();
+        this.categorySortBySection = this.loadCategorySort();
         this.focusIndex = 0;
         this.focusArea = 'home'; // langBtn, home, lang, sidebar, filters, grid, details, player
         this.currentSort = 'default';
