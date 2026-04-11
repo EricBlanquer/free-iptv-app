@@ -60,7 +60,10 @@
         "noHistory": "Geen kijkgeschiedenis",
         "downloads": "Downloads",
         "noDownloads": "Geen downloads",
-        "categories": "Categorieën"
+        "categories": "Categorieën",
+        "recommended": "Aanbevolen",
+        "noRecommendations": "Nog geen aanbevelingen — bekijk of markeer eerst enkele favorieten",
+        "computingRecommendations": "Aanbevelingen berekenen..."
     },
     "guide": {
         "today": "Vandaag",
@@ -251,7 +254,9 @@
         "unitWeeks_one": "{n} week",
         "unitWeeks_other": "{n} weken",
         "unitSeconds_one": "{n} seconde",
-        "unitSeconds_other": "{n} seconden"
+        "unitSeconds_other": "{n} seconden",
+        "showRecommended": "Categorie \"Aanbevolen\" tonen",
+        "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out"
     },
     "player": {
         "play": "Afspelen",
@@ -291,7 +296,8 @@
         "liveBtn": "Live",
         "live": "Live",
         "timeshift": "Uitgesteld",
-        "switchingQuality": "Schakelen naar lagere kwaliteit"
+        "switchingQuality": "Schakelen naar lagere kwaliteit",
+        "autoFormat": "Auto"
     },
     "subtitleOptions": {
         "title": "Ondertitel opties",

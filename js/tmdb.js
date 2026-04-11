@@ -487,6 +487,30 @@ TMDB.searchMovieAsync = function(title, year) {
     });
 };
 
+TMDB.getRecommendations = function(id, type) {
+    var self = this;
+    return new Promise(function(resolve) {
+        if (!self.isEnabled() || !id) { resolve([]); return; }
+        var path = (type === 'tv' || type === 'series') ? 'tv' : 'movie';
+        var url = self.baseUrl + '/' + path + '/' + id + '/recommendations?api_key=' + self.apiKey + '&language=' + self.language;
+        self._fetch(url, function(data) {
+            resolve(data && data.results ? data.results : []);
+        });
+    });
+};
+
+TMDB.getSimilar = function(id, type) {
+    var self = this;
+    return new Promise(function(resolve) {
+        if (!self.isEnabled() || !id) { resolve([]); return; }
+        var path = (type === 'tv' || type === 'series') ? 'tv' : 'movie';
+        var url = self.baseUrl + '/' + path + '/' + id + '/similar?api_key=' + self.apiKey + '&language=' + self.language;
+        self._fetch(url, function(data) {
+            resolve(data && data.results ? data.results : []);
+        });
+    });
+};
+
 TMDB.searchTVAsync = function(title, year) {
     var self = this;
     return new Promise(function(resolve) {

@@ -1030,6 +1030,11 @@ IPTVApp.prototype.loadStreams = function(categoryId, options) {
         this.updateCategorySelection(categoryId);
         return;
     }
+    if (categoryId === 'recommended') {
+        this.showRecommendedInGrid();
+        this.updateCategorySelection(categoryId);
+        return;
+    }
     if (categoryId === 'tnt') {
         this.showTntInGrid();
         this.updateCategorySelection(categoryId);
@@ -1329,6 +1334,18 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
         this.setCategoryText(favoritesItem, I18n.t('home.favorites', 'Favorites') + ' (' + favoritesCount + ')');
         favoritesItem.dataset.categoryId = 'favorites';
         container.appendChild(favoritesItem);
+    }
+    // Add "Recommended" pseudo-category for vod and series only when non-empty
+    if (this.settings.showRecommended !== false && (section === 'vod' || section === 'series')) {
+        this.ensureRecommendationsComputed(section);
+        if (this._hasRecommendations(section)) {
+            var recCount = this._recommendationsCache[section].streams.length;
+            var recItem = document.createElement('div');
+            recItem.className = 'category-item category-recommended' + (defaultCategory === 'recommended' ? ' selected' : '');
+            this.setCategoryText(recItem, I18n.t('home.recommended', 'Recommended') + ' (' + recCount + ')');
+            recItem.dataset.categoryId = 'recommended';
+            container.appendChild(recItem);
+        }
     }
     // Add "TNT" category for live section (only if not empty)
     if (hasTnt) {

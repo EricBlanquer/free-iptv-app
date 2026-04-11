@@ -524,8 +524,8 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
         self._pendingHistoryStream = null;
         // HTTP error (stream not available)
         if (error && error.type === 'HTTP_ERROR') {
-            // HLS m3u8 not supported by provider - fallback to .ts
-            if (self._liveHlsFallbackUrl) {
+            // HLS m3u8 not supported by provider - fallback to .ts (if auto-switch enabled)
+            if (self._liveHlsFallbackUrl && self.settings.liveAutoFormatSwitch !== false) {
                 window.log('PLAYER', 'HLS m3u8 failed, falling back to .ts');
                 var fallbackUrl = self._liveHlsFallbackUrl;
                 self._liveHlsFallbackUrl = null;
@@ -606,8 +606,8 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             }, 100);
             return;
         }
-        // HLS m3u8 not supported - fallback to .ts before retrying
-        if (self._liveHlsFallbackUrl) {
+        // HLS m3u8 not supported - fallback to .ts before retrying (if auto-switch enabled)
+        if (self._liveHlsFallbackUrl && self.settings.liveAutoFormatSwitch !== false) {
             window.log('PLAYER', 'HLS m3u8 failed, falling back to .ts');
             var fallbackUrl = self._liveHlsFallbackUrl;
             self._liveHlsFallbackUrl = null;
@@ -1171,9 +1171,17 @@ IPTVApp.prototype.updatePlayerStateIndicator = function() {
     var liveBtnEl = document.getElementById('player-live-btn');
     var formatBtnEl = document.getElementById('player-format-btn');
     var formatLabelEl = document.getElementById('player-format-label');
+    var autoFormatBtnEl = document.getElementById('player-auto-format-btn');
+    var autoFormatIconEl = document.getElementById('player-auto-format-icon');
     var durationEl = document.getElementById('player-duration');
     if (formatBtnEl) this.setHidden(formatBtnEl, !isLive);
     if (formatLabelEl) formatLabelEl.textContent = (this.settings.liveFormat || 'ts').toUpperCase();
+    if (autoFormatBtnEl) this.setHidden(autoFormatBtnEl, !isLive);
+    if (autoFormatIconEl) {
+        var autoOn = this.settings.liveAutoFormatSwitch !== false;
+        autoFormatIconEl.textContent = autoOn ? 'sync' : 'sync_disabled';
+        if (autoFormatBtnEl) autoFormatBtnEl.classList.toggle('disabled-state', !autoOn);
+    }
     this.updateLiveVariantButton();
     if (isLive) {
         // Hide progress row for live (status shown in tracks)
@@ -1932,6 +1940,9 @@ IPTVApp.prototype.selectPlayerTrack = function() {
     else if (btn.id === 'player-format-btn') {
         this.toggleLiveFormat();
     }
+    else if (btn.id === 'player-auto-format-btn') {
+        this.toggleLiveAutoFormatSwitch();
+    }
     else if (btn.id === 'player-quality-btn') {
         this.hideQualityTooltip(true);
         this.cycleLiveVariant();
@@ -2072,6 +2083,18 @@ IPTVApp.prototype.toggleLiveFormat = function() {
             if (self.currentScreen === 'player') self.showPlayerOverlay();
         }, 500);
     }
+};
+
+IPTVApp.prototype.toggleLiveAutoFormatSwitch = function() {
+    var next = this.settings.liveAutoFormatSwitch === false ? true : false;
+    this.settings.liveAutoFormatSwitch = next;
+    this.saveSettings();
+    window.log('ACTION', 'toggleLiveAutoFormatSwitch: ' + next);
+    var iconEl = document.getElementById('player-auto-format-icon');
+    if (iconEl) iconEl.textContent = next ? 'sync' : 'sync_disabled';
+    var btnEl = document.getElementById('player-auto-format-btn');
+    if (btnEl) btnEl.classList.toggle('disabled-state', !next);
+    this.showToast(I18n.t('settings.liveAutoFormatSwitch', 'Auto-switch live format on timeout') + ': ' + (next ? I18n.t('settings.yes', 'Yes') : I18n.t('settings.no', 'No')), 2000);
 };
 
 IPTVApp.prototype.cycleDisplayMode = function() {

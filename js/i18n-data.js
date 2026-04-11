@@ -1060,7 +1060,10 @@ var I18nData = {
                             "noHistory": "لا يوجد سجل مشاهدة",
                             "downloads": "التنزيلات",
                             "noDownloads": "لا توجد تنزيلات",
-                            "categories": "الفئات"
+                            "categories": "الفئات",
+                            "recommended": "موصى به",
+                            "noRecommendations": "لا توجد توصيات بعد — شاهد أو أضف بعض المفضلات أولاً",
+                            "computingRecommendations": "جاري حساب التوصيات..."
                     },
                     "guide": {
                             "today": "اليوم",
@@ -1251,7 +1254,9 @@ var I18nData = {
                             "unitWeeks_one": "أسبوع واحد",
                             "unitWeeks_other": "{n} أسابيع",
                             "unitSeconds_one": "ثانية واحدة",
-                            "unitSeconds_other": "{n} ثوانٍ"
+                            "unitSeconds_other": "{n} ثوانٍ",
+                            "showRecommended": "إظهار فئة « موصى به »",
+                            "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة"
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1291,7 +1296,8 @@ var I18nData = {
                             "liveBtn": "مباشر",
                             "live": "مباشر",
                             "timeshift": "مؤجل",
-                            "switchingQuality": "التبديل إلى جودة أقل"
+                            "switchingQuality": "التبديل إلى جودة أقل",
+                            "autoFormat": "تلقائي"
                     },
                     "subtitleOptions": {
                             "title": "خيارات الترجمة",
@@ -1528,7 +1534,10 @@ var I18nData = {
                             "noHistory": "Kein Wiedergabeverlauf",
                             "downloads": "Downloads",
                             "noDownloads": "Keine Downloads",
-                            "categories": "Kategorien"
+                            "categories": "Kategorien",
+                            "recommended": "Empfohlen",
+                            "noRecommendations": "Noch keine Empfehlungen — sieh dir zuerst etwas an oder markiere Favoriten",
+                            "computingRecommendations": "Empfehlungen werden berechnet..."
                     },
                     "guide": {
                             "today": "Heute",
@@ -1719,7 +1728,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} Woche",
                             "unitWeeks_other": "{n} Wochen",
                             "unitSeconds_one": "{n} Sekunde",
-                            "unitSeconds_other": "{n} Sekunden"
+                            "unitSeconds_other": "{n} Sekunden",
+                            "showRecommended": "Kategorie „Empfohlen“ anzeigen",
+                            "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln"
                     },
                     "player": {
                             "play": "Abspielen",
@@ -1759,7 +1770,8 @@ var I18nData = {
                             "liveBtn": "Live",
                             "live": "Live",
                             "timeshift": "Zeitversetzt",
-                            "switchingQuality": "Wechsel zu niedrigerer Qualität"
+                            "switchingQuality": "Wechsel zu niedrigerer Qualität",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Untertitel-Optionen",
@@ -1996,7 +2008,10 @@ var I18nData = {
                             "noHistory": "No viewing history",
                             "downloads": "Downloads",
                             "noDownloads": "No downloads",
-                            "categories": "Categories"
+                            "categories": "Categories",
+                            "recommended": "Recommended",
+                            "noRecommendations": "No recommendations yet — watch or favorite a few items first",
+                            "computingRecommendations": "Computing recommendations..."
                     },
                     "guide": {
                             "today": "Today",
@@ -2192,7 +2207,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} week",
                             "unitWeeks_other": "{n} weeks",
                             "unitSeconds_one": "{n} second",
-                            "unitSeconds_other": "{n} seconds"
+                            "unitSeconds_other": "{n} seconds",
+                            "showRecommended": "Show \"Recommended\" category",
+                            "liveAutoFormatSwitch": "Auto-switch live format on timeout"
                     },
                     "player": {
                             "play": "Play",
@@ -2232,7 +2249,8 @@ var I18nData = {
                             "liveBtn": "Live",
                             "live": "Live",
                             "timeshift": "Timeshift",
-                            "switchingQuality": "Switching to lower quality"
+                            "switchingQuality": "Switching to lower quality",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Subtitle options",
@@ -2464,7 +2482,10 @@ var I18nData = {
                             "noHistory": "Sin historial de reproducción",
                             "downloads": "Descargas",
                             "noDownloads": "Sin descargas",
-                            "categories": "Categorías"
+                            "categories": "Categorías",
+                            "recommended": "Recomendado",
+                            "noRecommendations": "Aún no hay recomendaciones — mira o marca algunos favoritos primero",
+                            "computingRecommendations": "Calculando recomendaciones..."
                     },
                     "guide": {
                             "today": "Hoy",
@@ -2655,7 +2676,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} semana",
                             "unitWeeks_other": "{n} semanas",
                             "unitSeconds_one": "{n} segundo",
-                            "unitSeconds_other": "{n} segundos"
+                            "unitSeconds_other": "{n} segundos",
+                            "showRecommended": "Mostrar categoría \"Recomendado\"",
+                            "liveAutoFormatSwitch": "Cambio auto de formato live al timeout"
                     },
                     "player": {
                             "play": "Reproducir",
@@ -2695,7 +2718,8 @@ var I18nData = {
                             "liveBtn": "Directo",
                             "live": "En directo",
                             "timeshift": "Diferido",
-                            "switchingQuality": "Cambiando a calidad inferior"
+                            "switchingQuality": "Cambiando a calidad inferior",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Opciones de subtítulos",
@@ -2932,7 +2956,10 @@ var I18nData = {
                             "noHistory": "Aucun historique de lecture",
                             "downloads": "Téléchargements",
                             "noDownloads": "Aucun téléchargement",
-                            "categories": "Catégories"
+                            "categories": "Catégories",
+                            "recommended": "Recommandé",
+                            "noRecommendations": "Aucune recommandation — regardez ou ajoutez quelques favoris pour commencer",
+                            "computingRecommendations": "Calcul des recommandations..."
                     },
                     "guide": {
                             "today": "Aujourd'hui",
@@ -3128,7 +3155,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} semaine",
                             "unitWeeks_other": "{n} semaines",
                             "unitSeconds_one": "{n} seconde",
-                            "unitSeconds_other": "{n} secondes"
+                            "unitSeconds_other": "{n} secondes",
+                            "showRecommended": "Afficher la catégorie « Recommandé »",
+                            "liveAutoFormatSwitch": "Bascule auto du format live au timeout"
                     },
                     "player": {
                             "play": "Lecture",
@@ -3168,7 +3197,8 @@ var I18nData = {
                             "options": "Options",
                             "liveBtn": "Direct",
                             "live": "En direct",
-                            "timeshift": "Différé"
+                            "timeshift": "Différé",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Options sous-titres",
@@ -3400,7 +3430,10 @@ var I18nData = {
                             "noHistory": "Nessuna cronologia di visualizzazione",
                             "downloads": "Download",
                             "noDownloads": "Nessun download",
-                            "categories": "Categorie"
+                            "categories": "Categorie",
+                            "recommended": "Consigliati",
+                            "noRecommendations": "Nessun suggerimento — guarda o aggiungi qualcosa ai preferiti",
+                            "computingRecommendations": "Calcolo dei suggerimenti..."
                     },
                     "guide": {
                             "today": "Oggi",
@@ -3591,7 +3624,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} settimana",
                             "unitWeeks_other": "{n} settimane",
                             "unitSeconds_one": "{n} secondo",
-                            "unitSeconds_other": "{n} secondi"
+                            "unitSeconds_other": "{n} secondi",
+                            "showRecommended": "Mostra categoria \"Consigliati\"",
+                            "liveAutoFormatSwitch": "Cambio automatico formato live al timeout"
                     },
                     "player": {
                             "play": "Riproduci",
@@ -3631,7 +3666,8 @@ var I18nData = {
                             "liveBtn": "Diretta",
                             "live": "In diretta",
                             "timeshift": "Differita",
-                            "switchingQuality": "Passaggio a qualità inferiore"
+                            "switchingQuality": "Passaggio a qualità inferiore",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Opzioni sottotitoli",
@@ -3868,7 +3904,10 @@ var I18nData = {
                             "noHistory": "Geen kijkgeschiedenis",
                             "downloads": "Downloads",
                             "noDownloads": "Geen downloads",
-                            "categories": "Categorieën"
+                            "categories": "Categorieën",
+                            "recommended": "Aanbevolen",
+                            "noRecommendations": "Nog geen aanbevelingen — bekijk of markeer eerst enkele favorieten",
+                            "computingRecommendations": "Aanbevelingen berekenen..."
                     },
                     "guide": {
                             "today": "Vandaag",
@@ -4059,7 +4098,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} week",
                             "unitWeeks_other": "{n} weken",
                             "unitSeconds_one": "{n} seconde",
-                            "unitSeconds_other": "{n} seconden"
+                            "unitSeconds_other": "{n} seconden",
+                            "showRecommended": "Categorie \"Aanbevolen\" tonen",
+                            "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out"
                     },
                     "player": {
                             "play": "Afspelen",
@@ -4099,7 +4140,8 @@ var I18nData = {
                             "liveBtn": "Live",
                             "live": "Live",
                             "timeshift": "Uitgesteld",
-                            "switchingQuality": "Schakelen naar lagere kwaliteit"
+                            "switchingQuality": "Schakelen naar lagere kwaliteit",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Ondertitel opties",
@@ -4336,7 +4378,10 @@ var I18nData = {
                             "noHistory": "Brak historii oglądania",
                             "downloads": "Pobieranie",
                             "noDownloads": "Brak pobrań",
-                            "categories": "Kategorie"
+                            "categories": "Kategorie",
+                            "recommended": "Polecane",
+                            "noRecommendations": "Brak rekomendacji — najpierw obejrzyj lub dodaj coś do ulubionych",
+                            "computingRecommendations": "Obliczanie rekomendacji..."
                     },
                     "guide": {
                             "today": "Dziś",
@@ -4527,7 +4572,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} tydzień",
                             "unitWeeks_other": "{n} tygodni",
                             "unitSeconds_one": "{n} sekunda",
-                            "unitSeconds_other": "{n} sekund"
+                            "unitSeconds_other": "{n} sekund",
+                            "showRecommended": "Pokaż kategorię „Polecane”",
+                            "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout"
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -4567,7 +4614,8 @@ var I18nData = {
                             "liveBtn": "Na żywo",
                             "live": "Na żywo",
                             "timeshift": "Przesunięte",
-                            "switchingQuality": "Przełączanie na niższą jakość"
+                            "switchingQuality": "Przełączanie na niższą jakość",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Opcje napisów",
@@ -4804,7 +4852,10 @@ var I18nData = {
                             "noHistory": "Sem histórico de visualização",
                             "downloads": "Downloads",
                             "noDownloads": "Sem downloads",
-                            "categories": "Categorias"
+                            "categories": "Categorias",
+                            "recommended": "Recomendado",
+                            "noRecommendations": "Sem recomendações ainda — veja ou favorite alguns itens primeiro",
+                            "computingRecommendations": "Calculando recomendações..."
                     },
                     "guide": {
                             "today": "Hoje",
@@ -4995,7 +5046,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} semana",
                             "unitWeeks_other": "{n} semanas",
                             "unitSeconds_one": "{n} segundo",
-                            "unitSeconds_other": "{n} segundos"
+                            "unitSeconds_other": "{n} segundos",
+                            "showRecommended": "Mostrar categoria \"Recomendado\"",
+                            "liveAutoFormatSwitch": "Troca auto de formato live no timeout"
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -5035,7 +5088,8 @@ var I18nData = {
                             "liveBtn": "Ao vivo",
                             "live": "Ao vivo",
                             "timeshift": "Diferido",
-                            "switchingQuality": "Mudando para qualidade inferior"
+                            "switchingQuality": "Mudando para qualidade inferior",
+                            "autoFormat": "Auto"
                     },
                     "subtitleOptions": {
                             "title": "Opções de legendas",
@@ -5272,7 +5326,10 @@ var I18nData = {
                             "noHistory": "Нет истории просмотра",
                             "downloads": "Загрузки",
                             "noDownloads": "Нет загрузок",
-                            "categories": "Категории"
+                            "categories": "Категории",
+                            "recommended": "Рекомендации",
+                            "noRecommendations": "Пока нет рекомендаций — сначала посмотрите или добавьте что-то в избранное",
+                            "computingRecommendations": "Подбор рекомендаций..."
                     },
                     "guide": {
                             "today": "Сегодня",
@@ -5463,7 +5520,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} неделя",
                             "unitWeeks_other": "{n} недель",
                             "unitSeconds_one": "{n} секунда",
-                            "unitSeconds_other": "{n} секунд"
+                            "unitSeconds_other": "{n} секунд",
+                            "showRecommended": "Показать категорию «Рекомендации»",
+                            "liveAutoFormatSwitch": "Авто-смена формата live при таймауте"
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -5503,7 +5562,8 @@ var I18nData = {
                             "liveBtn": "Прямой эфир",
                             "live": "Прямой эфир",
                             "timeshift": "Отложенный",
-                            "switchingQuality": "Переключение на низкое качество"
+                            "switchingQuality": "Переключение на низкое качество",
+                            "autoFormat": "Авто"
                     },
                     "subtitleOptions": {
                             "title": "Параметры субтитров",
@@ -5740,7 +5800,10 @@ var I18nData = {
                             "noHistory": "İzleme geçmişi yok",
                             "downloads": "İndirmeler",
                             "noDownloads": "İndirme yok",
-                            "categories": "Kategoriler"
+                            "categories": "Kategoriler",
+                            "recommended": "Önerilenler",
+                            "noRecommendations": "Henüz öneri yok — önce bir şeyler izleyin veya favorilere ekleyin",
+                            "computingRecommendations": "Öneriler hesaplanıyor..."
                     },
                     "guide": {
                             "today": "Bugün",
@@ -5931,7 +5994,9 @@ var I18nData = {
                             "unitWeeks_one": "{n} hafta",
                             "unitWeeks_other": "{n} hafta",
                             "unitSeconds_one": "{n} saniye",
-                            "unitSeconds_other": "{n} saniye"
+                            "unitSeconds_other": "{n} saniye",
+                            "showRecommended": "\"Önerilenler\" kategorisini göster",
+                            "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme"
                     },
                     "player": {
                             "play": "Oynat",
@@ -5971,7 +6036,8 @@ var I18nData = {
                             "liveBtn": "Canlı",
                             "live": "Canlı",
                             "timeshift": "Gecikmeli",
-                            "switchingQuality": "Daha düşük kaliteye geçiş"
+                            "switchingQuality": "Daha düşük kaliteye geçiş",
+                            "autoFormat": "Oto"
                     },
                     "subtitleOptions": {
                             "title": "Altyazı seçenekleri",

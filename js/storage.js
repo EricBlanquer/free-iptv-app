@@ -83,6 +83,7 @@ IPTVApp.prototype.saveWatchHistory = function() {
     }
     catch (e) { /* storage error */ }
     this._rebuildHistoryIndex();
+    if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
 
 IPTVApp.prototype._rebuildHistoryIndex = function() {
@@ -1218,6 +1219,8 @@ IPTVApp.prototype.loadSettings = function() {
         viewMode: {},
         preferHtml5Player: false,
         liveFormat: 'ts',
+        liveAutoFormatSwitch: true,
+        showRecommended: true,
         dialogueBoost: false,
         historyMaxItems: 50,
         focusOnCategories: false,
@@ -1394,6 +1397,7 @@ IPTVApp.prototype.saveFavorites = function() {
     }
     catch (e) { /* storage error */ }
     this._rebuildFavoritesIndex();
+    if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
 
 IPTVApp.prototype._rebuildFavoritesIndex = function() {

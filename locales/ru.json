@@ -58,7 +58,10 @@
         "noHistory": "Нет истории просмотра",
         "downloads": "Загрузки",
         "noDownloads": "Нет загрузок",
-        "categories": "Категории"
+        "categories": "Категории",
+        "recommended": "Рекомендации",
+        "noRecommendations": "Пока нет рекомендаций — сначала посмотрите или добавьте что-то в избранное",
+        "computingRecommendations": "Подбор рекомендаций..."
     },
     "guide": {
         "today": "Сегодня",
@@ -249,7 +252,9 @@
         "unitWeeks_one": "{n} неделя",
         "unitWeeks_other": "{n} недель",
         "unitSeconds_one": "{n} секунда",
-        "unitSeconds_other": "{n} секунд"
+        "unitSeconds_other": "{n} секунд",
+        "showRecommended": "Показать категорию «Рекомендации»",
+        "liveAutoFormatSwitch": "Авто-смена формата live при таймауте"
     },
     "player": {
         "play": "Воспроизвести",
@@ -289,7 +294,8 @@
         "liveBtn": "Прямой эфир",
         "live": "Прямой эфир",
         "timeshift": "Отложенный",
-        "switchingQuality": "Переключение на низкое качество"
+        "switchingQuality": "Переключение на низкое качество",
+        "autoFormat": "Авто"
     },
     "subtitleOptions": {
         "title": "Параметры субтитров",
