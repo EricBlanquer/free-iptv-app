@@ -297,7 +297,9 @@
         "live": "Live",
         "timeshift": "Uitgesteld",
         "switchingQuality": "Schakelen naar lagere kwaliteit",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Niet voor mij",
+        "notForMeDone": "Verwijderd uit aanbevelingen"
     },
     "subtitleOptions": {
         "title": "Ondertitel opties",
@@ -327,7 +329,8 @@
         "season": "Seizoen",
         "episode": "Aflevering",
         "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven.",
-        "age": "{count} jaar"
+        "age": "{count} jaar",
+        "similarGenres": "Meer in hetzelfde genre"
     },
     "department": {
         "Acting": "Acteerwerk",

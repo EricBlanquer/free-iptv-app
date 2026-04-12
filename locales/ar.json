@@ -295,7 +295,9 @@
         "live": "مباشر",
         "timeshift": "مؤجل",
         "switchingQuality": "التبديل إلى جودة أقل",
-        "autoFormat": "تلقائي"
+        "autoFormat": "تلقائي",
+        "notForMe": "ليس لي",
+        "notForMeDone": "تمت الإزالة من التوصيات"
     },
     "subtitleOptions": {
         "title": "خيارات الترجمة",
@@ -325,7 +327,8 @@
         "season": "الموسم",
         "episode": "الحلقة",
         "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
-        "age": "{count} سنة"
+        "age": "{count} سنة",
+        "similarGenres": "المزيد من نفس النوع"
     },
     "department": {
         "Acting": "تمثيل",

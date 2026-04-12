@@ -296,7 +296,7 @@
         "unitWeeks_other": "{n} semaines",
         "unitSeconds_one": "{n} seconde",
         "unitSeconds_other": "{n} secondes",
-        "showRecommended": "Afficher la catégorie «\u00a0Recommandé\u00a0»",
+        "showRecommended": "Afficher la catégorie « Recommandé »",
         "liveAutoFormatSwitch": "Bascule auto du format live au timeout"
     },
     "player": {
@@ -338,7 +338,9 @@
         "liveBtn": "Direct",
         "live": "En direct",
         "timeshift": "Différé",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Pas pour moi",
+        "notForMeDone": "Retiré des recommandations"
     },
     "subtitleOptions": {
         "title": "Options sous-titres",
@@ -368,7 +370,8 @@
         "season": "Saison",
         "episode": "Épisode",
         "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
-        "age": "{count} ans"
+        "age": "{count} ans",
+        "similarGenres": "Plus dans le même genre"
     },
     "department": {
         "Acting": "Acteur",

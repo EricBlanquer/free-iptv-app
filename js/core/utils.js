@@ -79,9 +79,10 @@ IPTVApp.prototype.initBrowseScreen = function(section, streamType, titleKey, tit
     this.showElement('filters-bar');
     this.hideElement('search-filters');
     this.hideElement('sort-filters');
+    this.hideElement('category-sort-bar');
     this.hideElement('sidebar');
     this.setHidden('view-mode-filters', false);
-    document.getElementById('categories-list').innerHTML = '';
+    document.getElementById('categories-list').textContent = '';
 };
 
 IPTVApp.prototype.goToScreen = function(screen, area, index) {

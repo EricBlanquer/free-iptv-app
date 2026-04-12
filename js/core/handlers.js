@@ -184,6 +184,8 @@ IPTVApp.prototype.selectHandlers = {
             this.playCurrentStream(true);
         } else if (current.id === 'mark-watched-btn') {
             this.markAsWatched();
+        } else if (current.id === 'not-for-me-btn') {
+            this.rejectRecommendation();
         } else if (current.id === 'details-title') {
             current.click();
         } else if (current.id === 'download-btn' || current.classList.contains('download-btn')) {
@@ -198,6 +200,10 @@ IPTVApp.prototype.selectHandlers = {
             this.lastDetailsIndex = this.focusIndex;
             this.pushDetailsState();
             this.showActor(actorId);
+        } else if (current.classList.contains('tmdb-card')) {
+            this.lastDetailsIndex = this.focusIndex;
+            this.pushDetailsState();
+            this.showDetailsFromTMDB(current);
         } else if (current.id === 'download-season-btn' || current.classList.contains('download-season-btn')) {
             this.hideButtonTooltip('download-season-btn', true);
             this.triggerFreeboxSeasonDownload();
@@ -218,7 +224,7 @@ IPTVApp.prototype.selectHandlers = {
             this.toggleDescriptionTTS('actor-bio');
             return;
         }
-        if (current.classList.contains('filmography-item')) {
+        if (current.classList.contains('tmdb-card')) {
             this.lastActorIndex = this.focusIndex;
             this.showDetailsFromTMDB(current);
         }
@@ -341,6 +347,13 @@ IPTVApp.prototype.backHandlers = {
             this.previousScreen = null;
             this.detailsReturnActorId = null;
             this.showActor(actorId);
+        } else if (this.previousScreen === 'details' && this.detailsStack.length > 0) {
+            this.popDetailsState();
+            this.showScreen('details');
+            this.currentScreen = 'details';
+            this.focusArea = 'details';
+            this.focusIndex = this.lastDetailsIndex;
+            this.updateFocus();
         } else if (this.currentSection === 'history') {
             this.showHistoryScreen();
         } else if (this.currentSection === 'downloads') {

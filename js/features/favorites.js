@@ -87,6 +87,7 @@ IPTVApp.prototype.showFavoritesScreen = function() {
     this.showElement('filters-bar');
     this.hideElement('search-filters');
     this.hideElement('sort-filters');
+    this.hideElement('category-sort-bar');
     this.hideElement('sidebar');
     var editBtn = document.getElementById('edit-favorites-btn');
     editBtn.classList.toggle('hidden', this.favorites.length === 0);

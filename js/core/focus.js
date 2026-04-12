@@ -705,6 +705,8 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
                         }, 16);
                     }, 0);
                 }
+            } else if (this.displayedCount >= this.currentStreams.length && newIndex < ctx.focusables.length - 1) {
+                newIndex = ctx.focusables.length - 1;
             } else if (this.displayedCount < this.currentStreams.length) {
                 if (!this._loadingMore) {
                     this._loadingMore = true;
@@ -994,7 +996,7 @@ IPTVApp.prototype.getFocusables = function() {
             selector = '#details-screen .focusable:not(.hidden)';
             break;
         case 'actor':
-            selector = '#actor-screen #actor-bio, #actor-filmography-grid .filmography-item';
+            selector = '#actor-screen #actor-bio, #actor-filmography-grid .tmdb-card';
             break;
         case 'tracks':
             return this.trackModalItems || [];
@@ -1046,17 +1048,17 @@ IPTVApp.prototype.getDetailsZone = function(element) {
     if (element.classList.contains('season-btn') || element.classList.contains('download-season-btn')) return 'seasons';
     if (element.classList.contains('episode-item')) return 'episodes';
     if (element.classList.contains('cast-card')) {
-        if (element.parentElement && element.parentElement.id === 'details-director-grid') {
-            return 'director';
-        }
         return 'cast';
+    }
+    if (element.classList.contains('tmdb-card')) {
+        return 'similar';
     }
     return 'actions';
 };
 
 IPTVApp.prototype.getDetailsZones = function(focusables) {
     var zones = {};
-    var zoneOrder = ['title', 'favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'director'];
+    var zoneOrder = ['title', 'favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'similar'];
     for (var i = 0; i < focusables.length; i++) {
         var zone = this.getDetailsZone(focusables[i]);
         if (!zones[zone]) {
@@ -1202,8 +1204,8 @@ IPTVApp.prototype.applyMarqueeToFocusedElement = function(el) {
         if (castName) this.applyMarqueeLoop(castName, containerWidth);
         if (castChar) this.applyMarqueeLoop(castChar, containerWidth);
     }
-    else if (el.classList.contains('filmography-item')) {
-        var filmTitle = el.querySelector('.filmography-title');
+    else if (el.classList.contains('tmdb-card')) {
+        var filmTitle = el.querySelector('.tmdb-card-title');
         if (filmTitle) {
             this.applyMarqueeLoop(filmTitle, el.clientWidth - 20);
         }
@@ -1399,7 +1401,7 @@ IPTVApp.prototype.scrollDetailsToElement = function(el) {
 };
 
 IPTVApp.prototype.scrollHorizontalGridToElement = function(el) {
-    var horizontalGrid = el.closest('#details-cast-grid, #details-director-grid, #actor-filmography-grid, #details-season-selector');
+    var horizontalGrid = el.closest('#details-cast-grid, #details-similar-grid, #actor-filmography-grid, #details-season-selector');
     if (!horizontalGrid) return;
     var elRect = el.getBoundingClientRect();
     var gridRect = horizontalGrid.getBoundingClientRect();
