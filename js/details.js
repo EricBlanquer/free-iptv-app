@@ -2481,6 +2481,17 @@ IPTVApp.prototype.renderFilmography = function(credits) {
     this.filmographyLoading = false;
     var neededItems = Math.max(16, (this.restoreActorIndex || 0) + 8);
     this.loadMoreFilmography(neededItems);
+    var self = this;
+    var scrollTimer = null;
+    grid.addEventListener('scroll', function() {
+        if (scrollTimer) return;
+        scrollTimer = setTimeout(function() {
+            scrollTimer = null;
+            if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 500) {
+                self.loadMoreFilmography(8);
+            }
+        }, 150);
+    });
 };
 
 IPTVApp.prototype.loadMoreFilmography = function(count) {
@@ -2521,18 +2532,6 @@ IPTVApp.prototype.loadMoreFilmography = function(count) {
         });
         for (var i = skeletonIndex; i < existingSkeletons.length; i++) {
             existingSkeletons[i].remove();
-        }
-        var remaining = self.filmographyData.length - self.filmographyOffset;
-        for (var i = 0; i < remaining; i++) {
-            var skeleton = document.createElement('div');
-            skeleton.className = 'tmdb-card tmdb-card-skeleton';
-            var posterSkel = document.createElement('div');
-            posterSkel.className = 'tmdb-card-poster skeleton-shimmer';
-            skeleton.appendChild(posterSkel);
-            var titleSkel = document.createElement('div');
-            titleSkel.className = 'tmdb-card-title skeleton-text';
-            skeleton.appendChild(titleSkel);
-            grid.appendChild(skeleton);
         }
         self.filmographyLoadPending = false;
         self._checkTmdbCardsAvailability('actor-filmography-grid');
@@ -2581,15 +2580,29 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     document.getElementById('details-cast-grid').innerHTML = '';
     this.setHidden('series-status', true);
     this.setHidden('details-episodes-section', true);
+    // Remove version buttons from previous details
+    var actionsEl = document.getElementById('details-actions');
+    var oldVersionBtns = actionsEl.querySelectorAll('.version-btn');
+    for (var vi = 0; vi < oldVersionBtns.length; vi++) {
+        oldVersionBtns[vi].parentNode.removeChild(oldVersionBtns[vi]);
+    }
+    var breakEl = actionsEl.querySelector('.actions-break');
+    if (breakEl) breakEl.style.display = 'none';
     // Reset buttons
     var playBtn = document.getElementById('play-btn');
+    this.setHidden(playBtn, false);
     var continueBtn = document.getElementById('continue-btn');
     var markWatchedBtn = document.getElementById('mark-watched-btn');
     this.setHidden(continueBtn, true);
     this.setHidden(markWatchedBtn, true);
     var minMs = (this.settings.minProgressMinutes || 2) * 60000;
     if (available) {
-        // Check progress for this movie
+        this._ensureDuplicateVersions(available.stream);
+        var isSeries = available.type === 'series';
+        var versionResult = this._setupVersionSelector(available.stream, isSeries);
+        if (versionResult.hasVersions) {
+            this.selectedStream = { id: available.id, type: available.type, data: available.stream };
+        }
         if (available.type === 'vod') {
             var vodProg = this.getWatchHistoryItem(available.stream || available.id);
             if (vodProg && vodProg.position >= minMs && !vodProg.watched) {
@@ -2598,12 +2611,11 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
                 this.setHidden(continueBtn, false);
                 this.setHidden(markWatchedBtn, false);
                 this.selectedStream.historyPosition = vodProg.position;
-            } else {
+            } else if (!versionResult.hasVersions) {
                 playBtn.textContent = I18n.t('player.play', 'Play');
             }
             playBtn.style.opacity = '1';
         } else {
-            // Series: hide play buttons until episodes are loaded
             this.setHidden(playBtn, true);
             this.loadSeriesInfo(available.id);
         }
