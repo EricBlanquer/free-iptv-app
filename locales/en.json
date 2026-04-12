@@ -326,7 +326,9 @@
         "live": "Live",
         "timeshift": "Timeshift",
         "switchingQuality": "Switching to lower quality",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Not for me",
+        "notForMeDone": "Removed from recommendations"
     },
     "subtitleOptions": {
         "title": "Subtitle options",
@@ -356,7 +358,8 @@
         "season": "Season",
         "episode": "Episode",
         "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
-        "age": "{count} years old"
+        "age": "{count} years old",
+        "similarGenres": "More in the same genre"
     },
     "department": {
         "Acting": "Actor",

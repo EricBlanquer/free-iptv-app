@@ -299,7 +299,9 @@
         "live": "Ao vivo",
         "timeshift": "Diferido",
         "switchingQuality": "Mudando para qualidade inferior",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Não é para mim",
+        "notForMeDone": "Removido das recomendações"
     },
     "subtitleOptions": {
         "title": "Opções de legendas",
@@ -329,7 +331,8 @@
         "season": "Temporada",
         "episode": "Episódio",
         "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
-        "age": "{count} anos"
+        "age": "{count} anos",
+        "similarGenres": "Mais do mesmo gênero"
     },
     "department": {
         "Acting": "Atuação",

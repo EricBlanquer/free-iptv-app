@@ -912,7 +912,10 @@ IPTVApp.prototype._renderCategoryContent = function(categories, streams, section
         sidebarContainer.querySelector('[data-category-id="' + savedCategory + '"]') !== null;
     var categoryExistsInData = savedCategory !== undefined &&
         categories.some(function(c) { return c.category_id === savedCategory || String(c.category_id) === String(savedCategory); });
-    if (categoryExistsInSidebar || categoryExistsInData) {
+    var isDeferredPseudoCategory = savedCategory === 'recommended'
+        && (section === 'vod' || section === 'series')
+        && this._collectRecommendationSeeds(section).length > 0;
+    if (categoryExistsInSidebar || categoryExistsInData || isDeferredPseudoCategory) {
         this.loadStreams(savedCategory);
     }
     else {
@@ -1241,8 +1244,15 @@ IPTVApp.prototype.updateCategorySortButtons = function() {
     if (!section) return;
     var config = this.getCategorySortConfig(section);
     var btns = document.querySelectorAll('#category-sort-bar .cat-sort-btn');
+    var hideUsage = section === 'live';
     for (var i = 0; i < btns.length; i++) {
         var btn = btns[i];
+        if (btn.dataset.sort === 'usage') {
+            this.setHidden(btn, hideUsage);
+            if (hideUsage && config.mode === 'usage') {
+                config = { mode: 'alpha', dir: 'asc' };
+            }
+        }
         var isSelected = btn.dataset.sort === config.mode;
         btn.classList.toggle('selected', isSelected);
         var arrow = btn.querySelector('.cat-sort-dir');
@@ -1277,6 +1287,7 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
     this.showElement('search-filters');
     this.showElement('sort-filters');
     this.showElement('rating-filters');
+    this.showElement('category-sort-bar');
     this.updateCategorySortButtons();
     // Hide edit favorites button (only shown in favorites category)
     this.setHidden('edit-favorites-btn', true);
@@ -2193,7 +2204,7 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
     }
     var needsSDFilter = self.hideSD || self.hide3D;
     var needsQualityFilter = needsSDFilter;
-    var needsGenre = self.settings.useGenreCategories;
+    var needsGenre = true;
     var beforeCount = streams.length;
     var BATCH_SIZE = 2000;
     var hasPreprocessedData = streams.length > 0 && streams[0]._dedupKey;

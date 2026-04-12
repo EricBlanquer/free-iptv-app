@@ -297,7 +297,9 @@
         "live": "Live",
         "timeshift": "Zeitversetzt",
         "switchingQuality": "Wechsel zu niedrigerer Qualität",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Nichts für mich",
+        "notForMeDone": "Aus Empfehlungen entfernt"
     },
     "subtitleOptions": {
         "title": "Untertitel-Optionen",
@@ -327,7 +329,8 @@
         "season": "Staffel",
         "episode": "Episode",
         "configureTMDB": "Konfigurieren Sie Ihren TMDB API-Schlüssel in den Einstellungen, um Beschreibungen anzuzeigen.",
-        "age": "{count} Jahre"
+        "age": "{count} Jahre",
+        "similarGenres": "Mehr im gleichen Genre"
     },
     "department": {
         "Acting": "Schauspiel",

@@ -297,17 +297,15 @@ body.text-small .grid-item-image:not([style*="background-image"]) .grid-overlay-
 body.text-small .episode-title,
 body.text-small .genre-tag,
 body.text-small .season-btn,
-body.text-small .filmography-year { font-size: 22px; }
+body.text-small .tmdb-card-year { font-size: 22px; }
 body.text-small .category-item,
-body.text-small #details-director,
 body.text-small #actor-bio { font-size: 24px; }
 body.text-small #details-cast-title,
-body.text-small #details-director-title,
 body.text-small #actor-meta,
 body.text-small #series-status { font-size: 26px; }
 body.text-small #details-description,
 body.text-small #actor-filmography-title,
-body.text-small .filmography-title { font-size: 28px; }
+body.text-small .tmdb-card-title { font-size: 28px; }
 body.text-small #details-meta { font-size: 30px; }
 body.text-small .tmdb-match-inline { font-size: 20px; }
 body.text-small .settings-label { font-size: 26px; }
@@ -378,8 +376,8 @@ body.text-small #details-genres span { font-size: 18px; }
 body.text-small .action-btn { font-size: 24px; }
 body.text-small .version-bitrate { font-size: 16px; }
 body.text-small .favorite-star { font-size: 44px; }
-body.text-small .filmography-more-poster { font-size: 68px; }
-body.text-small .filmography-available { font-size: 18px; }
+body.text-small .tmdb-card-more-poster { font-size: 68px; }
+body.text-small .tmdb-card-available { font-size: 18px; }
 /* Settings: small */
 body.text-small #settings-screen h1,
 body.text-small #playlists-screen h1,
@@ -488,17 +486,15 @@ body.text-medium .grid-item-image:not([style*="background-image"]) .grid-overlay
 body.text-medium .episode-title,
 body.text-medium .genre-tag,
 body.text-medium .season-btn,
-body.text-medium .filmography-year { font-size: 26px; }
+body.text-medium .tmdb-card-year { font-size: 26px; }
 body.text-medium .category-item,
-body.text-medium #details-director,
 body.text-medium #actor-bio { font-size: 28px; }
 body.text-medium #details-cast-title,
-body.text-medium #details-director-title,
 body.text-medium #actor-meta,
 body.text-medium #series-status { font-size: 30px; }
 body.text-medium #details-description,
 body.text-medium #actor-filmography-title,
-body.text-medium .filmography-title { font-size: 32px; }
+body.text-medium .tmdb-card-title { font-size: 32px; }
 body.text-medium #details-meta { font-size: 34px; }
 body.text-medium .tmdb-match-inline { font-size: 22px; }
 body.text-medium .settings-label { font-size: 30px; }
@@ -569,8 +565,8 @@ body.text-medium #details-genres span { font-size: 20px; }
 body.text-medium .action-btn { font-size: 28px; }
 body.text-medium .version-bitrate { font-size: 19px; }
 body.text-medium .favorite-star { font-size: 48px; }
-body.text-medium .filmography-more-poster { font-size: 72px; }
-body.text-medium .filmography-available { font-size: 20px; }
+body.text-medium .tmdb-card-more-poster { font-size: 72px; }
+body.text-medium .tmdb-card-available { font-size: 20px; }
 /* Settings: medium */
 body.text-medium #settings-screen h1,
 body.text-medium #playlists-screen h1,
@@ -666,17 +662,15 @@ body.text-large .grid-item-image:not([style*="background-image"]) .grid-overlay-
 body.text-large .episode-title,
 body.text-large .genre-tag,
 body.text-large .season-btn,
-body.text-large .filmography-year { font-size: 30px; }
+body.text-large .tmdb-card-year { font-size: 30px; }
 body.text-large .category-item,
-body.text-large #details-director,
 body.text-large #actor-bio { font-size: 32px; }
 body.text-large #details-cast-title,
-body.text-large #details-director-title,
 body.text-large #actor-meta,
 body.text-large #series-status { font-size: 34px; }
 body.text-large #details-description,
 body.text-large #actor-filmography-title,
-body.text-large .filmography-title { font-size: 36px; }
+body.text-large .tmdb-card-title { font-size: 36px; }
 body.text-large #details-meta { font-size: 38px; }
 body.text-large .tmdb-match-inline { font-size: 24px; }
 body.text-large .settings-label { font-size: 34px; }
@@ -747,8 +741,8 @@ body.text-large #details-genres span { font-size: 24px; }
 body.text-large .action-btn { font-size: 32px; }
 body.text-large .version-bitrate { font-size: 22px; }
 body.text-large .favorite-star { font-size: 52px; }
-body.text-large .filmography-more-poster { font-size: 76px; }
-body.text-large .filmography-available { font-size: 24px; }
+body.text-large .tmdb-card-more-poster { font-size: 76px; }
+body.text-large .tmdb-card-available { font-size: 24px; }
 /* Settings: large */
 body.text-large #settings-screen h1,
 body.text-large #playlists-screen h1,
@@ -909,17 +903,15 @@ body.text-xlarge .grid-item-image:not([style*="background-image"]) .grid-overlay
 body.text-xlarge .episode-title,
 body.text-xlarge .genre-tag,
 body.text-xlarge .season-btn,
-body.text-xlarge .filmography-year { font-size: 36px; }
+body.text-xlarge .tmdb-card-year { font-size: 36px; }
 body.text-xlarge .category-item,
-body.text-xlarge #details-director,
 body.text-xlarge #actor-bio { font-size: 38px; }
 body.text-xlarge #details-cast-title,
-body.text-xlarge #details-director-title,
 body.text-xlarge #actor-meta,
 body.text-xlarge #series-status { font-size: 40px; }
 body.text-xlarge #details-description,
 body.text-xlarge #actor-filmography-title,
-body.text-xlarge .filmography-title { font-size: 43px; }
+body.text-xlarge .tmdb-card-title { font-size: 43px; }
 body.text-xlarge #details-meta { font-size: 45px; }
 body.text-xlarge .tmdb-match-inline { font-size: 28px; }
 body.text-xlarge .settings-label { font-size: 40px; }
@@ -984,8 +976,8 @@ body.text-xlarge #details-genres span { font-size: 28px; }
 body.text-xlarge .action-btn { font-size: 38px; }
 body.text-xlarge .version-bitrate { font-size: 26px; }
 body.text-xlarge .favorite-star { font-size: 62px; }
-body.text-xlarge .filmography-more-poster { font-size: 91px; }
-body.text-xlarge .filmography-available { font-size: 28px; }
+body.text-xlarge .tmdb-card-more-poster { font-size: 91px; }
+body.text-xlarge .tmdb-card-available { font-size: 28px; }
 body.text-xlarge #settings-screen h1,
 body.text-xlarge #playlists-screen h1,
 body.text-xlarge #playlist-edit-screen h1,
@@ -1080,17 +1072,15 @@ body.text-xxlarge .grid-item-image:not([style*="background-image"]) .grid-overla
 body.text-xxlarge .episode-title,
 body.text-xxlarge .genre-tag,
 body.text-xxlarge .season-btn,
-body.text-xxlarge .filmography-year { font-size: 43px; }
+body.text-xxlarge .tmdb-card-year { font-size: 43px; }
 body.text-xxlarge .category-item,
-body.text-xxlarge #details-director,
 body.text-xxlarge #actor-bio { font-size: 46px; }
 body.text-xxlarge #details-cast-title,
-body.text-xxlarge #details-director-title,
 body.text-xxlarge #actor-meta,
 body.text-xxlarge #series-status { font-size: 48px; }
 body.text-xxlarge #details-description,
 body.text-xxlarge #actor-filmography-title,
-body.text-xxlarge .filmography-title { font-size: 51px; }
+body.text-xxlarge .tmdb-card-title { font-size: 51px; }
 body.text-xxlarge #details-meta { font-size: 54px; }
 body.text-xxlarge .tmdb-match-inline { font-size: 34px; }
 body.text-xxlarge .settings-label { font-size: 48px; }
@@ -1155,8 +1145,8 @@ body.text-xxlarge #details-genres span { font-size: 34px; }
 body.text-xxlarge .action-btn { font-size: 46px; }
 body.text-xxlarge .version-bitrate { font-size: 31px; }
 body.text-xxlarge .favorite-star { font-size: 74px; }
-body.text-xxlarge .filmography-more-poster { font-size: 109px; }
-body.text-xxlarge .filmography-available { font-size: 34px; }
+body.text-xxlarge .tmdb-card-more-poster { font-size: 109px; }
+body.text-xxlarge .tmdb-card-available { font-size: 34px; }
 body.text-xxlarge #settings-screen h1,
 body.text-xxlarge #playlists-screen h1,
 body.text-xxlarge #playlist-edit-screen h1,

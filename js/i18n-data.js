@@ -1297,7 +1297,9 @@ var I18nData = {
                             "live": "مباشر",
                             "timeshift": "مؤجل",
                             "switchingQuality": "التبديل إلى جودة أقل",
-                            "autoFormat": "تلقائي"
+                            "autoFormat": "تلقائي",
+                            "notForMe": "ليس لي",
+                            "notForMeDone": "تمت الإزالة من التوصيات"
                     },
                     "subtitleOptions": {
                             "title": "خيارات الترجمة",
@@ -1327,7 +1329,8 @@ var I18nData = {
                             "season": "الموسم",
                             "episode": "الحلقة",
                             "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
-                            "age": "{count} سنة"
+                            "age": "{count} سنة",
+                            "similarGenres": "المزيد من نفس النوع"
                     },
                     "department": {
                             "Acting": "تمثيل",
@@ -1771,7 +1774,9 @@ var I18nData = {
                             "live": "Live",
                             "timeshift": "Zeitversetzt",
                             "switchingQuality": "Wechsel zu niedrigerer Qualität",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Nichts für mich",
+                            "notForMeDone": "Aus Empfehlungen entfernt"
                     },
                     "subtitleOptions": {
                             "title": "Untertitel-Optionen",
@@ -1801,7 +1806,8 @@ var I18nData = {
                             "season": "Staffel",
                             "episode": "Episode",
                             "configureTMDB": "Konfigurieren Sie Ihren TMDB API-Schlüssel in den Einstellungen, um Beschreibungen anzuzeigen.",
-                            "age": "{count} Jahre"
+                            "age": "{count} Jahre",
+                            "similarGenres": "Mehr im gleichen Genre"
                     },
                     "department": {
                             "Acting": "Schauspiel",
@@ -2250,7 +2256,9 @@ var I18nData = {
                             "live": "Live",
                             "timeshift": "Timeshift",
                             "switchingQuality": "Switching to lower quality",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Not for me",
+                            "notForMeDone": "Removed from recommendations"
                     },
                     "subtitleOptions": {
                             "title": "Subtitle options",
@@ -2280,7 +2288,8 @@ var I18nData = {
                             "season": "Season",
                             "episode": "Episode",
                             "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
-                            "age": "{count} years old"
+                            "age": "{count} years old",
+                            "similarGenres": "More in the same genre"
                     },
                     "department": {
                             "Acting": "Actor",
@@ -2719,7 +2728,9 @@ var I18nData = {
                             "live": "En directo",
                             "timeshift": "Diferido",
                             "switchingQuality": "Cambiando a calidad inferior",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "No para mí",
+                            "notForMeDone": "Eliminado de las recomendaciones"
                     },
                     "subtitleOptions": {
                             "title": "Opciones de subtítulos",
@@ -2749,7 +2760,8 @@ var I18nData = {
                             "season": "Temporada",
                             "episode": "Episodio",
                             "configureTMDB": "Configure su clave API de TMDB en ajustes para mostrar descripciones.",
-                            "age": "{count} años"
+                            "age": "{count} años",
+                            "similarGenres": "Más en el mismo género"
                     },
                     "department": {
                             "Acting": "Actuación",
@@ -3198,7 +3210,9 @@ var I18nData = {
                             "liveBtn": "Direct",
                             "live": "En direct",
                             "timeshift": "Différé",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Pas pour moi",
+                            "notForMeDone": "Retiré des recommandations"
                     },
                     "subtitleOptions": {
                             "title": "Options sous-titres",
@@ -3228,7 +3242,8 @@ var I18nData = {
                             "season": "Saison",
                             "episode": "Épisode",
                             "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
-                            "age": "{count} ans"
+                            "age": "{count} ans",
+                            "similarGenres": "Plus dans le même genre"
                     },
                     "department": {
                             "Acting": "Acteur",
@@ -3667,7 +3682,9 @@ var I18nData = {
                             "live": "In diretta",
                             "timeshift": "Differita",
                             "switchingQuality": "Passaggio a qualità inferiore",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Non fa per me",
+                            "notForMeDone": "Rimosso dai suggerimenti"
                     },
                     "subtitleOptions": {
                             "title": "Opzioni sottotitoli",
@@ -3697,7 +3714,8 @@ var I18nData = {
                             "season": "Stagione",
                             "episode": "Episodio",
                             "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
-                            "age": "{count} anni"
+                            "age": "{count} anni",
+                            "similarGenres": "Altri dello stesso genere"
                     },
                     "department": {
                             "Acting": "Recitazione",
@@ -4141,7 +4159,9 @@ var I18nData = {
                             "live": "Live",
                             "timeshift": "Uitgesteld",
                             "switchingQuality": "Schakelen naar lagere kwaliteit",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Niet voor mij",
+                            "notForMeDone": "Verwijderd uit aanbevelingen"
                     },
                     "subtitleOptions": {
                             "title": "Ondertitel opties",
@@ -4171,7 +4191,8 @@ var I18nData = {
                             "season": "Seizoen",
                             "episode": "Aflevering",
                             "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven.",
-                            "age": "{count} jaar"
+                            "age": "{count} jaar",
+                            "similarGenres": "Meer in hetzelfde genre"
                     },
                     "department": {
                             "Acting": "Acteerwerk",
@@ -4615,7 +4636,9 @@ var I18nData = {
                             "live": "Na żywo",
                             "timeshift": "Przesunięte",
                             "switchingQuality": "Przełączanie na niższą jakość",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Nie dla mnie",
+                            "notForMeDone": "Usunięte z rekomendacji"
                     },
                     "subtitleOptions": {
                             "title": "Opcje napisów",
@@ -4645,7 +4668,8 @@ var I18nData = {
                             "season": "Sezon",
                             "episode": "Odcinek",
                             "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy.",
-                            "age": "{count} lat"
+                            "age": "{count} lat",
+                            "similarGenres": "Więcej w tym samym gatunku"
                     },
                     "department": {
                             "Acting": "Aktorstwo",
@@ -5089,7 +5113,9 @@ var I18nData = {
                             "live": "Ao vivo",
                             "timeshift": "Diferido",
                             "switchingQuality": "Mudando para qualidade inferior",
-                            "autoFormat": "Auto"
+                            "autoFormat": "Auto",
+                            "notForMe": "Não é para mim",
+                            "notForMeDone": "Removido das recomendações"
                     },
                     "subtitleOptions": {
                             "title": "Opções de legendas",
@@ -5119,7 +5145,8 @@ var I18nData = {
                             "season": "Temporada",
                             "episode": "Episódio",
                             "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
-                            "age": "{count} anos"
+                            "age": "{count} anos",
+                            "similarGenres": "Mais do mesmo gênero"
                     },
                     "department": {
                             "Acting": "Atuação",
@@ -5563,7 +5590,9 @@ var I18nData = {
                             "live": "Прямой эфир",
                             "timeshift": "Отложенный",
                             "switchingQuality": "Переключение на низкое качество",
-                            "autoFormat": "Авто"
+                            "autoFormat": "Авто",
+                            "notForMe": "Не для меня",
+                            "notForMeDone": "Удалено из рекомендаций"
                     },
                     "subtitleOptions": {
                             "title": "Параметры субтитров",
@@ -5593,7 +5622,8 @@ var I18nData = {
                             "season": "Сезон",
                             "episode": "Эпизод",
                             "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
-                            "age": "{count} лет"
+                            "age": "{count} лет",
+                            "similarGenres": "Ещё в том же жанре"
                     },
                     "department": {
                             "Acting": "Актёрская игра",
@@ -6037,7 +6067,9 @@ var I18nData = {
                             "live": "Canlı",
                             "timeshift": "Gecikmeli",
                             "switchingQuality": "Daha düşük kaliteye geçiş",
-                            "autoFormat": "Oto"
+                            "autoFormat": "Oto",
+                            "notForMe": "Bana göre değil",
+                            "notForMeDone": "Önerilerden kaldırıldı"
                     },
                     "subtitleOptions": {
                             "title": "Altyazı seçenekleri",
@@ -6067,7 +6099,8 @@ var I18nData = {
                             "season": "Sezon",
                             "episode": "Bölüm",
                             "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
-                            "age": "{count} yaşında"
+                            "age": "{count} yaşında",
+                            "similarGenres": "Aynı türde daha fazlası"
                     },
                     "department": {
                             "Acting": "Oyunculuk",

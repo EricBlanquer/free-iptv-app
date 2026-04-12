@@ -20,9 +20,6 @@ document.body.innerHTML = `
         <div id="details-cast-title">Cast</div>
         <div id="details-cast-grid"></div>
     </div>
-    <div id="details-director-section" class="hidden">
-        <div id="details-director-grid"></div>
-    </div>
     <div id="series-status"></div>
     <div id="details-episodes-section"></div>
 `;

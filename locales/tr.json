@@ -297,7 +297,9 @@
         "live": "Canlı",
         "timeshift": "Gecikmeli",
         "switchingQuality": "Daha düşük kaliteye geçiş",
-        "autoFormat": "Oto"
+        "autoFormat": "Oto",
+        "notForMe": "Bana göre değil",
+        "notForMeDone": "Önerilerden kaldırıldı"
     },
     "subtitleOptions": {
         "title": "Altyazı seçenekleri",
@@ -327,7 +329,8 @@
         "season": "Sezon",
         "episode": "Bölüm",
         "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
-        "age": "{count} yaşında"
+        "age": "{count} yaşında",
+        "similarGenres": "Aynı türde daha fazlası"
     },
     "department": {
         "Acting": "Oyunculuk",

@@ -59,7 +59,7 @@ IPTVApp.prototype.bindTouchEvents = function() {
         { selector: '#filters-bar .focusable', area: 'filters' },
         { selector: '#content-grid .grid-item', area: 'grid' },
         { selector: '#details-screen .focusable', area: 'details' },
-        { selector: '#actor-filmography-grid .filmography-item', area: 'actor' },
+        { selector: '#actor-filmography-grid .tmdb-card', area: 'actor' },
         { selector: '#settings-screen .focusable', area: 'settings' },
         { selector: '#playlists-screen .focusable', area: 'playlists' },
         { selector: '#playlist-edit-screen .focusable', area: 'playlist-edit' }

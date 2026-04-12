@@ -295,7 +295,9 @@
         "live": "Прямой эфир",
         "timeshift": "Отложенный",
         "switchingQuality": "Переключение на низкое качество",
-        "autoFormat": "Авто"
+        "autoFormat": "Авто",
+        "notForMe": "Не для меня",
+        "notForMeDone": "Удалено из рекомендаций"
     },
     "subtitleOptions": {
         "title": "Параметры субтитров",
@@ -325,7 +327,8 @@
         "season": "Сезон",
         "episode": "Эпизод",
         "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
-        "age": "{count} лет"
+        "age": "{count} лет",
+        "similarGenres": "Ещё в том же жанре"
     },
     "department": {
         "Acting": "Актёрская игра",

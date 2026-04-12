@@ -55,6 +55,13 @@ IPTVApp.prototype.showDetails = function(item) {
     }
     this.updateFavoriteButton();
     this.updateDownloadButton();
+    var notForMeBtn = document.getElementById('not-for-me-btn');
+    if (notForMeBtn) {
+        var categoryKey = (this.settings.activePlaylistId || '') + '_' + this.currentSection;
+        var currentCategory = this.selectedCategoryBySection && this.selectedCategoryBySection[categoryKey];
+        var fromReco = currentCategory === 'recommended';
+        this.setHidden(notForMeBtn, !fromReco);
+    }
     var selfTip = this;
     this._detailsTooltipTimer = setTimeout(function() {
         if (selfTip.currentScreen !== 'details') return;
@@ -173,8 +180,10 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     var castGridReset = document.getElementById('details-cast-grid');
     if (castGridReset) castGridReset.scrollLeft = 0;
     this.setHidden('details-cast-section', true);
-    this.setHidden('details-director-section', true);
-    this.clearElement('details-director-grid');
+    this.clearElement('details-similar-grid');
+    var similarGridReset = document.getElementById('details-similar-grid');
+    if (similarGridReset) similarGridReset.scrollLeft = 0;
+    this.setHidden('details-similar-section', true);
     this.setHidden('details-episodes-section', true);
     this.clearElement('details-season-selector');
     this.clearElement('details-episodes-grid');
@@ -489,7 +498,8 @@ IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualTy
         else {
             playBtn.textContent = I18n.t('player.play', 'Play');
             this.setHidden(continueBtn, true);
-            this.setHidden(markWatchedBtn, true);
+            var alreadyWatched = vodProg && vodProg.watched;
+            this.setHidden(markWatchedBtn, alreadyWatched);
         }
         playBtn.style.opacity = '1';
     }
@@ -536,7 +546,9 @@ IPTVApp.prototype._showDetailsSeries = function(streamId, streamData, seriesId, 
     if (!hasEpisodeFromHistory) {
         this.setHidden(playBtn, true);
         this.setHidden(continueBtn, true);
-        this.setHidden(markWatchedBtn, true);
+        var seriesHistoryItem = streamData ? this.getWatchHistoryItem(streamData, this.selectedStream && this.selectedStream._playlistId) : null;
+        var seriesWatched = seriesHistoryItem && seriesHistoryItem.watched;
+        this.setHidden(markWatchedBtn, seriesWatched);
     }
     var seriesIdToLoad = seriesId || (streamData && streamData.series_id) || (isFromDownload ? null : streamId);
     if (this.selectedStream) {
@@ -564,8 +576,6 @@ IPTVApp.prototype.prepareDetailsFromHistory = function() {
     var castGridReset = document.getElementById('details-cast-grid');
     if (castGridReset) castGridReset.scrollLeft = 0;
     this.setHidden('details-cast-section', true);
-    this.setHidden('details-director-section', true);
-    this.clearElement('details-director-grid');
     this.setHidden('series-status', true);
     this.updateFavoriteButton();
     if (isSeries) {
@@ -710,48 +720,39 @@ IPTVApp.prototype.renderVodInfoFromProvider = function(data) {
             genresEl.appendChild(tag);
         });
     }
-    // Display cast
-    if (data.cast) {
-        var castSection = document.getElementById('details-cast-section');
-        var castGrid = document.getElementById('details-cast-grid');
-        castGrid.textContent = '';
-        castGrid.scrollLeft = 0;
-        var castList = this.parseDelimitedList(data.cast);
-        if (castList.length > 0) {
-            this.setHidden(castSection, false);
-            castList.forEach(function(actorName) {
-                var card = document.createElement('div');
-                card.className = 'cast-card';
-                var photo = document.createElement('div');
-                photo.className = 'cast-photo';
-                card.appendChild(photo);
-                var name = document.createElement('div');
-                name.className = 'cast-name';
-                name.textContent = actorName;
-                card.appendChild(name);
-                castGrid.appendChild(card);
-            });
+    // Display director(s) first, then cast, all in the same row
+    var castSection = document.getElementById('details-cast-section');
+    var castGrid = document.getElementById('details-cast-grid');
+    castGrid.textContent = '';
+    castGrid.scrollLeft = 0;
+    var directors = data.director ? this.parseDelimitedList(data.director) : [];
+    var castList = data.cast ? this.parseDelimitedList(data.cast) : [];
+    var directorLabel = I18n.t('details.director', 'Director');
+    var makeCard = function(personName, characterLabel) {
+        var card = document.createElement('div');
+        card.className = 'cast-card';
+        var photo = document.createElement('div');
+        photo.className = 'cast-photo';
+        card.appendChild(photo);
+        var info = document.createElement('div');
+        info.className = 'cast-info';
+        var name = document.createElement('div');
+        name.className = 'cast-name';
+        name.textContent = personName;
+        info.appendChild(name);
+        if (characterLabel) {
+            var char = document.createElement('div');
+            char.className = 'cast-character';
+            char.textContent = characterLabel;
+            info.appendChild(char);
         }
-    }
-    // Display director
-    if (data.director) {
-        var directorSection = document.getElementById('details-director-section');
-        var directorGrid = document.getElementById('details-director-grid');
-        this.setHidden(directorSection, false);
-        directorGrid.innerHTML = '';
-        var directors = this.parseDelimitedList(data.director);
-        directors.forEach(function(directorName) {
-            var card = document.createElement('div');
-            card.className = 'cast-card';
-            var photo = document.createElement('div');
-            photo.className = 'cast-photo';
-            card.appendChild(photo);
-            var name = document.createElement('div');
-            name.className = 'cast-name';
-            name.textContent = directorName;
-            card.appendChild(name);
-            directorGrid.appendChild(card);
-        });
+        card.appendChild(info);
+        return card;
+    };
+    if (directors.length > 0 || castList.length > 0) {
+        this.setHidden(castSection, false);
+        directors.forEach(function(d) { castGrid.appendChild(makeCard(d, directorLabel)); });
+        castList.forEach(function(a) { castGrid.appendChild(makeCard(a, '')); });
     }
 };
 
@@ -865,10 +866,12 @@ IPTVApp.prototype.createCastCard = function(person, showCharacter) {
     return card;
 };
 
-IPTVApp.prototype.renderCast = function(cast) {
+IPTVApp.prototype.renderCast = function(cast, director, directorLabel) {
     var castSection = document.getElementById('details-cast-section');
     var castGrid = document.getElementById('details-cast-grid');
-    if (!cast || cast.length === 0) {
+    var hasDirector = !!director;
+    var hasCast = cast && cast.length > 0;
+    if (!hasDirector && !hasCast) {
         castGrid.textContent = '';
         this.setHidden(castSection, true);
         return;
@@ -876,9 +879,20 @@ IPTVApp.prototype.renderCast = function(cast) {
     this.setHidden(castSection, false);
     castGrid.textContent = '';
     var self = this;
-    cast.forEach(function(actor) {
-        castGrid.appendChild(self.createCastCard(actor, true));
-    });
+    if (hasDirector) {
+        var dirWithRole = {
+            id: director.id,
+            name: director.name,
+            photo: director.photo,
+            character: directorLabel || I18n.t('details.director', 'Director')
+        };
+        castGrid.appendChild(this.createCastCard(dirWithRole, true));
+    }
+    if (hasCast) {
+        cast.forEach(function(actor) {
+            castGrid.appendChild(self.createCastCard(actor, true));
+        });
+    }
     castGrid.scrollLeft = 0;
     requestAnimationFrame(function() { castGrid.scrollLeft = 0; });
     this.invalidateFocusables();
@@ -1935,8 +1949,6 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
     document.getElementById('details-genres').innerHTML = '';
     this.setHidden('details-cast-section', true);
     document.getElementById('details-cast-grid').innerHTML = '';
-    this.setHidden('details-director-section', true);
-    document.getElementById('details-director-grid').innerHTML = '';
     // Skip TMDB for sections where it's not relevant
     if (this.shouldSkipTMDB()) {
         setDescription('', 'fetchTMDB-skip');
@@ -2064,17 +2076,23 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
                 span.textContent = g;
                 genresEl.appendChild(span);
             });
+            var dirPerson = null;
+            var dirLabel = '';
             if (type === 'movie') {
-                var director = TMDB.getDirector(result);
-                self.displayDirector(director, I18n.t('details.director', 'Director'));
+                dirPerson = TMDB.getDirector(result);
+                dirLabel = I18n.t('details.director', 'Director');
             }
             else {
-                var creator = TMDB.getCreator(result);
-                self.displayDirector(creator, I18n.t('details.creator', 'Creator'));
+                dirPerson = TMDB.getCreator(result);
+                dirLabel = I18n.t('details.creator', 'Creator');
             }
             var cast = TMDB.getCast(result);
-            self.renderCast(cast);
+            self.renderCast(cast, dirPerson, dirLabel);
             self.fetchRandomBackdrop(result.id, type);
+            if (result.id && self.selectedStream && self.selectedStream.data) {
+                self.selectedStream.data.tmdb_id = result.id;
+                self.renderSimilarGenres(self.selectedStream.data);
+            }
         }
         else {
             setDescription(I18n.t('details.noDescription', 'No description'), 'fetchTMDBInfo-notFound');
@@ -2082,19 +2100,135 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
     }, false, tmdbId);
 };
 
-IPTVApp.prototype.displayDirector = function(director, label) {
-    var directorSection = document.getElementById('details-director-section');
-    var directorGrid = document.getElementById('details-director-grid');
-    var directorTitle = document.getElementById('details-director-title');
-    directorGrid.innerHTML = '';
-    if (director) {
-        this.setHidden(directorSection, false);
-        directorTitle.textContent = label;
-        directorGrid.appendChild(this.createCastCard(director, false));
+IPTVApp.prototype.renderSimilarGenres = function(streamData) {
+    var section = this.currentSection;
+    var similarSection = document.getElementById('details-similar-section');
+    var similarGrid = document.getElementById('details-similar-grid');
+    similarGrid.textContent = '';
+    this.setHidden(similarSection, true);
+    if (section !== 'vod' && section !== 'series') return;
+    if (!streamData) return;
+    var tmdbId = streamData.tmdb_id || streamData._tmdbId;
+    if (!tmdbId) return;
+    var self = this;
+    var tmdbType = section === 'series' ? 'tv' : 'movie';
+    Promise.all([
+        this._getRecommendationsCached(tmdbId, tmdbType),
+        this._getSimilarCached(tmdbId, tmdbType)
+    ]).then(function(results) {
+        var scoreById = {};
+        var resultById = {};
+        for (var li = 0; li < results.length; li++) {
+            var list = results[li] || [];
+            for (var j = 0; j < list.length; j++) {
+                var r = list[j];
+                if (!r || !r.id) continue;
+                scoreById[r.id] = (scoreById[r.id] || 0) + 1;
+                if (!resultById[r.id]) resultById[r.id] = r;
+            }
+        }
+        var all = [];
+        Object.keys(scoreById).forEach(function(idKey) {
+            var tmdbResult = resultById[idKey];
+            var dateStr = tmdbType === 'tv' ? tmdbResult.first_air_date : tmdbResult.release_date;
+            var year = dateStr ? parseInt(dateStr.substring(0, 4), 10) : 0;
+            all.push({
+                tmdbResult: tmdbResult,
+                score: scoreById[idKey],
+                year: year || 0,
+                vote: tmdbResult.vote_average || 0
+            });
+        });
+        all.sort(function(a, b) {
+            if (b.score !== a.score) return b.score - a.score;
+            if (b.year !== a.year) return b.year - a.year;
+            return b.vote - a.vote;
+        });
+        window.log('SIMILAR', 'tmdbId=' + tmdbId + ' results=' + all.length);
+        if (all.length === 0) return;
+        self.setHidden(similarSection, false);
+        all.slice(0, 40).forEach(function(item) {
+            var r = item.tmdbResult;
+            var title = tmdbType === 'tv' ? (r.name || r.original_name) : (r.title || r.original_title);
+            var posterUrl = r.poster_path ? 'https://image.tmdb.org/t/p/w185' + r.poster_path : '';
+            var backdropUrl = r.backdrop_path ? 'https://image.tmdb.org/t/p/w1280' + r.backdrop_path : '';
+            similarGrid.appendChild(self._createTmdbCard({
+                tmdbId: r.id,
+                tmdbType: tmdbType,
+                title: title,
+                year: item.year || '',
+                posterUrl: posterUrl,
+                backdropUrl: backdropUrl
+            }));
+        });
+        similarGrid.scrollLeft = 0;
+        self._checkTmdbCardsAvailability('details-similar-grid');
+        self.invalidateFocusables();
+    }).catch(function(err) {
+        window.log('ERROR', 'renderSimilarGenres TMDB: ' + (err && err.message || err));
+    });
+};
+
+IPTVApp.prototype._createTmdbCard = function(item) {
+    var card = document.createElement('div');
+    card.className = 'tmdb-card focusable';
+    var title = item.title || '';
+    var year = item.year || '';
+    var posterUrl = item.posterUrl || '';
+    var backdropUrl = item.backdropUrl || '';
+    card.dataset.tmdbId = item.tmdbId || '';
+    card.dataset.tmdbType = item.tmdbType || 'movie';
+    card.dataset.title = title;
+    card.dataset.posterUrl = posterUrl;
+    card.dataset.backdropUrl = backdropUrl;
+    if (!item.skipAvailCheck) card.dataset.needsAvailCheck = '1';
+    var poster = document.createElement('div');
+    poster.className = 'tmdb-card-poster';
+    if (posterUrl) poster.style.backgroundImage = cssUrl(posterUrl);
+    card.appendChild(poster);
+    var titleEl = document.createElement('div');
+    titleEl.className = 'tmdb-card-title';
+    titleEl.textContent = title;
+    card.appendChild(titleEl);
+    if (year) {
+        var yearEl = document.createElement('div');
+        yearEl.className = 'tmdb-card-year';
+        yearEl.textContent = year;
+        card.appendChild(yearEl);
     }
-    else {
-        this.setHidden(directorSection, true);
+    if (item.available) {
+        var availEl = document.createElement('div');
+        availEl.className = 'tmdb-card-available';
+        availEl.textContent = '▶';
+        card.appendChild(availEl);
     }
+    return card;
+};
+
+IPTVApp.prototype._checkTmdbCardsAvailability = function(gridId) {
+    var self = this;
+    var grid = document.getElementById(gridId);
+    if (!grid) return;
+    var items = grid.querySelectorAll('.tmdb-card[data-needs-avail-check="1"]');
+    if (items.length === 0) return;
+    var index = 0;
+    function checkNext() {
+        if (index >= items.length) return;
+        var item = items[index];
+        index++;
+        var title = item.dataset.title;
+        var mediaType = item.dataset.tmdbType;
+        var available = self.findInPlaylist(title, mediaType);
+        delete item.dataset.needsAvailCheck;
+        if (available && !item.querySelector('.tmdb-card-available')) {
+            var availEl = document.createElement('div');
+            availEl.className = 'tmdb-card-available';
+            availEl.textContent = '▶';
+            item.appendChild(availEl);
+        }
+        setTimeout(checkNext, 10);
+    }
+    setTimeout(checkNext, 50);
 };
 IPTVApp.prototype.fetchRandomBackdrop = function(tmdbId, type) {
     var self = this;
@@ -2227,10 +2361,20 @@ IPTVApp.prototype.playVersion = function(versionIndex) {
 IPTVApp.prototype.markAsWatched = function() {
     if (this.selectedStream) {
         var streamId = this.selectedStream.id;
+        var streamData = this.selectedStream.data;
+        var type = this.selectedStream.type;
         // Mark as watched in watchHistory
-        var historyItem = this.getWatchHistoryItem(this.selectedStream.data || streamId, this.selectedStream._playlistId);
+        var historyItem = this.getWatchHistoryItem(streamData || streamId, this.selectedStream._playlistId);
+        var wasNew = false;
+        if (!historyItem && streamData) {
+            var histType = (type === 'series' || type === 'episode') ? 'series' : 'vod';
+            this.addToWatchHistory(streamData, histType, 0);
+            historyItem = this.getWatchHistoryItem(streamData, this.selectedStream._playlistId);
+            wasNew = true;
+        }
         if (historyItem) {
             historyItem.watched = true;
+            if (wasNew) historyItem._manuallyMarked = true;
             this.saveWatchHistory();
             this.updateContinueCounter();
         }
@@ -2351,34 +2495,22 @@ IPTVApp.prototype.loadMoreFilmography = function(count) {
     var self = this;
     requestAnimationFrame(function() {
         var grid = document.getElementById('actor-filmography-grid');
-        var existingSkeletons = grid.querySelectorAll('.filmography-skeleton');
+        var existingSkeletons = grid.querySelectorAll('.tmdb-card-skeleton');
         var skeletonIndex = 0;
         movies.forEach(function(movie) {
-            var item = document.createElement('div');
-            item.className = 'filmography-item focusable';
             var title = movie.title || movie.name || '';
             var year = (movie.release_date || movie.first_air_date || '').substring(0, 4);
             var posterUrl = 'https://image.tmdb.org/t/p/w185' + movie.poster_path;
             var backdropUrl = movie.backdrop_path ? 'https://image.tmdb.org/t/p/w1280' + movie.backdrop_path : '';
             var mediaType = movie.media_type || 'movie';
-            var poster = document.createElement('div');
-            poster.className = 'filmography-poster';
-            poster.style.backgroundImage = cssUrl(posterUrl);
-            item.appendChild(poster);
-            var titleEl = document.createElement('div');
-            titleEl.className = 'filmography-title';
-            titleEl.textContent = title;
-            item.appendChild(titleEl);
-            var yearEl = document.createElement('div');
-            yearEl.className = 'filmography-year';
-            yearEl.textContent = year;
-            item.appendChild(yearEl);
-            item.dataset.tmdbId = movie.id;
-            item.dataset.tmdbType = mediaType;
-            item.dataset.title = title;
-            item.dataset.posterUrl = posterUrl;
-            item.dataset.needsAvailCheck = '1';
-            item.dataset.backdropUrl = backdropUrl;
+            var item = self._createTmdbCard({
+                tmdbId: movie.id,
+                tmdbType: mediaType,
+                title: title,
+                year: year,
+                posterUrl: posterUrl,
+                backdropUrl: backdropUrl
+            });
             if (existingSkeletons[skeletonIndex]) {
                 grid.replaceChild(item, existingSkeletons[skeletonIndex]);
                 skeletonIndex++;
@@ -2393,20 +2525,20 @@ IPTVApp.prototype.loadMoreFilmography = function(count) {
         var remaining = self.filmographyData.length - self.filmographyOffset;
         for (var i = 0; i < remaining; i++) {
             var skeleton = document.createElement('div');
-            skeleton.className = 'filmography-item filmography-skeleton';
+            skeleton.className = 'tmdb-card tmdb-card-skeleton';
             var posterSkel = document.createElement('div');
-            posterSkel.className = 'filmography-poster skeleton-shimmer';
+            posterSkel.className = 'tmdb-card-poster skeleton-shimmer';
             skeleton.appendChild(posterSkel);
             var titleSkel = document.createElement('div');
-            titleSkel.className = 'filmography-title skeleton-text';
+            titleSkel.className = 'tmdb-card-title skeleton-text';
             skeleton.appendChild(titleSkel);
             grid.appendChild(skeleton);
         }
         self.filmographyLoadPending = false;
-        self.checkFilmographyAvailability();
+        self._checkTmdbCardsAvailability('actor-filmography-grid');
         self.invalidateFocusables();
         if (self.restoreActorIndex > 1) {
-            var items = grid.querySelectorAll('.filmography-item:not(.filmography-skeleton)');
+            var items = grid.querySelectorAll('.tmdb-card:not(.tmdb-card-skeleton)');
             if (self.restoreActorIndex - 1 < items.length) {
                 self.focusIndex = self.restoreActorIndex;
             }
@@ -2416,40 +2548,16 @@ IPTVApp.prototype.loadMoreFilmography = function(count) {
     });
 };
 
-IPTVApp.prototype.checkFilmographyAvailability = function() {
-    var self = this;
-    var grid = document.getElementById('actor-filmography-grid');
-    var items = grid.querySelectorAll('.filmography-item[data-needs-avail-check="1"]');
-    if (items.length === 0) return;
-    var index = 0;
-    function checkNext() {
-        if (index >= items.length) return;
-        var item = items[index];
-        index++;
-        var title = item.dataset.title;
-        var mediaType = item.dataset.tmdbType;
-        var available = self.findInPlaylist(title, mediaType);
-        delete item.dataset.needsAvailCheck;
-        if (available && !item.querySelector('.filmography-available')) {
-            var availableEl = document.createElement('div');
-            availableEl.className = 'filmography-available';
-            availableEl.textContent = '▶';
-            item.appendChild(availableEl);
-        }
-        setTimeout(checkNext, 10);
-    }
-    setTimeout(checkNext, 50);
-};
-
 // Details from TMDB
 IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
-    this.detailsReturnActorId = this.currentActorId;
+    var cameFromDetails = this.currentScreen === 'details';
+    this.detailsReturnActorId = cameFromDetails ? null : this.currentActorId;
     var tmdbId = filmItem.dataset.tmdbId;
     var tmdbType = filmItem.dataset.tmdbType;
     var title = filmItem.dataset.title;
     var posterUrl = filmItem.dataset.posterUrl;
     var backdropUrl = filmItem.dataset.backdropUrl;
-    this.previousScreen = 'actor';
+    this.previousScreen = cameFromDetails ? 'details' : 'actor';
     var available = this.findInPlaylist(title, tmdbType);
     if (available) {
         this.selectedStream = { id: available.id, type: available.type, data: available.stream };
@@ -2471,8 +2579,6 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     document.getElementById('details-genres').innerHTML = '';
     this.setHidden('details-cast-section', true);
     document.getElementById('details-cast-grid').innerHTML = '';
-    this.setHidden('details-director-section', true);
-    document.getElementById('details-director-grid').innerHTML = '';
     this.setHidden('series-status', true);
     this.setHidden('details-episodes-section', true);
     // Reset buttons
@@ -2557,6 +2663,10 @@ IPTVApp.prototype.fetchTMDBDetailsById = function(tmdbId, type) {
 IPTVApp.prototype.displayTMDBDetails = function(result, type) {
     this.tmdbInfo = result;
     this.tmdbInfo._type = type;
+    if (result && result.id && this.selectedStream && this.selectedStream.data) {
+        this.selectedStream.data.tmdb_id = result.id;
+        this.renderSimilarGenres(this.selectedStream.data);
+    }
     var tmdbTitle = type === 'movie' ? result.title : result.name;
     this._titleReplacedByTmdb = false;
     if (tmdbTitle) {
@@ -2623,16 +2733,18 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
         span.textContent = g;
         genresEl.appendChild(span);
     });
+    var dirPerson = null;
+    var dirLabel = '';
     if (type === 'movie') {
-        var director = TMDB.getDirector(result);
-        this.displayDirector(director, I18n.t('details.director', 'Director'));
+        dirPerson = TMDB.getDirector(result);
+        dirLabel = I18n.t('details.director', 'Director');
     }
     else {
-        var creator = TMDB.getCreator(result);
-        this.displayDirector(creator, I18n.t('details.creator', 'Creator'));
+        dirPerson = TMDB.getCreator(result);
+        dirLabel = I18n.t('details.creator', 'Creator');
     }
     var cast = TMDB.getCast(result);
-    this.renderCast(cast);
+    this.renderCast(cast, dirPerson, dirLabel);
     this.fetchRandomBackdrop(result.id, type);
 };
 
@@ -2661,8 +2773,6 @@ IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, fi
         setDescription('', 'showDetailsFromFilmography');
         document.getElementById('details-genres').innerHTML = '';
         document.getElementById('details-cast-grid').innerHTML = '';
-        this.setHidden('details-director-section', true);
-        document.getElementById('details-director-grid').innerHTML = '';
         this.setHidden('series-status', true);
         this.setHidden('details-episodes-section', true);
         // Reset buttons
@@ -2716,7 +2826,8 @@ IPTVApp.prototype.pushDetailsState = function() {
         previousScreen: this.previousScreen,
         detailsReturnActorId: this.detailsReturnActorId,
         currentSeriesInfo: this.currentSeriesInfo,
-        currentSeason: this.currentSeason
+        currentSeason: this.currentSeason,
+        lastDetailsIndex: this.lastDetailsIndex
     });
 };
 
@@ -2734,6 +2845,9 @@ IPTVApp.prototype.popDetailsState = function() {
     this.detailsReturnActorId = state.detailsReturnActorId;
     this.currentSeriesInfo = state.currentSeriesInfo;
     this.currentSeason = state.currentSeason;
+    if (state.lastDetailsIndex !== undefined) {
+        this.lastDetailsIndex = state.lastDetailsIndex;
+    }
     return true;
 };
 

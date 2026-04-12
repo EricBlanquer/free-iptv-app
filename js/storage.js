@@ -1553,12 +1553,15 @@ IPTVApp.prototype.doRemoveHistoryAtIndex = function(index) {
         var self = this;
         setTimeout(function() {
             item.remove();
-            // Update focus
+            self.displayedCount = Math.max(0, self.displayedCount - 1);
+            if (self.displayedCount < self.currentStreams.length) {
+                self.loadMoreItems();
+            }
             if (self.focusIndex >= self.currentStreams.length) {
                 self.focusIndex = Math.max(0, self.currentStreams.length - 1);
             }
+            self.invalidateFocusables();
             self.updateFocus();
-            // Show empty message if no more items
             if (self.currentStreams.length === 0) {
                 self.showEmptyMessage(grid, 'home.noHistory', 'No viewing history');
             }
@@ -1709,6 +1712,79 @@ IPTVApp.prototype.saveBackdropImages = function() {
         localStorage.setItem('loadingBackdrops', JSON.stringify(images));
     }
     catch (e) { /* storage error */ }
+    this.prepareNextBackdrops(images);
+};
+
+IPTVApp.prototype.prepareNextBackdrops = function(images) {
+    if (!images) images = this.loadBackdropImages();
+    if (!images || images.length === 0) return;
+    var shuffled = images.slice();
+    for (var i = shuffled.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = temp;
+    }
+    var candidates = shuffled.slice(0, 5);
+    try {
+        localStorage.setItem('nextBackdrops', JSON.stringify(candidates.slice(0, 3)));
+    }
+    catch (e) { /* storage error */ }
+    var self = this;
+    var encoded = [];
+    var remaining = candidates.length;
+    candidates.forEach(function(url, idx) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', self.proxyImageUrl(url), true);
+        xhr.responseType = 'blob';
+        xhr.onload = function() {
+            if (xhr.status === 200 && xhr.response) {
+                var reader = new FileReader();
+                reader.onloadend = function() {
+                    encoded[idx] = reader.result;
+                    if (--remaining === 0) {
+                        self._storeBackdropsData(encoded);
+                    }
+                };
+                reader.onerror = function() {
+                    encoded[idx] = null;
+                    if (--remaining === 0) self._storeBackdropsData(encoded);
+                };
+                reader.readAsDataURL(xhr.response);
+            }
+            else {
+                encoded[idx] = null;
+                if (--remaining === 0) self._storeBackdropsData(encoded);
+            }
+        };
+        xhr.onerror = function() {
+            encoded[idx] = null;
+            if (--remaining === 0) self._storeBackdropsData(encoded);
+        };
+        xhr.send();
+    });
+};
+
+IPTVApp.prototype._storeBackdropsData = function(dataUris) {
+    var valid = dataUris.filter(function(d) { return d && d.length > 100; });
+    if (valid.length === 0) return;
+    var seen = {};
+    var unique = [];
+    for (var i = 0; i < valid.length && unique.length < 3; i++) {
+        if (!seen[valid[i]]) {
+            seen[valid[i]] = true;
+            unique.push(valid[i]);
+        }
+    }
+    try {
+        localStorage.setItem('nextBackdropsData', JSON.stringify(unique));
+        window.log('BACKDROP', 'Cached ' + unique.length + ' unique backdrop(s) from ' + valid.length + ' candidates');
+    }
+    catch (e) {
+        window.log('BACKDROP', 'Failed to store data URIs: ' + (e.message || e));
+        try { localStorage.removeItem('nextBackdropsData'); }
+        catch (ex) { /* ignore */ }
+    }
 };
 
 IPTVApp.prototype.preloadBackdropImages = function() {
@@ -1755,23 +1831,44 @@ IPTVApp.prototype.preloadSectionPosters = function() {
 
 IPTVApp.prototype.showLoadingBackdrop = function() {
     var self = this;
-    var images = this.loadBackdropImages();
-    window.log('showLoadingBackdrop: ' + images.length + ' images in cache');
-    if (images.length === 0) {
-        return;
-    }
     var backdrop = document.getElementById('loading-backdrop');
     if (!backdrop) return;
     var imgDivs = backdrop.querySelectorAll('.backdrop-img');
-    // Fisher-Yates shuffle and pick 3 unique images
-    var shuffled = images.slice();
-    for (var i = shuffled.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = shuffled[i];
-        shuffled[i] = shuffled[j];
-        shuffled[j] = temp;
+    // 1. Try pre-cached data URIs first (instant display, no network)
+    var dataUris = null;
+    try {
+        var storedData = localStorage.getItem('nextBackdropsData');
+        if (storedData) dataUris = JSON.parse(storedData);
     }
-    for (var i = 0; i < imgDivs.length && i < shuffled.length; i++) {
+    catch (e) { /* storage error */ }
+    if (dataUris && dataUris.length > 0) {
+        window.log('showLoadingBackdrop: using ' + dataUris.length + ' cached data URIs');
+        for (var i = 0; i < imgDivs.length && i < dataUris.length; i++) {
+            imgDivs[i].style.backgroundImage = cssUrl(dataUris[i]);
+        }
+        return;
+    }
+    // 2. Fallback: fetch from URL list
+    var images = this.loadBackdropImages();
+    window.log('showLoadingBackdrop: ' + images.length + ' images in cache (no data URIs)');
+    if (images.length === 0) return;
+    var selection = null;
+    try {
+        var stored = localStorage.getItem('nextBackdrops');
+        if (stored) selection = JSON.parse(stored);
+    }
+    catch (e) { /* storage error */ }
+    if (!selection || selection.length === 0) {
+        var shuffled = images.slice();
+        for (var i = shuffled.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = shuffled[i];
+            shuffled[i] = shuffled[j];
+            shuffled[j] = temp;
+        }
+        selection = shuffled.slice(0, 3);
+    }
+    for (var i = 0; i < imgDivs.length && i < selection.length; i++) {
         (function(div, url) {
             var proxiedUrl = self.proxyImageUrl(url);
             var img = new Image();
@@ -1779,7 +1876,7 @@ IPTVApp.prototype.showLoadingBackdrop = function() {
                 div.style.backgroundImage = cssUrl(proxiedUrl);
             };
             img.src = proxiedUrl;
-        })(imgDivs[i], shuffled[i]);
+        })(imgDivs[i], selection[i]);
     }
 };
 

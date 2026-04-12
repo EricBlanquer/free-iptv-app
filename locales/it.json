@@ -294,7 +294,9 @@
         "live": "In diretta",
         "timeshift": "Differita",
         "switchingQuality": "Passaggio a qualità inferiore",
-        "autoFormat": "Auto"
+        "autoFormat": "Auto",
+        "notForMe": "Non fa per me",
+        "notForMeDone": "Rimosso dai suggerimenti"
     },
     "subtitleOptions": {
         "title": "Opzioni sottotitoli",
@@ -324,7 +326,8 @@
         "season": "Stagione",
         "episode": "Episodio",
         "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
-        "age": "{count} anni"
+        "age": "{count} anni",
+        "similarGenres": "Altri dello stesso genere"
     },
     "department": {
         "Acting": "Recitazione",
