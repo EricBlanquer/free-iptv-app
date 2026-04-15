@@ -60,19 +60,37 @@ def _validate_url(url):
     return True
 
 
+THREAD_DUMP_DIR = Path('/var/log/stream-proxy')
+THREAD_DUMP_MAX_FILES = 20
+
+
 def _thread_dump(reason='manual'):
-    print('\n' + '=' * 60)
-    print(f'THREAD DUMP ({reason}) - {time.strftime("%Y-%m-%d %H:%M:%S")}')
-    print('=' * 60)
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    header = f'THREAD DUMP ({reason}) - {timestamp}'
+    lines = ['', '=' * 60, header, '=' * 60]
     for thread_id, stack in sys._current_frames().items():
         thread_name = 'unknown'
         for t in threading.enumerate():
             if t.ident == thread_id:
                 thread_name = t.name
                 break
-        print(f'\nThread {thread_id} ({thread_name}):')
-        traceback.print_stack(stack)
-    print('=' * 60 + '\n')
+        lines.append(f'\nThread {thread_id} ({thread_name}):')
+        lines.append(''.join(traceback.format_stack(stack)))
+    lines.append('=' * 60 + '\n')
+    output = '\n'.join(lines)
+    print(output)
+    try:
+        THREAD_DUMP_DIR.mkdir(parents=True, exist_ok=True)
+        fname = THREAD_DUMP_DIR / f'dump_{time.strftime("%Y%m%d_%H%M%S")}_{reason.replace(" ", "_").replace(":", "")[:40]}.txt'
+        fname.write_text(output)
+        dumps = sorted(THREAD_DUMP_DIR.glob('dump_*.txt'))
+        for old in dumps[:-THREAD_DUMP_MAX_FILES]:
+            try:
+                old.unlink()
+            except OSError:
+                pass
+    except Exception as ex:
+        print(f'[THREAD DUMP] failed to write file: {ex}', file=sys.stderr)
 
 
 def _thread_dump_handler(signum, frame):
@@ -98,6 +116,28 @@ CPU_ALERT_COOLDOWN = 300
 MEM_LOG_INTERVAL_TICKS = 10
 MEM_ALERT_THRESHOLD_MB = 300
 MEM_ALERT_COOLDOWN = 1800
+THREAD_KILL_THRESHOLD = 200
+THREAD_DUMP_THRESHOLDS = (30, 60, 100, 150)
+MEM_KILL_THRESHOLD_MB = 1500
+WATCHDOG_NOTIFY_INTERVAL = 20
+
+
+def _sd_notify(message):
+    try:
+        socket_path = os.environ.get('NOTIFY_SOCKET')
+        if not socket_path:
+            return
+        if socket_path.startswith('@'):
+            socket_path = '\0' + socket_path[1:]
+        import socket as _socket
+        sock = _socket.socket(_socket.AF_UNIX, _socket.SOCK_DGRAM)
+        try:
+            sock.connect(socket_path)
+            sock.sendall(message.encode())
+        finally:
+            sock.close()
+    except Exception:
+        pass
 
 
 def _read_rss_mb():
@@ -111,6 +151,15 @@ def _read_rss_mb():
     return 0
 
 
+def _sd_notify_loop():
+    while True:
+        try:
+            _sd_notify('WATCHDOG=1')
+        except Exception as ex:
+            print(f'[NOTIFY] error: {ex}', file=sys.stderr)
+        time.sleep(WATCHDOG_NOTIFY_INTERVAL)
+
+
 def _cpu_watchdog():
     import resource
     prev_cpu = resource.getrusage(resource.RUSAGE_SELF)
@@ -119,38 +168,66 @@ def _cpu_watchdog():
     last_mem_alert = 0
     consecutive_high = 0
     tick = 0
+    dumped_thresholds = set()
     while True:
-        time.sleep(CPU_CHECK_INTERVAL)
-        tick += 1
-        now = time.monotonic()
-        curr_cpu = resource.getrusage(resource.RUSAGE_SELF)
-        dt = now - prev_time
-        cpu_used = (curr_cpu.ru_utime - prev_cpu.ru_utime) + (curr_cpu.ru_stime - prev_cpu.ru_stime)
-        cpu_percent = (cpu_used / dt) * 100 if dt > 0 else 0
-        prev_cpu = curr_cpu
-        prev_time = now
-        rss_mb = _read_rss_mb()
-        thread_count = threading.active_count()
-        with vm_download_lock:
-            dl_active = sum(1 for d in vm_downloads.values() if d['status'] == 'downloading')
-            dl_uploading = sum(1 for d in vm_downloads.values() if d['status'] == 'uploading')
-            dl_total = len(vm_downloads)
-            dl_queued = len(vm_download_queue)
-        if tick % MEM_LOG_INTERVAL_TICKS == 0:
-            print(f'[WATCHDOG] mem={rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued} cpu={cpu_percent:.1f}%')
-        if rss_mb > MEM_ALERT_THRESHOLD_MB and (now - last_mem_alert) > MEM_ALERT_COOLDOWN:
-            print(f'[WATCHDOG] High memory: {rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued}')
-            _thread_dump(reason=f'watchdog: MEM {rss_mb:.0f}MB')
-            last_mem_alert = now
-        if cpu_percent > CPU_THRESHOLD_PERCENT:
-            consecutive_high += 1
-            if consecutive_high >= 3 and (now - last_alert) > CPU_ALERT_COOLDOWN:
-                print(f'[WATCHDOG] High CPU detected: {cpu_percent:.1f}% (>{CPU_THRESHOLD_PERCENT}% for {consecutive_high} checks)')
-                _thread_dump(reason=f'watchdog: CPU {cpu_percent:.1f}%')
-                last_alert = now
+        try:
+            time.sleep(CPU_CHECK_INTERVAL)
+            tick += 1
+            now = time.monotonic()
+            curr_cpu = resource.getrusage(resource.RUSAGE_SELF)
+            dt = now - prev_time
+            cpu_used = (curr_cpu.ru_utime - prev_cpu.ru_utime) + (curr_cpu.ru_stime - prev_cpu.ru_stime)
+            cpu_percent = (cpu_used / dt) * 100 if dt > 0 else 0
+            prev_cpu = curr_cpu
+            prev_time = now
+            rss_mb = _read_rss_mb()
+            thread_count = threading.active_count()
+            lock_acquired = vm_download_lock.acquire(timeout=5)
+            if lock_acquired:
+                try:
+                    dl_active = sum(1 for d in vm_downloads.values() if d['status'] == 'downloading')
+                    dl_uploading = sum(1 for d in vm_downloads.values() if d['status'] == 'uploading')
+                    dl_total = len(vm_downloads)
+                    dl_queued = len(vm_download_queue)
+                finally:
+                    vm_download_lock.release()
+            else:
+                print('[WATCHDOG] vm_download_lock contention >5s, skipping download stats', file=sys.stderr)
+                dl_active = dl_uploading = dl_total = dl_queued = -1
+            if tick % MEM_LOG_INTERVAL_TICKS == 0:
+                print(f'[WATCHDOG] mem={rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued} cpu={cpu_percent:.1f}%')
+            for threshold in THREAD_DUMP_THRESHOLDS:
+                if thread_count >= threshold and threshold not in dumped_thresholds:
+                    print(f'[WATCHDOG] Thread count crossed {threshold} (now {thread_count}) - capturing dump')
+                    _thread_dump(reason=f'watchdog: threads={thread_count}')
+                    dumped_thresholds.add(threshold)
+            if thread_count < THREAD_DUMP_THRESHOLDS[0]:
+                dumped_thresholds.clear()
+            if thread_count > THREAD_KILL_THRESHOLD or rss_mb > MEM_KILL_THRESHOLD_MB:
+                print(f'[WATCHDOG] FATAL leak detected: threads={thread_count} mem={rss_mb:.0f}MB - dumping and exiting for systemd restart', file=sys.stderr)
+                _thread_dump(reason=f'watchdog: KILL threads={thread_count} mem={rss_mb:.0f}MB')
+                try:
+                    _save_state()
+                except Exception:
+                    pass
+                os._exit(1)
+            if rss_mb > MEM_ALERT_THRESHOLD_MB and (now - last_mem_alert) > MEM_ALERT_COOLDOWN:
+                print(f'[WATCHDOG] High memory: {rss_mb:.0f}MB threads={thread_count} dl_total={dl_total} active={dl_active} uploading={dl_uploading} queued={dl_queued}')
+                _thread_dump(reason=f'watchdog: MEM {rss_mb:.0f}MB')
+                last_mem_alert = now
+            if cpu_percent > CPU_THRESHOLD_PERCENT:
+                consecutive_high += 1
+                if consecutive_high >= 3 and (now - last_alert) > CPU_ALERT_COOLDOWN:
+                    print(f'[WATCHDOG] High CPU detected: {cpu_percent:.1f}% (>{CPU_THRESHOLD_PERCENT}% for {consecutive_high} checks)')
+                    _thread_dump(reason=f'watchdog: CPU {cpu_percent:.1f}%')
+                    last_alert = now
+                    consecutive_high = 0
+            else:
                 consecutive_high = 0
-        else:
-            consecutive_high = 0
+        except Exception as ex:
+            print(f'[WATCHDOG] crashed: {ex}', file=sys.stderr)
+            traceback.print_exc()
+            time.sleep(5)
 
 def _generate_silence_mp3(duration_ms: int) -> bytes:
     """Generate silent MP3 frames matching Edge-TTS output format.
@@ -878,8 +955,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
             cmd.extend(['-H', f'Range: {range_header}'])
         cmd.extend(['--', url])
 
+        proc = None
         try:
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
             status_code = 200
             headers = {}
@@ -951,8 +1029,6 @@ class ProxyHandler(BaseHTTPRequestHandler):
                     self.wfile.write(remaining)
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
-                    proc.terminate()
-                    proc.wait()
                     return
             while True:
                 chunk = proc.stdout.read(65536)
@@ -963,10 +1039,18 @@ class ProxyHandler(BaseHTTPRequestHandler):
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
                     break
-            proc.terminate()
-            proc.wait()
         except Exception as e:
             print(f'Error: {e}', file=sys.stderr)
+        finally:
+            if proc is not None:
+                try:
+                    proc.terminate()
+                    proc.wait(timeout=5)
+                except Exception:
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
 
     def _handle_tts(self, parsed):
         params = parse_qs(parsed.query)
@@ -1195,6 +1279,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             '-f', 'mp4', '-movflags', 'frag_keyframe+empty_moov+faststart',
             '-'
         ]
+        proc = None
         try:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
             self.send_response(200)
@@ -1211,10 +1296,18 @@ class ProxyHandler(BaseHTTPRequestHandler):
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
                     break
-            proc.terminate()
-            proc.wait()
         except Exception as e:
             print(f'Transcode error: {e}', file=sys.stderr)
+        finally:
+            if proc is not None:
+                try:
+                    proc.terminate()
+                    proc.wait(timeout=5)
+                except Exception:
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
 
     def log_message(self, format, *args):
         print(f'[PROXY] {args[0]}')
@@ -1222,6 +1315,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     _start_time = time.time()
     load_azure_config()
+    notify_thread = threading.Thread(target=_sd_notify_loop, name='sd-notify', daemon=True)
+    notify_thread.start()
+    _sd_notify('READY=1')
     _load_and_resume_state()
     print('Cleaning up old TTS cache...')
     cleanup_cache()

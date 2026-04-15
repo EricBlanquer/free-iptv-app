@@ -2971,8 +2971,8 @@ IPTVApp.prototype.hasAppDownloads = function() {
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
     if (!viaVm && !this.settings.freeboxAppToken) return false;
     if (this._freeboxDownloadQueue && this._freeboxDownloadQueue.length > 0) return true;
-    var dlMap = this._freeboxDownloadMap || {};
     if (viaVm && this._vmPollTimer) return true;
+    var dlMap = this._freeboxDownloadMap || {};
     if (Object.keys(dlMap).length === 0) return false;
     if (viaVm) return true;
     var downloads = FreeboxAPI.getActiveDownloads();

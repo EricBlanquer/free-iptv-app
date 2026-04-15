@@ -125,6 +125,7 @@ IPTVApp.prototype.updateProxyUrlVisibility = function() {
         var el = document.getElementById(ids[i]);
         if (el) el.style.display = show ? '' : 'none';
     }
+    this.invalidateFocusables();
 };
 
 IPTVApp.prototype.updateDialogueBoostVisibility = function() {
@@ -132,6 +133,7 @@ IPTVApp.prototype.updateDialogueBoostVisibility = function() {
     if (dialogueBoostSetting) {
         dialogueBoostSetting.style.display = this.settings.preferHtml5Player ? '' : 'none';
     }
+    this.invalidateFocusables();
 };
 
 IPTVApp.prototype.updateBufferAdvancedVisibility = function() {
@@ -141,6 +143,7 @@ IPTVApp.prototype.updateBufferAdvancedVisibility = function() {
         var row = document.getElementById(rows[i]);
         if (row) row.style.display = isCustom ? '' : 'none';
     }
+    this.invalidateFocusables();
 };
 
 IPTVApp.prototype.initTTSVoiceOptions = function() {
@@ -1227,6 +1230,7 @@ IPTVApp.prototype.setPlaylistType = function(type) {
     this.setHidden(providerFields, type !== 'provider');
     this.setHidden(m3uFields, type === 'provider');
     this.currentPlaylistType = type;
+    this.invalidateFocusables();
 };
 
 IPTVApp.prototype.savePlaylist = function() {
@@ -2571,6 +2575,7 @@ IPTVApp.prototype.updateFreeboxVisibility = function() {
         var showVia = show && this.settings.proxyEnabled && this.settings.proxyUrl;
         viaRow.style.display = showVia ? '' : 'none';
     }
+    this.invalidateFocusables();
 };
 
 IPTVApp.prototype.updateFreeboxStatus = function() {
