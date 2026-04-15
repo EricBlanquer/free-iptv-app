@@ -756,25 +756,44 @@ class IPTVApp {
             }
             this.loadFreeboxMaps();
             window.log('INIT', 'Freebox configured: viaVm=' + viaVm + ' maps=' + Object.keys(this._freeboxDownloadMap || {}).length);
-            if (Object.keys(this._freeboxDownloadMap || {}).length > 0) {
-                this.ensureFreeboxPolling();
-            }
-            else if (viaVm) {
+            if (viaVm) {
+                var staleCount = Object.keys(this._freeboxDownloadMap || {}).length;
+                if (staleCount > 0) {
+                    this._freeboxDownloadMap = {};
+                    this._freeboxDownloadProviderMap = {};
+                    this._freeboxDownloadPosterMap = {};
+                    this.saveFreeboxMaps();
+                    window.log('INIT', 'VM mode: cleared ' + staleCount + ' dlMap entries pending /downloads check');
+                }
+                this.updateHomeDownloadButton();
                 var baseProxy = this.settings.proxyUrl.replace(/\/+$/, '');
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', baseProxy + '/downloads' + '?' + proxyDuidParam().replace(/^&/, ''), true);
-                xhr.timeout = 5000;
+                xhr.timeout = 3000;
                 xhr.onload = function() {
                     try {
                         var resp = JSON.parse(xhr.responseText);
-                        self._startFreeboxPollingIfActive(resp.success && resp.result || [], 'VM');
-                    } catch (ex) {}
+                        var vmList = resp.success && resp.result || [];
+                        window.log('INIT', 'VM /downloads response: ' + vmList.length + ' items');
+                        self._startFreeboxPollingIfActive(vmList, 'VM');
+                        self.updateHomeDownloadButton();
+                    } catch (ex) {
+                        window.log('INIT', 'VM /downloads parse error: ' + (ex.message || ex));
+                    }
                 };
+                xhr.onerror = function() { window.log('INIT', 'VM /downloads network error'); };
+                xhr.ontimeout = function() { window.log('INIT', 'VM /downloads timeout'); };
                 xhr.send();
             }
             else {
                 FreeboxAPI.getDownloads().then(function(downloads) {
+                    var downloadsById = {};
+                    for (var k = 0; k < downloads.length; k++) {
+                        downloadsById[downloads[k].id] = downloads[k];
+                    }
+                    self.cleanupDownloadMap(downloadsById);
                     self._startFreeboxPollingIfActive(downloads, 'Freebox');
+                    self.updateHomeDownloadButton();
                 }).catch(function(err) {
                     window.log('INIT', 'Freebox: could not check downloads: ' + err.message);
                 });
