@@ -1360,9 +1360,16 @@ var I18nData = {
                             "continue": "متابعة",
                             "fromStart": "من البداية"
                     },
+                    "welcome": {
+                            "demoTitle": "مرحباً بك في Free IPTV",
+                            "demoMessage": "هل تريد تجربة قائمة تشغيل تجريبية متكيفة مع موقعك؟",
+                            "demoYes": "نعم، جرب العرض التوضيحي",
+                            "demoNo": "لا، إعداد يدوي",
+                            "demoName": "عرض Free IPTV التوضيحي"
+                    },
                     "disclaimer": {
                             "title": "إخلاء المسؤولية",
-                            "text": "هذا التطبيق لا يوفر أي محتوى. المستخدمون هم المسؤولون الوحيدون عن المصادر التي يقومون بتكوينها ويجب عليهم التأكد من أن لديهم الحق القانوني للوصول إلى هذا المحتوى. المطور لا يتحمل أي مسؤولية عن استخدام هذا التطبيق.",
+                            "text": "هذا التطبيق لا يستضيف أي محتوى. المستخدمون هم المسؤولون الوحيدون عن المصادر التي يقومون بتكوينها ويجب عليهم التأكد من أن لديهم الحق القانوني للوصول إلى هذا المحتوى. المطور لا يتحمل أي مسؤولية عن استخدام هذا التطبيق.",
                             "accept": "فهمت"
                     },
                     "messages": {
@@ -1839,9 +1846,16 @@ var I18nData = {
                             "continue": "Fortsetzen",
                             "fromStart": "Von Anfang an"
                     },
+                    "welcome": {
+                            "demoTitle": "Willkommen bei Free IPTV",
+                            "demoMessage": "Möchten Sie eine Demo-Playlist ausprobieren, die an Ihren Standort angepasst ist?",
+                            "demoYes": "Ja, Demo testen",
+                            "demoNo": "Nein, manuell einrichten",
+                            "demoName": "Free IPTV Demo"
+                    },
                     "disclaimer": {
                             "title": "Haftungsausschluss",
-                            "text": "Diese Anwendung stellt keine Inhalte bereit. Die Benutzer sind allein verantwortlich für die von ihnen konfigurierten Quellen und müssen sicherstellen, dass sie das gesetzliche Recht haben, auf solche Inhalte zuzugreifen. Der Entwickler übernimmt keine Verantwortung für die Nutzung dieser Anwendung.",
+                            "text": "Diese Anwendung hostet keine Inhalte. Die Benutzer sind allein verantwortlich für die von ihnen konfigurierten Quellen und müssen sicherstellen, dass sie das gesetzliche Recht haben, auf solche Inhalte zuzugreifen. Der Entwickler übernimmt keine Verantwortung für die Nutzung dieser Anwendung.",
                             "accept": "Verstanden"
                     },
                     "messages": {
@@ -2325,8 +2339,15 @@ var I18nData = {
                     },
                     "disclaimer": {
                             "title": "Disclaimer",
-                            "text": "This application does not provide any content. Users are solely responsible for the sources they configure and must ensure they have the legal right to access such content. The developer assumes no responsibility for how this application is used.",
+                            "text": "This application does not host any content. Users are solely responsible for the sources they configure and must ensure they have the legal right to access such content. The developer assumes no responsibility for how this application is used.",
                             "accept": "I Understand"
+                    },
+                    "welcome": {
+                            "demoTitle": "Welcome to Free IPTV",
+                            "demoMessage": "Would you like to try a demo playlist adapted to your location?",
+                            "demoYes": "Yes, try demo",
+                            "demoNo": "No, configure manually",
+                            "demoName": "Free IPTV Demo"
                     },
                     "messages": {
                             "searching": "Searching: \"{title}\"...",
@@ -2797,9 +2818,16 @@ var I18nData = {
                             "continue": "Continuar",
                             "fromStart": "Desde el inicio"
                     },
+                    "welcome": {
+                            "demoTitle": "Bienvenido a Free IPTV",
+                            "demoMessage": "¿Le gustaría probar una lista de reproducción demo adaptada a su ubicación?",
+                            "demoYes": "Sí, probar demo",
+                            "demoNo": "No, configurar manualmente",
+                            "demoName": "Demo Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Aviso Legal",
-                            "text": "Esta aplicación no proporciona ningún contenido. Los usuarios son los únicos responsables de las fuentes que configuran y deben asegurarse de tener el derecho legal de acceder a dicho contenido. El desarrollador no asume ninguna responsabilidad por el uso de esta aplicación.",
+                            "text": "Esta aplicación no aloja ningún contenido. Los usuarios son los únicos responsables de las fuentes que configuran y deben asegurarse de tener el derecho legal de acceder a dicho contenido. El desarrollador no asume ninguna responsabilidad por el uso de esta aplicación.",
                             "accept": "Entendido"
                     },
                     "messages": {
@@ -3281,9 +3309,16 @@ var I18nData = {
                             "continue": "Continuer",
                             "fromStart": "Depuis le début"
                     },
+                    "welcome": {
+                            "demoTitle": "Bienvenue dans Free IPTV",
+                            "demoMessage": "Voulez-vous essayer une playlist de démo adaptée à votre localisation ?",
+                            "demoYes": "Oui, essayer la démo",
+                            "demoNo": "Non, configurer manuellement",
+                            "demoName": "Démo Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Avertissement",
-                            "text": "Cette application ne fournit aucun contenu. Les utilisateurs sont seuls responsables des sources qu'ils configurent et doivent s'assurer qu'ils ont le droit légal d'accéder à ces contenus. Le développeur décline toute responsabilité quant à l'utilisation de cette application.",
+                            "text": "Cette application n'héberge aucun contenu. Les utilisateurs sont seuls responsables des sources qu'ils configurent et doivent s'assurer qu'ils ont le droit légal d'accéder à ces contenus. Le développeur décline toute responsabilité quant à l'utilisation de cette application.",
                             "accept": "J'ai compris"
                     },
                     "messages": {
@@ -3755,9 +3790,16 @@ var I18nData = {
                             "continue": "Continua",
                             "fromStart": "Dall'inizio"
                     },
+                    "welcome": {
+                            "demoTitle": "Benvenuto in Free IPTV",
+                            "demoMessage": "Vuoi provare una playlist demo adattata alla tua posizione?",
+                            "demoYes": "Sì, prova la demo",
+                            "demoNo": "No, configura manualmente",
+                            "demoName": "Demo Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Avviso legale",
-                            "text": "Questa applicazione non fornisce alcun contenuto. Gli utenti sono gli unici responsabili delle fonti che configurano e devono assicurarsi di avere il diritto legale di accedere a tali contenuti. Lo sviluppatore non si assume alcuna responsabilità per l'utilizzo di questa applicazione.",
+                            "text": "Questa applicazione non ospita alcun contenuto. Gli utenti sono gli unici responsabili delle fonti che configurano e devono assicurarsi di avere il diritto legale di accedere a tali contenuti. Lo sviluppatore non si assume alcuna responsabilità per l'utilizzo di questa applicazione.",
                             "accept": "Ho capito"
                     },
                     "messages": {
@@ -4234,9 +4276,16 @@ var I18nData = {
                             "continue": "Doorgaan",
                             "fromStart": "Vanaf begin"
                     },
+                    "welcome": {
+                            "demoTitle": "Welkom bij Free IPTV",
+                            "demoMessage": "Wilt u een demo-afspeellijst proberen die is aangepast aan uw locatie?",
+                            "demoYes": "Ja, demo proberen",
+                            "demoNo": "Nee, handmatig configureren",
+                            "demoName": "Free IPTV Demo"
+                    },
                     "disclaimer": {
                             "title": "Disclaimer",
-                            "text": "Deze applicatie levert geen inhoud. Gebruikers zijn zelf verantwoordelijk voor de bronnen die zij configureren en moeten ervoor zorgen dat zij het wettelijke recht hebben om toegang te krijgen tot dergelijke inhoud. De ontwikkelaar aanvaardt geen verantwoordelijkheid voor het gebruik van deze applicatie.",
+                            "text": "Deze applicatie host geen inhoud. Gebruikers zijn zelf verantwoordelijk voor de bronnen die zij configureren en moeten ervoor zorgen dat zij het wettelijke recht hebben om toegang te krijgen tot dergelijke inhoud. De ontwikkelaar aanvaardt geen verantwoordelijkheid voor het gebruik van deze applicatie.",
                             "accept": "Begrepen"
                     },
                     "messages": {
@@ -4713,9 +4762,16 @@ var I18nData = {
                             "continue": "Kontynuuj",
                             "fromStart": "Od początku"
                     },
+                    "welcome": {
+                            "demoTitle": "Witaj w Free IPTV",
+                            "demoMessage": "Czy chcesz wypróbować przykładową playlistę dopasowaną do Twojej lokalizacji?",
+                            "demoYes": "Tak, wypróbuj demo",
+                            "demoNo": "Nie, skonfiguruj ręcznie",
+                            "demoName": "Demo Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Zastrzeżenie",
-                            "text": "Ta aplikacja nie dostarcza żadnych treści. Użytkownicy są wyłącznie odpowiedzialni za źródła, które konfigurują i muszą upewnić się, że mają prawo do dostępu do takich treści. Deweloper nie ponosi odpowiedzialności za sposób korzystania z tej aplikacji.",
+                            "text": "Ta aplikacja nie hostuje żadnych treści. Użytkownicy są wyłącznie odpowiedzialni za źródła, które konfigurują i muszą upewnić się, że mają prawo do dostępu do takich treści. Deweloper nie ponosi odpowiedzialności za sposób korzystania z tej aplikacji.",
                             "accept": "Rozumiem"
                     },
                     "messages": {
@@ -5192,9 +5248,16 @@ var I18nData = {
                             "continue": "Continuar",
                             "fromStart": "Desde o início"
                     },
+                    "welcome": {
+                            "demoTitle": "Bem-vindo ao Free IPTV",
+                            "demoMessage": "Deseja experimentar uma playlist de demonstração adaptada à sua localização?",
+                            "demoYes": "Sim, experimentar demo",
+                            "demoNo": "Não, configurar manualmente",
+                            "demoName": "Demo Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Aviso Legal",
-                            "text": "Esta aplicação não fornece nenhum conteúdo. Os usuários são os únicos responsáveis pelas fontes que configuram e devem garantir que têm o direito legal de acessar tal conteúdo. O desenvolvedor não assume nenhuma responsabilidade pelo uso desta aplicação.",
+                            "text": "Esta aplicação não hospeda nenhum conteúdo. Os usuários são os únicos responsáveis pelas fontes que configuram e devem garantir que têm o direito legal de acessar tal conteúdo. O desenvolvedor não assume nenhuma responsabilidade pelo uso desta aplicação.",
                             "accept": "Entendi"
                     },
                     "messages": {
@@ -5671,9 +5734,16 @@ var I18nData = {
                             "continue": "Продолжить",
                             "fromStart": "С начала"
                     },
+                    "welcome": {
+                            "demoTitle": "Добро пожаловать в Free IPTV",
+                            "demoMessage": "Хотите попробовать демонстрационный плейлист, адаптированный к вашему местоположению?",
+                            "demoYes": "Да, попробовать демо",
+                            "demoNo": "Нет, настроить вручную",
+                            "demoName": "Демо Free IPTV"
+                    },
                     "disclaimer": {
                             "title": "Отказ от ответственности",
-                            "text": "Это приложение не предоставляет никакого контента. Пользователи несут полную ответственность за настраиваемые источники и должны убедиться, что имеют законное право на доступ к такому контенту. Разработчик не несёт ответственности за использование этого приложения.",
+                            "text": "Это приложение не размещает никакого контента. Пользователи несут полную ответственность за настраиваемые источники и должны убедиться, что имеют законное право на доступ к такому контенту. Разработчик не несёт ответственности за использование этого приложения.",
                             "accept": "Понятно"
                     },
                     "messages": {
@@ -6150,9 +6220,16 @@ var I18nData = {
                             "continue": "Devam et",
                             "fromStart": "Baştan"
                     },
+                    "welcome": {
+                            "demoTitle": "Free IPTV'ye hoş geldiniz",
+                            "demoMessage": "Konumunuza uyarlanmış bir demo oynatma listesi denemek ister misiniz?",
+                            "demoYes": "Evet, demoyu dene",
+                            "demoNo": "Hayır, manuel yapılandır",
+                            "demoName": "Free IPTV Demo"
+                    },
                     "disclaimer": {
                             "title": "Sorumluluk Reddi",
-                            "text": "Bu uygulama herhangi bir içerik sağlamaz. Kullanıcılar yapılandırdıkları kaynaklardan yalnızca kendileri sorumludur ve bu tür içeriklere erişmek için yasal hakka sahip olduklarından emin olmalıdırlar. Geliştirici, bu uygulamanın kullanımı için hiçbir sorumluluk kabul etmez.",
+                            "text": "Bu uygulama herhangi bir içerik barındırmaz. Kullanıcılar yapılandırdıkları kaynaklardan yalnızca kendileri sorumludur ve bu tür içeriklere erişmek için yasal hakka sahip olduklarından emin olmalıdırlar. Geliştirici, bu uygulamanın kullanımı için hiçbir sorumluluk kabul etmez.",
                             "accept": "Anladım"
                     },
                     "messages": {

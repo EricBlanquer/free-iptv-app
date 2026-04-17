@@ -258,7 +258,7 @@ IPTVApp.prototype.showLoading = function(show, posterUrl, message) {
     }
 };
 
-IPTVApp.prototype.showToast = function(message, duration, isError) {
+IPTVApp.prototype.showToast = function(message, duration, isError, variant) {
     duration = duration || 3000;
     var existing = document.getElementById('toast-message');
     if (existing) existing.remove();
@@ -267,6 +267,9 @@ IPTVApp.prototype.showToast = function(message, duration, isError) {
     toast.className = 'toast-message';
     if (isError) {
         toast.classList.add('toast-error');
+    }
+    else if (variant === 'discreet') {
+        toast.classList.add('toast-discreet');
     }
     toast.textContent = message;
     document.body.appendChild(toast);

@@ -1,0 +1,27 @@
+=== Rejected ===
+Date: 2026-04-17
+Reviewer: Samsung Document Review
+Version: 1.0.4
+
+=== Reason ===
+CRITICAL: Unable to play content.
+We were unable to use the playback of the app.
+Please make sure the content is playing correctly.
+Fix this issue and re-submit the app for these models in order to start certification process again.
+
+=== Rejected Model Groups ===
+26TV_STANDARD1, 26TV_PREMIUM2, 26TV_PREMIUM1, 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1, 25TV_PREMIUM4/3/2/1, 25TV_BASIC3/2/1 (Tizen 9.0),
+24TV_STANDARD3/2/1, 24TV_PREMIUM6/5/4/2/1, 24TV_BASIC3/2 (Tizen 9.0+1),
+24TV_BASIC4, 24TV_BASIC2_LIC2/LIC (Tizen 8.0),
+23TV_BASIC1_LIC2/LIC (Tizen 7.0)
+
+=== Root Cause Analysis ===
+The Note for Tester pointed to https://iptv-org.github.io/iptv/index.m3u — a raw aggregated playlist containing many geo-blocked and dead streams. From Samsung's test location (South Korea), the first channels clicked (e.g. TF1 HD marked [Geo-Blocked]) returned no playable variants, causing the tester to conclude the app couldn't play content.
+
+=== Resolution ===
+- Built dynamic geo-filtered playlist endpoint at https://iptv.blanquer.org/playlist.m3u (server-side country detection via ip-api.com, filtered iptv-org country/news/weather sources)
+- Added welcome modal at first launch offering the demo playlist
+- Auto-open Live TV when only live section is available
+- Updated Note for Tester to instruct selecting "Yes" on the welcome popup
+- Resubmitted as v1.0.5

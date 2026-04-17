@@ -1,0 +1,23 @@
+=== Rejected ===
+Date: 2026-04-16
+Reviewer: Samsung Document Review
+Version: 1.0.3
+
+=== Reason ===
+CRITICAL: Return Key Policy
+The return key policy must be followed.
+Exit and Return functionalities are necessary, please integrate this functions to the app.
+Reference: https://developer.samsung.com/smarttv/develop/guides/fundamentals/terminating-applications.html
+
+=== Rejected Model Groups ===
+26TV_STANDARD1 (Tizen 10.0), 26TV_PREMIUM2/1 (Tizen 10.0), 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1 (Tizen 9.0), 25TV_PREMIUM4/3/2/1 (Tizen 9.0), 25TV_BASIC3/2/1 (Tizen 9.0),
+24TV_STANDARD3/2/1 (Tizen 9.0+1), 24TV_PREMIUM6/5/4/2/1 (Tizen 9.0+1), 24TV_BASIC4 (Tizen 8.0),
+24TV_BASIC3 (Tizen 9.0+1), 24TV_BASIC2_LIC2/LIC (Tizen 8.0), 24TV_BASIC2 (Tizen 9.0+1),
+23TV_BASIC1_LIC2/LIC (Tizen 7.0)
+
+=== Root Cause Analysis ===
+Samsung's Return Key Policy requires that pressing Back on the home screen triggers an exit confirmation dialog, not a silent termination. v1.0.3 didn't implement this — pressing Back from home terminated the app directly.
+
+=== Resolution ===
+Added exit confirmation popup on home screen in v1.0.4. See v1.0.4/changelog.txt.

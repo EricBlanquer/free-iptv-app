@@ -360,9 +360,16 @@
         "continue": "Doorgaan",
         "fromStart": "Vanaf begin"
     },
+    "welcome": {
+        "demoTitle": "Welkom bij Free IPTV",
+        "demoMessage": "Wilt u een demo-afspeellijst proberen die is aangepast aan uw locatie?",
+        "demoYes": "Ja, demo proberen",
+        "demoNo": "Nee, handmatig configureren",
+        "demoName": "Free IPTV Demo"
+    },
     "disclaimer": {
         "title": "Disclaimer",
-        "text": "Deze applicatie levert geen inhoud. Gebruikers zijn zelf verantwoordelijk voor de bronnen die zij configureren en moeten ervoor zorgen dat zij het wettelijke recht hebben om toegang te krijgen tot dergelijke inhoud. De ontwikkelaar aanvaardt geen verantwoordelijkheid voor het gebruik van deze applicatie.",
+        "text": "Deze applicatie host geen inhoud. Gebruikers zijn zelf verantwoordelijk voor de bronnen die zij configureren en moeten ervoor zorgen dat zij het wettelijke recht hebben om toegang te krijgen tot dergelijke inhoud. De ontwikkelaar aanvaardt geen verantwoordelijkheid voor het gebruik van deze applicatie.",
         "accept": "Begrepen"
     },
     "messages": {

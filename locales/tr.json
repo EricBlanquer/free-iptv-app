@@ -360,9 +360,16 @@
         "continue": "Devam et",
         "fromStart": "Baştan"
     },
+    "welcome": {
+        "demoTitle": "Free IPTV'ye hoş geldiniz",
+        "demoMessage": "Konumunuza uyarlanmış bir demo oynatma listesi denemek ister misiniz?",
+        "demoYes": "Evet, demoyu dene",
+        "demoNo": "Hayır, manuel yapılandır",
+        "demoName": "Free IPTV Demo"
+    },
     "disclaimer": {
         "title": "Sorumluluk Reddi",
-        "text": "Bu uygulama herhangi bir içerik sağlamaz. Kullanıcılar yapılandırdıkları kaynaklardan yalnızca kendileri sorumludur ve bu tür içeriklere erişmek için yasal hakka sahip olduklarından emin olmalıdırlar. Geliştirici, bu uygulamanın kullanımı için hiçbir sorumluluk kabul etmez.",
+        "text": "Bu uygulama herhangi bir içerik barındırmaz. Kullanıcılar yapılandırdıkları kaynaklardan yalnızca kendileri sorumludur ve bu tür içeriklere erişmek için yasal hakka sahip olduklarından emin olmalıdırlar. Geliştirici, bu uygulamanın kullanımı için hiçbir sorumluluk kabul etmez.",
         "accept": "Anladım"
     },
     "messages": {

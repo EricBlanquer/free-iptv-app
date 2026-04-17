@@ -2481,6 +2481,7 @@ IPTVApp.prototype.hidePrivacyPolicy = function() {
 IPTVApp.prototype.showConfirmModal = function(message, action, options) {
     var self = this;
     this.confirmModalAction_ = action;
+    this.confirmModalNoAction_ = (options && options.noAction) ? options.noAction : null;
     this.confirmModalPreviousFocusArea = this.focusArea;
     this.confirmModalPreviousFocusIndex = this.focusIndex;
     var modal = document.getElementById('confirm-modal');
@@ -2535,12 +2536,14 @@ IPTVApp.prototype.hideConfirmModal = function() {
     this.focusArea = this.confirmModalPreviousFocusArea || 'playlists';
     this.focusIndex = this.confirmModalPreviousFocusIndex || 0;
     this.confirmModalAction_ = null;
+    this.confirmModalNoAction_ = null;
     this.updateFocus();
 };
 
 IPTVApp.prototype.confirmModalAction = function(confirmed) {
     window.log('ACTION confirmModal: ' + (confirmed ? 'yes' : 'no'));
     var action = this.confirmModalAction_;
+    var noAction = this.confirmModalNoAction_;
     this.hideConfirmModal();
     if (confirmed && action) {
         if (typeof action === 'function') {
@@ -2560,6 +2563,9 @@ IPTVApp.prototype.confirmModalAction = function(confirmed) {
             }
             window.location.reload();
         }
+    }
+    else if (!confirmed && typeof noAction === 'function') {
+        noAction();
     }
 };
 

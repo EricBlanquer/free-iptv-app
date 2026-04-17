@@ -1,0 +1,40 @@
+=== Submission ===
+Version: 1.0.0
+Submitted: 2026-03-29
+Type: Optional
+
+=== English ===
+Initial release of Free IPTV.
+Stream your personal IPTV content on your Samsung TV.
+Supports M3U playlists and API server providers.
+Features include Live TV with EPG guide, Movies (VOD), Series with season/episode navigation, multiple audio tracks, subtitle support, favorites, watch history, and 11 interface languages.
+
+=== Arabic ===
+الإصدار الأول من Free IPTV. شاهد محتوى IPTV الخاص بك على تلفزيون سامسونج
+
+=== German ===
+Erstveröffentlichung von Free IPTV. Streamen Sie Ihre IPTV-Inhalte auf Ihrem Samsung TV.
+
+=== Spanish ===
+Lanzamiento inicial de Free IPTV. Transmite tu contenido IPTV en tu Samsung TV
+
+=== French ===
+Version initiale de Free IPTV. Regardez vos contenus IPTV sur votre Samsung TV
+
+=== Italian ===
+Rilascio iniziale di Free IPTV. Guarda i tuoi contenuti IPTV sulla tua Samsung TV
+
+=== Dutch ===
+Eerste versie van Free IPTV. Stream uw IPTV-inhoud op uw Samsung TV
+
+=== Polish ===
+Pierwsze wydanie Free IPTV. Oglądaj treści IPTV na swoim Samsung TV
+
+=== Portuguese ===
+Lançamento inicial do Free IPTV. Assista seu conteúdo IPTV na sua Samsung TV
+
+=== Russian ===
+Первый выпуск Free IPTV. Смотрите IPTV-контент на вашем Samsung TV
+
+=== Turkish ===
+Free IPTV ilk sürümü. IPTV içeriğinizi Samsung TV'nizde izleyin

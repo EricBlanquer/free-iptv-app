@@ -49,6 +49,7 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
         this.clampHomeFocusIndex();
         this.updateFocus();
     }
+    this.maybeAutoJumpToLive();
 };
 
 IPTVApp.prototype.renderCategoryIcon = function(iconData, container) {
@@ -106,6 +107,26 @@ IPTVApp.prototype.renderCustomCategoryButtons = function(configured, isM3U, patt
         name.textContent = cat.name;
         btn.appendChild(name);
         historyBtn.parentNode.insertBefore(btn, historyBtn);
+    }
+};
+
+IPTVApp.prototype.maybeAutoJumpToLive = function() {
+    if (!this._autoJumpPending) return;
+    if (this.currentScreen !== 'home') return;
+    var contentButtons = document.querySelectorAll('#home-grid > .home-btn:not([data-section="settings"])');
+    var visible = [];
+    for (var i = 0; i < contentButtons.length; i++) {
+        if (contentButtons[i].style.display !== 'none') {
+            visible.push(contentButtons[i].dataset.section);
+        }
+    }
+    if (visible.length === 1 && visible[0] === 'live') {
+        this._autoJumpPending = false;
+        window.log('INIT', 'auto-jumping to Live (only section available)');
+        this.openSection('live');
+    }
+    else if (visible.length > 0) {
+        this._autoJumpPending = false;
     }
 };
 

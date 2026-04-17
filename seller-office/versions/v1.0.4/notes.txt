@@ -1,0 +1,46 @@
+=== Submission ===
+Version: 1.0.4
+Submitted: 2026-04-17
+Type: Optional
+
+=== Note for Tester ===
+No login required. To test the app:
+1. Launch the app
+2. Go to Settings
+3. Add a playlist: select M3U type, enter URL: https://iptv-org.github.io/iptv/index.m3u
+4. Save and return to Home
+5. Select "Live TV" to browse channels
+The app does not provide content - users supply their own M3U playlists or IPTV provider credentials.
+
+=== English ===
+Added an exit confirmation popup on the home screen to comply with Samsung's Return Key Policy.
+
+=== Arabic ===
+تمت إضافة نافذة تأكيد الخروج عند الضغط على زر الرجوع في الشاشة الرئيسية (سياسة زر الرجوع من سامسونج).
+
+=== German ===
+Beim Beenden der App vom Startbildschirm aus wird nun eine Bestätigungsabfrage angezeigt (Samsung Return Key Policy).
+
+=== Spanish ===
+Se ha añadido una ventana de confirmación de salida al pulsar Atrás en la pantalla principal (política de tecla Return de Samsung).
+
+=== French ===
+Ajout d'une fenêtre de confirmation de sortie lors de l'appui sur Retour depuis l'écran d'accueil (conformité à la politique Samsung Return Key).
+
+=== Italian ===
+Aggiunta una finestra di conferma uscita premendo Indietro dalla schermata principale (conformità alla Return Key Policy di Samsung).
+
+=== Dutch ===
+Er verschijnt nu een bevestigingsvenster bij het afsluiten van de app vanaf het startscherm (Samsung Return Key Policy).
+
+=== Polish ===
+Dodano okno potwierdzenia wyjścia po naciśnięciu klawisza Wstecz na ekranie głównym (zgodność z Samsung Return Key Policy).
+
+=== Portuguese ===
+Adicionada janela de confirmação de saída ao pressionar Voltar na tela inicial (conformidade com a Return Key Policy da Samsung).
+
+=== Russian ===
+Добавлено окно подтверждения выхода при нажатии кнопки «Назад» на главном экране (соответствие политике Samsung Return Key).
+
+=== Turkish ===
+Ana ekranda Geri tuşuna basıldığında çıkış onay penceresi eklendi (Samsung Return Key Policy uyumluluğu).
