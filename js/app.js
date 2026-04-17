@@ -242,9 +242,10 @@ class IPTVApp {
     startApp() {
         var self = this;
         if (!this.isIPTVConfigured()) {
-            this.showSettings();
+            this.showWelcomeDemo();
         }
         else {
+            this._autoJumpPending = true;
             this.loadAllPlaylistCacheTimestamps().then(function() {
                 self.renderPlaylistSelector();
                 self.startPlaylistAgeTimer();
@@ -407,6 +408,37 @@ class IPTVApp {
             }
         }
         return maxId + 1;
+    }
+
+    showWelcomeDemo() {
+        var self = this;
+        this.showConfirmModal(I18n.t('welcome.demoMessage', 'Would you like to try a demo playlist adapted to your location?'), function() {
+            self.addDemoPlaylist();
+        }, {
+            title: I18n.t('welcome.demoTitle', 'Welcome to Free IPTV'),
+            yesLabel: I18n.t('welcome.demoYes', 'Yes, try demo'),
+            noLabel: I18n.t('welcome.demoNo', 'No, configure manually'),
+            focusYes: true,
+            noAction: function() {
+                self.showSettings();
+            }
+        });
+    }
+
+    addDemoPlaylist() {
+        var playlist = {
+            id: this.getNextPlaylistId(),
+            name: I18n.t('welcome.demoName', 'Free IPTV Demo'),
+            type: 'm3u',
+            url: 'https://iptv.blanquer.org/playlist.m3u'
+        };
+        this.settings.playlists.push(playlist);
+        this.settings.activePlaylistId = playlist.id;
+        this.saveSettings();
+        this.showScreen('home');
+        this.currentScreen = 'home';
+        this.focusArea = 'home';
+        this.startApp();
     }
 
     autoConnect() {

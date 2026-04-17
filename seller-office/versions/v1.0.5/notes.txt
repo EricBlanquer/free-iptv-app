@@ -1,0 +1,87 @@
+=== Note for Tester ===
+No login required.
+
+At first launch, a welcome popup appears: "Would you like to try a demo playlist adapted to your location?". Select "Yes, try demo" — the app automatically adds a geo-adapted playlist (served from https://iptv.blanquer.org/playlist.m3u, detecting the tester's country from the request IP) and opens the Live TV section. Select any channel to test playback.
+
+Alternatively, select "No, configure manually" to reach Settings > Playlists and add your own source:
+- M3U type: enter a playlist URL
+- Server type: enter host URL, username, password
+
+The app does not host any content. This version adds the welcome demo playlist, auto-jumps to Live TV when only live content is available, and fixes false "frozen" playback detections that were triggering unwanted reconnections on otherwise normal streams.
+
+=== English ===
+- Added a welcome prompt on first launch offering a demo playlist adapted to your location
+- Auto-open Live TV directly when it is the only configured section
+- Fixed false "frozen" playback detections that caused unwanted reconnections
+- "Reconnecting…" notification is now discreet in the bottom-right corner
+- Improved initial-buffering grace period for slower streams
+
+=== Arabic ===
+- إضافة نافذة ترحيب عند التشغيل الأول تقترح قائمة تشغيل تجريبية متكيفة مع موقعك
+- فتح تلقائي للتلفزيون المباشر عندما يكون القسم الوحيد المهيأ
+- إصلاح الاكتشافات الخاطئة لـ"تجمد" التشغيل التي تسببت في إعادة اتصال غير مرغوب فيها
+- إشعار "إعادة الاتصال…" أصبح الآن خفيًا في الركن السفلي الأيمن
+- تحسين فترة السماح للتخزين المؤقت الأولي للبث الأبطأ
+
+=== German ===
+- Willkommensdialog beim ersten Start mit einer standortangepassten Demo-Playlist
+- Direktes Öffnen von Live-TV, wenn nur dieser Bereich konfiguriert ist
+- Falsche "Eingefroren"-Erkennungen behoben, die unerwünschte Wiederverbindungen ausgelöst haben
+- "Wiederverbindung…" Meldung erscheint nun dezent unten rechts
+- Verbesserte Karenzzeit beim ersten Puffern für langsamere Streams
+
+=== Spanish ===
+- Diálogo de bienvenida al primer inicio que ofrece una lista de demostración adaptada a tu ubicación
+- Apertura directa de la TV en directo cuando es la única sección configurada
+- Corregidas las falsas detecciones de "congelación" que provocaban reconexiones no deseadas
+- La notificación "Reconectando…" ahora es discreta en la esquina inferior derecha
+- Mejorada la tolerancia del buffer inicial para streams más lentos
+
+=== French ===
+- Ajout d'un écran de bienvenue au premier lancement proposant une playlist de démo adaptée à votre localisation
+- Ouverture directe de la TV en direct quand c'est la seule section configurée
+- Correction des fausses détections de "gel" de lecture qui provoquaient des reconnexions non souhaitées
+- Notification "Reconnexion…" désormais discrète en bas à droite
+- Amélioration de la tolérance de mise en mémoire tampon initiale pour les flux plus lents
+
+=== Italian ===
+- Aggiunta finestra di benvenuto al primo avvio con una playlist demo adattata alla tua posizione
+- Apertura diretta della TV in diretta quando è l'unica sezione configurata
+- Corrette le false rilevazioni di "blocco" che causavano riconnessioni indesiderate
+- La notifica "Riconnessione…" è ora discreta nell'angolo in basso a destra
+- Migliorata la tolleranza del buffering iniziale per stream più lenti
+
+=== Dutch ===
+- Welkomstscherm bij de eerste start met een demo-afspeellijst aangepast aan uw locatie
+- Live TV wordt direct geopend wanneer het de enige geconfigureerde sectie is
+- Valse "bevroren" detecties gecorrigeerd die ongewenste herverbindingen veroorzaakten
+- Melding "Opnieuw verbinden…" is nu discreet in de rechterbenedenhoek
+- Verbeterde marge voor eerste buffering voor tragere streams
+
+=== Polish ===
+- Dodano ekran powitalny przy pierwszym uruchomieniu z demonstracyjną playlistą dostosowaną do Twojej lokalizacji
+- Bezpośrednie otwieranie Telewizji na żywo, gdy jest to jedyna skonfigurowana sekcja
+- Naprawiono fałszywe wykrywanie "zawieszenia" powodujące niechciane ponowne połączenia
+- Powiadomienie "Ponowne łączenie…" jest teraz dyskretne w prawym dolnym rogu
+- Zwiększona tolerancja początkowego buforowania dla wolniejszych strumieni
+
+=== Portuguese ===
+- Adicionada janela de boas-vindas no primeiro lançamento com uma playlist de demonstração adaptada à sua localização
+- Abertura direta da TV ao Vivo quando é a única seção configurada
+- Corrigidas falsas detecções de "congelamento" que causavam reconexões indesejadas
+- Notificação "Reconectando…" agora discreta no canto inferior direito
+- Melhorada a tolerância do buffer inicial para streams mais lentos
+
+=== Russian ===
+- Добавлено приветственное окно при первом запуске с демонстрационным плейлистом, адаптированным к вашему местоположению
+- Прямое открытие «ТВ в прямом эфире», если это единственный настроенный раздел
+- Исправлены ложные обнаружения «зависания», которые вызывали нежелательные переподключения
+- Уведомление «Повторное подключение…» теперь ненавязчивое в правом нижнем углу
+- Улучшен запас при начальной буферизации для более медленных потоков
+
+=== Turkish ===
+- İlk başlatmada, konumunuza uyarlanmış bir demo oynatma listesi öneren karşılama penceresi eklendi
+- Yapılandırılmış tek bölüm Canlı TV olduğunda doğrudan açılır
+- İstenmeyen yeniden bağlanmalara neden olan yanlış "donma" algılamaları düzeltildi
+- "Yeniden bağlanılıyor…" bildirimi artık sağ alt köşede daha gizli
+- Daha yavaş akışlar için ilk arabelleğe alma toleransı iyileştirildi

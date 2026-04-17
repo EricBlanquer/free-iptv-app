@@ -1,0 +1,19 @@
+=== Rejected ===
+Date: 2026-04-14
+Reviewer: Samsung Document Review
+Version: 1.0.2
+
+=== Reason ===
+CRITICAL: Unable to login. Unable to select the text field of m3u link.
+
+=== Rejected Model Groups ===
+26TV_STANDARD1 (Tizen 10.0), 26TV_PREMIUM2/1 (Tizen 10.0), 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1 (Tizen 9.0), 25TV_PREMIUM4/3/2/1 (Tizen 9.0), 25TV_BASIC3/2/1 (Tizen 9.0),
+24TV_STANDARD3/2/1 (Tizen 9.0+1), 24TV_PREMIUM6/5/4/2/1 (Tizen 9.0+1), 24TV_BASIC4 (Tizen 8.0),
+24TV_BASIC3 (Tizen 9.0+1), 24TV_BASIC2_LIC2/LIC (Tizen 8.0), 24TV_BASIC2 (Tizen 9.0+1)
+
+=== Root Cause Analysis ===
+After switching the playlist type to "M3U" in Settings > Playlists, the M3U URL input field could not receive focus (keyboard navigation couldn't reach it). The tester could not paste the M3U URL, effectively blocking any manual configuration path.
+
+=== Resolution ===
+Focus management fixed in v1.0.3: the M3U URL field now properly receives focus after switching playlist type to M3U. See v1.0.3/changelog.txt.

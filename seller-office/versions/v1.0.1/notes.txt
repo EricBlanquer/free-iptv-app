@@ -1,0 +1,10 @@
+=== Submission ===
+Version: 1.0.1
+Status: ABANDONED — never published, never sent for review
+
+=== Note ===
+v1.0.1 was uploaded to Samsung Seller Office as a documentation fix after v1.0.0 was rejected (missing preview images, see v1.0.0/rejection.txt).
+
+Before requesting review, the developer noticed the wgt also needed code changes. However, Samsung Seller Office does not allow replacing an uploaded package unless review has already been requested — so the upload couldn't be overwritten.
+
+The decision was to skip v1.0.1 entirely and bump straight to v1.0.2 (with both the doc fix and the code changes). No git commit exists for this version.

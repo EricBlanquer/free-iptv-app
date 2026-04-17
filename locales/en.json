@@ -391,8 +391,15 @@
     },
     "disclaimer": {
         "title": "Disclaimer",
-        "text": "This application does not provide any content. Users are solely responsible for the sources they configure and must ensure they have the legal right to access such content. The developer assumes no responsibility for how this application is used.",
+        "text": "This application does not host any content. Users are solely responsible for the sources they configure and must ensure they have the legal right to access such content. The developer assumes no responsibility for how this application is used.",
         "accept": "I Understand"
+    },
+    "welcome": {
+        "demoTitle": "Welcome to Free IPTV",
+        "demoMessage": "Would you like to try a demo playlist adapted to your location?",
+        "demoYes": "Yes, try demo",
+        "demoNo": "No, configure manually",
+        "demoName": "Free IPTV Demo"
     },
     "messages": {
         "searching": "Searching: \"{title}\"...",

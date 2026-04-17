@@ -55,6 +55,7 @@ class TVPlayer {
     _applyAvplayBuffering() {
         if (typeof webapis === 'undefined' || !webapis.avplay) return;
         if (!this.bufferConfig) return;
+        if (typeof webapis.avplay.setBufferingParam !== 'function') return;
         try {
             webapis.avplay.setBufferingParam('PLAYER_BUFFER_FOR_PLAY', 'PLAYER_BUFFER_TIME', this.bufferConfig.play);
             webapis.avplay.setBufferingParam('PLAYER_BUFFER_FOR_RESUME', 'PLAYER_BUFFER_TIME', this.bufferConfig.rebuffer);
@@ -210,6 +211,9 @@ class TVPlayer {
         this.bufferStaleCount = 0;
         this.lastBandwidth = -1;
         this.bandwidthStaleCount = 0;
+        this._avplayTimeScale = undefined;
+        this._freezeStartMs = Date.now();
+        this._hasPlayedOnce = false;
         // Check every 2 seconds: buffer progress (when buffering) OR currentTime progress
         this.freezeCheckInterval = setInterval(function() {
             if (!self.isPlaying || self.isPaused) {
@@ -219,14 +223,17 @@ class TVPlayer {
                 self.bufferStaleCount = 0;
                 return;
             }
-            // Stuck buffering: trigger only if buffer percent does not advance for 3 checks (6s)
+            // Stuck buffering: trigger if buffer percent does not advance.
+            // Initial play needs more time (DNS/TLS/manifest/first segment/decode): 8 ticks = 16s.
+            // After at least one successful play, stricter: 3 ticks = 6s.
             if (self.isBuffering) {
                 var p = self.lastBufferPercentSeen;
                 if (p === undefined) p = -1;
+                var stallLimit = self._hasPlayedOnce ? 3 : 8;
                 if (p === self.lastBufferPercent) {
                     self.bufferStaleCount++;
-                    window.log('PLAYER', 'Buffering stalled (' + self.bufferStaleCount + '/3) percent=' + p + ' [' + self._getAvplayDiag() + ']');
-                    if (self.bufferStaleCount >= 3) {
+                    window.log('PLAYER', 'Buffering stalled (' + self.bufferStaleCount + '/' + stallLimit + ') percent=' + p + ' [' + self._getAvplayDiag() + ']');
+                    if (self.bufferStaleCount >= stallLimit) {
                         window.log('ERROR', 'Player stuck buffering (no progress), triggering recovery');
                         self.bufferStaleCount = 0;
                         self.lastBufferPercent = -1;
@@ -241,6 +248,7 @@ class TVPlayer {
                 }
                 return;
             }
+            self._hasPlayedOnce = true;
             self.lastBufferPercent = -1;
             self.bufferStaleCount = 0;
             var currentTime = self.currentTime;
@@ -250,27 +258,16 @@ class TVPlayer {
                 }
                 catch (ex) { /* player may not be ready */ }
             }
-            var timeDiff = currentTime - self.lastCheckedTime;
+            var rawDiff = currentTime - self.lastCheckedTime;
+            if (self._avplayTimeScale === undefined && self.lastCheckedTime > 0 && rawDiff > 0) {
+                self._avplayTimeScale = (rawDiff < 10) ? 1000 : 1;
+                window.log('PLAYER', 'Time unit detected: ' + (self._avplayTimeScale === 1000 ? 'seconds' : 'ms'));
+            }
+            var scale = self._avplayTimeScale || 1;
+            var timeDiff = rawDiff * scale;
             var bw = self._getAvplayBandwidth();
-            window.log('PLAYER', 'Heartbeat: dt=' + timeDiff + 'ms ct=' + currentTime + ' bw=' + bw + ' bwStale=' + self.bandwidthStaleCount + ' tStale=' + self.freezeCheckCount);
-            // Bandwidth-based freeze detection (catches frozen video where AVPlay clock keeps ticking)
-            if (bw > 0 && bw === self.lastBandwidth) {
-                self.bandwidthStaleCount++;
-                if (self.bandwidthStaleCount >= 2) {
-                    window.log('ERROR', 'Player frozen (bandwidth stale at ' + bw + '), triggering recovery');
-                    self.bandwidthStaleCount = 0;
-                    self.freezeCheckCount = 0;
-                    if (self.onFrozen) {
-                        self.onFrozen();
-                    }
-                    return;
-                }
-            }
-            else if (bw > 0) {
-                self.bandwidthStaleCount = 0;
-            }
-            self.lastBandwidth = bw;
-            // Time-based freeze detection (fallback for when bandwidth signal isn't available)
+            window.log('PLAYER', 'Heartbeat: dt=' + timeDiff + 'ms ct=' + currentTime + ' bw=' + bw + ' tStale=' + self.freezeCheckCount);
+            // Time-based freeze detection
             if (timeDiff < 500) {
                 self.freezeCheckCount++;
                 if (self.freezeCheckCount >= 3) {
@@ -455,7 +452,10 @@ class TVPlayer {
             this._applyAvplayBuffering();
             webapis.avplay.setListener(this._getListeners());
             window.log('PLAYER', 'AVPlay.prepareAsync...');
+            this._prepareAsyncHandled = false;
             webapis.avplay.prepareAsync(() => {
+                if (this._prepareAsyncHandled) return;
+                this._prepareAsyncHandled = true;
                 window.log('PLAYER', 'prepareAsync done, will seek to ' + formatMs(this.startPosition) + ' after play');
                 webapis.avplay.play();
                 this.isPlaying = true;
@@ -476,9 +476,10 @@ class TVPlayer {
                 if (this.onError) this.onError(error);
             });
         } catch (e) {
-            window.log('ERROR', '_playDirect exception: ' + (e ? (e.message || e.name || JSON.stringify(e)) : 'unknown'));
-            // Emulator InvalidStateError - retry once after delay
-            if (e && e.name === 'InvalidStateError' && retryCount < 1) {
+            var isRecoverable = e && e.name === 'InvalidStateError' && retryCount < 1;
+            var msg = '_playDirect exception: ' + (e ? (e.message || e.name || JSON.stringify(e)) : 'unknown');
+            window.log(isRecoverable ? 'PLAYER' : 'ERROR', msg);
+            if (isRecoverable) {
                 window.log('PLAYER', 'InvalidStateError caught, retrying...');
                 setTimeout(function() { self._playDirect(url, retryCount + 1); }, 100);
                 return;
@@ -511,7 +512,10 @@ class TVPlayer {
             webapis.avplay.setTimeoutForBuffering(30000);
             this._applyAvplayBuffering();
             webapis.avplay.setListener(this._getListeners());
+            this._prepareAsyncHandled = false;
             webapis.avplay.prepareAsync(() => {
+                if (this._prepareAsyncHandled) return;
+                this._prepareAsyncHandled = true;
                 window.log('PLAYER', 'playNative prepareAsync done, will seek to ' + formatMs(this.startPosition) + ' after play');
                 webapis.avplay.play();
                 this.isPlaying = true;

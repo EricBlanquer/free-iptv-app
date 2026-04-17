@@ -359,9 +359,16 @@
         "continue": "Kontynuuj",
         "fromStart": "Od początku"
     },
+    "welcome": {
+        "demoTitle": "Witaj w Free IPTV",
+        "demoMessage": "Czy chcesz wypróbować przykładową playlistę dopasowaną do Twojej lokalizacji?",
+        "demoYes": "Tak, wypróbuj demo",
+        "demoNo": "Nie, skonfiguruj ręcznie",
+        "demoName": "Demo Free IPTV"
+    },
     "disclaimer": {
         "title": "Zastrzeżenie",
-        "text": "Ta aplikacja nie dostarcza żadnych treści. Użytkownicy są wyłącznie odpowiedzialni za źródła, które konfigurują i muszą upewnić się, że mają prawo do dostępu do takich treści. Deweloper nie ponosi odpowiedzialności za sposób korzystania z tej aplikacji.",
+        "text": "Ta aplikacja nie hostuje żadnych treści. Użytkownicy są wyłącznie odpowiedzialni za źródła, które konfigurują i muszą upewnić się, że mają prawo do dostępu do takich treści. Deweloper nie ponosi odpowiedzialności za sposób korzystania z tej aplikacji.",
         "accept": "Rozumiem"
     },
     "messages": {

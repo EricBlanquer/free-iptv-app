@@ -1,0 +1,20 @@
+=== Rejected ===
+Date: 2026-03-31
+Reviewer: Samsung Document Review
+Version: 1.0.0
+
+=== Reason ===
+CRITICAL: Description file incomplete.
+Please add app preview images to the description file.
+Samsung couldn't see any difference in the description file from previous submissions and required app preview images per the template at:
+https://developer.samsung.com/tv-seller-office/checklists-for-distribution/application-ui-description.html
+
+=== Rejected Model Groups ===
+26TV_STANDARD1 (Tizen 10.0), 26TV_PREMIUM2/1 (Tizen 10.0), 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1 (Tizen 9.0), 25TV_PREMIUM4/3/2/1 (Tizen 9.0), 25TV_BASIC3/2/1 (Tizen 9.0),
+24TV_STANDARD3/2/1 (Tizen 9.0+1), 24TV_PREMIUM6/5/4/2/1 (Tizen 9.0+1), 24TV_BASIC4 (Tizen 8.0),
+24TV_BASIC3 (Tizen 9.0+1), 24TV_BASIC2_LIC2/LIC (Tizen 8.0), 24TV_BASIC2 (Tizen 9.0+1),
+23TV_BASIC1_LIC2/LIC (Tizen 7.0)
+
+=== Resolution ===
+App Description file updated with preview images and resubmitted as v1.0.1.

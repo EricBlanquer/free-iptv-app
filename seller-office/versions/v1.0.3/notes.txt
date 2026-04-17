@@ -1,0 +1,37 @@
+=== Submission ===
+Version: 1.0.3
+Submitted: 2026-04-16
+Type: Optional
+
+=== English ===
+Fixed input field focus when switching playlist type to M3U. Improved settings navigation reliability.
+
+=== Arabic ===
+إصلاح تركيز حقل الإدخال عند التبديل إلى نوع قائمة تشغيل M3U. تحسين موثوقية التنقل في الإعدادات.
+
+=== German ===
+Eingabefeld-Fokus beim Wechsel des Playlist-Typs zu M3U behoben. Verbesserte Zuverlässigkeit der Einstellungsnavigation.
+
+=== Spanish ===
+Corregido el enfoque del campo de entrada al cambiar el tipo de lista de reproducción a M3U. Mejora en la fiabilidad de la navegación en ajustes.
+
+=== French ===
+Correction du focus sur le champ de saisie lors du changement de type de playlist vers M3U. Amélioration de la fiabilité de la navigation dans les paramètres.
+
+=== Italian ===
+Corretto il focus del campo di immissione durante il passaggio al tipo di playlist M3U. Migliorata l'affidabilità della navigazione nelle impostazioni.
+
+=== Dutch ===
+Invoerveld-focus bij het wisselen van afspeellijsttype naar M3U opgelost. Verbeterde betrouwbaarheid van navigatie in instellingen.
+
+=== Polish ===
+Naprawiono fokus pola wprowadzania przy przełączaniu typu playlisty na M3U. Poprawiono niezawodność nawigacji w ustawieniach.
+
+=== Portuguese ===
+Corrigido o foco do campo de entrada ao alternar o tipo de playlist para M3U. Melhoria na fiabilidade da navegação nas definições.
+
+=== Russian ===
+Исправлен фокус поля ввода при переключении типа плейлиста на M3U. Улучшена надёжность навигации в настройках.
+
+=== Turkish ===
+M3U çalma listesi türüne geçerken giriş alanı odağı düzeltildi. Ayarlar gezinme güvenilirliği iyileştirildi.

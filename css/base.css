@@ -842,6 +842,20 @@ body.text-large #premium-status-text { font-size: 22px; }
     text-align: left;
 }
 
+.toast-message.toast-discreet {
+    top: auto;
+    left: auto;
+    bottom: 30px;
+    right: 30px;
+    transform: none;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-align: left;
+    opacity: 0.85;
+    font-size: 22px !important;
+}
+
 .empty-message {
     color: #888;
     padding: 40px;

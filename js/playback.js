@@ -626,7 +626,7 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             var resumePosition = (type !== 'live') ? (self.player.currentTime || 0) : 0;
             window.log('PLAYER', 'Playback error, retry ' + self._errorRetryCount + '/' + maxRetries + ' in ' + retryDelay + 'ms at position ' + resumePosition);
             self.showLoading(false);
-            self.showToast(I18n.t('player.reconnecting', 'Reconnecting...') + ' (' + self._errorRetryCount + '/' + maxRetries + ')');
+            self.showToast(I18n.t('player.reconnecting', 'Reconnecting...') + ' (' + self._errorRetryCount + '/' + maxRetries + ')', 3000, false, 'discreet');
             self.player.stop();
             setTimeout(function() {
                 self.player.play(url, type === 'live', resumePosition);
@@ -691,7 +691,7 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
             return;
         }
         window.log('PLAYER', 'No variants left, restarting same stream');
-        self.showToast(I18n.t('player.reconnecting', 'Reconnecting...'));
+        self.showToast(I18n.t('player.reconnecting', 'Reconnecting...'), 3000, false, 'discreet');
         self.player.stop();
         setTimeout(function() {
             self.player.play(url, true);

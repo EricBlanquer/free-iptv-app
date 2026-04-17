@@ -1,0 +1,81 @@
+=== Submission ===
+Version: 1.0.2
+Submitted: 2026-04-13
+Type: Optional
+
+=== English ===
+- Recommended channels category based on your watch history
+- Improved search with multi-word support
+- Category sorting and better grid navigation
+- Auto-dismiss tooltips and focus improvements
+- Performance optimizations and bug fixes
+
+=== Arabic ===
+- قنوات موصى بها بناءً على سجل المشاهدة
+- بحث محسّن يدعماكلمات متعددة ─
+- ترتيب الفئات وتحسين العنقل في الشبكة
+- إخفاء تلقائي للتلميحات وتحسينات التركيز
+- تحسينات في الأداء وإصلاح الأخطاء
+
+=== German ===
+- Empfohlene Sender basierend auf Ihrem Wiedergabeverlauf
+- Verbesserte Suche mit Mehrwort-Unterstützung
+- Kategorie-Sortierung und verbesserte Rasternavigation
+- Automatisches Ausblenden von Tooltips und Fokus-Verbesserungen
+- Leistungsoptimierungen und Fehlerbehebungen
+
+=== Spanish ===
+- Canales recomendados según tu historial de reproducción
+- Búsqueda mejorada con soporte para múltiples palabras
+- Ordenación de categorías y mejor navegación en la cuadrícula
+- Ocultación automática de tooltips y mejoras de enfoque
+- Optimizaciones de rendimiento y corrección de errores
+
+=== French ===
+- Chaînes recommandées basées sur votre historique de visionnage
+- Recherche améliorée avec support multi-mots
+- Tri des catégories et navigation améliorée dans la grille
+- Masquage automatique des infobulles et améliorations du focus
+- Optimisations de performance et corrections de bugs
+
+=== Italian ===
+- Canali consigliati in base alla cronologia di visione
+- Ricerca migliorata con supporto per più parole
+- Ordinamento delle categorie e navigazione migliorata nella griglia
+- Nascondimento automatico dei tooltip e miglioramenti del focus
+- Ottimizzazioni delle prestazioni e correzioni di bug
+
+=== Dutch ===
+- Aanbevolen zenders op basis van uw kijkgeschiedenis
+- Verbeterd zoeken met ondersteuning voor meerdere woorden
+- Categoriesortering en verbeterde rasternavigatie
+- Automatisch verbergen van tooltips en focusverbeteringen
+- Prestatieoptimalisaties en bugfixes
+
+=== Polish ===
+- Polecane kanały na podstawie historii oglądania
+- Ulepszone wyszukiwanie z obsługą wielu słów
+- Sortowanie kategorii i lepsza nawigacja w siatce
+- Automatyczne ukrywanie podpowiedzi i ulepszenia fokusa
+- Optymalizacje wydajności i poprawki błędów
+
+=== Portuguese ===
+- Canais recomendados com base no seu histórico de visualização
+- Pesquisa melhorada com suporte a múltiplas palavras
+- Ordenação de categorias e navegação melhorada na grelha
+- Ocultação automática de tooltips e melhorias de foco
+- Otimizações de desempenho e correções de bugs
+
+=== Russian ===
+- Рекомендуемые каналы на основе истории просмотров
+- Улучшенный поиск с поддержкой нескольких слов
+- Сортировка категорий и улучшенная навигация по сетке
+- Автоматическое скрытие подсказок и улучшения фокуса
+- Оптимизация производительности и исправление ошибок
+
+=== Turkish ===
+- İzleme geçmişinize göre önerilen kanallar
+- Çoklu kelime desteği ile geliştirilmiş arama
+- Kategori sıralaması ve iyileştirilmiş ızgara navigasyonu
+- Araç ipuçlarının otomatik gizlenmesi ve odak iyileştirmeleri
+- Performans optimizasyonları ve hata düzeltmeleri
