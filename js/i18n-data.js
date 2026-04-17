@@ -1023,7 +1023,9 @@ var I18nData = {
                     "app": {
                             "loading": "جاري التحميل...",
                             "noResults": "لا توجد نتائج",
-                            "timeout": "انتهت المهلة"
+                            "timeout": "انتهت المهلة",
+                            "exitTitle": "خروج",
+                            "exitMessage": "هل تريد الخروج من التطبيق؟"
                     },
                     "loading": {
                             "connecting": "...جاري الاتصال",
@@ -1500,7 +1502,9 @@ var I18nData = {
                     "app": {
                             "loading": "Laden...",
                             "noResults": "Keine Ergebnisse",
-                            "timeout": "Zeitüberschreitung"
+                            "timeout": "Zeitüberschreitung",
+                            "exitTitle": "Beenden",
+                            "exitMessage": "Möchten Sie die App beenden?"
                     },
                     "loading": {
                             "connecting": "Verbindung wird hergestellt...",
@@ -1977,7 +1981,9 @@ var I18nData = {
                     "app": {
                             "loading": "Loading...",
                             "noResults": "No results",
-                            "timeout": "Timeout"
+                            "timeout": "Timeout",
+                            "exitTitle": "Exit",
+                            "exitMessage": "Do you want to exit the app?"
                     },
                     "loading": {
                             "connecting": "Connecting...",
@@ -2454,7 +2460,9 @@ var I18nData = {
                     "app": {
                             "loading": "Cargando...",
                             "noResults": "Sin resultados",
-                            "timeout": "Tiempo agotado"
+                            "timeout": "Tiempo agotado",
+                            "exitTitle": "Salir",
+                            "exitMessage": "¿Quieres salir de la aplicación?"
                     },
                     "loading": {
                             "connecting": "Conectando...",
@@ -2931,7 +2939,9 @@ var I18nData = {
                     "app": {
                             "loading": "Chargement...",
                             "noResults": "Aucun résultat",
-                            "timeout": "Délai dépassé"
+                            "timeout": "Délai dépassé",
+                            "exitTitle": "Quitter",
+                            "exitMessage": "Voulez-vous quitter l'application ?"
                     },
                     "loading": {
                             "connecting": "Connexion...",
@@ -3408,7 +3418,9 @@ var I18nData = {
                     "app": {
                             "loading": "Caricamento...",
                             "noResults": "Nessun risultato",
-                            "timeout": "Tempo scaduto"
+                            "timeout": "Tempo scaduto",
+                            "exitTitle": "Esci",
+                            "exitMessage": "Vuoi uscire dall'app?"
                     },
                     "loading": {
                             "connecting": "Connessione...",
@@ -3885,7 +3897,9 @@ var I18nData = {
                     "app": {
                             "loading": "Laden...",
                             "noResults": "Geen resultaten",
-                            "timeout": "Time-out"
+                            "timeout": "Time-out",
+                            "exitTitle": "Afsluiten",
+                            "exitMessage": "Wilt u de app afsluiten?"
                     },
                     "loading": {
                             "connecting": "Verbinden...",
@@ -4362,7 +4376,9 @@ var I18nData = {
                     "app": {
                             "loading": "Ładowanie...",
                             "noResults": "Brak wyników",
-                            "timeout": "Przekroczono czas"
+                            "timeout": "Przekroczono czas",
+                            "exitTitle": "Wyjdź",
+                            "exitMessage": "Czy chcesz wyjść z aplikacji?"
                     },
                     "loading": {
                             "connecting": "Łączenie...",
@@ -4839,7 +4855,9 @@ var I18nData = {
                     "app": {
                             "loading": "Carregando...",
                             "noResults": "Sem resultados",
-                            "timeout": "Tempo esgotado"
+                            "timeout": "Tempo esgotado",
+                            "exitTitle": "Sair",
+                            "exitMessage": "Deseja sair do aplicativo?"
                     },
                     "loading": {
                             "connecting": "Conectando...",
@@ -5316,7 +5334,9 @@ var I18nData = {
                     "app": {
                             "loading": "Загрузка...",
                             "noResults": "Нет результатов",
-                            "timeout": "Тайм-аут"
+                            "timeout": "Тайм-аут",
+                            "exitTitle": "Выход",
+                            "exitMessage": "Вы хотите выйти из приложения?"
                     },
                     "loading": {
                             "connecting": "Подключение...",
@@ -5793,7 +5813,9 @@ var I18nData = {
                     "app": {
                             "loading": "Yükleniyor...",
                             "noResults": "Sonuç yok",
-                            "timeout": "Zaman aşımı"
+                            "timeout": "Zaman aşımı",
+                            "exitTitle": "Çıkış",
+                            "exitMessage": "Uygulamadan çıkmak istiyor musunuz?"
                     },
                     "loading": {
                             "connecting": "Bağlanıyor...",

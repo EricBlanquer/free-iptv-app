@@ -21,7 +21,9 @@
     "app": {
         "loading": "Загрузка...",
         "noResults": "Нет результатов",
-        "timeout": "Тайм-аут"
+        "timeout": "Тайм-аут",
+        "exitTitle": "Выход",
+        "exitMessage": "Вы хотите выйти из приложения?"
     },
     "loading": {
         "connecting": "Подключение...",

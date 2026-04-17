@@ -21,7 +21,9 @@
     "app": {
         "loading": "جاري التحميل...",
         "noResults": "لا توجد نتائج",
-        "timeout": "انتهت المهلة"
+        "timeout": "انتهت المهلة",
+        "exitTitle": "خروج",
+        "exitMessage": "هل تريد الخروج من التطبيق؟"
     },
     "loading": {
         "connecting": "...جاري الاتصال",

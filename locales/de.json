@@ -23,7 +23,9 @@
     "app": {
         "loading": "Laden...",
         "noResults": "Keine Ergebnisse",
-        "timeout": "Zeitüberschreitung"
+        "timeout": "Zeitüberschreitung",
+        "exitTitle": "Beenden",
+        "exitMessage": "Möchten Sie die App beenden?"
     },
     "loading": {
         "connecting": "Verbindung wird hergestellt...",

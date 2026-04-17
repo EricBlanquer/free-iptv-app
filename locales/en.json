@@ -47,7 +47,9 @@
     "app": {
         "loading": "Loading...",
         "noResults": "No results",
-        "timeout": "Timeout"
+        "timeout": "Timeout",
+        "exitTitle": "Exit",
+        "exitMessage": "Do you want to exit the app?"
     },
     "loading": {
         "connecting": "Connecting...",

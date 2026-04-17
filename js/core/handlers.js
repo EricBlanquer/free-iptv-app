@@ -451,13 +451,21 @@ IPTVApp.prototype.backHandlers = {
         this.updateFocus();
     },
     'screen:home': function() {
-        window.log('ACTION', 'exit');
-        if (typeof Android !== 'undefined' && Android.exitApp) {
-            Android.exitApp();
-        }
-        else if (typeof tizen !== 'undefined') {
-            tizen.application.getCurrentApplication().exit();
-        }
+        window.log('ACTION', 'exit-confirm');
+        this.showConfirmModal(I18n.t('app.exitMessage', 'Do you want to exit the app?'), function() {
+            window.log('ACTION', 'exit');
+            if (typeof Android !== 'undefined' && Android.exitApp) {
+                Android.exitApp();
+            }
+            else if (typeof tizen !== 'undefined') {
+                tizen.application.getCurrentApplication().exit();
+            }
+        }, {
+            title: I18n.t('app.exitTitle', 'Exit'),
+            yesLabel: I18n.t('settings.yes', 'Yes'),
+            noLabel: I18n.t('settings.no', 'No'),
+            focusYes: false
+        });
     }
 };
 
