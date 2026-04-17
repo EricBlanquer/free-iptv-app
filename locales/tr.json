@@ -23,7 +23,9 @@
     "app": {
         "loading": "Yükleniyor...",
         "noResults": "Sonuç yok",
-        "timeout": "Zaman aşımı"
+        "timeout": "Zaman aşımı",
+        "exitTitle": "Çıkış",
+        "exitMessage": "Uygulamadan çıkmak istiyor musunuz?"
     },
     "loading": {
         "connecting": "Bağlanıyor...",

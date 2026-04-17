@@ -59,7 +59,9 @@
     "app": {
         "loading": "Chargement...",
         "noResults": "Aucun résultat",
-        "timeout": "Délai dépassé"
+        "timeout": "Délai dépassé",
+        "exitTitle": "Quitter",
+        "exitMessage": "Voulez-vous quitter l'application\u00a0?"
     },
     "loading": {
         "connecting": "Connexion...",

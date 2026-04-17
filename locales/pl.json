@@ -22,7 +22,9 @@
     "app": {
         "loading": "Ładowanie...",
         "noResults": "Brak wyników",
-        "timeout": "Przekroczono czas"
+        "timeout": "Przekroczono czas",
+        "exitTitle": "Wyjdź",
+        "exitMessage": "Czy chcesz wyjść z aplikacji?"
     },
     "loading": {
         "connecting": "Łączenie...",

@@ -25,7 +25,9 @@
     "app": {
         "loading": "Cargando...",
         "noResults": "Sin resultados",
-        "timeout": "Tiempo agotado"
+        "timeout": "Tiempo agotado",
+        "exitTitle": "Salir",
+        "exitMessage": "¿Quieres salir de la aplicación?"
     },
     "loading": {
         "connecting": "Conectando...",

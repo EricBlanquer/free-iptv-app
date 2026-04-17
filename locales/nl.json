@@ -23,7 +23,9 @@
     "app": {
         "loading": "Laden...",
         "noResults": "Geen resultaten",
-        "timeout": "Time-out"
+        "timeout": "Time-out",
+        "exitTitle": "Afsluiten",
+        "exitMessage": "Wilt u de app afsluiten?"
     },
     "loading": {
         "connecting": "Verbinden...",

@@ -20,7 +20,9 @@
     "app": {
         "loading": "Caricamento...",
         "noResults": "Nessun risultato",
-        "timeout": "Tempo scaduto"
+        "timeout": "Tempo scaduto",
+        "exitTitle": "Esci",
+        "exitMessage": "Vuoi uscire dall'app?"
     },
     "loading": {
         "connecting": "Connessione...",
