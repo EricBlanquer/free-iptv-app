@@ -1421,7 +1421,8 @@ var I18nData = {
                             "allAlreadyQueued": "جميع الحلقات موجودة بالفعل في قائمة الانتظار أو قيد التحميل",
                             "selectEpisodes": "حدد الحلقات، ثم اضغط تنزيل",
                             "noEpisodesSelected": "لم يتم تحديد حلقات، تنزيل الكل",
-                            "downloadAll": "الكل"
+                            "downloadAll": "الكل",
+                            "notConfigured": "تنزيل Freebox غير مُكوَّن"
                     },
                     "time": {
                             "now": "الآن",
@@ -1908,7 +1909,8 @@ var I18nData = {
                             "allAlreadyQueued": "Alle Episoden bereits in der Warteschlange oder werden heruntergeladen",
                             "selectEpisodes": "Episoden auswählen, dann Download drücken",
                             "noEpisodesSelected": "Keine Episoden ausgewählt, alle werden heruntergeladen",
-                            "downloadAll": "Alle"
+                            "downloadAll": "Alle",
+                            "notConfigured": "Freebox-Download nicht konfiguriert"
                     },
                     "time": {
                             "now": "jetzt",
@@ -2380,7 +2382,8 @@ var I18nData = {
                             "allAlreadyQueued": "All episodes already queued or downloading",
                             "selectEpisodes": "Select episodes, then press download",
                             "noEpisodesSelected": "No episodes selected, downloading all",
-                            "downloadAll": "All"
+                            "downloadAll": "All",
+                            "notConfigured": "Freebox download not configured"
                     },
                     "time": {
                             "now": "now",
@@ -2882,7 +2885,8 @@ var I18nData = {
                             "allAlreadyQueued": "Todos los episodios ya están en cola o descargándose",
                             "selectEpisodes": "Selecciona episodios, luego pulsa descargar",
                             "noEpisodesSelected": "Ningún episodio seleccionado, descargando todos",
-                            "downloadAll": "Todo"
+                            "downloadAll": "Todo",
+                            "notConfigured": "Descarga Freebox no configurada"
                     },
                     "time": {
                             "now": "ahora",
@@ -3354,7 +3358,8 @@ var I18nData = {
                             "allAlreadyQueued": "Tous les épisodes sont déjà en file d'attente ou en cours",
                             "selectEpisodes": "Sélectionnez des épisodes, puis appuyez sur télécharger",
                             "noEpisodesSelected": "Aucun épisode sélectionné, téléchargement complet",
-                            "downloadAll": "Tout"
+                            "downloadAll": "Tout",
+                            "notConfigured": "Téléchargement Freebox non configuré"
                     },
                     "time": {
                             "now": "à l'instant",
@@ -3856,7 +3861,8 @@ var I18nData = {
                             "allAlreadyQueued": "Tutti gli episodi sono già in coda o in download",
                             "selectEpisodes": "Seleziona gli episodi, poi premi scarica",
                             "noEpisodesSelected": "Nessun episodio selezionato, scaricamento completo",
-                            "downloadAll": "Tutto"
+                            "downloadAll": "Tutto",
+                            "notConfigured": "Download Freebox non configurato"
                     },
                     "time": {
                             "now": "adesso",
@@ -4343,7 +4349,8 @@ var I18nData = {
                             "allAlreadyQueued": "Alle afleveringen staan al in de wachtrij of worden gedownload",
                             "selectEpisodes": "Selecteer afleveringen, druk dan op downloaden",
                             "noEpisodesSelected": "Geen afleveringen geselecteerd, alles downloaden",
-                            "downloadAll": "Alles"
+                            "downloadAll": "Alles",
+                            "notConfigured": "Freebox-download niet geconfigureerd"
                     },
                     "time": {
                             "now": "nu",
@@ -4830,7 +4837,8 @@ var I18nData = {
                             "allAlreadyQueued": "Wszystkie odcinki są już w kolejce lub pobierane",
                             "selectEpisodes": "Wybierz odcinki, następnie naciśnij pobierz",
                             "noEpisodesSelected": "Nie wybrano odcinków, pobieranie wszystkich",
-                            "downloadAll": "Wszystko"
+                            "downloadAll": "Wszystko",
+                            "notConfigured": "Pobieranie Freebox nieskonfigurowane"
                     },
                     "time": {
                             "now": "teraz",
@@ -5317,7 +5325,8 @@ var I18nData = {
                             "allAlreadyQueued": "Todos os episódios já estão na fila ou em download",
                             "selectEpisodes": "Selecione episódios, depois pressione download",
                             "noEpisodesSelected": "Nenhum episódio selecionado, baixando todos",
-                            "downloadAll": "Tudo"
+                            "downloadAll": "Tudo",
+                            "notConfigured": "Download Freebox não configurado"
                     },
                     "time": {
                             "now": "agora",
@@ -5804,7 +5813,8 @@ var I18nData = {
                             "allAlreadyQueued": "Все эпизоды уже в очереди или загружаются",
                             "selectEpisodes": "Выберите эпизоды, затем нажмите загрузить",
                             "noEpisodesSelected": "Эпизоды не выбраны, загрузка всех",
-                            "downloadAll": "Все"
+                            "downloadAll": "Все",
+                            "notConfigured": "Загрузка через Freebox не настроена"
                     },
                     "time": {
                             "now": "сейчас",
@@ -6291,7 +6301,8 @@ var I18nData = {
                             "allAlreadyQueued": "Tüm bölümler zaten sırada veya indiriliyor",
                             "selectEpisodes": "Bölümleri seçin, ardından indire basın",
                             "noEpisodesSelected": "Bölüm seçilmedi, tümü indiriliyor",
-                            "downloadAll": "Tümü"
+                            "downloadAll": "Tümü",
+                            "notConfigured": "Freebox indirme yapılandırılmamış"
                     },
                     "time": {
                             "now": "şimdi",

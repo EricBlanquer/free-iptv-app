@@ -487,7 +487,8 @@
         "allAlreadyQueued": "Alle Episoden bereits in der Warteschlange oder werden heruntergeladen",
         "selectEpisodes": "Episoden auswählen, dann Download drücken",
         "noEpisodesSelected": "Keine Episoden ausgewählt, alle werden heruntergeladen",
-        "downloadAll": "Alle"
+        "downloadAll": "Alle",
+        "notConfigured": "Freebox-Download nicht konfiguriert"
     },
     "time": {
         "now": "jetzt",

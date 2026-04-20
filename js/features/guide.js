@@ -557,7 +557,7 @@ IPTVApp.prototype.selectGuideProgram = function() {
                 break;
             }
         }
-        this.playCatchup(ch, progStart, duration, 'm3u8', null, null, dayPrograms, programIndex, daysAgo);
+        this.playCatchup(ch, progStart, duration, 'ts', null, null, dayPrograms, programIndex, daysAgo);
         return;
     }
     this.playStream(ch.stream_id, 'live', ch);

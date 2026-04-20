@@ -489,7 +489,8 @@
         "allAlreadyQueued": "Wszystkie odcinki są już w kolejce lub pobierane",
         "selectEpisodes": "Wybierz odcinki, następnie naciśnij pobierz",
         "noEpisodesSelected": "Nie wybrano odcinków, pobieranie wszystkich",
-        "downloadAll": "Wszystko"
+        "downloadAll": "Wszystko",
+        "notConfigured": "Pobieranie Freebox nieskonfigurowane"
     },
     "time": {
         "now": "teraz",

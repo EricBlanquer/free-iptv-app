@@ -430,7 +430,8 @@
         "allAlreadyQueued": "All episodes already queued or downloading",
         "selectEpisodes": "Select episodes, then press download",
         "noEpisodesSelected": "No episodes selected, downloading all",
-        "downloadAll": "All"
+        "downloadAll": "All",
+        "notConfigured": "Freebox download not configured"
     },
     "time": {
         "now": "now",
