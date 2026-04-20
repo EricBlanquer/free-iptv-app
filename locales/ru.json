@@ -256,7 +256,8 @@
         "unitSeconds_one": "{n} секунда",
         "unitSeconds_other": "{n} секунд",
         "showRecommended": "Показать категорию «Рекомендации»",
-        "liveAutoFormatSwitch": "Авто-смена формата live при таймауте"
+        "liveAutoFormatSwitch": "Авто-смена формата live при таймауте",
+        "exitConfirmation": "Подтверждение выхода"
     },
     "player": {
         "play": "Воспроизвести",

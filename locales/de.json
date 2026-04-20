@@ -258,7 +258,8 @@
         "unitSeconds_one": "{n} Sekunde",
         "unitSeconds_other": "{n} Sekunden",
         "showRecommended": "Kategorie „Empfohlen“ anzeigen",
-        "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln"
+        "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln",
+        "exitConfirmation": "Beenden bestätigen"
     },
     "player": {
         "play": "Abspielen",

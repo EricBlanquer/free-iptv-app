@@ -258,7 +258,8 @@
         "unitSeconds_one": "{n} saniye",
         "unitSeconds_other": "{n} saniye",
         "showRecommended": "\"Önerilenler\" kategorisini göster",
-        "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme"
+        "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
+        "exitConfirmation": "Çıkış onayı"
     },
     "player": {
         "play": "Oynat",

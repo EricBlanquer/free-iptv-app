@@ -256,7 +256,8 @@
         "unitSeconds_one": "ثانية واحدة",
         "unitSeconds_other": "{n} ثوانٍ",
         "showRecommended": "إظهار فئة « موصى به »",
-        "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة"
+        "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
+        "exitConfirmation": "تأكيد الخروج"
     },
     "player": {
         "play": "تشغيل",

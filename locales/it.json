@@ -255,7 +255,8 @@
         "unitSeconds_one": "{n} secondo",
         "unitSeconds_other": "{n} secondi",
         "showRecommended": "Mostra categoria \"Consigliati\"",
-        "liveAutoFormatSwitch": "Cambio automatico formato live al timeout"
+        "liveAutoFormatSwitch": "Cambio automatico formato live al timeout",
+        "exitConfirmation": "Conferma di uscita"
     },
     "player": {
         "play": "Riproduci",
