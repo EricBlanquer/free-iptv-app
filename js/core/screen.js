@@ -45,6 +45,101 @@ IPTVApp.prototype.bindTouchEvents = function() {
         if (self.hideAllButtonTooltips) self.hideAllButtonTooltips();
         if (self.hideTTSTooltip) self.hideTTSTooltip();
     });
+    var swipeState = null;
+    var SWIPE_TRIGGER_PX = 100;
+    var SWIPE_MAX_VERTICAL_PX = 40;
+    var createTrashIndicator = function(item) {
+        var grid = document.getElementById('content-grid');
+        if (!grid._prevPositionSet) {
+            grid._prevPositionSet = true;
+            grid._prevPosition = grid.style.position;
+            grid.style.position = 'relative';
+        }
+        var trash = document.createElement('div');
+        trash.className = 'swipe-trash-bg';
+        var icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined';
+        icon.textContent = 'delete';
+        trash.appendChild(icon);
+        trash.style.position = 'absolute';
+        trash.style.top = item.offsetTop + 'px';
+        trash.style.left = item.offsetLeft + 'px';
+        trash.style.width = item.offsetWidth + 'px';
+        trash.style.height = item.offsetHeight + 'px';
+        trash.style.setProperty('--swipe-trash-slot', item.offsetHeight + 'px');
+        trash.style.zIndex = '0';
+        grid.appendChild(trash);
+        item.style.zIndex = '1';
+        return trash;
+    };
+    var destroyTrashIndicator = function(state) {
+        if (state.trashEl) state.trashEl.remove();
+        if (state.item) state.item.style.zIndex = '';
+        var grid = document.getElementById('content-grid');
+        if (grid._prevPositionSet) {
+            grid.style.position = grid._prevPosition || '';
+            grid._prevPositionSet = false;
+        }
+    };
+    document.addEventListener('touchstart', function(e) {
+        var item = e.target.closest('#content-grid .grid-item[data-is-download="1"]');
+        if (!item || self.currentSection !== 'downloads') return;
+        var touch = e.touches[0];
+        swipeState = { item: item, startX: touch.clientX, startY: touch.clientY, dx: 0, cancelled: false, trashEl: null };
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+        if (!swipeState || swipeState.cancelled) return;
+        var touch = e.touches[0];
+        var dx = touch.clientX - swipeState.startX;
+        var dy = touch.clientY - swipeState.startY;
+        if (Math.abs(dy) > SWIPE_MAX_VERTICAL_PX) {
+            swipeState.cancelled = true;
+            swipeState.item.style.transform = '';
+            swipeState.item.style.opacity = '';
+            destroyTrashIndicator(swipeState);
+            return;
+        }
+        if (dx > 0) {
+            if (!swipeState.trashEl && dx > 5) {
+                swipeState.trashEl = createTrashIndicator(swipeState.item);
+            }
+            var maxDx = swipeState.item.offsetHeight;
+            var clampedDx = Math.min(dx, maxDx);
+            swipeState.dx = clampedDx;
+            swipeState.item.style.transform = 'translateX(' + clampedDx + 'px)';
+            swipeState.item.style.opacity = String(Math.max(0.3, 1 - clampedDx / 300));
+        }
+    }, { passive: true });
+    var endSwipe = function() {
+        if (!swipeState) return;
+        var state = swipeState;
+        swipeState = null;
+        if (state.cancelled) {
+            destroyTrashIndicator(state);
+            return;
+        }
+        var trigger = Math.min(SWIPE_TRIGGER_PX, state.item.offsetHeight * 0.7);
+        if (state.dx >= trigger) {
+            var grid = document.getElementById('content-grid');
+            var items = grid.querySelectorAll('.grid-item');
+            var idx = Array.prototype.indexOf.call(items, state.item);
+            if (idx >= 0) {
+                self._suppressNextClickUntil = Date.now() + 500;
+                destroyTrashIndicator(state);
+                self.removeDownloadAtIndex(idx);
+                return;
+            }
+        }
+        state.item.style.transition = 'transform 0.2s, opacity 0.2s';
+        state.item.style.transform = '';
+        state.item.style.opacity = '';
+        setTimeout(function() {
+            state.item.style.transition = '';
+            destroyTrashIndicator(state);
+        }, 250);
+    };
+    document.addEventListener('touchend', endSwipe, { passive: true });
+    document.addEventListener('touchcancel', endSwipe, { passive: true });
     var areaMap = [
         { selector: '#player-tracks .player-track-btn', area: 'player-tracks' },
         { selector: '#resume-modal .modal-btn', area: 'modal' },
@@ -65,6 +160,7 @@ IPTVApp.prototype.bindTouchEvents = function() {
         { selector: '#playlist-edit-screen .focusable', area: 'playlist-edit' }
     ];
     document.addEventListener('click', function(e) {
+        if (self._suppressNextClickUntil && Date.now() < self._suppressNextClickUntil) return;
         var target = e.target;
         // Player track buttons
         var playerBtn = target.closest('#player-tracks .player-track-btn');
@@ -186,8 +282,7 @@ IPTVApp.prototype.resetScreens = function() {
 
 IPTVApp.prototype.showScreen = function(screen) {
     window.log('SCREEN ' + screen);
-    var existing = document.getElementById('tts-tooltip');
-    if (existing) existing.remove();
+    if (this.hideAllTooltips) this.hideAllTooltips();
     var screens = document.querySelectorAll('.screen');
     for (var i = 0; i < screens.length; i++) {
         screens[i].classList.remove('active');

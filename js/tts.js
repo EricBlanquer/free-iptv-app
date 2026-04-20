@@ -157,8 +157,7 @@ IPTVApp.prototype.showTTSTooltip = function(elementId) {
     var self = this;
     var targetId = elementId || 'details-description';
     window.log('TTS', 'showTTSTooltip: targetId=' + targetId);
-    this._ttsTooltipTimer = setTimeout(function() {
-        self._ttsTooltipTimer = null;
+    this.scheduleTooltipShow('tts', function() {
         window.log('TTS', 'tooltip timer fired: screen=' + self.currentScreen + ' targetId=' + targetId);
         if (self.currentScreen !== 'details' && self.currentScreen !== 'actor') return;
         var descEl = document.getElementById(targetId);
@@ -181,10 +180,7 @@ IPTVApp.prototype.showTTSTooltip = function(elementId) {
 };
 
 IPTVApp.prototype.hideTTSTooltip = function() {
-    if (this._ttsTooltipTimer) {
-        clearTimeout(this._ttsTooltipTimer);
-        this._ttsTooltipTimer = null;
-    }
+    this.cancelTooltipShow('tts');
     var existing = document.getElementById('tts-tooltip');
     if (existing) existing.remove();
 };
