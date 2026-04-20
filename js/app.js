@@ -779,6 +779,15 @@ class IPTVApp {
     }
 
     initFreebox() {
+        this.loadFreeboxMaps();
+        if (this.canAndroidLocalDownload && this.canAndroidLocalDownload()) {
+            var androidCount = Object.keys(this._androidDownloadMap || {}).length;
+            window.log('INIT', 'Android local download available, pending=' + androidCount);
+            if (androidCount > 0) {
+                this.ensureAndroidPolling();
+                this.updateHomeDownloadButton();
+            }
+        }
         var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
         if (this.settings.freeboxEnabled && (viaVm || this.settings.freeboxAppToken)) {
             var self = this;
@@ -786,7 +795,6 @@ class IPTVApp {
                 var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
                 FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
             }
-            this.loadFreeboxMaps();
             window.log('INIT', 'Freebox configured: viaVm=' + viaVm + ' maps=' + Object.keys(this._freeboxDownloadMap || {}).length);
             if (viaVm) {
                 var staleCount = Object.keys(this._freeboxDownloadMap || {}).length;
@@ -840,6 +848,7 @@ class IPTVApp {
             localStorage.setItem('freeboxDownloadQueue', JSON.stringify(this._freeboxDownloadQueue || []));
             localStorage.setItem('freeboxPosterMap', JSON.stringify(this._freeboxDownloadPosterMap || {}));
             localStorage.setItem('freeboxSeriesMap', JSON.stringify(this._freeboxDownloadSeriesMap || {}));
+            localStorage.setItem('androidDownloadMap', JSON.stringify(this._androidDownloadMap || {}));
         } catch (ex) {}
     }
 
@@ -850,17 +859,20 @@ class IPTVApp {
             var queue = localStorage.getItem('freeboxDownloadQueue');
             var posterMap = localStorage.getItem('freeboxPosterMap');
             var seriesMap = localStorage.getItem('freeboxSeriesMap');
+            var androidMap = localStorage.getItem('androidDownloadMap');
             this._freeboxDownloadMap = dlMap ? JSON.parse(dlMap) : {};
             this._freeboxDownloadProviderMap = provMap ? JSON.parse(provMap) : {};
             this._freeboxDownloadQueue = queue ? JSON.parse(queue) : [];
             this._freeboxDownloadPosterMap = posterMap ? JSON.parse(posterMap) : {};
             this._freeboxDownloadSeriesMap = seriesMap ? JSON.parse(seriesMap) : {};
+            this._androidDownloadMap = androidMap ? JSON.parse(androidMap) : {};
         } catch (ex) {
             this._freeboxDownloadMap = {};
             this._freeboxDownloadProviderMap = {};
             this._freeboxDownloadQueue = [];
             this._freeboxDownloadPosterMap = {};
             this._freeboxDownloadSeriesMap = {};
+            this._androidDownloadMap = {};
         }
     }
 

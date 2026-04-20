@@ -63,7 +63,7 @@ IPTVApp.prototype.showDetails = function(item) {
         this.setHidden(notForMeBtn, !fromReco);
     }
     var selfTip = this;
-    this._detailsTooltipTimer = setTimeout(function() {
+    this.scheduleTooltipShow('details', function() {
         if (selfTip.currentScreen !== 'details') return;
         selfTip.showButtonTooltip('favorite-btn', 'favoriteTooltipShown', I18n.t('tips.favoriteHint', 'Add to your list'), 'bottom');
         var dlBtn = document.getElementById('download-btn');
@@ -1201,7 +1201,7 @@ IPTVApp.prototype.renderSeasons = function(seriesData) {
         dlBtn.id = 'download-season-btn';
         container.appendChild(dlBtn);
         var selfTip = this;
-        this._seasonTooltipTimer = setTimeout(function() {
+        this.scheduleTooltipShow('season', function() {
             if (selfTip.currentScreen !== 'details') return;
             selfTip.showButtonTooltip('download-season-btn', 'downloadSeasonTooltipShown', I18n.t('tips.downloadSeasonHint', 'Download season to Freebox'), 'top');
         }, 1000);
@@ -2967,6 +2967,8 @@ IPTVApp.prototype.updateHomeDownloadButton = function() {
 };
 
 IPTVApp.prototype.hasAppDownloads = function() {
+    var androidMap = this._androidDownloadMap || {};
+    if (Object.keys(androidMap).length > 0) return true;
     if (!this.settings.freeboxEnabled) return false;
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
     if (!viaVm && !this.settings.freeboxAppToken) return false;
@@ -2987,16 +2989,17 @@ IPTVApp.prototype.hasAppDownloads = function() {
 IPTVApp.prototype.updateDownloadButton = function() {
     var btn = document.getElementById('download-btn');
     if (!btn) return;
+    var isAndroidLocal = this.canAndroidLocalDownload();
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
-    if (!viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
+    if (!isAndroidLocal && !viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
         var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
         FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
     }
-    if (!viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
+    if (!isAndroidLocal && !viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
         this.setHidden(btn, true);
         return;
     }
-    if (!this.settings.freeboxEnabled) {
+    if (!isAndroidLocal && !this.settings.freeboxEnabled) {
         this.setHidden(btn, true);
         return;
     }
@@ -3056,6 +3059,16 @@ IPTVApp.prototype.getStreamDownloadState = function(streamId, playlistId) {
     for (var j = 0; j < queue.length; j++) {
         if (String(queue[j].streamId) === String(streamId) && this.sameId(queue[j].playlistId, playlistId)) return 'queued';
     }
+    var aMap = this._androidDownloadMap || {};
+    var aIds = Object.keys(aMap);
+    for (var ai = 0; ai < aIds.length; ai++) {
+        var aE = aMap[aIds[ai]];
+        if (String(aE.streamId) === String(streamId) && this.sameId(aE.playlistId, playlistId)) {
+            if (aE.status === 'paused') return 'paused';
+            if (aE.status === 'queued') return 'queued';
+            return 'downloading';
+        }
+    }
     return null;
 };
 
@@ -3097,6 +3110,10 @@ IPTVApp.prototype.triggerFreeboxDownload = function() {
     var playlistId = stream._playlistId || this.settings.activePlaylistId;
     var filename = this.getDownloadFilename(stream);
     var poster = (this.currentTMDB && this.currentTMDB.poster_path) ? 'https://image.tmdb.org/t/p/w300' + this.currentTMDB.poster_path : this.getStreamImage(stream);
+    if (this.canAndroidLocalDownload()) {
+        this._startAndroidDownload(url, filename, streamId, playlistId, poster, null);
+        return;
+    }
     if (!this.settings.freeboxBatchDownload && this.getActiveStreamCount(playlistId) >= this.getMaxConnections(playlistId)) {
         if (!this._freeboxDownloadQueue) this._freeboxDownloadQueue = [];
         this._freeboxDownloadQueue.push({ url: url, filename: filename, streamId: streamId, playlistId: playlistId, poster: poster });
@@ -3419,6 +3436,33 @@ IPTVApp.prototype.renderDownloadsList = function(freeboxDownloads, queueSnapshot
             _type: qType
         });
     }
+    var androidMap = this._androidDownloadMap || {};
+    var androidIds = Object.keys(androidMap);
+    for (var a = 0; a < androidIds.length; a++) {
+        var aId = androidIds[a];
+        var aEntry = androidMap[aId];
+        var aPct = aEntry.totalBytes > 0 ? Math.round((aEntry.downloadedBytes / aEntry.totalBytes) * 100) : 0;
+        var aStatusLabel = aEntry.status === 'downloading' ? '⬇ ' + aPct + '%' :
+            aEntry.status === 'queued' ? '⏳' :
+            aEntry.status === 'paused' ? '⏸' :
+            aEntry.status === 'done' ? '✓' : aEntry.status;
+        var aName = (aEntry.filename || '').replace(/\.\w{2,4}$/, '').replace(/_/g, ' ');
+        var aType = /[_.]S\d{1,2}E\d{1,2}/i.test(aEntry.filename || '') ? 'series' : 'movie';
+        items.push({
+            stream_id: aEntry.streamId || aId,
+            series_id: aEntry.seriesId || null,
+            name: aName,
+            stream_icon: aEntry.poster || '',
+            _isDownload: true,
+            _dlStatus: aEntry.status,
+            _dlPercent: aPct,
+            _dlId: 'android_' + aId,
+            _streamId: aEntry.streamId ? String(aEntry.streamId) : null,
+            _playlistId: aEntry.playlistId || null,
+            _statusLabel: aStatusLabel,
+            _type: aType
+        });
+    }
     var DL_STATUS_ORDER = { downloading: 0, uploading: 1, queued: 2, paused: 3, done: 4 };
     var DL_STATUS_LAST = Object.keys(DL_STATUS_ORDER).length;
     items.sort(function(a, b) {
@@ -3453,6 +3497,11 @@ IPTVApp.prototype.removeDownloadAtIndex = function(index) {
     var self = this;
     if (stream._dlStatus === 'queued' && !stream._dlId) {
         this.removeFromDownloadQueue(stream._streamId, stream._playlistId);
+        this.showToast(I18n.t('freebox.downloadCancelled', 'Download cancelled'), 2000);
+    }
+    else if (stream._dlId && String(stream._dlId).indexOf('android_') === 0) {
+        var androidDmId = String(stream._dlId).replace('android_', '');
+        this.cancelAndroidDownload(androidDmId);
         this.showToast(I18n.t('freebox.downloadCancelled', 'Download cancelled'), 2000);
     }
     else if (stream._dlId && String(stream._dlId).indexOf('vm_') === 0) {
@@ -3555,7 +3604,105 @@ IPTVApp.prototype.removeCompletedDownloadsFromGrid = function(downloads) {
     }, 300);
 };
 
+IPTVApp.prototype._startAndroidDownload = function(url, filename, streamId, playlistId, poster, seriesId) {
+    var dmId = window.Android.downloadFile(url, filename);
+    if (!dmId || dmId <= 0) {
+        window.log('ERROR', 'Android local download failed to enqueue: ' + filename);
+        this.showToast(I18n.t('freebox.downloadError', 'Download error'), 3000, true);
+        return;
+    }
+    window.log('Android local download started: ' + filename + ' dmId=' + dmId);
+    if (!this._androidDownloadMap) this._androidDownloadMap = {};
+    this._androidDownloadMap[String(dmId)] = {
+        filename: filename,
+        streamId: String(streamId),
+        playlistId: playlistId || null,
+        poster: poster || '',
+        seriesId: seriesId || null,
+        status: 'downloading',
+        totalBytes: 0,
+        downloadedBytes: 0,
+        addedAt: Date.now()
+    };
+    this.saveFreeboxMaps();
+    this.showToast(I18n.t('freebox.downloadStarted', 'Download started') + ': ' + filename, 3000);
+    this.updateHomeDownloadButton();
+    this.updateGlobalDownloadBar();
+    this.ensureAndroidPolling();
+};
+
+IPTVApp.prototype.ensureAndroidPolling = function() {
+    if (this._androidPollTimer) return;
+    var self = this;
+    var tick = function() {
+        self._pollAndroidDownloads();
+        var map = self._androidDownloadMap || {};
+        if (Object.keys(map).length === 0) {
+            clearInterval(self._androidPollTimer);
+            self._androidPollTimer = null;
+        }
+    };
+    tick();
+    this._androidPollTimer = setInterval(tick, 2000);
+};
+
+IPTVApp.prototype._pollAndroidDownloads = function() {
+    var map = this._androidDownloadMap || {};
+    var ids = Object.keys(map);
+    if (ids.length === 0) return;
+    if (!window.Android || typeof window.Android.getAndroidDownloadStatus !== 'function') return;
+    var changed = false;
+    for (var i = 0; i < ids.length; i++) {
+        var dmId = ids[i];
+        var raw = window.Android.getAndroidDownloadStatus(parseInt(dmId, 10));
+        var info;
+        try {
+            info = JSON.parse(raw || '{}');
+        }
+        catch (ex) {
+            continue;
+        }
+        if (!info.status) {
+            delete map[dmId];
+            changed = true;
+            continue;
+        }
+        var entry = map[dmId];
+        if (entry.status !== info.status || entry.totalBytes !== info.total || entry.downloadedBytes !== info.downloaded) {
+            entry.status = info.status;
+            entry.totalBytes = info.total || 0;
+            entry.downloadedBytes = info.downloaded || 0;
+            changed = true;
+        }
+        if (info.status === 'done' || info.status === 'error') {
+            delete map[dmId];
+            changed = true;
+        }
+    }
+    if (changed) {
+        this.saveFreeboxMaps();
+        this.updateHomeDownloadButton();
+        this.updateGlobalDownloadBar();
+        if (this.currentScreen === 'browse' && this.currentSection === 'downloads') {
+            this.refreshDownloadsScreen();
+        }
+    }
+};
+
+IPTVApp.prototype.cancelAndroidDownload = function(dmId) {
+    if (!window.Android || typeof window.Android.cancelAndroidDownload !== 'function') return;
+    window.Android.cancelAndroidDownload(parseInt(dmId, 10));
+    if (this._androidDownloadMap) delete this._androidDownloadMap[String(dmId)];
+    this.saveFreeboxMaps();
+    this.updateHomeDownloadButton();
+    this.updateGlobalDownloadBar();
+};
+
 IPTVApp.prototype.startFreeboxDownload = function(url, filename, streamId, playlistId, poster, seriesId) {
+    if (this.canAndroidLocalDownload()) {
+        this._startAndroidDownload(url, filename, streamId, playlistId, poster, seriesId);
+        return;
+    }
     if (this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl) {
         this._startVmDownload(url, filename, streamId, playlistId, poster, seriesId);
         return;
@@ -3867,16 +4014,34 @@ IPTVApp.prototype.updateGlobalDownloadBar = function(downloads) {
     var bar = document.getElementById('global-download-bar');
     if (!bar) return;
     if (!downloads) {
-        if (this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl) {
+        if (this.canAndroidLocalDownload()) {
+            downloads = {};
+        }
+        else if (this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl) {
             downloads = {};
         }
         else {
             downloads = FreeboxAPI.getActiveDownloads();
         }
     }
+    var androidMap = this._androidDownloadMap || {};
+    var androidIds = Object.keys(androidMap);
+    for (var ai = 0; ai < androidIds.length; ai++) {
+        var aId = androidIds[ai];
+        var aE = androidMap[aId];
+        downloads['android_' + aId] = {
+            id: 'android_' + aId,
+            name: aE.filename || '',
+            status: aE.status === 'downloading' ? 'downloading' : (aE.status === 'paused' ? 'stopped' : aE.status),
+            rx_bytes: aE.downloadedBytes || 0,
+            size: aE.totalBytes || 0,
+            rx_rate: 0
+        };
+    }
     var keys = Object.keys(downloads);
     var dlMap = this._freeboxDownloadMap || {};
     var isVmMode = this._vmPollTimer;
+    var isAndroidMode = this.canAndroidLocalDownload();
     var activeDl = null;
     var pausedDl = null;
     var activeCount = 0;
@@ -3884,7 +4049,7 @@ IPTVApp.prototype.updateGlobalDownloadBar = function(downloads) {
     var pausedCount = 0;
     for (var i = 0; i < keys.length; i++) {
         var dl = downloads[keys[i]];
-        if (!dlMap[dl.id] && !(isVmMode && String(dl.id).indexOf('vm_') === 0)) continue;
+        if (!dlMap[dl.id] && !(isVmMode && String(dl.id).indexOf('vm_') === 0) && !(isAndroidMode && String(dl.id).indexOf('android_') === 0)) continue;
         if (dl.status === 'downloading') {
             activeCount++;
             if (!activeDl) activeDl = dl;

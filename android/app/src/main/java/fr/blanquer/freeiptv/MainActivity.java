@@ -556,5 +556,63 @@ public class MainActivity extends Activity {
         public void playerSetVisible(boolean visible) {
             runOnUiThread(() -> mAspectRatioLayout.setVisibility(visible ? View.VISIBLE : View.GONE));
         }
+
+        @JavascriptInterface
+        public long downloadFile(String url, String filename) {
+            try {
+                android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                if (dm == null) return -1;
+                String safeName = filename == null || filename.isEmpty() ? "download.ts" : filename.replaceAll("[/\\\\]", "_");
+                android.app.DownloadManager.Request req = new android.app.DownloadManager.Request(android.net.Uri.parse(url));
+                req.setTitle(safeName);
+                req.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                req.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_MOVIES, safeName);
+                req.setAllowedOverMetered(true);
+                req.setAllowedOverRoaming(true);
+                return dm.enqueue(req);
+            }
+            catch (Exception ex) {
+                runOnUiThread(() -> mWebView.evaluateJavascript(
+                    "window.log && window.log('ERROR downloadFile: " + ex.getMessage().replace("'", "\\'") + "');", null));
+                return -1;
+            }
+        }
+
+        @JavascriptInterface
+        public String getAndroidDownloadStatus(long id) {
+            try {
+                android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                if (dm == null) return "{}";
+                android.app.DownloadManager.Query q = new android.app.DownloadManager.Query().setFilterById(id);
+                android.database.Cursor c = dm.query(q);
+                if (c == null || !c.moveToFirst()) {
+                    if (c != null) c.close();
+                    return "{}";
+                }
+                int status = c.getInt(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_STATUS));
+                long total = c.getLong(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                long downloaded = c.getLong(c.getColumnIndexOrThrow(android.app.DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                c.close();
+                String label;
+                if (status == android.app.DownloadManager.STATUS_SUCCESSFUL) label = "done";
+                else if (status == android.app.DownloadManager.STATUS_FAILED) label = "error";
+                else if (status == android.app.DownloadManager.STATUS_PAUSED) label = "paused";
+                else if (status == android.app.DownloadManager.STATUS_PENDING) label = "queued";
+                else label = "downloading";
+                return "{\"status\":\"" + label + "\",\"total\":" + total + ",\"downloaded\":" + downloaded + "}";
+            }
+            catch (Exception ex) {
+                return "{}";
+            }
+        }
+
+        @JavascriptInterface
+        public void cancelAndroidDownload(long id) {
+            try {
+                android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                if (dm != null) dm.remove(id);
+            }
+            catch (Exception ex) { /* ignore */ }
+        }
     }
 }

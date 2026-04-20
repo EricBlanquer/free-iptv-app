@@ -384,10 +384,6 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     document.getElementById('player-duration').style.display = isLive ? 'none' : '';
     var posterUrl = stream ? this.getStreamImage(stream) : null;
     this.showLoading(true, posterUrl, I18n.t('loading.playback', 'Starting playback...'));
-    clearTimeout(this._detailsTooltipTimer);
-    clearTimeout(this._seasonTooltipTimer);
-    this.hideAllButtonTooltips();
-    this.hideTTSTooltip();
     this.showScreen('player');
     this.currentScreen = 'player';
     this.focusArea = 'player';
@@ -798,7 +794,7 @@ IPTVApp.prototype.stopPlayback = function() {
         this.currentScreen = 'details';
         this.focusArea = 'details';
         var selfTip = this;
-        this._detailsTooltipTimer = setTimeout(function() {
+        this.scheduleTooltipShow('details', function() {
             if (selfTip.currentScreen !== 'details') return;
             selfTip.showButtonTooltip('favorite-btn', 'favoriteTooltipShown', I18n.t('tips.favoriteHint', 'Add to your list'), 'bottom');
             var dlBtn = document.getElementById('download-btn');
@@ -1390,7 +1386,7 @@ IPTVApp.prototype.updatePlayerTracks = function() {
         if (this._subtitleAutoSelected && !this._subTooltipTriggered) {
             this._subTooltipTriggered = true;
             var self2 = this;
-            setTimeout(function() { self2.showSubtitleTooltip(); }, 1000);
+            this.scheduleTooltipShow('subtitle', function() { self2.showSubtitleTooltip(); }, 1000);
         }
     }
     else {
@@ -1809,6 +1805,41 @@ IPTVApp.prototype.hideAllButtonTooltips = function() {
     }
 };
 
+IPTVApp.prototype.scheduleTooltipShow = function(name, fn, delay) {
+    if (!this._tooltipShowTimers) this._tooltipShowTimers = {};
+    clearTimeout(this._tooltipShowTimers[name]);
+    var self = this;
+    this._tooltipShowTimers[name] = setTimeout(function() {
+        delete self._tooltipShowTimers[name];
+        fn();
+    }, delay);
+};
+
+IPTVApp.prototype.cancelTooltipShow = function(name) {
+    if (!this._tooltipShowTimers) return;
+    clearTimeout(this._tooltipShowTimers[name]);
+    delete this._tooltipShowTimers[name];
+};
+
+IPTVApp.prototype.clearAllTooltipShowTimers = function() {
+    if (!this._tooltipShowTimers) return;
+    var keys = Object.keys(this._tooltipShowTimers);
+    for (var i = 0; i < keys.length; i++) {
+        clearTimeout(this._tooltipShowTimers[keys[i]]);
+    }
+    this._tooltipShowTimers = {};
+};
+
+IPTVApp.prototype.hideAllTooltips = function() {
+    this.clearAllTooltipShowTimers();
+    if (this.hideQualityTooltip) this.hideQualityTooltip();
+    if (this.hideSubtitleTooltip) this.hideSubtitleTooltip();
+    if (this.hideTTSTooltip) this.hideTTSTooltip();
+    this.hideAllButtonTooltips();
+    var stragglers = document.querySelectorAll('.tts-tooltip, .button-tooltip, #tts-tooltip, #quality-tooltip, #subtitle-tooltip');
+    for (var s = 0; s < stragglers.length; s++) stragglers[s].remove();
+};
+
 IPTVApp.prototype.unfocusPlayerTracks = function(hideOverlay) {
     this.playerTracksFocused = false;
     document.querySelectorAll('.player-track-btn').forEach(function(el) {
@@ -2084,7 +2115,7 @@ IPTVApp.prototype.updateLiveVariantButton = function() {
     if (!this._qualityTooltipTriggered) {
         this._qualityTooltipTriggered = true;
         var self = this;
-        setTimeout(function() { self.showQualityTooltip(); }, 1000);
+        this.scheduleTooltipShow('quality', function() { self.showQualityTooltip(); }, 1000);
     }
 };
 
@@ -2759,7 +2790,12 @@ IPTVApp.prototype.resetSubtitlePosition = function(el) {
     el.style.textAlign = 'center';
 };
 
+IPTVApp.prototype.canAndroidLocalDownload = function() {
+    return typeof window.Android !== 'undefined' && window.Android && typeof window.Android.downloadFile === 'function';
+};
+
 IPTVApp.prototype.canFreeboxDownload = function() {
+    if (this.canAndroidLocalDownload()) return true;
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
     if (viaVm) return true;
     if (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken) return false;
@@ -3046,12 +3082,13 @@ IPTVApp.prototype.selectCatchupItem = function() {
 };
 
 IPTVApp.prototype.downloadCatchup = function(stream, program, start, duration) {
+    var isAndroidLocal = this.canAndroidLocalDownload();
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
-    if (!viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
+    if (!isAndroidLocal && !viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
         var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
         FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
     }
-    if (!viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
+    if (!isAndroidLocal && !viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
         this.showToast(I18n.t('freebox.notConfigured', 'Freebox download not configured'), 4000, true);
         return;
     }
@@ -3081,6 +3118,10 @@ IPTVApp.prototype.downloadCatchup = function(stream, program, start, duration) {
     var dateStr = startDate.getFullYear() + '-' + pad(startDate.getMonth() + 1) + '-' + pad(startDate.getDate()) + '_' + pad(startDate.getHours()) + '-' + pad(startDate.getMinutes());
     var filename = channelName + '_' + cleanProgTitle + '_' + dateStr + '.' + extension;
     var catchupId = 'catchup_' + streamId + '_' + start;
+    if (isAndroidLocal) {
+        this._startAndroidDownload(url, filename, catchupId, playlistId, this.getStreamImage(stream), null);
+        return;
+    }
     var state = this.getStreamDownloadState(catchupId, playlistId);
     if (state) {
         this.showToast(I18n.t('freebox.allAlreadyQueued', 'Already queued or downloading'), 3000);
@@ -3118,10 +3159,6 @@ IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes
     var streamId = stream.stream_id;
     var url = this.api.getCatchupUrl(streamId, startTimestamp, durationMinutes, extension, formatIndex);
     window.log('Playing catchup format ' + formatIndex + ' ext=' + extension + ': ' + url);
-    clearTimeout(this._detailsTooltipTimer);
-    clearTimeout(this._seasonTooltipTimer);
-    this.hideAllButtonTooltips();
-    this.hideTTSTooltip();
     this.showScreen('player');
     this.currentScreen = 'player';
     this.focusArea = 'player';
