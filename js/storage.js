@@ -1236,7 +1236,8 @@ IPTVApp.prototype.loadSettings = function() {
         bufferPlay: 2,
         bufferRebuffer: 5,
         bufferMin: 30,
-        bufferMax: 60
+        bufferMax: 60,
+        exitConfirmation: true
     };
     try {
         var data = localStorage.getItem('settings');

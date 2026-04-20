@@ -451,8 +451,7 @@ IPTVApp.prototype.backHandlers = {
         this.updateFocus();
     },
     'screen:home': function() {
-        window.log('ACTION', 'exit-confirm');
-        this.showConfirmModal(I18n.t('app.exitMessage', 'Do you want to exit the app?'), function() {
+        var doExit = function() {
             window.log('ACTION', 'exit');
             if (typeof Android !== 'undefined' && Android.exitApp) {
                 Android.exitApp();
@@ -460,7 +459,14 @@ IPTVApp.prototype.backHandlers = {
             else if (typeof tizen !== 'undefined') {
                 tizen.application.getCurrentApplication().exit();
             }
-        }, {
+        };
+        if (this.settings.exitConfirmation === false) {
+            window.log('ACTION', 'exit-no-confirm');
+            doExit();
+            return;
+        }
+        window.log('ACTION', 'exit-confirm');
+        this.showConfirmModal(I18n.t('app.exitMessage', 'Do you want to exit the app?'), doExit, {
             title: I18n.t('app.exitTitle', 'Exit'),
             yesLabel: I18n.t('settings.yes', 'Yes'),
             noLabel: I18n.t('settings.no', 'No'),

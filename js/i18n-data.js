@@ -1258,7 +1258,8 @@ var I18nData = {
                             "unitSeconds_one": "ثانية واحدة",
                             "unitSeconds_other": "{n} ثوانٍ",
                             "showRecommended": "إظهار فئة « موصى به »",
-                            "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة"
+                            "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
+                            "exitConfirmation": "تأكيد الخروج"
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1744,7 +1745,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} Sekunde",
                             "unitSeconds_other": "{n} Sekunden",
                             "showRecommended": "Kategorie „Empfohlen“ anzeigen",
-                            "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln"
+                            "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln",
+                            "exitConfirmation": "Beenden bestätigen"
                     },
                     "player": {
                             "play": "Abspielen",
@@ -2235,7 +2237,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} second",
                             "unitSeconds_other": "{n} seconds",
                             "showRecommended": "Show \"Recommended\" category",
-                            "liveAutoFormatSwitch": "Auto-switch live format on timeout"
+                            "liveAutoFormatSwitch": "Auto-switch live format on timeout",
+                            "exitConfirmation": "Exit confirmation"
                     },
                     "player": {
                             "play": "Play",
@@ -2716,7 +2719,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} segundo",
                             "unitSeconds_other": "{n} segundos",
                             "showRecommended": "Mostrar categoría \"Recomendado\"",
-                            "liveAutoFormatSwitch": "Cambio auto de formato live al timeout"
+                            "liveAutoFormatSwitch": "Cambio auto de formato live al timeout",
+                            "exitConfirmation": "Confirmación de salida"
                     },
                     "player": {
                             "play": "Reproducir",
@@ -3207,7 +3211,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} seconde",
                             "unitSeconds_other": "{n} secondes",
                             "showRecommended": "Afficher la catégorie « Recommandé »",
-                            "liveAutoFormatSwitch": "Bascule auto du format live au timeout"
+                            "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
+                            "exitConfirmation": "Confirmation de sortie"
                     },
                     "player": {
                             "play": "Lecture",
@@ -3688,7 +3693,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} secondo",
                             "unitSeconds_other": "{n} secondi",
                             "showRecommended": "Mostra categoria \"Consigliati\"",
-                            "liveAutoFormatSwitch": "Cambio automatico formato live al timeout"
+                            "liveAutoFormatSwitch": "Cambio automatico formato live al timeout",
+                            "exitConfirmation": "Conferma di uscita"
                     },
                     "player": {
                             "play": "Riproduci",
@@ -4174,7 +4180,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} seconde",
                             "unitSeconds_other": "{n} seconden",
                             "showRecommended": "Categorie \"Aanbevolen\" tonen",
-                            "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out"
+                            "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
+                            "exitConfirmation": "Afsluitbevestiging"
                     },
                     "player": {
                             "play": "Afspelen",
@@ -4660,7 +4667,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} sekunda",
                             "unitSeconds_other": "{n} sekund",
                             "showRecommended": "Pokaż kategorię „Polecane”",
-                            "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout"
+                            "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout",
+                            "exitConfirmation": "Potwierdzenie wyjścia"
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -5146,7 +5154,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} segundo",
                             "unitSeconds_other": "{n} segundos",
                             "showRecommended": "Mostrar categoria \"Recomendado\"",
-                            "liveAutoFormatSwitch": "Troca auto de formato live no timeout"
+                            "liveAutoFormatSwitch": "Troca auto de formato live no timeout",
+                            "exitConfirmation": "Confirmação de saída"
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -5632,7 +5641,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} секунда",
                             "unitSeconds_other": "{n} секунд",
                             "showRecommended": "Показать категорию «Рекомендации»",
-                            "liveAutoFormatSwitch": "Авто-смена формата live при таймауте"
+                            "liveAutoFormatSwitch": "Авто-смена формата live при таймауте",
+                            "exitConfirmation": "Подтверждение выхода"
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -6118,7 +6128,8 @@ var I18nData = {
                             "unitSeconds_one": "{n} saniye",
                             "unitSeconds_other": "{n} saniye",
                             "showRecommended": "\"Önerilenler\" kategorisini göster",
-                            "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme"
+                            "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
+                            "exitConfirmation": "Çıkış onayı"
                     },
                     "player": {
                             "play": "Oynat",

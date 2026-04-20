@@ -260,7 +260,8 @@
         "unitSeconds_one": "{n} segundo",
         "unitSeconds_other": "{n} segundos",
         "showRecommended": "Mostrar categoría \"Recomendado\"",
-        "liveAutoFormatSwitch": "Cambio auto de formato live al timeout"
+        "liveAutoFormatSwitch": "Cambio auto de formato live al timeout",
+        "exitConfirmation": "Confirmación de salida"
     },
     "player": {
         "play": "Reproducir",

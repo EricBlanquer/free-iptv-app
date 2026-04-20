@@ -258,7 +258,8 @@
         "unitSeconds_one": "{n} seconde",
         "unitSeconds_other": "{n} seconden",
         "showRecommended": "Categorie \"Aanbevolen\" tonen",
-        "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out"
+        "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
+        "exitConfirmation": "Afsluitbevestiging"
     },
     "player": {
         "play": "Afspelen",

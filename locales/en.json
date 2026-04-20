@@ -287,7 +287,8 @@
         "unitSeconds_one": "{n} second",
         "unitSeconds_other": "{n} seconds",
         "showRecommended": "Show \"Recommended\" category",
-        "liveAutoFormatSwitch": "Auto-switch live format on timeout"
+        "liveAutoFormatSwitch": "Auto-switch live format on timeout",
+        "exitConfirmation": "Exit confirmation"
     },
     "player": {
         "play": "Play",

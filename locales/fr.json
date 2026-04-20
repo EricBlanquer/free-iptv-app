@@ -299,7 +299,8 @@
         "unitSeconds_one": "{n} seconde",
         "unitSeconds_other": "{n} secondes",
         "showRecommended": "Afficher la catégorie « Recommandé »",
-        "liveAutoFormatSwitch": "Bascule auto du format live au timeout"
+        "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
+        "exitConfirmation": "Confirmation de sortie"
     },
     "player": {
         "play": "Lecture",
