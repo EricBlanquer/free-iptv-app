@@ -676,6 +676,31 @@
     margin-left: 20px;
 }
 
+.catchup-program-action {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.catchup-program.focused .catchup-program-action {
+    opacity: 1;
+}
+
+.catchup-action-icon {
+    color: rgba(255, 255, 255, 0.4);
+    margin-left: 10px;
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.catchup-action-icon.active {
+    color: #fff;
+    background: #e50914;
+}
+
 #catchup-loading {
     text-align: center;
     padding: 50px;

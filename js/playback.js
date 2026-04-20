@@ -1414,6 +1414,12 @@ IPTVApp.prototype.updatePlayerTracks = function() {
     else if (replayBtn) {
         this.setHidden(replayBtn, true);
     }
+    var downloadBtn = document.getElementById('player-download-btn');
+    if (downloadBtn) {
+        var showDownload = isCatchup && this.canFreeboxDownload() && this.catchupParams;
+        this.setHidden(downloadBtn, !showDownload);
+        if (showDownload) visibleButtons++;
+    }
     // Status btn and Direct btn are managed by updatePlayerStateIndicator
     // Count them as visible for live
     if (isLive) {
@@ -1934,6 +1940,9 @@ IPTVApp.prototype.selectPlayerTrack = function() {
     else if (btn.id === 'player-replay-btn') {
         this.openReplayFromPlayer();
     }
+    else if (btn.id === 'player-download-btn') {
+        this.downloadCurrentCatchup();
+    }
     else if (btn.id === 'player-live-btn') {
         this.returnToLive();
     }
@@ -1954,6 +1963,21 @@ IPTVApp.prototype.selectPlayerTrack = function() {
         this.cycleDisplayMode();
     }
     this.showPlayerOverlay();
+};
+
+IPTVApp.prototype.downloadCurrentCatchup = function() {
+    if (this.currentPlayingType !== 'catchup' || !this.catchupParams) return;
+    var stream = this.catchupParams.stream;
+    var start = this.catchupParams.start;
+    var duration = this.catchupParams.duration;
+    var program = null;
+    if (this.catchupPlaylist && this.catchupPlaylistIndex !== undefined) {
+        program = this.catchupPlaylist[this.catchupPlaylistIndex];
+    }
+    if (!program) {
+        program = { title: '' };
+    }
+    this.downloadCatchup(stream, program, start, duration);
 };
 
 IPTVApp.prototype.openReplayFromPlayer = function() {
@@ -2735,6 +2759,17 @@ IPTVApp.prototype.resetSubtitlePosition = function(el) {
     el.style.textAlign = 'center';
 };
 
+IPTVApp.prototype.canFreeboxDownload = function() {
+    var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
+    if (viaVm) return true;
+    if (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken) return false;
+    if (!FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
+    }
+    return FreeboxAPI.isConfigured();
+};
+
 // Catchup/Replay Modal
 IPTVApp.prototype.showCatchupModal = function(stream, restoreDay, restoreIndex) {
     var self = this;
@@ -2744,6 +2779,7 @@ IPTVApp.prototype.showCatchupModal = function(stream, restoreDay, restoreIndex) 
     this.catchupFocusIndex = restoreIndex || 0;
     this._catchupRestoreProgramIndex = restoreIndex;
     this.catchupPrograms = [];
+    this.catchupActionMode = 'play';
     var archiveDuration = parseInt(stream.tv_archive_duration, 10) || 5;
     var modal = document.getElementById('catchup-modal');
     var channelName = document.getElementById('catchup-channel-name');
@@ -2811,6 +2847,8 @@ IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
             return parseInt(a.start_timestamp, 10) - parseInt(b.start_timestamp, 10);
         });
         self.catchupPrograms = filteredPrograms;
+        var canDownload = self.canFreeboxDownload();
+        if (!canDownload) self.catchupActionMode = 'play';
         if (filteredPrograms.length === 0) {
             // If today is empty, automatically try yesterday
             if (daysAgo === 0) {
@@ -2848,6 +2886,19 @@ IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
             item.innerHTML = '<div class="catchup-program-time">' + timeStr + '</div>' +
                 '<div class="catchup-program-title">' + title + (isLive ? ' <span style="color:#e50914;">●</span>' : '') + '</div>' +
                 '<div class="catchup-program-duration">' + durationStr + '</div>';
+            if (canDownload) {
+                var actionDiv = document.createElement('div');
+                actionDiv.className = 'catchup-program-action';
+                var playIcon = document.createElement('span');
+                playIcon.className = 'catchup-action-icon catchup-action-play material-symbols-outlined';
+                playIcon.textContent = 'play_arrow';
+                var dlIcon = document.createElement('span');
+                dlIcon.className = 'catchup-action-icon catchup-action-download material-symbols-outlined';
+                dlIcon.textContent = 'download';
+                actionDiv.appendChild(playIcon);
+                actionDiv.appendChild(dlIcon);
+                item.appendChild(actionDiv);
+            }
             programsList.appendChild(item);
         });
         self.catchupFocusArea = 'programs';
@@ -2895,11 +2946,16 @@ IPTVApp.prototype.hideCatchupModal = function() {
 IPTVApp.prototype.updateCatchupFocus = function() {
     var days = document.querySelectorAll('#catchup-days-selector .catchup-day-btn');
     var programs = document.querySelectorAll('#catchup-programs-list .catchup-program');
+    var mode = this.catchupActionMode || 'play';
     days.forEach(function(d, i) {
         d.classList.toggle('focused', this.catchupFocusArea === 'days' && i === this.catchupFocusIndex);
     }, this);
     programs.forEach(function(p, i) {
         p.classList.toggle('focused', this.catchupFocusArea === 'programs' && i === this.catchupFocusIndex);
+        var playIcon = p.querySelector('.catchup-action-play');
+        var dlIcon = p.querySelector('.catchup-action-download');
+        if (playIcon) playIcon.classList.toggle('active', mode === 'play');
+        if (dlIcon) dlIcon.classList.toggle('active', mode === 'download');
     }, this);
     if (this.catchupFocusArea === 'programs' && programs[this.catchupFocusIndex]) {
         programs[this.catchupFocusIndex].scrollIntoView({ block: 'nearest' });
@@ -2934,6 +2990,12 @@ IPTVApp.prototype.navigateCatchupModal = function(direction) {
         else if (direction === 'down' && this.catchupFocusIndex < programs.length - 1) {
             this.catchupFocusIndex++;
         }
+        else if (direction === 'left' && this.canFreeboxDownload()) {
+            this.catchupActionMode = 'play';
+        }
+        else if (direction === 'right' && this.canFreeboxDownload()) {
+            this.catchupActionMode = 'download';
+        }
     }
     this.updateCatchupFocus();
 };
@@ -2957,47 +3019,105 @@ IPTVApp.prototype.selectCatchupItem = function() {
         var start = parseInt(prog.start_timestamp, 10);
         var end = parseInt(prog.stop_timestamp, 10);
         var duration = Math.round((end - start) / 60);
-        window.log('selectCatchupItem: program start=' + start + ' end=' + end + ' duration=' + duration + 'min');
-        // Save stream and programs before hiding modal (hideCatchupModal clears them)
+        window.log('selectCatchupItem: program start=' + start + ' end=' + end + ' duration=' + duration + 'min mode=' + (this.catchupActionMode || 'play'));
         var stream = this.catchupStream;
-        var programs = this.catchupPrograms.slice();
-        var programIndex = this.catchupFocusIndex;
         if (!stream) {
             window.log('ERROR', 'selectCatchupItem: no stream!');
             return;
         }
+        if (this.catchupActionMode === 'download') {
+            this.downloadCatchup(stream, prog, start, duration);
+            return;
+        }
+        var programs = this.catchupPrograms.slice();
+        var programIndex = this.catchupFocusIndex;
         window.log('selectCatchupItem: stream=' + stream.stream_id + ' ' + stream.name);
-        // Stop live player if replay was opened from player overlay
         if (this._replayFromPlayer) {
             this.player.stop();
             this._replayFromPlayer = false;
             this._catchupFromPlayer = true;
         }
-        // Just hide the modal visually, don't reset focus (playCatchup will set it)
         this.setHidden('catchup-modal', true);
         var daysAgo = this.catchupSelectedDay || 0;
         this.catchupStream = null;
         this.catchupPrograms = [];
-        this.playCatchup(stream, start, duration, 'm3u8', null, null, programs, programIndex, daysAgo);
+        this.playCatchup(stream, start, duration, 'ts', null, null, programs, programIndex, daysAgo);
     }
 };
 
-IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes, extension, formatIndex, triedFormats, programs, programIndex, daysAgo) {
+IPTVApp.prototype.downloadCatchup = function(stream, program, start, duration) {
+    var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
+    if (!viaVm && this.settings.freeboxEnabled && this.settings.freeboxAppToken && !FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
+    }
+    if (!viaVm && (!this.settings.freeboxEnabled || !this.settings.freeboxAppToken || !FreeboxAPI.isConfigured())) {
+        this.showToast(I18n.t('freebox.notConfigured', 'Freebox download not configured'), 4000, true);
+        return;
+    }
+    if (!this.api || !this.api.getCatchupUrl) {
+        this.showToast(I18n.t('freebox.downloadError', 'Download error'), 3000, true);
+        return;
+    }
+    var playlistId = stream._playlistId || this.settings.activePlaylistId;
+    var streamId = stream.stream_id;
+    var extension = this.settings.catchupExtension || 'ts';
+    var format = this.settings.catchupFormat || 0;
+    var url = this.api.getCatchupUrl(streamId, start, duration, extension, format);
+    if (!url) {
+        window.log('Catchup download: no URL');
+        this.showToast(I18n.t('freebox.downloadError', 'Download error'), 3000, true);
+        return;
+    }
+    var channelName = this.cleanTitle(this.getStreamTitle(stream) || 'Channel').replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var progTitle = program.title;
+    try {
+        progTitle = decodeURIComponent(escape(atob(program.title)));
+    }
+    catch (e) { /* keep original title */ }
+    var cleanProgTitle = this.cleanTitle(progTitle || 'Program').replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var startDate = new Date(start * 1000);
+    var pad = function(n) { return n < 10 ? '0' + n : String(n); };
+    var dateStr = startDate.getFullYear() + '-' + pad(startDate.getMonth() + 1) + '-' + pad(startDate.getDate()) + '_' + pad(startDate.getHours()) + '-' + pad(startDate.getMinutes());
+    var filename = channelName + '_' + cleanProgTitle + '_' + dateStr + '.' + extension;
+    var catchupId = 'catchup_' + streamId + '_' + start;
+    var state = this.getStreamDownloadState(catchupId, playlistId);
+    if (state) {
+        this.showToast(I18n.t('freebox.allAlreadyQueued', 'Already queued or downloading'), 3000);
+        return;
+    }
+    var poster = this.getStreamImage(stream);
+    if (!this.settings.freeboxBatchDownload && this.getActiveStreamCount(playlistId) >= this.getMaxConnections(playlistId)) {
+        if (!this._freeboxDownloadQueue) this._freeboxDownloadQueue = [];
+        this._freeboxDownloadQueue.push({ url: url, filename: filename, streamId: catchupId, playlistId: playlistId, poster: poster });
+        this.saveFreeboxMaps();
+        window.log('Catchup download queued: ' + filename);
+        this.showToast(I18n.t('freebox.downloadQueued', 'Download queued. Will start automatically.'), 3000);
+        this.updateHomeDownloadButton();
+        this.updateGlobalDownloadBar();
+        this.ensureFreeboxPolling();
+        return;
+    }
+    window.log('Catchup download start: ' + filename);
+    this.startFreeboxDownload(url, filename, catchupId, playlistId, poster);
+    this.updateHomeDownloadButton();
+};
+
+IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes, extension, formatIndex, triedPairs, programs, programIndex, daysAgo) {
     extension = extension || 'ts';
-    triedFormats = triedFormats || [];
+    triedPairs = triedPairs || [];
     if (daysAgo === undefined) daysAgo = 0;
-    // Stop any ongoing seek before starting new catchup
     this.stopSeek();
-    // Reset debug flag for progress logging
     this._catchupLogDone = false;
-    // Use saved format if available and no format specified
     if (formatIndex === undefined || formatIndex === null) {
         formatIndex = this.settings.catchupFormat || 0;
+        if (this.settings.catchupExtension) extension = this.settings.catchupExtension;
     }
-    triedFormats.push(formatIndex);
+    var pairKey = formatIndex === 0 ? '0:*' : formatIndex + ':' + extension;
+    triedPairs.push(pairKey);
     var streamId = stream.stream_id;
     var url = this.api.getCatchupUrl(streamId, startTimestamp, durationMinutes, extension, formatIndex);
-    window.log('Playing catchup format ' + formatIndex + ': ' + url);
+    window.log('Playing catchup format ' + formatIndex + ' ext=' + extension + ': ' + url);
     clearTimeout(this._detailsTooltipTimer);
     clearTimeout(this._seasonTooltipTimer);
     this.hideAllButtonTooltips();
@@ -3026,15 +3146,25 @@ IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes
     var posterUrl = stream ? this.getStreamImage(stream) : null;
     this.showLoading(true, posterUrl, I18n.t('loading.playback', 'Starting playback...'));
     var self = this;
+    var fallbackFired = false;
+    clearTimeout(this._catchupStartupTimer);
+    this._catchupStartupTimer = setTimeout(function() {
+        if (!self.streamReady && !fallbackFired) {
+            fallbackFired = true;
+            window.log('Catchup startup timeout (5s) format ' + formatIndex + ' ext=' + extension);
+            if (self.player.onError) self.player.onError({ type: 'timeout' });
+        }
+    }, 5000);
     this.player.onStateChange = function(state) {
         if (state === 'playing') {
+            clearTimeout(self._catchupStartupTimer);
             self.streamReady = true;
             self.isBuffering = false;
             self.updatePlayerStateIndicator();
             self.showLoading(false);
             self.showPlayerOverlay();
-            // Save working format
             self.settings.catchupFormat = formatIndex;
+            self.settings.catchupExtension = extension;
             self.saveSettings();
         }
         else if (state === 'buffering') {
@@ -3049,19 +3179,30 @@ IPTVApp.prototype.playCatchup = function(stream, startTimestamp, durationMinutes
         self.updatePlayerProgress(current, total);
     };
     this.player.onError = function(error) {
+        if (fallbackFired && error && error.type !== 'timeout') return;
+        fallbackFired = true;
+        clearTimeout(self._catchupStartupTimer);
         var errorMsg = error ? (error.type || JSON.stringify(error)) : 'unknown';
-        window.log('ERROR', 'Catchup format ' + formatIndex + ' failed: ' + errorMsg);
-        // Find next format to try (0-3 that hasn't been tried yet)
-        var nextFormat = -1;
-        for (var i = 0; i < 4; i++) {
-            if (triedFormats.indexOf(i) === -1) {
-                nextFormat = i;
+        window.log('ERROR', 'Catchup format ' + formatIndex + ' ext=' + extension + ' failed: ' + errorMsg);
+        var allPairs = [
+            { f: 0, e: extension, k: '0:*' },
+            { f: 1, e: 'ts', k: '1:ts' },
+            { f: 1, e: 'm3u8', k: '1:m3u8' },
+            { f: 2, e: 'ts', k: '2:ts' },
+            { f: 2, e: 'm3u8', k: '2:m3u8' },
+            { f: 3, e: 'ts', k: '3:ts' },
+            { f: 3, e: 'm3u8', k: '3:m3u8' }
+        ];
+        var next = null;
+        for (var i = 0; i < allPairs.length; i++) {
+            if (triedPairs.indexOf(allPairs[i].k) === -1) {
+                next = allPairs[i];
                 break;
             }
         }
-        if (nextFormat >= 0) {
-            window.log('Trying catchup format ' + nextFormat + '...');
-            self.playCatchup(stream, startTimestamp, durationMinutes, extension, nextFormat, triedFormats);
+        if (next) {
+            window.log('Trying catchup format ' + next.f + ' ext=' + next.e + '...');
+            self.playCatchup(stream, startTimestamp, durationMinutes, next.e, next.f, triedPairs);
         }
         else {
             window.log('ERROR', 'All catchup formats failed');

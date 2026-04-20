@@ -491,7 +491,8 @@
         "allAlreadyQueued": "جميع الحلقات موجودة بالفعل في قائمة الانتظار أو قيد التحميل",
         "selectEpisodes": "حدد الحلقات، ثم اضغط تنزيل",
         "noEpisodesSelected": "لم يتم تحديد حلقات، تنزيل الكل",
-        "downloadAll": "الكل"
+        "downloadAll": "الكل",
+        "notConfigured": "تنزيل Freebox غير مُكوَّن"
     },
     "time": {
         "now": "الآن",

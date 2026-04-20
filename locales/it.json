@@ -484,7 +484,8 @@
         "allAlreadyQueued": "Tutti gli episodi sono già in coda o in download",
         "selectEpisodes": "Seleziona gli episodi, poi premi scarica",
         "noEpisodesSelected": "Nessun episodio selezionato, scaricamento completo",
-        "downloadAll": "Tutto"
+        "downloadAll": "Tutto",
+        "notConfigured": "Download Freebox non configurato"
     },
     "time": {
         "now": "adesso",

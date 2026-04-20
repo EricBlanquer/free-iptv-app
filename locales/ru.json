@@ -489,7 +489,8 @@
         "allAlreadyQueued": "Все эпизоды уже в очереди или загружаются",
         "selectEpisodes": "Выберите эпизоды, затем нажмите загрузить",
         "noEpisodesSelected": "Эпизоды не выбраны, загрузка всех",
-        "downloadAll": "Все"
+        "downloadAll": "Все",
+        "notConfigured": "Загрузка через Freebox не настроена"
     },
     "time": {
         "now": "сейчас",

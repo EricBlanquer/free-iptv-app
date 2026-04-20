@@ -61,7 +61,7 @@
         "noResults": "Aucun résultat",
         "timeout": "Délai dépassé",
         "exitTitle": "Quitter",
-        "exitMessage": "Voulez-vous quitter l'application\u00a0?"
+        "exitMessage": "Voulez-vous quitter l'application ?"
     },
     "loading": {
         "connecting": "Connexion...",
@@ -404,7 +404,7 @@
     },
     "welcome": {
         "demoTitle": "Bienvenue dans Free IPTV",
-        "demoMessage": "Voulez-vous essayer une playlist de démo adaptée à votre localisation\u00A0?",
+        "demoMessage": "Voulez-vous essayer une playlist de démo adaptée à votre localisation ?",
         "demoYes": "Oui, essayer la démo",
         "demoNo": "Non, configurer manuellement",
         "demoName": "Démo Free IPTV"
@@ -442,7 +442,8 @@
         "allAlreadyQueued": "Tous les épisodes sont déjà en file d'attente ou en cours",
         "selectEpisodes": "Sélectionnez des épisodes, puis appuyez sur télécharger",
         "noEpisodesSelected": "Aucun épisode sélectionné, téléchargement complet",
-        "downloadAll": "Tout"
+        "downloadAll": "Tout",
+        "notConfigured": "Téléchargement Freebox non configuré"
     },
     "time": {
         "now": "à l'instant",

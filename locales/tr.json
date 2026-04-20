@@ -489,7 +489,8 @@
         "allAlreadyQueued": "Tüm bölümler zaten sırada veya indiriliyor",
         "selectEpisodes": "Bölümleri seçin, ardından indire basın",
         "noEpisodesSelected": "Bölüm seçilmedi, tümü indiriliyor",
-        "downloadAll": "Tümü"
+        "downloadAll": "Tümü",
+        "notConfigured": "Freebox indirme yapılandırılmamış"
     },
     "time": {
         "now": "şimdi",

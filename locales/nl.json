@@ -486,7 +486,8 @@
         "allAlreadyQueued": "Alle afleveringen staan al in de wachtrij of worden gedownload",
         "selectEpisodes": "Selecteer afleveringen, druk dan op downloaden",
         "noEpisodesSelected": "Geen afleveringen geselecteerd, alles downloaden",
-        "downloadAll": "Alles"
+        "downloadAll": "Alles",
+        "notConfigured": "Freebox-download niet geconfigureerd"
     },
     "time": {
         "now": "nu",
