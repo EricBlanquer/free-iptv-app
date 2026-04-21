@@ -42,7 +42,9 @@
         "select": "Select...",
         "loading": "Loading...",
         "error": "Error",
-        "connectionError": "Connection error"
+        "connectionError": "Connection error",
+        "cancel": "Cancel",
+        "close": "Close"
     },
     "app": {
         "loading": "Loading...",
@@ -89,7 +91,9 @@
         "categories": "Categories",
         "recommended": "Recommended",
         "noRecommendations": "No recommendations yet — watch or favorite a few items first",
-        "computingRecommendations": "Computing recommendations..."
+        "computingRecommendations": "Computing recommendations...",
+        "myRatings": "My ratings",
+        "noRatings": "No ratings yet"
     },
     "guide": {
         "today": "Today",
@@ -288,7 +292,18 @@
         "unitSeconds_other": "{n} seconds",
         "showRecommended": "Show \"Recommended\" category",
         "liveAutoFormatSwitch": "Auto-switch live format on timeout",
-        "exitConfirmation": "Exit confirmation"
+        "exitConfirmation": "Exit confirmation",
+        "tmdbV4ReadToken": "TMDB v4 Read Token",
+        "tmdbV4ReadTokenDesc": "Required to connect a TMDB account (rate movies).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "TMDB Account",
+        "tmdbConnect": "Connect",
+        "tmdbDisconnect": "Disconnect {name}",
+        "tmdbConnectInstructions": "Scan this QR code with your phone and approve access on TMDB:",
+        "tmdbConnectWaiting": "Waiting for authorization...",
+        "tmdbConnectFailed": "Could not start authentication",
+        "tmdbConnectTimeout": "Authorization timed out",
+        "tmdbNoV4Token": "v4 Read Token required in settings above",
+        "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows."
     },
     "player": {
         "play": "Play",
@@ -362,7 +377,13 @@
         "episode": "Episode",
         "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
         "age": "{count} years old",
-        "similarGenres": "More in the same genre"
+        "similarGenres": "More in the same genre",
+        "yourRating": "Your rating",
+        "removeRating": "Remove",
+        "rateHint": "Press 0-9 for direct rating",
+        "ratingSaved": "Rating saved",
+        "ratingRemoved": "Rating removed",
+        "ratingFailed": "Rating failed"
     },
     "department": {
         "Acting": "Actor",
@@ -545,7 +566,8 @@
         "qualityHint": "Click to switch resolution",
         "favoriteHint": "Add to your list",
         "downloadHint": "Download to Freebox",
-        "downloadSeasonHint": "Download season to Freebox"
+        "downloadSeasonHint": "Download season to Freebox",
+        "userRatingHint": "Rating influences your recommendations"
     },
     "diagnostic": {
         "title": "Connection problem",

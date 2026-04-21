@@ -226,6 +226,14 @@ IPTVApp.prototype.bindKeys = function() {
                     self.showTVGuide();
                 }
                 break;
+            case 48: case 49: case 50: case 51: case 52:
+            case 53: case 54: case 55: case 56: case 57:
+                if (self.currentScreen === 'details' && self._userRatingTmdbId && TMDB.isUserLoggedIn()) {
+                    var digit = key - 48;
+                    var ratingValue = digit === 0 ? 10 : digit;
+                    self.submitUserRating(ratingValue);
+                }
+                break;
         }
         e.preventDefault();
     });
@@ -255,6 +263,7 @@ IPTVApp.prototype.bindKeys = function() {
             { id: 'add-category-modal', area: 'add-category-modal' },
             { id: 'tracks-modal', area: 'tracks' },
             { id: 'tts-voice-modal', area: 'tts-voice-modal' },
+            { id: 'tmdb-connect-modal', area: 'tmdb-connect-modal' },
             { id: 'playlist-selector', area: 'home' },
             { id: 'home-grid', area: 'home' },
             { id: 'continue-grid', area: 'continue' },
@@ -738,10 +747,14 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
     var current = ctx.focusables[newIndex];
     var currentZone = this.getDetailsZone(current);
     var zones = this.getDetailsZones(ctx.focusables);
-    if (currentZone === 'versions' || currentZone === 'actions') {
+    if (currentZone === 'versions' || currentZone === 'actions' || currentZone === 'rating') {
         var candidate = this.navigate2D(ctx.focusables, newIndex, ctx.direction);
         if (candidate !== newIndex) {
-            return { index: candidate };
+            var crossesZone = this.getDetailsZone(ctx.focusables[candidate]) !== currentZone;
+            var isHorizontal = ctx.direction === 'left' || ctx.direction === 'right';
+            if (!(isHorizontal && crossesZone)) {
+                return { index: candidate };
+            }
         }
     }
     switch (ctx.direction) {
@@ -783,7 +796,7 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             }
             break;
         case 'up':
-            if (current.id === 'details-description' && this.scrollableTextNav(current, 'up')) {
+            if (current.id === 'details-description' && Date.now() - (this._descriptionFocusedAt || 0) >= 1000 && this.scrollableTextNav(current, 'up')) {
                 return { index: newIndex, handled: true };
             }
             if (currentZone === 'favorite' || currentZone === 'download' || currentZone === 'title') {
@@ -812,7 +825,7 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             }
             break;
         case 'down':
-            if (current.id === 'details-description' && this.scrollableTextNav(current, 'down')) {
+            if (current.id === 'details-description' && Date.now() - (this._descriptionFocusedAt || 0) >= 1000 && this.scrollableTextNav(current, 'down')) {
                 return { index: newIndex, handled: true };
             }
             if (currentZone === 'favorite' || currentZone === 'download' || currentZone === 'title') {
@@ -1023,6 +1036,9 @@ IPTVApp.prototype.getFocusables = function() {
         case 'premium-modal':
             selector = '#premium-modal .focusable';
             break;
+        case 'tmdb-connect-modal':
+            selector = '#tmdb-connect-modal .focusable';
+            break;
     }
     var elements = document.querySelectorAll(selector);
     var visible = [];
@@ -1042,6 +1058,7 @@ IPTVApp.prototype.getDetailsZone = function(element) {
     if (element.id === 'details-title') return 'title';
     if (element.classList.contains('favorite-star')) return 'favorite';
     if (element.classList.contains('download-btn')) return 'download';
+    if (element.classList.contains('user-rating-star') || element.id === 'user-rating-remove-btn') return 'rating';
     if (element.classList.contains('version-btn')) return 'versions';
     if (element.classList.contains('action-btn')) return 'actions';
     if (element.id === 'details-description') return 'description';
@@ -1058,7 +1075,7 @@ IPTVApp.prototype.getDetailsZone = function(element) {
 
 IPTVApp.prototype.getDetailsZones = function(focusables) {
     var zones = {};
-    var zoneOrder = ['title', 'favorite', 'download', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'similar'];
+    var zoneOrder = ['title', 'favorite', 'download', 'rating', 'description', 'versions', 'actions', 'seasons', 'episodes', 'cast', 'similar'];
     for (var i = 0; i < focusables.length; i++) {
         var zone = this.getDetailsZone(focusables[i]);
         if (!zones[zone]) {
@@ -1096,26 +1113,35 @@ IPTVApp.prototype.getNextDetailsZone = function(currentZone, zones) {
 
 IPTVApp.prototype.getDetailsPlayIndex = function() {
     var focusables = document.querySelectorAll('#details-screen .focusable:not(.hidden)');
-    for (var i = 0; i < focusables.length; i++) {
-        if (focusables[i].id === 'continue-btn') {
+    var visible = [];
+    for (var v = 0; v < focusables.length; v++) {
+        if (!focusables[v].closest('.hidden')) visible.push(focusables[v]);
+    }
+    for (var i = 0; i < visible.length; i++) {
+        if (visible[i].id === 'continue-btn') {
+            window.log('FOCUS', 'getDetailsPlayIndex: continue-btn at ' + i + '/' + visible.length);
             return i;
         }
     }
-    for (var i = 0; i < focusables.length; i++) {
-        if (focusables[i].id === 'play-btn') {
+    for (var i = 0; i < visible.length; i++) {
+        if (visible[i].id === 'play-btn') {
+            window.log('FOCUS', 'getDetailsPlayIndex: play-btn at ' + i + '/' + visible.length);
             return i;
         }
     }
-    for (var i = 0; i < focusables.length; i++) {
-        if (focusables[i].classList.contains('version-btn') && focusables[i].classList.contains('selected')) {
+    for (var i = 0; i < visible.length; i++) {
+        if (visible[i].classList.contains('version-btn') && visible[i].classList.contains('selected')) {
+            window.log('FOCUS', 'getDetailsPlayIndex: selected version-btn at ' + i + '/' + visible.length);
             return i;
         }
     }
-    for (var i = 0; i < focusables.length; i++) {
-        if (focusables[i].classList.contains('version-btn')) {
+    for (var i = 0; i < visible.length; i++) {
+        if (visible[i].classList.contains('version-btn')) {
+            window.log('FOCUS', 'getDetailsPlayIndex: version-btn at ' + i + '/' + visible.length);
             return i;
         }
     }
+    window.log('FOCUS', 'getDetailsPlayIndex: fallback 0 count=' + visible.length);
     return 0;
 };
 
@@ -1244,6 +1270,7 @@ IPTVApp.prototype.applyMarqueeToFocusedElement = function(el) {
 
 IPTVApp.prototype.updateFocus = function() {
     var self = this;
+    var wasDescription = this._lastFocusedEl && this._lastFocusedEl.id === 'details-description';
     if (this._lastFocusedEl) {
         this._lastFocusedEl.classList.remove('focused');
         var marquees = this._lastFocusedEl.querySelectorAll('.marquee, .marquee-wrapper');
@@ -1267,6 +1294,9 @@ IPTVApp.prototype.updateFocus = function() {
         el.classList.add('focused');
         this._lastFocusedEl = el;
         this.applyMarqueeToFocusedElement(el);
+        if (el.id === 'details-description' && !wasDescription) {
+            this._descriptionFocusedAt = Date.now();
+        }
         this.lastValidFocus = {
             screen: this.currentScreen,
             area: this.focusArea,

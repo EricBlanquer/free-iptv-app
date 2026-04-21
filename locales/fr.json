@@ -54,7 +54,9 @@
         "select": "Sélectionner...",
         "loading": "Chargement...",
         "error": "Erreur",
-        "connectionError": "Erreur de connexion"
+        "connectionError": "Erreur de connexion",
+        "cancel": "Annuler",
+        "close": "Fermer"
     },
     "app": {
         "loading": "Chargement...",
@@ -101,7 +103,9 @@
         "categories": "Catégories",
         "recommended": "Recommandé",
         "noRecommendations": "Aucune recommandation — regardez ou ajoutez quelques favoris pour commencer",
-        "computingRecommendations": "Calcul des recommandations..."
+        "computingRecommendations": "Calcul des recommandations...",
+        "myRatings": "Mes notes",
+        "noRatings": "Aucune note pour l’instant"
     },
     "guide": {
         "today": "Aujourd'hui",
@@ -300,7 +304,18 @@
         "unitSeconds_other": "{n} secondes",
         "showRecommended": "Afficher la catégorie « Recommandé »",
         "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
-        "exitConfirmation": "Confirmation de sortie"
+        "exitConfirmation": "Confirmation de sortie",
+        "tmdbV4ReadToken": "Jeton lecture TMDB v4",
+        "tmdbV4ReadTokenDesc": "Requis pour connecter un compte TMDB (noter les films).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "Compte TMDB",
+        "tmdbConnect": "Connecter",
+        "tmdbDisconnect": "Déconnecter {name}",
+        "tmdbConnectInstructions": "Scannez ce QR code avec votre téléphone et approuvez l’accès sur TMDB :",
+        "tmdbConnectWaiting": "En attente de l’autorisation...",
+        "tmdbConnectFailed": "Impossible de démarrer l’authentification",
+        "tmdbConnectTimeout": "Délai d’autorisation dépassé",
+        "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
+        "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries."
     },
     "player": {
         "play": "Lecture",
@@ -374,7 +389,13 @@
         "episode": "Épisode",
         "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
         "age": "{count} ans",
-        "similarGenres": "Plus dans le même genre"
+        "similarGenres": "Plus dans le même genre",
+        "yourRating": "Votre note",
+        "removeRating": "Supprimer",
+        "rateHint": "Appuyez 0-9 pour noter directement",
+        "ratingSaved": "Note enregistrée",
+        "ratingRemoved": "Note supprimée",
+        "ratingFailed": "Échec de la notation"
     },
     "department": {
         "Acting": "Acteur",
@@ -556,7 +577,8 @@
         "qualityHint": "Cliquez pour changer la qualité",
         "favoriteHint": "Ajouter à ma liste",
         "downloadHint": "Télécharger sur la Freebox",
-        "downloadSeasonHint": "Télécharger la saison sur la Freebox"
+        "downloadSeasonHint": "Télécharger la saison sur la Freebox",
+        "userRatingHint": "Ta note influence tes recommandations"
     },
     "diagnostic": {
         "title": "Problème de connexion",

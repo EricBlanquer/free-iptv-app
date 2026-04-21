@@ -20,7 +20,9 @@
         "select": "Selecionar...",
         "loading": "Carregando...",
         "error": "Erro",
-        "connectionError": "Erro de conexão"
+        "connectionError": "Erro de conexão",
+        "cancel": "Cancelar",
+        "close": "Fechar"
     },
     "app": {
         "loading": "Carregando...",
@@ -67,7 +69,9 @@
         "categories": "Categorias",
         "recommended": "Recomendado",
         "noRecommendations": "Sem recomendações ainda — veja ou favorite alguns itens primeiro",
-        "computingRecommendations": "Calculando recomendações..."
+        "computingRecommendations": "Calculando recomendações...",
+        "myRatings": "As minhas avaliações",
+        "noRatings": "Ainda não há avaliações"
     },
     "guide": {
         "today": "Hoje",
@@ -261,7 +265,18 @@
         "unitSeconds_other": "{n} segundos",
         "showRecommended": "Mostrar categoria \"Recomendado\"",
         "liveAutoFormatSwitch": "Troca auto de formato live no timeout",
-        "exitConfirmation": "Confirmação de saída"
+        "exitConfirmation": "Confirmação de saída",
+        "tmdbV4ReadToken": "Token de leitura TMDB v4",
+        "tmdbV4ReadTokenDesc": "Necessário para ligar uma conta TMDB (avaliar filmes).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "Conta TMDB",
+        "tmdbConnect": "Ligar",
+        "tmdbDisconnect": "Desligar {name}",
+        "tmdbConnectInstructions": "Digitalize este código QR com o seu telemóvel e aprove o acesso no TMDB:",
+        "tmdbConnectWaiting": "A aguardar autorização...",
+        "tmdbConnectFailed": "Não foi possível iniciar a autenticação",
+        "tmdbConnectTimeout": "Tempo de autorização esgotado",
+        "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
+        "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries."
     },
     "player": {
         "play": "Reproduzir",
@@ -335,7 +350,13 @@
         "episode": "Episódio",
         "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
         "age": "{count} anos",
-        "similarGenres": "Mais do mesmo gênero"
+        "similarGenres": "Mais do mesmo gênero",
+        "yourRating": "A sua avaliação",
+        "removeRating": "Remover",
+        "rateHint": "Prima 0-9 para avaliar diretamente",
+        "ratingSaved": "Avaliação guardada",
+        "ratingRemoved": "Avaliação removida",
+        "ratingFailed": "Falha na avaliação"
     },
     "department": {
         "Acting": "Atuação",
@@ -522,7 +543,8 @@
         "qualityHint": "Clique para mudar a resolução",
         "favoriteHint": "Adicionar à minha lista",
         "downloadHint": "Baixar para a Freebox",
-        "downloadSeasonHint": "Baixar temporada para Freebox"
+        "downloadSeasonHint": "Baixar temporada para Freebox",
+        "userRatingHint": "A sua avaliação influencia as recomendações"
     },
     "diagnostic": {
         "title": "Problema de conexão",

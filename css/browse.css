@@ -121,6 +121,12 @@
     padding-bottom: 15px;
 }
 
+.category-item.category-rated {
+    color: #ff9800;
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+}
+
 #content {
     flex: 1;
     padding: 20px;

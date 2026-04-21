@@ -15,7 +15,9 @@
         "select": "Seleziona...",
         "loading": "Caricamento...",
         "error": "Errore",
-        "connectionError": "Errore di connessione"
+        "connectionError": "Errore di connessione",
+        "cancel": "Annulla",
+        "close": "Chiudi"
     },
     "app": {
         "loading": "Caricamento...",
@@ -62,7 +64,9 @@
         "categories": "Categorie",
         "recommended": "Consigliati",
         "noRecommendations": "Nessun suggerimento — guarda o aggiungi qualcosa ai preferiti",
-        "computingRecommendations": "Calcolo dei suggerimenti..."
+        "computingRecommendations": "Calcolo dei suggerimenti...",
+        "myRatings": "Le mie valutazioni",
+        "noRatings": "Nessuna valutazione"
     },
     "guide": {
         "today": "Oggi",
@@ -256,7 +260,18 @@
         "unitSeconds_other": "{n} secondi",
         "showRecommended": "Mostra categoria \"Consigliati\"",
         "liveAutoFormatSwitch": "Cambio automatico formato live al timeout",
-        "exitConfirmation": "Conferma di uscita"
+        "exitConfirmation": "Conferma di uscita",
+        "tmdbV4ReadToken": "Token di lettura TMDB v4",
+        "tmdbV4ReadTokenDesc": "Richiesto per connettere un account TMDB (valutare film).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "Account TMDB",
+        "tmdbConnect": "Connetti",
+        "tmdbDisconnect": "Disconnetti {name}",
+        "tmdbConnectInstructions": "Scansiona questo codice QR con il telefono e approva l’accesso su TMDB:",
+        "tmdbConnectWaiting": "In attesa di autorizzazione...",
+        "tmdbConnectFailed": "Impossibile avviare l’autenticazione",
+        "tmdbConnectTimeout": "Tempo scaduto per l’autorizzazione",
+        "tmdbNoV4Token": "Token di lettura v4 richiesto nelle impostazioni sopra",
+        "tmdbAccountDesc": "Collega il tuo account TMDB per valutare film e serie."
     },
     "player": {
         "play": "Riproduci",
@@ -330,7 +345,13 @@
         "episode": "Episodio",
         "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
         "age": "{count} anni",
-        "similarGenres": "Altri dello stesso genere"
+        "similarGenres": "Altri dello stesso genere",
+        "yourRating": "Il tuo voto",
+        "removeRating": "Rimuovi",
+        "rateHint": "Premi 0-9 per votare direttamente",
+        "ratingSaved": "Voto salvato",
+        "ratingRemoved": "Voto rimosso",
+        "ratingFailed": "Voto non riuscito"
     },
     "department": {
         "Acting": "Recitazione",
@@ -510,7 +531,8 @@
         "qualityHint": "Clicca per cambiare la risoluzione",
         "favoriteHint": "Aggiungi alla mia lista",
         "downloadHint": "Scarica su Freebox",
-        "downloadSeasonHint": "Scarica stagione su Freebox"
+        "downloadSeasonHint": "Scarica stagione su Freebox",
+        "userRatingHint": "Il tuo voto influenza le raccomandazioni"
     },
     "diagnostic": {
         "title": "Problema di connessione",

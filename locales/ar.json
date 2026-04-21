@@ -16,7 +16,9 @@
         "select": "اختر...",
         "loading": "جاري التحميل...",
         "error": "خطأ",
-        "connectionError": "خطأ في الاتصال"
+        "connectionError": "خطأ في الاتصال",
+        "cancel": "إلغاء",
+        "close": "إغلاق"
     },
     "app": {
         "loading": "جاري التحميل...",
@@ -63,7 +65,9 @@
         "categories": "الفئات",
         "recommended": "موصى به",
         "noRecommendations": "لا توجد توصيات بعد — شاهد أو أضف بعض المفضلات أولاً",
-        "computingRecommendations": "جاري حساب التوصيات..."
+        "computingRecommendations": "جاري حساب التوصيات...",
+        "myRatings": "تقييماتي",
+        "noRatings": "لا توجد تقييمات بعد"
     },
     "guide": {
         "today": "اليوم",
@@ -257,7 +261,18 @@
         "unitSeconds_other": "{n} ثوانٍ",
         "showRecommended": "إظهار فئة « موصى به »",
         "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
-        "exitConfirmation": "تأكيد الخروج"
+        "exitConfirmation": "تأكيد الخروج",
+        "tmdbV4ReadToken": "رمز قراءة TMDB v4",
+        "tmdbV4ReadTokenDesc": "مطلوب لربط حساب TMDB (تقييم الأفلام).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "حساب TMDB",
+        "tmdbConnect": "اتصال",
+        "tmdbDisconnect": "فصل {name}",
+        "tmdbConnectInstructions": "امسح رمز QR هذا بهاتفك ووافق على الوصول في TMDB:",
+        "tmdbConnectWaiting": "في انتظار التفويض...",
+        "tmdbConnectFailed": "تعذر بدء المصادقة",
+        "tmdbConnectTimeout": "انتهت مهلة التفويض",
+        "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
+        "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات."
     },
     "player": {
         "play": "تشغيل",
@@ -331,7 +346,13 @@
         "episode": "الحلقة",
         "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
         "age": "{count} سنة",
-        "similarGenres": "المزيد من نفس النوع"
+        "similarGenres": "المزيد من نفس النوع",
+        "yourRating": "تقييمك",
+        "removeRating": "إزالة",
+        "rateHint": "اضغط 0-9 للتقييم المباشر",
+        "ratingSaved": "تم حفظ التقييم",
+        "ratingRemoved": "تمت إزالة التقييم",
+        "ratingFailed": "فشل التقييم"
     },
     "department": {
         "Acting": "تمثيل",
@@ -517,7 +538,8 @@
         "qualityHint": "انقر لتغيير الدقة",
         "favoriteHint": "إضافة إلى قائمتي",
         "downloadHint": "تنزيل إلى Freebox",
-        "downloadSeasonHint": "تحميل الموسم إلى Freebox"
+        "downloadSeasonHint": "تحميل الموسم إلى Freebox",
+        "userRatingHint": "يؤثر تقييمك على توصياتك"
     },
     "diagnostic": {
         "title": "مشكلة في الاتصال",

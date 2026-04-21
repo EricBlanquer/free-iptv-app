@@ -18,7 +18,9 @@
         "select": "Seç...",
         "loading": "Yükleniyor...",
         "error": "Hata",
-        "connectionError": "Bağlantı hatası"
+        "connectionError": "Bağlantı hatası",
+        "cancel": "İptal",
+        "close": "Kapat"
     },
     "app": {
         "loading": "Yükleniyor...",
@@ -65,7 +67,9 @@
         "categories": "Kategoriler",
         "recommended": "Önerilenler",
         "noRecommendations": "Henüz öneri yok — önce bir şeyler izleyin veya favorilere ekleyin",
-        "computingRecommendations": "Öneriler hesaplanıyor..."
+        "computingRecommendations": "Öneriler hesaplanıyor...",
+        "myRatings": "Puanlarım",
+        "noRatings": "Henüz puan yok"
     },
     "guide": {
         "today": "Bugün",
@@ -259,7 +263,18 @@
         "unitSeconds_other": "{n} saniye",
         "showRecommended": "\"Önerilenler\" kategorisini göster",
         "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
-        "exitConfirmation": "Çıkış onayı"
+        "exitConfirmation": "Çıkış onayı",
+        "tmdbV4ReadToken": "TMDB v4 Okuma Token",
+        "tmdbV4ReadTokenDesc": "TMDB hesabı bağlamak için gerekli (film puanlama).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "TMDB Hesabı",
+        "tmdbConnect": "Bağlan",
+        "tmdbDisconnect": "{name} bağlantısını kes",
+        "tmdbConnectInstructions": "Bu QR kodunu telefonunla tara ve TMDB’de erişimi onayla:",
+        "tmdbConnectWaiting": "Yetkilendirme bekleniyor...",
+        "tmdbConnectFailed": "Kimlik doğrulama başlatılamadı",
+        "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
+        "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
+        "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla."
     },
     "player": {
         "play": "Oynat",
@@ -333,7 +348,13 @@
         "episode": "Bölüm",
         "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
         "age": "{count} yaşında",
-        "similarGenres": "Aynı türde daha fazlası"
+        "similarGenres": "Aynı türde daha fazlası",
+        "yourRating": "Senin puanın",
+        "removeRating": "Kaldır",
+        "rateHint": "Doğrudan puanlamak için 0-9’a bas",
+        "ratingSaved": "Puan kaydedildi",
+        "ratingRemoved": "Puan kaldırıldı",
+        "ratingFailed": "Puanlama başarısız"
     },
     "department": {
         "Acting": "Oyunculuk",
@@ -515,7 +536,8 @@
         "qualityHint": "Çözünürlüğü değiştirmek için tıklayın",
         "favoriteHint": "Listeme ekle",
         "downloadHint": "Freebox'a indir",
-        "downloadSeasonHint": "Sezonu Freebox'a indir"
+        "downloadSeasonHint": "Sezonu Freebox'a indir",
+        "userRatingHint": "Puanın önerilerini etkiler"
     },
     "diagnostic": {
         "title": "Bağlantı sorunu",

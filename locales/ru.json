@@ -16,7 +16,9 @@
         "select": "Выбрать...",
         "loading": "Загрузка...",
         "error": "Ошибка",
-        "connectionError": "Ошибка подключения"
+        "connectionError": "Ошибка подключения",
+        "cancel": "Отмена",
+        "close": "Закрыть"
     },
     "app": {
         "loading": "Загрузка...",
@@ -63,7 +65,9 @@
         "categories": "Категории",
         "recommended": "Рекомендации",
         "noRecommendations": "Пока нет рекомендаций — сначала посмотрите или добавьте что-то в избранное",
-        "computingRecommendations": "Подбор рекомендаций..."
+        "computingRecommendations": "Подбор рекомендаций...",
+        "myRatings": "Мои оценки",
+        "noRatings": "Нет оценок"
     },
     "guide": {
         "today": "Сегодня",
@@ -257,7 +261,18 @@
         "unitSeconds_other": "{n} секунд",
         "showRecommended": "Показать категорию «Рекомендации»",
         "liveAutoFormatSwitch": "Авто-смена формата live при таймауте",
-        "exitConfirmation": "Подтверждение выхода"
+        "exitConfirmation": "Подтверждение выхода",
+        "tmdbV4ReadToken": "Токен чтения TMDB v4",
+        "tmdbV4ReadTokenDesc": "Необходим для подключения аккаунта TMDB (оценка фильмов).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "Аккаунт TMDB",
+        "tmdbConnect": "Подключить",
+        "tmdbDisconnect": "Отключить {name}",
+        "tmdbConnectInstructions": "Отсканируйте этот QR-код телефоном и подтвердите доступ на TMDB:",
+        "tmdbConnectWaiting": "Ожидание авторизации...",
+        "tmdbConnectFailed": "Не удалось запустить аутентификацию",
+        "tmdbConnectTimeout": "Время авторизации истекло",
+        "tmdbNoV4Token": "Токен чтения v4 требуется в настройках выше",
+        "tmdbAccountDesc": "Подключите аккаунт TMDB, чтобы оценивать фильмы и сериалы."
     },
     "player": {
         "play": "Воспроизвести",
@@ -331,7 +346,13 @@
         "episode": "Эпизод",
         "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
         "age": "{count} лет",
-        "similarGenres": "Ещё в том же жанре"
+        "similarGenres": "Ещё в том же жанре",
+        "yourRating": "Ваша оценка",
+        "removeRating": "Удалить",
+        "rateHint": "Нажмите 0-9 для прямой оценки",
+        "ratingSaved": "Оценка сохранена",
+        "ratingRemoved": "Оценка удалена",
+        "ratingFailed": "Не удалось оценить"
     },
     "department": {
         "Acting": "Актёрская игра",
@@ -515,7 +536,8 @@
         "qualityHint": "Нажмите для смены качества",
         "favoriteHint": "Добавить в мой список",
         "downloadHint": "Скачать на Freebox",
-        "downloadSeasonHint": "Скачать сезон на Freebox"
+        "downloadSeasonHint": "Скачать сезон на Freebox",
+        "userRatingHint": "Ваша оценка влияет на рекомендации"
     },
     "diagnostic": {
         "title": "Проблема соединения",

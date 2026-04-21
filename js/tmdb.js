@@ -4,16 +4,40 @@
 var TMDB = {
     apiKey: '',
     baseUrl: 'https://api.themoviedb.org/3',
+    v4BaseUrl: 'https://api.themoviedb.org/4',
     language: 'fr-FR',
 
     defaultApiKey: 'b796d544bb4de0b1a89ffdfb01304b94',
+    defaultV4ReadToken: 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNzk2ZDU0NGJiNGRlMGIxYTg5ZmZkZmIwMTMwNGI5NCIsIm5iZiI6MTU2OTY3MjgzMi4wOTEsInN1YiI6IjVkOGY0ZTgwMTcyZDdmMDAyNzU1NWQ1MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UytVKNoNF8-AV3mYS9jmWH1VHlKqEh-XNPqwLJc1kh8',
+
+    accessToken: '',
+    accountId: null,
+    username: '',
 
     setApiKey: function(key) {
         this.apiKey = key || this.defaultApiKey;
     },
 
+    setV4ReadToken: function(token) {
+        this.v4ReadToken = token || this.defaultV4ReadToken;
+    },
+
+    setAccessToken: function(token, accountId, username) {
+        this.accessToken = token || '';
+        this.accountId = accountId || null;
+        this.username = username || '';
+    },
+
     isEnabled: function() {
         return !!this.apiKey;
+    },
+
+    isUserLoggedIn: function() {
+        return !!this.accessToken && !!this.accountId;
+    },
+
+    canStartAuth: function() {
+        return !!(this.v4ReadToken || this.defaultV4ReadToken);
     },
 
     findByImdbId: function(imdbId, callback) {
@@ -375,7 +399,15 @@ var TMDB = {
         while (this._activeCount < this._maxConcurrent && this._pendingQueue.length > 0) {
             var item = this._pendingQueue.shift();
             this._activeCount++;
-            this._doFetch(item.url, item.callback);
+            if (item.method && item.method !== 'GET') {
+                this._doRequest(item.method, item.url, item.body, item.auth, item.callback);
+            }
+            else if (item.auth) {
+                this._doRequest('GET', item.url, null, item.auth, item.callback);
+            }
+            else {
+                this._doFetch(item.url, item.callback);
+            }
         }
     },
 
@@ -388,16 +420,45 @@ var TMDB = {
         return url.replace(/api_key=[^&]+/g, 'api_key=***');
     },
 
+    _stripApiKey: function(url) {
+        return url.replace(/([?&])api_key=[^&]*(&|$)/, function(m, p1, p2) {
+            return p2 === '&' ? p1 : '';
+        }).replace(/[?&]$/, '');
+    },
+
     _doFetch: function(url, callback) {
+        this._doRequest('GET', url, null, null, callback);
+    },
+
+    _doRequest: function(method, url, body, auth, callback) {
         var self = this;
         var xhr = new XMLHttpRequest();
-        window.log('HTTP', '> ' + this._redactUrl(url));
-        xhr.open('GET', url, true);
+        var bearer = null;
+        if (auth === 'app') {
+            bearer = this.v4ReadToken || this.defaultV4ReadToken;
+        }
+        else if (auth === 'user') {
+            bearer = this.accessToken;
+        }
+        else if (this.accessToken && url.indexOf('/3/') !== -1) {
+            bearer = this.accessToken;
+        }
+        if (bearer) {
+            url = this._stripApiKey(url);
+        }
+        window.log('HTTP', '> ' + method + ' ' + this._redactUrl(url) + (bearer ? ' [Bearer]' : ''));
+        xhr.open(method, url, true);
         xhr.timeout = 15000;
+        if (bearer) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + bearer);
+        }
+        if (body) {
+            xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+        }
         xhr.ontimeout = function() {
             self._activeCount--;
             window.log('ERROR', 'TMDB timeout: ' + self._redactUrl(url));
-            callback(null);
+            callback(null, 0);
             self._processQueue();
         };
         xhr.onreadystatechange = function() {
@@ -409,22 +470,23 @@ var TMDB = {
                     logMsg += ' -> ' + self._redactUrl(xhr.responseURL);
                 }
                 window.log('HTTP', logMsg);
-                if (xhr.status === 200) {
+                var parsedData = null;
+                if (xhr.responseText) {
                     try {
-                        var data = JSON.parse(xhr.responseText);
-                        callback(data);
-                    } catch (ex) {
+                        parsedData = JSON.parse(xhr.responseText);
+                    }
+                    catch (ex) {
                         window.log('ERROR', 'TMDB parse: ' + ex);
-                        callback(null);
                     }
                 }
-                else {
-                    callback(null);
+                if (parsedData && parsedData.status_message && !(xhr.status >= 200 && xhr.status < 300)) {
+                    window.log('TMDB', 'API error status=' + xhr.status + ' code=' + parsedData.status_code + ' msg="' + parsedData.status_message + '"');
                 }
+                callback(parsedData, xhr.status);
                 self._processQueue();
             }
         };
-        xhr.send();
+        xhr.send(body ? JSON.stringify(body) : null);
     },
 
     translate: function(text, targetLang, callback) {
@@ -536,6 +598,224 @@ TMDB.getTVDetailsAsync = function(tvId) {
             resolve(result);
         });
     });
+};
+
+TMDB.requestV4Token = function(callback) {
+    if (!this.canStartAuth()) {
+        window.log('TMDB', 'requestV4Token: no v4 read token configured');
+        callback(null);
+        return;
+    }
+    var url = this.v4BaseUrl + '/auth/request_token';
+    this._pendingQueue.push({
+        url: url,
+        method: 'POST',
+        body: { redirect_to: null },
+        auth: 'app',
+        callback: function(data, status) {
+            if (data && data.success && data.request_token) {
+                window.log('TMDB', 'requestV4Token ok');
+                callback(data.request_token);
+            }
+            else {
+                window.log('ERROR', 'TMDB requestV4Token failed status=' + status);
+                callback(null);
+            }
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.pollV4AccessToken = function(requestToken, callback) {
+    if (!this.canStartAuth() || !requestToken) {
+        callback(null, 'not-configured');
+        return;
+    }
+    var url = this.v4BaseUrl + '/auth/access_token';
+    this._pendingQueue.push({
+        url: url,
+        method: 'POST',
+        body: { request_token: requestToken },
+        auth: 'app',
+        callback: function(data, status) {
+            if (data && data.success && data.access_token && data.account_id) {
+                window.log('TMDB', 'pollV4AccessToken ok account=' + data.account_id);
+                callback({ accessToken: data.access_token, accountId: data.account_id }, null);
+            }
+            else if (status === 0 || status >= 500) {
+                callback(null, 'error');
+            }
+            else {
+                callback(null, 'pending');
+            }
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.logoutV4 = function(callback) {
+    if (!this.accessToken) {
+        callback(true);
+        return;
+    }
+    var token = this.accessToken;
+    var url = this.v4BaseUrl + '/auth/access_token';
+    var self = this;
+    this._pendingQueue.push({
+        url: url,
+        method: 'DELETE',
+        body: { access_token: token },
+        auth: 'app',
+        callback: function(data, status) {
+            self.setAccessToken('', null, '');
+            callback(status >= 200 && status < 300);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.getAccountDetails = function(callback) {
+    if (!this.accessToken) {
+        callback(null);
+        return;
+    }
+    var url = this.baseUrl + '/account';
+    this._pendingQueue.push({
+        url: url,
+        method: 'GET',
+        auth: 'user',
+        callback: function(data, status) {
+            callback(data || null);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.rateMovie = function(movieId, value, callback) {
+    if (!this.accessToken || !movieId) { callback(false); return; }
+    var url = this.baseUrl + '/movie/' + movieId + '/rating';
+    this._pendingQueue.push({
+        url: url,
+        method: 'POST',
+        body: { value: value },
+        auth: 'user',
+        callback: function(data, status) {
+            window.log('TMDB', 'rateMovie id=' + movieId + ' value=' + value + ' status=' + status);
+            callback(status >= 200 && status < 300);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.rateTVShow = function(tvId, value, callback) {
+    if (!this.accessToken || !tvId) { callback(false); return; }
+    var url = this.baseUrl + '/tv/' + tvId + '/rating';
+    this._pendingQueue.push({
+        url: url,
+        method: 'POST',
+        body: { value: value },
+        auth: 'user',
+        callback: function(data, status) {
+            window.log('TMDB', 'rateTVShow id=' + tvId + ' value=' + value + ' status=' + status);
+            callback(status >= 200 && status < 300);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.deleteRating = function(id, type, callback) {
+    if (!this.accessToken || !id) { callback(false); return; }
+    var path = (type === 'tv' || type === 'series') ? '/tv/' : '/movie/';
+    var url = this.baseUrl + path + id + '/rating';
+    this._pendingQueue.push({
+        url: url,
+        method: 'DELETE',
+        auth: 'user',
+        callback: function(data, status) {
+            window.log('TMDB', 'deleteRating id=' + id + ' type=' + type + ' status=' + status);
+            callback(status >= 200 && status < 300);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.getUserRating = function(id, type, callback) {
+    if (!this.accessToken || !id) { callback(null); return; }
+    var path = (type === 'tv' || type === 'series') ? '/tv/' : '/movie/';
+    var url = this.baseUrl + path + id + '/account_states';
+    this._pendingQueue.push({
+        url: url,
+        method: 'GET',
+        auth: 'user',
+        callback: function(data, status) {
+            if (!data) { callback(null); return; }
+            var rated = data.rated;
+            if (rated && typeof rated === 'object' && typeof rated.value === 'number') {
+                callback(rated.value);
+            }
+            else {
+                callback(null);
+            }
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.getMyRatedPage = function(type, page, callback) {
+    if (!this.accessToken || !this.accountId) { callback(null); return; }
+    var path = type === 'tv' ? '/tv/rated' : '/movie/rated';
+    var url = this.v4BaseUrl + '/account/' + this.accountId + path + '?page=' + (page || 1) + '&language=' + this.language;
+    this._pendingQueue.push({
+        url: url,
+        method: 'GET',
+        auth: 'user',
+        callback: function(data, status) {
+            callback(data || null);
+        }
+    });
+    this._processQueue();
+};
+
+TMDB.getAllMyRated = function(type, callback) {
+    var self = this;
+    if (!this.accessToken || !this.accountId) { callback({}); return; }
+    var all = {};
+    var fetchPage = function(page) {
+        self.getMyRatedPage(type, page, function(data) {
+            if (!data || !data.results) {
+                callback(all);
+                return;
+            }
+            data.results.forEach(function(item) {
+                if (!item || !item.id) return;
+                var ratingValue = null;
+                if (item.account_rating && typeof item.account_rating.value === 'number') {
+                    ratingValue = item.account_rating.value;
+                }
+                else if (typeof item.rating === 'number') {
+                    ratingValue = item.rating;
+                }
+                if (ratingValue === null) return;
+                var title = type === 'tv' ? item.name : item.title;
+                var dateField = type === 'tv' ? item.first_air_date : item.release_date;
+                var year = dateField ? String(dateField).substring(0, 4) : '';
+                all[item.id] = {
+                    value: ratingValue,
+                    title: title || '',
+                    year: year,
+                    posterPath: item.poster_path || ''
+                };
+            });
+            if (page < (data.total_pages || 1)) {
+                fetchPage(page + 1);
+            }
+            else {
+                window.log('TMDB', 'getAllMyRated type=' + type + ' count=' + Object.keys(all).length + ' pages=' + data.total_pages);
+                callback(all);
+            }
+        });
+    };
+    fetchPage(1);
 };
 
 window.TMDB = TMDB;

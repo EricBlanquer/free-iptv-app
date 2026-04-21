@@ -343,6 +343,157 @@ IPTVApp.prototype.selectTTSVoice = function() {
     this.hideTTSVoiceModal();
 };
 
+IPTVApp.prototype.updateTMDBAccountButton = function() {
+    var btn = document.getElementById('tmdb-account-btn');
+    if (!btn) return;
+    var desc = document.getElementById('tmdb-account-desc');
+    if (TMDB.isUserLoggedIn()) {
+        btn.classList.add('connected');
+        btn.dataset.action = 'tmdbDisconnect';
+        var name = TMDB.username || ('#' + TMDB.accountId);
+        btn.textContent = I18n.t('settings.tmdbDisconnect', 'Disconnect {name}', { name: name });
+        if (desc) this.setHidden(desc, true);
+    }
+    else {
+        btn.classList.remove('connected');
+        btn.dataset.action = 'tmdbConnect';
+        btn.textContent = I18n.t('settings.tmdbConnect', 'Connect');
+        if (desc) this.setHidden(desc, false);
+    }
+};
+
+IPTVApp.prototype.showTMDBConnectModal = function() {
+    var self = this;
+    if (!TMDB.canStartAuth()) {
+        this.showTMDBConnectError(I18n.t('settings.tmdbNoV4Token', 'v4 Read Token required in settings above'));
+        return;
+    }
+    var modal = document.getElementById('tmdb-connect-modal');
+    if (!modal) return;
+    this.setHidden(document.getElementById('tmdb-connect-step-loading'), false);
+    this.setHidden(document.getElementById('tmdb-connect-step-code'), true);
+    this.setHidden(document.getElementById('tmdb-connect-step-error'), true);
+    this.setHidden(modal, false);
+    this.tmdbConnectModalOpen = true;
+    this.previousFocusArea = this.focusArea;
+    this.focusArea = 'tmdb-connect-modal';
+    TMDB.requestV4Token(function(requestToken) {
+        if (!requestToken) {
+            self.showTMDBConnectError(I18n.t('settings.tmdbConnectFailed', 'Could not start authentication'));
+            return;
+        }
+        self.tmdbPendingRequestToken = requestToken;
+        self.renderTMDBConnectCode(requestToken);
+        self.startTMDBConnectPolling();
+    });
+};
+
+IPTVApp.prototype.renderTMDBConnectCode = function(requestToken) {
+    var qrEl = document.getElementById('tmdb-connect-qr');
+    var authUrl = 'https://www.themoviedb.org/auth/access?request_token=' + requestToken;
+    while (qrEl.firstChild) qrEl.removeChild(qrEl.firstChild);
+    var qrImg = document.createElement('img');
+    qrImg.alt = 'QR';
+    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=0&ecc=L&data=' + encodeURIComponent(authUrl);
+    qrEl.appendChild(qrImg);
+    this.setHidden(document.getElementById('tmdb-connect-step-loading'), true);
+    this.setHidden(document.getElementById('tmdb-connect-step-code'), false);
+    this.invalidateFocusables();
+    this.focusIndex = 0;
+    this.updateFocus();
+};
+
+IPTVApp.prototype.startTMDBConnectPolling = function() {
+    var self = this;
+    this.stopTMDBConnectPolling();
+    var startedAt = Date.now();
+    var POLL_INTERVAL = 5000;
+    var TIMEOUT_MS = 15 * 60 * 1000;
+    var pollFn = function() {
+        if (!self.tmdbConnectModalOpen || !self.tmdbPendingRequestToken) return;
+        if (Date.now() - startedAt > TIMEOUT_MS) {
+            self.showTMDBConnectError(I18n.t('settings.tmdbConnectTimeout', 'Authorization timed out'));
+            return;
+        }
+        TMDB.pollV4AccessToken(self.tmdbPendingRequestToken, function(tokenData, err) {
+            if (!self.tmdbConnectModalOpen) return;
+            if (tokenData) {
+                self.onTMDBConnectSuccess(tokenData);
+            }
+            else if (err === 'pending') {
+                self.tmdbConnectPollTimer = setTimeout(pollFn, POLL_INTERVAL);
+            }
+            else {
+                self.showTMDBConnectError(I18n.t('settings.tmdbConnectFailed', 'Could not start authentication'));
+            }
+        });
+    };
+    this.tmdbConnectPollTimer = setTimeout(pollFn, POLL_INTERVAL);
+};
+
+IPTVApp.prototype.stopTMDBConnectPolling = function() {
+    if (this.tmdbConnectPollTimer) {
+        clearTimeout(this.tmdbConnectPollTimer);
+        this.tmdbConnectPollTimer = null;
+    }
+};
+
+IPTVApp.prototype.onTMDBConnectSuccess = function(tokenData) {
+    var self = this;
+    this.stopTMDBConnectPolling();
+    TMDB.setAccessToken(tokenData.accessToken, tokenData.accountId, '');
+    this.settings.tmdbAccessToken = tokenData.accessToken;
+    this.settings.tmdbAccountId = tokenData.accountId;
+    TMDB.getAccountDetails(function(account) {
+        var username = account ? (account.username || account.name || '') : '';
+        TMDB.username = username;
+        self.settings.tmdbUsername = username;
+        self.saveSettings();
+        self.hideTMDBConnectModal();
+        self.updateTMDBAccountButton();
+    });
+};
+
+IPTVApp.prototype.showTMDBConnectError = function(message) {
+    this.stopTMDBConnectPolling();
+    if (!this.tmdbConnectModalOpen) {
+        var modal = document.getElementById('tmdb-connect-modal');
+        if (modal) this.setHidden(modal, false);
+        this.tmdbConnectModalOpen = true;
+        this.previousFocusArea = this.focusArea;
+        this.focusArea = 'tmdb-connect-modal';
+    }
+    var errEl = document.getElementById('tmdb-connect-error-msg');
+    if (errEl) errEl.textContent = message;
+    this.setHidden(document.getElementById('tmdb-connect-step-loading'), true);
+    this.setHidden(document.getElementById('tmdb-connect-step-code'), true);
+    this.setHidden(document.getElementById('tmdb-connect-step-error'), false);
+    this.invalidateFocusables();
+    this.focusIndex = 0;
+    this.updateFocus();
+};
+
+IPTVApp.prototype.hideTMDBConnectModal = function() {
+    this.stopTMDBConnectPolling();
+    var modal = document.getElementById('tmdb-connect-modal');
+    if (modal) this.setHidden(modal, true);
+    this.tmdbConnectModalOpen = false;
+    this.tmdbPendingRequestToken = null;
+    this.focusArea = this.previousFocusArea || 'settings';
+    this.updateFocus();
+};
+
+IPTVApp.prototype.disconnectTMDB = function() {
+    var self = this;
+    TMDB.logoutV4(function() {
+        self.settings.tmdbAccessToken = '';
+        self.settings.tmdbAccountId = null;
+        self.settings.tmdbUsername = '';
+        self.saveSettings();
+        self.updateTMDBAccountButton();
+    });
+};
+
 // Generate language options dynamically from I18nData
 IPTVApp.prototype.initLanguageOptions = function() {
     var locales = I18n.getAvailableLocales();
@@ -508,7 +659,7 @@ IPTVApp.prototype.initSettingsUI = function() {
             opt.classList.remove('selected');
         }
     }
-    var textSettings = ['tmdbApiKey', 'openSubtitlesApiKey', 'subDLApiKey', 'proxyUrl', 'freeboxHost'];
+    var textSettings = ['openSubtitlesApiKey', 'subDLApiKey', 'proxyUrl', 'freeboxHost'];
     for (var m = 0; m < textSettings.length; m++) {
         var inputKey = textSettings[m];
         var inputEl = document.getElementById('setting-' + inputKey);
@@ -516,6 +667,7 @@ IPTVApp.prototype.initSettingsUI = function() {
             inputEl.value = this.settings[inputKey] || '';
         }
     }
+    this.updateTMDBAccountButton();
     this.bindSettingsInputs();
     var nameEl = document.getElementById('active-playlist-name');
     if (nameEl) {
@@ -987,6 +1139,12 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             else {
                 this.startFreeboxPairing();
             }
+        }
+        else if (actionType === 'tmdbConnect') {
+            this.showTMDBConnectModal();
+        }
+        else if (actionType === 'tmdbDisconnect') {
+            this.disconnectTMDB();
         }
     }
     else if (current.classList.contains('pattern-edit-btn')) {

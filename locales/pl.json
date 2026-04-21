@@ -17,7 +17,9 @@
         "select": "Wybierz...",
         "loading": "Ładowanie...",
         "error": "Błąd",
-        "connectionError": "Błąd połączenia"
+        "connectionError": "Błąd połączenia",
+        "cancel": "Anuluj",
+        "close": "Zamknij"
     },
     "app": {
         "loading": "Ładowanie...",
@@ -64,7 +66,9 @@
         "categories": "Kategorie",
         "recommended": "Polecane",
         "noRecommendations": "Brak rekomendacji — najpierw obejrzyj lub dodaj coś do ulubionych",
-        "computingRecommendations": "Obliczanie rekomendacji..."
+        "computingRecommendations": "Obliczanie rekomendacji...",
+        "myRatings": "Moje oceny",
+        "noRatings": "Brak ocen"
     },
     "guide": {
         "today": "Dziś",
@@ -258,7 +262,18 @@
         "unitSeconds_other": "{n} sekund",
         "showRecommended": "Pokaż kategorię „Polecane”",
         "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout",
-        "exitConfirmation": "Potwierdzenie wyjścia"
+        "exitConfirmation": "Potwierdzenie wyjścia",
+        "tmdbV4ReadToken": "Token odczytu TMDB v4",
+        "tmdbV4ReadTokenDesc": "Wymagany do połączenia konta TMDB (ocenianie filmów).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "Konto TMDB",
+        "tmdbConnect": "Połącz",
+        "tmdbDisconnect": "Rozłącz {name}",
+        "tmdbConnectInstructions": "Zeskanuj ten kod QR telefonem i zatwierdź dostęp w TMDB:",
+        "tmdbConnectWaiting": "Oczekiwanie na autoryzację...",
+        "tmdbConnectFailed": "Nie udało się uruchomić uwierzytelniania",
+        "tmdbConnectTimeout": "Upłynął czas autoryzacji",
+        "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
+        "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale."
     },
     "player": {
         "play": "Odtwórz",
@@ -332,7 +347,13 @@
         "episode": "Odcinek",
         "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy.",
         "age": "{count} lat",
-        "similarGenres": "Więcej w tym samym gatunku"
+        "similarGenres": "Więcej w tym samym gatunku",
+        "yourRating": "Twoja ocena",
+        "removeRating": "Usuń",
+        "rateHint": "Naciśnij 0-9, aby ocenić bezpośrednio",
+        "ratingSaved": "Ocena zapisana",
+        "ratingRemoved": "Ocena usunięta",
+        "ratingFailed": "Ocenianie nie powiodło się"
     },
     "department": {
         "Acting": "Aktorstwo",
@@ -515,7 +536,8 @@
         "qualityHint": "Kliknij, aby zmienić rozdzielczość",
         "favoriteHint": "Dodaj do mojej listy",
         "downloadHint": "Pobierz do Freebox",
-        "downloadSeasonHint": "Pobierz sezon na Freebox"
+        "downloadSeasonHint": "Pobierz sezon na Freebox",
+        "userRatingHint": "Twoja ocena wpływa na rekomendacje"
     },
     "diagnostic": {
         "title": "Problem z połączeniem",

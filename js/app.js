@@ -60,6 +60,7 @@ class IPTVApp {
         this.movieVersionPrefs = this.loadMovieVersionPrefs();
         this.favorites = this.loadFavorites();
         this._rebuildFavoritesIndex();
+        this.myTMDBRatings = this.loadMyTMDBRatings();
         this.tmdbCache = this.loadTMDBCache();
         this.data = {
             live: { categories: [], streams: [] },
@@ -343,14 +344,21 @@ class IPTVApp {
     }
 
     initAPIs() {
+        var self = this;
         TMDB.setApiKey(this.settings.tmdbApiKey);
+        TMDB.setV4ReadToken(this.settings.tmdbV4ReadToken);
+        TMDB.setAccessToken(this.settings.tmdbAccessToken, this.settings.tmdbAccountId, this.settings.tmdbUsername);
         if (typeof OpenSubtitles !== 'undefined') {
             OpenSubtitles.setApiKey(this.settings.openSubtitlesApiKey);
         }
         if (typeof SubDL !== 'undefined') {
             SubDL.setApiKey(this.settings.subDLApiKey);
         }
-        window.log('INIT', 'APIs TMDB=' + TMDB.isEnabled() + ' OpenSub=' + (typeof OpenSubtitles !== 'undefined' && OpenSubtitles.isEnabled()) + ' SubDL=' + (typeof SubDL !== 'undefined' && SubDL.isEnabled()));
+        window.log('INIT', 'APIs TMDB=' + TMDB.isEnabled() + ' TMDBUser=' + TMDB.isUserLoggedIn() + ' OpenSub=' + (typeof OpenSubtitles !== 'undefined' && OpenSubtitles.isEnabled()) + ' SubDL=' + (typeof SubDL !== 'undefined' && SubDL.isEnabled()));
+        if (TMDB.isUserLoggedIn() && !this._myTMDBRatingsRefreshed) {
+            this._myTMDBRatingsRefreshed = true;
+            setTimeout(function() { self.refreshMyTMDBRatings(); }, 3000);
+        }
     }
 
     isIPTVConfigured() {

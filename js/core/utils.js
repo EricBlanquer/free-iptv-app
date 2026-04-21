@@ -271,6 +271,23 @@ IPTVApp.prototype.setBackgroundImage = function(element, url) {
     if (element) element.style.backgroundImage = cssUrl(this.proxyImageUrl(url));
 };
 
+IPTVApp.prototype._normalizeTitleForMatch = function(s) {
+    if (!s) return '';
+    var decomposed = s.toLowerCase();
+    if (typeof decomposed.normalize === 'function') {
+        decomposed = decomposed.normalize('NFD');
+    }
+    var out = '';
+    for (var i = 0; i < decomposed.length; i++) {
+        var code = decomposed.charCodeAt(i);
+        if (code >= 0x0300 && code <= 0x036F) continue;
+        if ((code >= 0x61 && code <= 0x7A) || (code >= 0x30 && code <= 0x39)) {
+            out += decomposed.charAt(i);
+        }
+    }
+    return out;
+};
+
 IPTVApp.prototype.setHidden = function(element, hide) {
     if (typeof element === 'string') {
         element = document.getElementById(element);
