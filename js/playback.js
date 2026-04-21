@@ -1456,17 +1456,35 @@ IPTVApp.prototype.reapplySubtitleTrack = function() {
     }
 };
 
-// Auto-select audio track matching interface language (prefer most channels)
+// Auto-select audio track matching playlist/interface language and channel preference
 IPTVApp.prototype.autoSelectAudioTrack = function(audioTracks) {
     if (!audioTracks || audioTracks.length <= 1) return;
-    var locale = this.settings.locale || 'en';
-    var langCodes = I18n.getIso639Codes(locale);
-    window.log('autoSelectAudioTrack: locale=' + locale + ' codes=' + langCodes.join(',') + ' tracks=' + audioTracks.length);
+    var activePlaylist = this.getActivePlaylist();
+    var providerLang = activePlaylist ? (activePlaylist.defaultAudioLang || '') : '';
+    var channelsPref = activePlaylist ? (activePlaylist.defaultAudioChannels || 'stereo') : 'stereo';
+    var locale;
+    var langCodes;
+    if (providerLang) {
+        locale = providerLang.toLowerCase();
+        langCodes = I18n.getIso639Codes(locale);
+    }
+    else {
+        locale = this.settings.locale || 'en';
+        langCodes = I18n.getIso639Codes(locale);
+    }
+    window.log('autoSelectAudioTrack: locale=' + locale + ' codes=' + langCodes.join(',') + ' channels=' + channelsPref + ' tracks=' + audioTracks.length);
     var self = this;
+    var stereoScore = function(channels) {
+        var c = parseInt(channels) || 2;
+        if (channelsPref === 'stereo') {
+            return c <= 2 ? 100 - c : -c;
+        }
+        return c;
+    };
     var selectBestFromCandidates = function(candidates) {
         if (candidates.length === 0) return false;
         candidates.sort(function(a, b) {
-            return (parseInt(b.track.channels) || 2) - (parseInt(a.track.channels) || 2);
+            return stereoScore(b.track.channels) - stereoScore(a.track.channels);
         });
         var best = candidates[0];
         window.log('autoSelectAudioTrack: selected index ' + best.i + ' lang=' + (best.track.lang || best.track.language) + ' channels=' + (best.track.channels || '?'));
