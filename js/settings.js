@@ -391,11 +391,23 @@ IPTVApp.prototype.showTMDBConnectModal = function() {
 IPTVApp.prototype.renderTMDBConnectCode = function(requestToken) {
     var qrEl = document.getElementById('tmdb-connect-qr');
     var authUrl = 'https://www.themoviedb.org/auth/access?request_token=' + requestToken;
+    var isAndroid = typeof Android !== 'undefined' && Android && typeof Android.openAuthWebView === 'function';
+    var instructionsEl = document.getElementById('tmdb-connect-instructions');
     while (qrEl.firstChild) qrEl.removeChild(qrEl.firstChild);
-    var qrImg = document.createElement('img');
-    qrImg.alt = 'QR';
-    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=0&ecc=L&data=' + encodeURIComponent(authUrl);
-    qrEl.appendChild(qrImg);
+    if (isAndroid) {
+        this.setHidden(qrEl, true);
+        if (instructionsEl) instructionsEl.textContent = I18n.t('settings.tmdbConnectInstructionsAndroid', 'Approve access in the opened page, then close it to return here.');
+        try { Android.openAuthWebView(authUrl); }
+        catch (ex) { window.log('ERROR openAuthWebView: ' + (ex.message || ex)); }
+    }
+    else {
+        this.setHidden(qrEl, false);
+        if (instructionsEl) instructionsEl.textContent = I18n.t('settings.tmdbConnectInstructions', 'Scan this QR code with your phone and approve access on TMDB:');
+        var qrImg = document.createElement('img');
+        qrImg.alt = 'QR';
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=0&ecc=L&data=' + encodeURIComponent(authUrl);
+        qrEl.appendChild(qrImg);
+    }
     this.setHidden(document.getElementById('tmdb-connect-step-loading'), true);
     this.setHidden(document.getElementById('tmdb-connect-step-code'), false);
     this.invalidateFocusables();
@@ -409,6 +421,8 @@ IPTVApp.prototype.startTMDBConnectPolling = function() {
     var startedAt = Date.now();
     var POLL_INTERVAL = 5000;
     var TIMEOUT_MS = 15 * 60 * 1000;
+    var MAX_CONSECUTIVE_ERRORS = 5;
+    var consecutiveErrors = 0;
     var pollFn = function() {
         if (!self.tmdbConnectModalOpen || !self.tmdbPendingRequestToken) return;
         if (Date.now() - startedAt > TIMEOUT_MS) {
@@ -419,13 +433,19 @@ IPTVApp.prototype.startTMDBConnectPolling = function() {
             if (!self.tmdbConnectModalOpen) return;
             if (tokenData) {
                 self.onTMDBConnectSuccess(tokenData);
+                return;
             }
-            else if (err === 'pending') {
-                self.tmdbConnectPollTimer = setTimeout(pollFn, POLL_INTERVAL);
+            if (err === 'pending') {
+                consecutiveErrors = 0;
             }
             else {
-                self.showTMDBConnectError(I18n.t('settings.tmdbConnectFailed', 'Could not start authentication'));
+                consecutiveErrors++;
+                if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+                    self.showTMDBConnectError(I18n.t('settings.tmdbConnectFailed', 'Could not start authentication'));
+                    return;
+                }
             }
+            self.tmdbConnectPollTimer = setTimeout(pollFn, POLL_INTERVAL);
         });
     };
     this.tmdbConnectPollTimer = setTimeout(pollFn, POLL_INTERVAL);

@@ -315,7 +315,8 @@
         "tmdbConnectFailed": "Impossible de démarrer l’authentification",
         "tmdbConnectTimeout": "Délai d’autorisation dépassé",
         "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
-        "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries."
+        "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries.",
+        "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici."
     },
     "player": {
         "play": "Lecture",

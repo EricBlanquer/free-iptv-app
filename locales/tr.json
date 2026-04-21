@@ -274,7 +274,8 @@
         "tmdbConnectFailed": "Kimlik doğrulama başlatılamadı",
         "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
         "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
-        "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla."
+        "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla.",
+        "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat."
     },
     "player": {
         "play": "Oynat",

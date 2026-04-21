@@ -273,7 +273,8 @@
         "tmdbConnectFailed": "Nie udało się uruchomić uwierzytelniania",
         "tmdbConnectTimeout": "Upłynął czas autoryzacji",
         "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
-        "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale."
+        "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale.",
+        "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj."
     },
     "player": {
         "play": "Odtwórz",

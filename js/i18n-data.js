@@ -1274,7 +1274,8 @@ var I18nData = {
                             "tmdbConnectFailed": "تعذر بدء المصادقة",
                             "tmdbConnectTimeout": "انتهت مهلة التفويض",
                             "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
-                            "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات."
+                            "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات.",
+                            "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا."
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1784,7 +1785,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Authentifizierung konnte nicht gestartet werden",
                             "tmdbConnectTimeout": "Zeitüberschreitung bei der Autorisierung",
                             "tmdbNoV4Token": "v4 Read-Token in den Einstellungen oben erforderlich",
-                            "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten."
+                            "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten.",
+                            "tmdbConnectInstructionsAndroid": "Erlaube den Zugriff auf der geöffneten Seite und schließe sie, um zurückzukehren."
                     },
                     "player": {
                             "play": "Abspielen",
@@ -2299,7 +2301,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Could not start authentication",
                             "tmdbConnectTimeout": "Authorization timed out",
                             "tmdbNoV4Token": "v4 Read Token required in settings above",
-                            "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows."
+                            "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows.",
+                            "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here."
                     },
                     "player": {
                             "play": "Play",
@@ -2804,7 +2807,8 @@ var I18nData = {
                             "tmdbConnectFailed": "No se pudo iniciar la autenticación",
                             "tmdbConnectTimeout": "Tiempo de autorización agotado",
                             "tmdbNoV4Token": "Token de lectura v4 requerido en los ajustes de arriba",
-                            "tmdbAccountDesc": "Conecta tu cuenta TMDB para valorar películas y series."
+                            "tmdbAccountDesc": "Conecta tu cuenta TMDB para valorar películas y series.",
+                            "tmdbConnectInstructionsAndroid": "Aprueba el acceso en la página abierta y ciérrala para volver aquí."
                     },
                     "player": {
                             "play": "Reproducir",
@@ -3319,7 +3323,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Impossible de démarrer l’authentification",
                             "tmdbConnectTimeout": "Délai d’autorisation dépassé",
                             "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
-                            "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries."
+                            "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries.",
+                            "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici."
                     },
                     "player": {
                             "play": "Lecture",
@@ -3824,7 +3829,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Impossibile avviare l’autenticazione",
                             "tmdbConnectTimeout": "Tempo scaduto per l’autorizzazione",
                             "tmdbNoV4Token": "Token di lettura v4 richiesto nelle impostazioni sopra",
-                            "tmdbAccountDesc": "Collega il tuo account TMDB per valutare film e serie."
+                            "tmdbAccountDesc": "Collega il tuo account TMDB per valutare film e serie.",
+                            "tmdbConnectInstructionsAndroid": "Approva l’accesso nella pagina aperta, poi chiudila per tornare qui."
                     },
                     "player": {
                             "play": "Riproduci",
@@ -4334,7 +4340,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Authenticatie kon niet starten",
                             "tmdbConnectTimeout": "Autorisatie verlopen",
                             "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
-                            "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen."
+                            "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen.",
+                            "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren."
                     },
                     "player": {
                             "play": "Afspelen",
@@ -4844,7 +4851,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Nie udało się uruchomić uwierzytelniania",
                             "tmdbConnectTimeout": "Upłynął czas autoryzacji",
                             "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
-                            "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale."
+                            "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale.",
+                            "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj."
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -5354,7 +5362,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Não foi possível iniciar a autenticação",
                             "tmdbConnectTimeout": "Tempo de autorização esgotado",
                             "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
-                            "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries."
+                            "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries.",
+                            "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui."
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -5864,7 +5873,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Не удалось запустить аутентификацию",
                             "tmdbConnectTimeout": "Время авторизации истекло",
                             "tmdbNoV4Token": "Токен чтения v4 требуется в настройках выше",
-                            "tmdbAccountDesc": "Подключите аккаунт TMDB, чтобы оценивать фильмы и сериалы."
+                            "tmdbAccountDesc": "Подключите аккаунт TMDB, чтобы оценивать фильмы и сериалы.",
+                            "tmdbConnectInstructionsAndroid": "Подтвердите доступ на открытой странице, затем закройте её, чтобы вернуться."
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -6374,7 +6384,8 @@ var I18nData = {
                             "tmdbConnectFailed": "Kimlik doğrulama başlatılamadı",
                             "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
                             "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
-                            "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla."
+                            "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla.",
+                            "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat."
                     },
                     "player": {
                             "play": "Oynat",

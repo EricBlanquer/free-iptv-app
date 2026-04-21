@@ -303,7 +303,8 @@
         "tmdbConnectFailed": "Could not start authentication",
         "tmdbConnectTimeout": "Authorization timed out",
         "tmdbNoV4Token": "v4 Read Token required in settings above",
-        "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows."
+        "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows.",
+        "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here."
     },
     "player": {
         "play": "Play",
