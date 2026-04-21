@@ -138,20 +138,19 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     this.setBackgroundImage('details-poster', imageUrl);
     var streamId = streamData ? (streamData.stream_id || streamData.vod_id) : null;
     var override = streamId ? this.getTitleOverride(streamId) : null;
+    var stripEmptyParens = function(s) {
+        return s.replace(/\s*\(\s*\)\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+    };
+    var resolvedYear = this.getStreamYear(streamData, title, null);
     var cleanDisplayTitle;
     if (override) {
-        cleanDisplayTitle = override;
-        var overrideYear = this.extractYear(title);
-        if (overrideYear && cleanDisplayTitle.indexOf('(' + overrideYear + ')') === -1) {
-            cleanDisplayTitle += ' (' + overrideYear + ')';
-        }
+        cleanDisplayTitle = stripEmptyParens(override);
     }
     else {
         cleanDisplayTitle = this.cleanTitle(title);
-        var year = this.extractYear(title);
-        if (year && cleanDisplayTitle.indexOf('(' + year + ')') === -1) {
-            cleanDisplayTitle += ' (' + year + ')';
-        }
+    }
+    if (resolvedYear && cleanDisplayTitle.indexOf('(' + resolvedYear + ')') === -1) {
+        cleanDisplayTitle += ' (' + resolvedYear + ')';
     }
     window.log('TITLE', 'showDetails: rawTitle="' + title + '" cleaned="' + cleanDisplayTitle + '"' + (override ? ' (override)' : ''));
     var detailsTitle = document.getElementById('details-title');
@@ -1539,6 +1538,8 @@ IPTVApp.prototype._computeSortKey = function(rawTitle, isOverride) {
 };
 
 IPTVApp.prototype.saveTitleOverride = function(streamId, title) {
+    title = (title || '').replace(/\s*\(\s*\)\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+    if (!title) return;
     try {
         var overrides = JSON.parse(localStorage.getItem('titleOverrides') || '{}');
         if (overrides[streamId] === title) return;
@@ -1952,6 +1953,35 @@ IPTVApp.prototype.extractYear = function(title) {
     return match ? match[1] : null;
 };
 
+IPTVApp.prototype._yearFromDate = function(d) {
+    if (!d) return null;
+    var s = String(d);
+    if (/^(?:19|20)\d{2}/.test(s)) return s.substring(0, 4);
+    return null;
+};
+
+IPTVApp.prototype.getStreamYear = function(streamData, rawTitle, tmdbInfo) {
+    if (streamData) {
+        var sy = streamData.year ? String(streamData.year).match(/(?:19|20)\d{2}/) : null;
+        if (sy) return sy[0];
+        var rd = this._yearFromDate(streamData.release_date);
+        if (rd) return rd;
+        var fad = this._yearFromDate(streamData.first_air_date);
+        if (fad) return fad;
+    }
+    if (tmdbInfo) {
+        var trd = this._yearFromDate(tmdbInfo.release_date);
+        if (trd) return trd;
+        var tfad = this._yearFromDate(tmdbInfo.first_air_date);
+        if (tfad) return tfad;
+    }
+    if (rawTitle) {
+        var ty = this.extractYear(rawTitle);
+        if (ty) return ty;
+    }
+    return null;
+};
+
 IPTVApp.prototype.fixOverviewSpacing = function(text) {
     return text.replace(/([.!?])([A-ZÀ-ÖÙ-Ü])/g, '$1 $2');
 };
@@ -1999,6 +2029,8 @@ IPTVApp.prototype.cleanTitle = function(title) {
     result = result.replace(Regex.seasonEpisode, '');
     if (Regex.saison) result = result.replace(Regex.saison, '');
     if (Regex.part) result = result.replace(Regex.part, '');
+    result = result.replace(/\s*\(\s*\)\s*/g, ' ');
+    result = result.replace(/\s{2,}/g, ' ');
     result = result.replace(Regex.trailingDash, '').trim();
     if (!result) result = stripped.trim();
     return result;
@@ -2892,6 +2924,15 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
                 this._titleReplacedByTmdb = true;
                 var streamId = streamData && (streamData.stream_id || streamData.vod_id || streamData.series_id);
                 if (streamId) this.saveTitleOverride(streamId, tmdbTitle);
+            }
+            else if (year && titleEl.firstChild) {
+                var currentText = titleEl.firstChild.nodeType === 3 ? titleEl.firstChild.nodeValue : titleEl.textContent;
+                var cleaned = (currentText || '').replace(/\s*\(\s*\)\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+                if (cleaned.indexOf('(' + year + ')') === -1) {
+                    var updated = cleaned + ' (' + year + ')';
+                    if (titleEl.firstChild.nodeType === 3) titleEl.firstChild.nodeValue = updated;
+                    else titleEl.textContent = updated;
+                }
             }
         }
     }
