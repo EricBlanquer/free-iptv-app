@@ -646,11 +646,6 @@
     margin-bottom: 10px;
 }
 
-.actions-break {
-    flex-basis: 100%;
-    height: 0;
-}
-
 #continue-btn {
     margin-left: 0;
 }
