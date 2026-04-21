@@ -912,14 +912,13 @@ IPTVApp.prototype._renderCategoryContent = function(categories, streams, section
         sidebarContainer.querySelector('[data-category-id="' + savedCategory + '"]') !== null;
     var categoryExistsInData = savedCategory !== undefined &&
         categories.some(function(c) { return c.category_id === savedCategory || String(c.category_id) === String(savedCategory); });
-    var isDeferredPseudoCategory = savedCategory === 'recommended'
-        && (section === 'vod' || section === 'series')
-        && this._collectRecommendationSeeds(section).length > 0;
-    if (categoryExistsInSidebar || categoryExistsInData || isDeferredPseudoCategory) {
+    if (categoryExistsInSidebar || categoryExistsInData) {
         this.loadStreams(savedCategory);
     }
     else {
-        if (savedCategory !== undefined) {
+        var pseudoCategories = ['continue', 'favorites', 'rated', 'recommended', 'tnt', 'guide'];
+        var isPseudoCategory = savedCategory !== undefined && pseudoCategories.indexOf(savedCategory) !== -1;
+        if (savedCategory !== undefined && !isPseudoCategory) {
             delete this.selectedCategoryBySection[categoryKey];
             this.saveSelectedCategories();
         }
