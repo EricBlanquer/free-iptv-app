@@ -2585,7 +2585,7 @@ IPTVApp.prototype.markAsWatched = function() {
         historyItem.watched = false;
         this.saveWatchHistory();
         this.updateContinueCounter();
-        this.goBack();
+        this.updateMarkWatchedButton();
         return;
     }
     var wasNew = false;
@@ -2601,24 +2601,7 @@ IPTVApp.prototype.markAsWatched = function() {
         this.saveWatchHistory();
         this.updateContinueCounter();
     }
-    if (this.currentStreamType === 'history') {
-        this.showScreen('browse');
-        this.currentScreen = 'browse';
-        this.showContinueInGrid();
-        var gridItems = document.querySelectorAll('#content-grid .grid-item');
-        if (gridItems.length > 0) {
-            this.focusArea = 'grid';
-            this.focusIndex = Math.max(0, Math.min(this.lastGridIndex - 1, gridItems.length - 1));
-        }
-        else {
-            this.focusArea = 'sidebar';
-            this.focusIndex = 0;
-        }
-        this.updateFocus();
-    }
-    else {
-        this.goBack();
-    }
+    this.updateMarkWatchedButton();
 };
 
 IPTVApp.prototype.updateMarkWatchedButton = function() {
