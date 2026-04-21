@@ -171,7 +171,8 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
             detailsTitle.appendChild(formatTag);
         }
     }
-    document.getElementById('details-meta').textContent = '';
+    document.getElementById('details-meta-parts').textContent = '';
+    this.hideUserRatingUI();
     var descResetEl = document.getElementById('details-description');
     descResetEl.textContent = '';
     descResetEl.scrollTop = 0;
@@ -503,6 +504,11 @@ IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualTy
         }
         playBtn.style.opacity = '1';
     }
+    var actionsEl = document.getElementById('details-actions');
+    var breakEl = actionsEl.querySelector('.actions-break');
+    if (breakEl) {
+        breakEl.style.display = continueBtn.classList.contains('hidden') ? 'none' : '';
+    }
 };
 
 IPTVApp.prototype._showDetailsLive = function(streamId, streamData) {
@@ -569,7 +575,7 @@ IPTVApp.prototype.prepareDetailsFromHistory = function() {
     this.setBackgroundImage('details-poster', imageUrl);
     var cleanDisplayTitle = this.stripCategoryPrefix(title);
     document.getElementById('details-title').textContent = cleanDisplayTitle;
-    document.getElementById('details-meta').textContent = '';
+    document.getElementById('details-meta-parts').textContent = '';
     setDescription('', 'showDetails');
     this.clearElement('details-genres');
     this.clearElement('details-cast-grid');
@@ -678,7 +684,7 @@ IPTVApp.prototype.renderVodInfoFromProvider = function(data) {
         this.preloadTTS(data.plot);
     }
     // Display metadata (year, duration, rating)
-    var metaEl = document.getElementById('details-meta');
+    var metaEl = document.getElementById('details-meta-parts');
     metaEl.textContent = '';
     var metaParts = [];
     var releaseDate = data.releaseDate || data.release_date || data.releasedate;
@@ -757,7 +763,7 @@ IPTVApp.prototype.renderVodInfoFromProvider = function(data) {
 };
 
 IPTVApp.prototype.displayBasicMetadata = function(streamData, title) {
-    var metaEl = document.getElementById('details-meta');
+    var metaEl = document.getElementById('details-meta-parts');
     metaEl.textContent = '';
     var year = this.extractYear(title);
     if (year) {
@@ -778,6 +784,204 @@ IPTVApp.prototype.displayBasicMetadata = function(streamData, title) {
             metaEl.appendChild(ratingContainer);
         }
     }
+};
+
+IPTVApp.prototype._renderTMDBMeta = function(tmdbInfo, type, providerRating, matchText) {
+    var metaEl = document.getElementById('details-meta-parts');
+    if (!metaEl || !tmdbInfo) return;
+    metaEl.textContent = '';
+    var metaParts = [];
+    if (type === 'movie') {
+        if (tmdbInfo.release_date) metaParts.push(tmdbInfo.release_date.substring(0, 4));
+        if (tmdbInfo.runtime) metaParts.push(TMDB.formatRuntime(tmdbInfo.runtime));
+    }
+    else {
+        if (tmdbInfo.first_air_date) metaParts.push(tmdbInfo.first_air_date.substring(0, 4));
+        if (tmdbInfo.number_of_seasons) {
+            metaParts.push(tmdbInfo.number_of_seasons + ' saison' + (tmdbInfo.number_of_seasons > 1 ? 's' : ''));
+        }
+    }
+    metaParts.forEach(function(part, idx) {
+        if (idx > 0) metaEl.appendChild(document.createTextNode(' · '));
+        metaEl.appendChild(document.createTextNode(part));
+    });
+    var voteAvg = tmdbInfo.vote_average || 0;
+    var voteCount = tmdbInfo.vote_count || 0;
+    var userRating = this._userRatingValue || 0;
+    if (userRating > 0) {
+        if (voteCount > 0) {
+            voteAvg = ((voteAvg * voteCount) + userRating) / (voteCount + 1);
+        }
+        else {
+            voteAvg = userRating;
+        }
+        voteCount = voteCount + 1;
+    }
+    this.displayDualRatings(metaEl, metaParts.length > 0, providerRating, voteAvg, voteCount);
+    if (matchText) {
+        metaEl.appendChild(document.createTextNode(' · '));
+        var matchSpan = document.createElement('span');
+        matchSpan.className = 'tmdb-match-inline';
+        matchSpan.textContent = matchText;
+        metaEl.appendChild(matchSpan);
+    }
+    this._detailsMetaCtx = { tmdbInfo: tmdbInfo, type: type, providerRating: providerRating, matchText: matchText };
+};
+
+IPTVApp.prototype._refreshTMDBMeta = function() {
+    if (!this._detailsMetaCtx) return;
+    var ctx = this._detailsMetaCtx;
+    this._renderTMDBMeta(ctx.tmdbInfo, ctx.type, ctx.providerRating, ctx.matchText);
+};
+
+IPTVApp.prototype.initUserRatingUI = function(tmdbId, type) {
+    var self = this;
+    var row = document.getElementById('details-user-rating');
+    if (!row) return;
+    if (!TMDB.isUserLoggedIn() || !tmdbId || (type !== 'movie' && type !== 'tv' && type !== 'series')) {
+        this.hideUserRatingUI();
+        return;
+    }
+    this._userRatingTmdbId = tmdbId;
+    this._userRatingType = (type === 'series') ? 'tv' : type;
+    this._userRatingValue = 0;
+    this._preserveDetailsFocus(function() {
+        self.setHidden(row, false);
+        self.renderUserRatingStars(0);
+    });
+    if (this.settings.showRecommended !== false) {
+        this.scheduleTooltipShow('userRating', function() {
+            if (self.currentScreen !== 'details') return;
+            self.showButtonTooltip('details-user-rating', 'userRatingTooltipShown', I18n.t('tips.userRatingHint', 'Rating influences your recommendations'), 'bottom');
+        }, 1500);
+    }
+    TMDB.getUserRating(tmdbId, this._userRatingType, function(value) {
+        if (self._userRatingTmdbId !== tmdbId) return;
+        self._userRatingValue = value || 0;
+        self._preserveDetailsFocus(function() {
+            self.renderUserRatingStars(self._userRatingValue);
+        });
+    });
+};
+
+IPTVApp.prototype._preserveDetailsFocus = function(domChangeFn) {
+    if (this.focusArea !== 'details') {
+        domChangeFn();
+        this.invalidateFocusables();
+        return;
+    }
+    var prevFocusables = this.getFocusables();
+    var prevFocused = prevFocusables[this.focusIndex] || null;
+    domChangeFn();
+    this.invalidateFocusables();
+    var newFocusables = this.getFocusables();
+    if (prevFocused) {
+        for (var i = 0; i < newFocusables.length; i++) {
+            if (newFocusables[i] === prevFocused) {
+                this.focusIndex = i;
+                this.updateFocus();
+                return;
+            }
+        }
+    }
+    if (this.focusIndex >= newFocusables.length) {
+        this.focusIndex = Math.max(0, newFocusables.length - 1);
+    }
+    this.updateFocus();
+};
+
+IPTVApp.prototype.hideUserRatingUI = function() {
+    var self = this;
+    var row = document.getElementById('details-user-rating');
+    if (!row || row.classList.contains('hidden')) {
+        this._userRatingTmdbId = null;
+        this._userRatingType = null;
+        this._userRatingValue = 0;
+        return;
+    }
+    this._preserveDetailsFocus(function() {
+        self.setHidden(row, true);
+        self._userRatingTmdbId = null;
+        self._userRatingType = null;
+        self._userRatingValue = 0;
+    });
+};
+
+IPTVApp.prototype.renderUserRatingStars = function(value) {
+    var stars = document.querySelectorAll('#user-rating-stars .user-rating-star');
+    var filledCount = value > 0 ? Math.round(value / 2) : 0;
+    for (var i = 0; i < stars.length; i++) {
+        var star = stars[i];
+        var starValue = parseInt(star.dataset.value, 10);
+        if (starValue <= filledCount) {
+            star.classList.add('filled');
+            star.textContent = '★';
+        }
+        else {
+            star.classList.remove('filled');
+            star.textContent = '☆';
+        }
+    }
+    var valueEl = document.getElementById('user-rating-value');
+    if (valueEl) valueEl.textContent = value > 0 ? (value + '/10') : '';
+    var removeBtn = document.getElementById('user-rating-remove-btn');
+    if (removeBtn) this.setHidden(removeBtn, value <= 0);
+    this._refreshTMDBMeta();
+};
+
+IPTVApp.prototype.submitUserRating = function(value) {
+    var self = this;
+    if (!this._userRatingTmdbId || !this._userRatingType) return;
+    if (value < 1) value = 1;
+    if (value > 10) value = 10;
+    var tmdbId = this._userRatingTmdbId;
+    var type = this._userRatingType;
+    this._userRatingValue = value;
+    this.renderUserRatingStars(value);
+    var title = '';
+    var year = '';
+    var posterPath = '';
+    if (this.tmdbInfo) {
+        title = this.tmdbInfo.title || this.tmdbInfo.name || '';
+        var d = this.tmdbInfo.release_date || this.tmdbInfo.first_air_date || '';
+        year = d ? String(d).substring(0, 4) : '';
+        posterPath = this.tmdbInfo.poster_path || '';
+    }
+    this.updateLocalTMDBRating(tmdbId, type, value, title, year, posterPath);
+    var cb = function(ok) {
+        if (!ok) {
+            window.log('ERROR', 'TMDB rating failed');
+            self._showToast(I18n.t('details.ratingFailed', 'Rating failed'));
+        }
+        else {
+            self._showToast(I18n.t('details.ratingSaved', 'Rating saved'));
+        }
+    };
+    if (type === 'movie') {
+        TMDB.rateMovie(tmdbId, value, cb);
+    }
+    else {
+        TMDB.rateTVShow(tmdbId, value, cb);
+    }
+};
+
+IPTVApp.prototype.removeUserRating = function() {
+    var self = this;
+    if (!this._userRatingTmdbId || !this._userRatingType) return;
+    var tmdbId = this._userRatingTmdbId;
+    var type = this._userRatingType;
+    this._userRatingValue = 0;
+    this.renderUserRatingStars(0);
+    this.updateLocalTMDBRating(tmdbId, type, 0);
+    TMDB.deleteRating(tmdbId, type, function(ok) {
+        if (!ok) {
+            window.log('ERROR', 'TMDB delete rating failed');
+            self._showToast(I18n.t('details.ratingFailed', 'Rating failed'));
+        }
+        else {
+            self._showToast(I18n.t('details.ratingRemoved', 'Rating removed'));
+        }
+    });
 };
 
 IPTVApp.prototype.displayDualRatings = function(metaEl, hasParts, providerRating, tmdbRating, voteCount) {
@@ -2041,33 +2245,9 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
                 self.preloadTTS(overview);
                 self.showTTSTooltip();
             }
-            var metaEl = document.getElementById('details-meta');
             var providerRatingEl = document.getElementById('details-rating-container');
             var providerRating = providerRatingEl ? parseFloat(providerRatingEl.dataset.providerRating) : 0;
-            metaEl.textContent = '';
-            var metaParts = [];
-            if (type === 'movie') {
-                if (result.release_date) metaParts.push(result.release_date.substring(0, 4));
-                if (result.runtime) metaParts.push(TMDB.formatRuntime(result.runtime));
-            }
-            else {
-                if (result.first_air_date) metaParts.push(result.first_air_date.substring(0, 4));
-                if (result.number_of_seasons) {
-                    metaParts.push(result.number_of_seasons + ' saison' + (result.number_of_seasons > 1 ? 's' : ''));
-                }
-            }
-            metaParts.forEach(function(part, idx) {
-                if (idx > 0) metaEl.appendChild(document.createTextNode(' · '));
-                metaEl.appendChild(document.createTextNode(part));
-            });
-            self.displayDualRatings(metaEl, metaParts.length > 0, providerRating, result.vote_average, result.vote_count);
-            if (self._tmdbMatchText) {
-                metaEl.appendChild(document.createTextNode(' · '));
-                var matchSpan = document.createElement('span');
-                matchSpan.className = 'tmdb-match-inline';
-                matchSpan.textContent = self._tmdbMatchText;
-                metaEl.appendChild(matchSpan);
-            }
+            self._renderTMDBMeta(result, type, providerRating, self._tmdbMatchText);
             var genres = TMDB.getGenres(result);
             var genresEl = document.getElementById('details-genres');
             self.clearElement(genresEl);
@@ -2093,9 +2273,11 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
                 self.selectedStream.data.tmdb_id = result.id;
                 self.renderSimilarGenres(self.selectedStream.data);
             }
+            self.initUserRatingUI(result.id, type);
         }
         else {
             setDescription(I18n.t('details.noDescription', 'No description'), 'fetchTMDBInfo-notFound');
+            self.hideUserRatingUI();
         }
     }, false, tmdbId);
 };
@@ -2573,7 +2755,7 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     }
     this.setBackgroundImage('details-poster', posterUrl);
     document.getElementById('details-title').textContent = title;
-    document.getElementById('details-meta').textContent = '';
+    document.getElementById('details-meta-parts').textContent = '';
     setDescription(I18n.t('app.loading', 'Loading...'), 'showDetailsFromTMDB');
     document.getElementById('details-genres').innerHTML = '';
     this.setHidden('details-cast-section', true);
@@ -2675,9 +2857,14 @@ IPTVApp.prototype.fetchTMDBDetailsById = function(tmdbId, type) {
 IPTVApp.prototype.displayTMDBDetails = function(result, type) {
     this.tmdbInfo = result;
     this.tmdbInfo._type = type;
-    if (result && result.id && this.selectedStream && this.selectedStream.data) {
-        this.selectedStream.data.tmdb_id = result.id;
-        this.renderSimilarGenres(this.selectedStream.data);
+    if (result && result.id) {
+        if (this.selectedStream && this.selectedStream.data) {
+            this.selectedStream.data.tmdb_id = result.id;
+            this.renderSimilarGenres(this.selectedStream.data);
+        }
+        else {
+            this.renderSimilarGenres({ tmdb_id: result.id });
+        }
     }
     var tmdbTitle = type === 'movie' ? result.title : result.name;
     this._titleReplacedByTmdb = false;
@@ -2717,26 +2904,9 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
         this.preloadTTS(descText);
         this.showTTSTooltip();
     }
-    var metaEl = document.getElementById('details-meta');
     var providerRatingEl = document.getElementById('details-rating-container');
     var providerRating = providerRatingEl ? parseFloat(providerRatingEl.dataset.providerRating) : 0;
-    metaEl.textContent = '';
-    var metaParts = [];
-    if (type === 'movie') {
-        if (result.release_date) metaParts.push(result.release_date.substring(0, 4));
-        if (result.runtime) metaParts.push(TMDB.formatRuntime(result.runtime));
-    }
-    else {
-        if (result.first_air_date) metaParts.push(result.first_air_date.substring(0, 4));
-        if (result.number_of_seasons) {
-            metaParts.push(result.number_of_seasons + ' saison' + (result.number_of_seasons > 1 ? 's' : ''));
-        }
-    }
-    metaParts.forEach(function(part, idx) {
-        if (idx > 0) metaEl.appendChild(document.createTextNode(' · '));
-        metaEl.appendChild(document.createTextNode(part));
-    });
-    this.displayDualRatings(metaEl, metaParts.length > 0, providerRating, result.vote_average, result.vote_count);
+    this._renderTMDBMeta(result, type, providerRating, null);
     var genres = TMDB.getGenres(result);
     var genresEl = document.getElementById('details-genres');
     this.clearElement(genresEl);
@@ -2758,6 +2928,7 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
     var cast = TMDB.getCast(result);
     this.renderCast(cast, dirPerson, dirLabel);
     this.fetchRandomBackdrop(result.id, type);
+    this.initUserRatingUI(result.id, type);
 };
 
 IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, filmItem) {
@@ -2781,7 +2952,7 @@ IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, fi
         this.setBackgroundImage('details-poster', imageUrl);
         var cleanDisplayTitle = this.stripCategoryPrefix(title);
         document.getElementById('details-title').textContent = cleanDisplayTitle;
-        document.getElementById('details-meta').textContent = '';
+        document.getElementById('details-meta-parts').textContent = '';
         setDescription('', 'showDetailsFromFilmography');
         document.getElementById('details-genres').innerHTML = '';
         document.getElementById('details-cast-grid').innerHTML = '';
@@ -2865,7 +3036,7 @@ IPTVApp.prototype.popDetailsState = function() {
 
 // Playlist search - searches in both VOD and series if needed
 IPTVApp.prototype.findInPlaylist = function(title, mediaType) {
-    var normalizedTitle = title.toLowerCase().replace(Regex.nonAlphanumeric, '');
+    var normalizedTitle = this._normalizeTitleForMatch(title);
     var vodStreams = this.getStreams('vod');
     var seriesStreams = this.getStreams('series');
     // Try primary section first
@@ -2897,10 +3068,9 @@ IPTVApp.prototype._searchInStreams = function(normalizedTitle, streams, type) {
     var bestMatch = null;
     var bestScore = 0;
     for (var i = 0; i < streams.length; i++) {
-        var streamTitle = (streams[i].name || streams[i].title || '').toLowerCase();
-        streamTitle = streamTitle.replace(Regex.categoryPrefix, '');
-        streamTitle = streamTitle.replace(Regex.removeYearParens, '');
-        streamTitle = streamTitle.replace(Regex.nonAlphanumeric, '');
+        var raw = (streams[i].name || streams[i].title || '').toLowerCase();
+        raw = raw.replace(Regex.categoryPrefix, '').replace(Regex.removeYearParens, '');
+        var streamTitle = this._normalizeTitleForMatch(raw);
         if (streamTitle === normalizedTitle) {
             return {
                 id: streams[i].stream_id || streams[i].vod_id || streams[i].series_id,

@@ -884,6 +884,7 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
     // Create a temporary API instance for background refresh
     var api = new ProviderAPI(playlist.serverUrl, playlist.username, playlist.password, this.getStreamProxyUrl());
     api.playlistId = playlist.id;
+    api.silent = true;
     api.authenticate().then(function() {
         window.log('Background refresh: authenticated for ' + playlistId);
         return api.preloadCache(function(step, total, name) {
@@ -1199,6 +1200,10 @@ IPTVApp.prototype.loadSettings = function() {
     var defaults = {
         locale: defaultLocale,
         tmdbApiKey: '',
+        tmdbV4ReadToken: '',
+        tmdbAccessToken: '',
+        tmdbAccountId: null,
+        tmdbUsername: '',
         openSubtitlesApiKey: '',
         subDLApiKey: '',
         proxyUrl: '',
@@ -1379,6 +1384,67 @@ IPTVApp.prototype.categoryHasPatterns = function(categoryId) {
     }
     var catPatterns = patterns[categoryId];
     return catPatterns && catPatterns.length > 0;
+};
+
+// My TMDB ratings
+IPTVApp.prototype.loadMyTMDBRatings = function() {
+    try {
+        var data = localStorage.getItem('myTMDBRatings');
+        var parsed = data ? JSON.parse(data) : null;
+        if (parsed && parsed.movies && parsed.tv) return parsed;
+    }
+    catch (e) {}
+    return { movies: {}, tv: {}, fetchedAt: 0 };
+};
+
+IPTVApp.prototype.saveMyTMDBRatings = function() {
+    try {
+        localStorage.setItem('myTMDBRatings', JSON.stringify(this.myTMDBRatings));
+    }
+    catch (e) { /* storage error */ }
+};
+
+IPTVApp.prototype.refreshMyTMDBRatings = function(callback) {
+    var self = this;
+    if (!TMDB.isUserLoggedIn()) {
+        if (callback) callback();
+        return;
+    }
+    TMDB.getAllMyRated('movie', function(movies) {
+        TMDB.getAllMyRated('tv', function(tv) {
+            self.myTMDBRatings = {
+                movies: movies || {},
+                tv: tv || {},
+                fetchedAt: Date.now()
+            };
+            self.saveMyTMDBRatings();
+            window.log('TMDB', 'refreshMyTMDBRatings: movies=' + Object.keys(self.myTMDBRatings.movies).length + ' tv=' + Object.keys(self.myTMDBRatings.tv).length);
+            if (callback) callback();
+        });
+    });
+};
+
+IPTVApp.prototype.updateLocalTMDBRating = function(tmdbId, type, value, title, year, posterPath) {
+    if (!this.myTMDBRatings) this.myTMDBRatings = this.loadMyTMDBRatings();
+    var bucket = (type === 'tv' || type === 'series') ? 'tv' : 'movies';
+    if (value > 0) {
+        this.myTMDBRatings[bucket][tmdbId] = {
+            value: value,
+            title: title || '',
+            year: year || '',
+            posterPath: posterPath || ''
+        };
+    }
+    else {
+        delete this.myTMDBRatings[bucket][tmdbId];
+    }
+    this.saveMyTMDBRatings();
+};
+
+IPTVApp.prototype.getMyTMDBRatingsCount = function(section) {
+    if (!this.myTMDBRatings) this.myTMDBRatings = this.loadMyTMDBRatings();
+    var bucket = section === 'series' ? 'tv' : 'movies';
+    return Object.keys(this.myTMDBRatings[bucket] || {}).length;
 };
 
 // Favorites

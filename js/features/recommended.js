@@ -144,14 +144,34 @@ IPTVApp.prototype._getSimilarCached = function(tmdbId, tmdbType) {
 IPTVApp.prototype.RECOMMENDED_WEIGHT_MANUAL = 0.3;
 
 IPTVApp.prototype._collectRecommendationSeeds = function(section) {
+    var wantTv = section === 'series';
+    var tmdbType = wantTv ? 'tv' : 'movie';
+    var bucket = wantTv ? 'tv' : 'movies';
+    var ratings = (this.myTMDBRatings && this.myTMDBRatings[bucket]) || {};
+    var ratingIds = Object.keys(ratings);
+    if (ratingIds.length > 0) {
+        var ratingSeeds = [];
+        for (var ri = 0; ri < ratingIds.length; ri++) {
+            var tmdbId = ratingIds[ri];
+            var entry = ratings[tmdbId];
+            var value = typeof entry === 'number' ? entry : (entry && entry.value) || 0;
+            if (value <= 0) continue;
+            var weight = (value - 5) / 5;
+            if (Math.abs(weight) < 0.2) continue;
+            ratingSeeds.push({ id: tmdbId, type: tmdbType, weight: weight, source: 'rating' });
+        }
+        if (ratingSeeds.length > 0) {
+            ratingSeeds.sort(function(a, b) { return Math.abs(b.weight) - Math.abs(a.weight); });
+            window.log('RECO', 'using TMDB ratings as seeds: ' + ratingSeeds.length + ' (section=' + section + ')');
+            return ratingSeeds.slice(0, this.RECOMMENDED_MAX_SEEDS);
+        }
+    }
     var seeds = [];
     var seenTmdbIds = {};
-    var wantTv = section === 'series';
     var addItem = function(tmdbId, tmdbType, weight, sourceName) {
         if (!tmdbId || !tmdbType) return;
         var k = tmdbType + ':' + tmdbId;
         if (seenTmdbIds[k]) {
-            // Keep the highest weight if the same tmdbId appears twice
             for (var si = 0; si < seeds.length; si++) {
                 if (seeds[si].id === tmdbId && seeds[si].type === tmdbType) {
                     if (weight > seeds[si].weight) seeds[si].weight = weight;
@@ -182,6 +202,7 @@ IPTVApp.prototype._collectRecommendationSeeds = function(section) {
         var f = favItems[fi];
         addItem(f.tmdb_id || f.tmdbId, f._tmdbType || f.tmdbType, 1, 'favorite');
     }
+    window.log('RECO', 'using fallback seeds: history=' + historyItems.length + ' favorites=' + favItems.length + ' total=' + seeds.length);
     return seeds;
 };
 
@@ -213,6 +234,11 @@ IPTVApp.prototype._buildSeenSet = function(section) {
         addStreamId(f.series_id || f.stream_id, f._playlistId || f.playlistId);
         addTmdb(f.tmdb_id || f.tmdbId, f._tmdbType || f.tmdbType);
     }
+    var ratedBucket = wantTv ? 'tv' : 'movies';
+    var ratedMap = (this.myTMDBRatings && this.myTMDBRatings[ratedBucket]) || {};
+    Object.keys(ratedMap).forEach(function(tmdbId) {
+        addTmdb(tmdbId, wantTv ? 'tv' : 'movie');
+    });
     return seen;
 };
 
@@ -315,7 +341,9 @@ IPTVApp.prototype.buildRecommendations = function(section) {
             dedup[sid] = m;
         });
         var unique = [];
-        Object.keys(dedup).forEach(function(k) { unique.push(dedup[k]); });
+        Object.keys(dedup).forEach(function(k) {
+            if (dedup[k].score > 0) unique.push(dedup[k]);
+        });
         unique.sort(function(a, b) {
             if (b.score !== a.score) return b.score - a.score;
             if (b.year !== a.year) return b.year - a.year;

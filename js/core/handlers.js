@@ -133,6 +133,11 @@ IPTVApp.prototype.selectHandlers = {
             this.showActor(actorId);
             return;
         }
+        if (current.dataset.tmdbOnly === '1') {
+            this.lastGridIndex = this.focusIndex;
+            this.showDetailsFromTMDB(current);
+            return;
+        }
         if (current.dataset.categoryId === 'guide') {
             this.showTVGuide();
             return;
@@ -217,6 +222,13 @@ IPTVApp.prototype.selectHandlers = {
             }
             var episodeId = current.dataset.episodeId;
             this.playEpisode(episodeId);
+        } else if (current.classList.contains('user-rating-star')) {
+            var starValue = parseInt(current.dataset.value, 10);
+            if (starValue > 0) {
+                this.submitUserRating(starValue * 2);
+            }
+        } else if (current.id === 'user-rating-remove-btn') {
+            this.removeUserRating();
         }
     },
     actor: function(current) {
@@ -231,6 +243,12 @@ IPTVApp.prototype.selectHandlers = {
     },
     settings: function(current) {
         this.handleSettingsSelect(current);
+    },
+    'tmdb-connect-modal': function(current) {
+        if (!current) return;
+        if (current.id === 'tmdb-connect-cancel-btn' || current.id === 'tmdb-connect-close-btn') {
+            this.hideTMDBConnectModal();
+        }
     },
     playlists: function() {
         this.handlePlaylistsSelect();
@@ -264,6 +282,9 @@ IPTVApp.prototype.backHandlers = {
     },
     'focusArea:tts-voice-modal': function() {
         this.hideTTSVoiceModal();
+    },
+    'focusArea:tmdb-connect-modal': function() {
+        this.hideTMDBConnectModal();
     },
     'screen:catchup-modal': function() {
         this.hideCatchupModal();

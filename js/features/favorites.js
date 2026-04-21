@@ -75,6 +75,99 @@ IPTVApp.prototype.showFavoritesInGrid = function() {
     this.loadMoreItems();
 };
 
+IPTVApp.prototype._getRatedEntriesForSection = function(section) {
+    if (!this.myTMDBRatings) this.myTMDBRatings = this.loadMyTMDBRatings();
+    var bucket = section === 'series' ? 'tv' : 'movies';
+    var ratings = this.myTMDBRatings[bucket] || {};
+    var entries = [];
+    Object.keys(ratings).forEach(function(tmdbId) {
+        var entry = ratings[tmdbId];
+        if (typeof entry === 'number') {
+            entries.push({ tmdbId: tmdbId, value: entry, title: '', year: '', posterPath: '' });
+        }
+        else {
+            entries.push({
+                tmdbId: tmdbId,
+                value: entry.value || 0,
+                title: entry.title || '',
+                year: entry.year || '',
+                posterPath: entry.posterPath || ''
+            });
+        }
+    });
+    entries.sort(function(a, b) { return b.value - a.value; });
+    return entries;
+};
+
+IPTVApp.prototype._getRatedStreamsForSection = function(section) {
+    return this._getRatedEntriesForSection(section);
+};
+
+IPTVApp.prototype.showRatedInGrid = function() {
+    var container = document.getElementById('content-grid');
+    this.clearElement(container);
+    var section = this.currentSection;
+    var entries = this._getRatedEntriesForSection(section);
+    if (entries.length === 0) {
+        this.showEmptyMessage(container, 'home.noRatings', 'No ratings yet');
+        return;
+    }
+    var streamType = section === 'series' ? 'series' : 'vod';
+    var self = this;
+    var normalize = this._normalizeTitleForMatch;
+    var data = this.data[section];
+    var streams = (data && data.streams) ? data.streams : [];
+    var streamsByTmdbId = {};
+    var streamsByTitleYear = {};
+    var streamsByTitle = {};
+    for (var i = 0; i < streams.length; i++) {
+        var s = streams[i];
+        var sTmdbId = s.tmdb_id || s._tmdbId;
+        if (sTmdbId) streamsByTmdbId[sTmdbId] = s;
+        var rawTitle = self.getStreamTitle(s);
+        var cleanedTitle = self.cleanTitle(rawTitle);
+        var extractedYear = self.extractYear(rawTitle);
+        var normTitle = normalize(cleanedTitle);
+        if (normTitle) {
+            if (extractedYear) streamsByTitleYear[normTitle + '|' + extractedYear] = s;
+            if (!streamsByTitle[normTitle]) streamsByTitle[normTitle] = s;
+        }
+    }
+    var items = [];
+    entries.forEach(function(e) {
+        var matched = streamsByTmdbId[e.tmdbId];
+        if (!matched && e.title) {
+            var normT = normalize(e.title);
+            if (e.year && streamsByTitleYear[normT + '|' + e.year]) {
+                matched = streamsByTitleYear[normT + '|' + e.year];
+            }
+            else if (streamsByTitle[normT]) {
+                matched = streamsByTitle[normT];
+            }
+            if (matched && !matched.tmdb_id) matched.tmdb_id = e.tmdbId;
+        }
+        if (matched) {
+            items.push(matched);
+        }
+        else {
+            items.push({
+                id: e.tmdbId,
+                name: e.title + (e.year ? ' (' + e.year + ')' : ''),
+                stream_icon: e.posterPath ? 'https://image.tmdb.org/t/p/w300' + e.posterPath : '',
+                _type: streamType,
+                tmdb_id: e.tmdbId,
+                _tmdbOnly: true
+            });
+        }
+    });
+    container.classList.remove('list-view');
+    this.originalStreams = items;
+    this.currentStreams = items;
+    this.currentStreamType = streamType;
+    this.displayedCount = 0;
+    this.loadMoreItems();
+};
+
 IPTVApp.prototype.showFavoritesScreen = function() {
     this.currentSection = 'favorites';
     this.currentStreamType = 'favorites';

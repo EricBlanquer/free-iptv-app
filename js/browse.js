@@ -1033,6 +1033,11 @@ IPTVApp.prototype.loadStreams = function(categoryId, options) {
         this.updateCategorySelection(categoryId);
         return;
     }
+    if (categoryId === 'rated') {
+        this.showRatedInGrid();
+        this.updateCategorySelection(categoryId);
+        return;
+    }
     if (categoryId === 'recommended') {
         this.showRecommendedInGrid();
         this.updateCategorySelection(categoryId);
@@ -1346,6 +1351,17 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
         favoritesItem.dataset.categoryId = 'favorites';
         container.appendChild(favoritesItem);
     }
+    // Add "My ratings" pseudo-category for vod and series when TMDB logged in
+    if ((section === 'vod' || section === 'series') && TMDB.isUserLoggedIn()) {
+        var ratedStreams = this._getRatedStreamsForSection(section);
+        if (ratedStreams.length > 0) {
+            var ratedItem = document.createElement('div');
+            ratedItem.className = 'category-item category-rated' + (defaultCategory === 'rated' ? ' selected' : '');
+            this.setCategoryText(ratedItem, I18n.t('home.myRatings', 'My ratings') + ' (' + ratedStreams.length + ')');
+            ratedItem.dataset.categoryId = 'rated';
+            container.appendChild(ratedItem);
+        }
+    }
     // Add "Recommended" pseudo-category for vod and series only when non-empty
     if (this.settings.showRecommended !== false && (section === 'vod' || section === 'series')) {
         this.ensureRecommendationsComputed(section);
@@ -1614,7 +1630,8 @@ IPTVApp.prototype.updateGridSpacer = function() {
 IPTVApp.prototype._sortToGroup = function(sort) {
     if (sort === 'name' || sort === 'name-desc') return 'name';
     if (sort === 'year' || sort === 'year-asc') return 'year';
-    return 'default';
+    if (sort === 'default' || sort === 'default-asc') return 'default';
+    return null;
 };
 
 IPTVApp.prototype._isSortAsc = function(sort) {
@@ -1804,6 +1821,14 @@ IPTVApp.prototype.applyFilters = function() {
         });
     }
     window.log('SORT', 'currentSort=' + this.currentSort + ', streams.length=' + streams.length);
+    if (this.currentSort === 'default' || this.currentSort === 'default-asc') {
+        var firstSample = streams.slice(0, 5).map(function(s) {
+            var id = s.stream_id || s.vod_id || s.series_id || '?';
+            var name = (self.getStreamTitle(s) || '').substring(0, 30);
+            return id + ':"' + name + '"(' + (s.added || 'no-added') + ')';
+        }).join(' | ');
+        window.log('SORT', 'default top5: ' + firstSample);
+    }
     if (this.currentSort === 'year' || this.currentSort === 'year-asc') {
         var yearRegex = /\((\d{4})\)/;
         streams.forEach(function(s) {
@@ -2740,6 +2765,14 @@ IPTVApp.prototype._createGridItem = function(stream) {
     item.dataset.playlistId = stream._playlistId || '';
     item.dataset.streamType = stream._type || stream._sourceType || this.currentStreamType;
     if (stream._isDownload) item.dataset.isDownload = '1';
+    if (stream._tmdbOnly) {
+        item.dataset.tmdbOnly = '1';
+        item.dataset.tmdbId = stream.tmdb_id || '';
+        item.dataset.tmdbType = stream._type === 'series' ? 'tv' : 'movie';
+        item.dataset.title = (stream.name || '').replace(/\s*\(\d{4}\)\s*$/, '');
+        item.dataset.posterUrl = stream.stream_icon || '';
+        item.dataset.backdropUrl = '';
+    }
     var imageUrl = this.getStreamImage(stream);
     item.dataset.imageUrl = imageUrl;
     item.dataset.streamTitle = this.getStreamTitle(stream);

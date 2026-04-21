@@ -33,10 +33,14 @@
     margin-bottom: 15px;
 }
 
+.settings-row + .settings-desc {
+    margin-top: -10px;
+}
+
 .settings-desc {
     color: #888;
     margin-top: 5px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     margin-left: 400px;
     white-space: pre-line;
 }
@@ -1243,4 +1247,75 @@
     background: rgba(0, 212, 255, 0.3);
     border-color: #00d4ff;
     box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.4);
+}
+
+.tmdb-connect-modal-content {
+    max-width: 600px;
+    text-align: center;
+}
+
+.tmdb-connect-modal-content .modal-title {
+    color: #00d4ff;
+    margin-bottom: 30px;
+}
+
+.tmdb-connect-message {
+    color: #ddd;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.tmdb-connect-qr {
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tmdb-connect-qr img {
+    width: 360px;
+    height: 360px;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.tmdb-connect-status {
+    color: #888;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+.tmdb-connect-error {
+    color: #ff5252;
+}
+
+.tmdb-connect-cancel {
+    display: inline-block;
+    padding: 12px 30px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.tmdb-connect-cancel.focused {
+    background: rgba(0, 212, 255, 0.3);
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.4);
+}
+
+#tmdb-account-btn {
+    margin-bottom: 0;
+}
+
+#tmdb-account-btn.connected {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #8bc34a;
 }

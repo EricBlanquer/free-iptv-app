@@ -1018,7 +1018,9 @@ var I18nData = {
                             "select": "اختر...",
                             "loading": "جاري التحميل...",
                             "error": "خطأ",
-                            "connectionError": "خطأ في الاتصال"
+                            "connectionError": "خطأ في الاتصال",
+                            "cancel": "إلغاء",
+                            "close": "إغلاق"
                     },
                     "app": {
                             "loading": "جاري التحميل...",
@@ -1065,7 +1067,9 @@ var I18nData = {
                             "categories": "الفئات",
                             "recommended": "موصى به",
                             "noRecommendations": "لا توجد توصيات بعد — شاهد أو أضف بعض المفضلات أولاً",
-                            "computingRecommendations": "جاري حساب التوصيات..."
+                            "computingRecommendations": "جاري حساب التوصيات...",
+                            "myRatings": "تقييماتي",
+                            "noRatings": "لا توجد تقييمات بعد"
                     },
                     "guide": {
                             "today": "اليوم",
@@ -1259,7 +1263,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} ثوانٍ",
                             "showRecommended": "إظهار فئة « موصى به »",
                             "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
-                            "exitConfirmation": "تأكيد الخروج"
+                            "exitConfirmation": "تأكيد الخروج",
+                            "tmdbV4ReadToken": "رمز قراءة TMDB v4",
+                            "tmdbV4ReadTokenDesc": "مطلوب لربط حساب TMDB (تقييم الأفلام).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "حساب TMDB",
+                            "tmdbConnect": "اتصال",
+                            "tmdbDisconnect": "فصل {name}",
+                            "tmdbConnectInstructions": "امسح رمز QR هذا بهاتفك ووافق على الوصول في TMDB:",
+                            "tmdbConnectWaiting": "في انتظار التفويض...",
+                            "tmdbConnectFailed": "تعذر بدء المصادقة",
+                            "tmdbConnectTimeout": "انتهت مهلة التفويض",
+                            "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
+                            "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات."
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1333,7 +1348,13 @@ var I18nData = {
                             "episode": "الحلقة",
                             "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
                             "age": "{count} سنة",
-                            "similarGenres": "المزيد من نفس النوع"
+                            "similarGenres": "المزيد من نفس النوع",
+                            "yourRating": "تقييمك",
+                            "removeRating": "إزالة",
+                            "rateHint": "اضغط 0-9 للتقييم المباشر",
+                            "ratingSaved": "تم حفظ التقييم",
+                            "ratingRemoved": "تمت إزالة التقييم",
+                            "ratingFailed": "فشل التقييم"
                     },
                     "department": {
                             "Acting": "تمثيل",
@@ -1447,7 +1468,8 @@ var I18nData = {
                             "qualityHint": "انقر لتغيير الدقة",
                             "favoriteHint": "إضافة إلى قائمتي",
                             "downloadHint": "تنزيل إلى Freebox",
-                            "downloadSeasonHint": "تحميل الموسم إلى Freebox"
+                            "downloadSeasonHint": "تحميل الموسم إلى Freebox",
+                            "userRatingHint": "يؤثر تقييمك على توصياتك"
                     },
                     "diagnostic": {
                             "title": "مشكلة في الاتصال",
@@ -1506,7 +1528,9 @@ var I18nData = {
                             "select": "Auswählen...",
                             "loading": "Laden...",
                             "error": "Fehler",
-                            "connectionError": "Verbindungsfehler"
+                            "connectionError": "Verbindungsfehler",
+                            "cancel": "Abbrechen",
+                            "close": "Schließen"
                     },
                     "app": {
                             "loading": "Laden...",
@@ -1553,7 +1577,9 @@ var I18nData = {
                             "categories": "Kategorien",
                             "recommended": "Empfohlen",
                             "noRecommendations": "Noch keine Empfehlungen — sieh dir zuerst etwas an oder markiere Favoriten",
-                            "computingRecommendations": "Empfehlungen werden berechnet..."
+                            "computingRecommendations": "Empfehlungen werden berechnet...",
+                            "myRatings": "Meine Bewertungen",
+                            "noRatings": "Noch keine Bewertungen"
                     },
                     "guide": {
                             "today": "Heute",
@@ -1747,7 +1773,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} Sekunden",
                             "showRecommended": "Kategorie „Empfohlen“ anzeigen",
                             "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln",
-                            "exitConfirmation": "Beenden bestätigen"
+                            "exitConfirmation": "Beenden bestätigen",
+                            "tmdbV4ReadToken": "TMDB v4 Read-Token",
+                            "tmdbV4ReadTokenDesc": "Erforderlich, um ein TMDB-Konto zu verbinden (Filme bewerten).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "TMDB-Konto",
+                            "tmdbConnect": "Verbinden",
+                            "tmdbDisconnect": "{name} trennen",
+                            "tmdbConnectInstructions": "Scanne diesen QR-Code mit deinem Handy und erlaube den Zugriff bei TMDB:",
+                            "tmdbConnectWaiting": "Warte auf Autorisierung...",
+                            "tmdbConnectFailed": "Authentifizierung konnte nicht gestartet werden",
+                            "tmdbConnectTimeout": "Zeitüberschreitung bei der Autorisierung",
+                            "tmdbNoV4Token": "v4 Read-Token in den Einstellungen oben erforderlich",
+                            "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten."
                     },
                     "player": {
                             "play": "Abspielen",
@@ -1821,7 +1858,13 @@ var I18nData = {
                             "episode": "Episode",
                             "configureTMDB": "Konfigurieren Sie Ihren TMDB API-Schlüssel in den Einstellungen, um Beschreibungen anzuzeigen.",
                             "age": "{count} Jahre",
-                            "similarGenres": "Mehr im gleichen Genre"
+                            "similarGenres": "Mehr im gleichen Genre",
+                            "yourRating": "Deine Bewertung",
+                            "removeRating": "Entfernen",
+                            "rateHint": "Drücke 0-9 zum direkten Bewerten",
+                            "ratingSaved": "Bewertung gespeichert",
+                            "ratingRemoved": "Bewertung entfernt",
+                            "ratingFailed": "Bewertung fehlgeschlagen"
                     },
                     "department": {
                             "Acting": "Schauspiel",
@@ -1935,7 +1978,8 @@ var I18nData = {
                             "qualityHint": "Klicken zum Umschalten der Auflösung",
                             "favoriteHint": "Zur Liste hinzufügen",
                             "downloadHint": "Auf Freebox herunterladen",
-                            "downloadSeasonHint": "Staffel auf Freebox herunterladen"
+                            "downloadSeasonHint": "Staffel auf Freebox herunterladen",
+                            "userRatingHint": "Bewertung beeinflusst deine Empfehlungen"
                     },
                     "diagnostic": {
                             "title": "Verbindungsproblem",
@@ -1994,7 +2038,9 @@ var I18nData = {
                             "select": "Select...",
                             "loading": "Loading...",
                             "error": "Error",
-                            "connectionError": "Connection error"
+                            "connectionError": "Connection error",
+                            "cancel": "Cancel",
+                            "close": "Close"
                     },
                     "app": {
                             "loading": "Loading...",
@@ -2041,7 +2087,9 @@ var I18nData = {
                             "categories": "Categories",
                             "recommended": "Recommended",
                             "noRecommendations": "No recommendations yet — watch or favorite a few items first",
-                            "computingRecommendations": "Computing recommendations..."
+                            "computingRecommendations": "Computing recommendations...",
+                            "myRatings": "My ratings",
+                            "noRatings": "No ratings yet"
                     },
                     "guide": {
                             "today": "Today",
@@ -2240,7 +2288,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} seconds",
                             "showRecommended": "Show \"Recommended\" category",
                             "liveAutoFormatSwitch": "Auto-switch live format on timeout",
-                            "exitConfirmation": "Exit confirmation"
+                            "exitConfirmation": "Exit confirmation",
+                            "tmdbV4ReadToken": "TMDB v4 Read Token",
+                            "tmdbV4ReadTokenDesc": "Required to connect a TMDB account (rate movies).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "TMDB Account",
+                            "tmdbConnect": "Connect",
+                            "tmdbDisconnect": "Disconnect {name}",
+                            "tmdbConnectInstructions": "Scan this QR code with your phone and approve access on TMDB:",
+                            "tmdbConnectWaiting": "Waiting for authorization...",
+                            "tmdbConnectFailed": "Could not start authentication",
+                            "tmdbConnectTimeout": "Authorization timed out",
+                            "tmdbNoV4Token": "v4 Read Token required in settings above",
+                            "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows."
                     },
                     "player": {
                             "play": "Play",
@@ -2314,7 +2373,13 @@ var I18nData = {
                             "episode": "Episode",
                             "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
                             "age": "{count} years old",
-                            "similarGenres": "More in the same genre"
+                            "similarGenres": "More in the same genre",
+                            "yourRating": "Your rating",
+                            "removeRating": "Remove",
+                            "rateHint": "Press 0-9 for direct rating",
+                            "ratingSaved": "Rating saved",
+                            "ratingRemoved": "Rating removed",
+                            "ratingFailed": "Rating failed"
                     },
                     "department": {
                             "Acting": "Actor",
@@ -2428,7 +2493,8 @@ var I18nData = {
                             "qualityHint": "Click to switch resolution",
                             "favoriteHint": "Add to your list",
                             "downloadHint": "Download to Freebox",
-                            "downloadSeasonHint": "Download season to Freebox"
+                            "downloadSeasonHint": "Download season to Freebox",
+                            "userRatingHint": "Rating influences your recommendations"
                     },
                     "diagnostic": {
                             "title": "Connection problem",
@@ -2482,7 +2548,9 @@ var I18nData = {
                             "select": "Seleccionar...",
                             "loading": "Cargando...",
                             "error": "Error",
-                            "connectionError": "Error de conexión"
+                            "connectionError": "Error de conexión",
+                            "cancel": "Cancelar",
+                            "close": "Cerrar"
                     },
                     "app": {
                             "loading": "Cargando...",
@@ -2529,7 +2597,9 @@ var I18nData = {
                             "categories": "Categorías",
                             "recommended": "Recomendado",
                             "noRecommendations": "Aún no hay recomendaciones — mira o marca algunos favoritos primero",
-                            "computingRecommendations": "Calculando recomendaciones..."
+                            "computingRecommendations": "Calculando recomendaciones...",
+                            "myRatings": "Mis valoraciones",
+                            "noRatings": "Aún no hay valoraciones"
                     },
                     "guide": {
                             "today": "Hoy",
@@ -2723,7 +2793,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} segundos",
                             "showRecommended": "Mostrar categoría \"Recomendado\"",
                             "liveAutoFormatSwitch": "Cambio auto de formato live al timeout",
-                            "exitConfirmation": "Confirmación de salida"
+                            "exitConfirmation": "Confirmación de salida",
+                            "tmdbV4ReadToken": "Token de lectura TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Necesario para conectar una cuenta TMDB (valorar películas).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Cuenta TMDB",
+                            "tmdbConnect": "Conectar",
+                            "tmdbDisconnect": "Desconectar {name}",
+                            "tmdbConnectInstructions": "Escanea este código QR con tu móvil y aprueba el acceso en TMDB:",
+                            "tmdbConnectWaiting": "Esperando autorización...",
+                            "tmdbConnectFailed": "No se pudo iniciar la autenticación",
+                            "tmdbConnectTimeout": "Tiempo de autorización agotado",
+                            "tmdbNoV4Token": "Token de lectura v4 requerido en los ajustes de arriba",
+                            "tmdbAccountDesc": "Conecta tu cuenta TMDB para valorar películas y series."
                     },
                     "player": {
                             "play": "Reproducir",
@@ -2797,7 +2878,13 @@ var I18nData = {
                             "episode": "Episodio",
                             "configureTMDB": "Configure su clave API de TMDB en ajustes para mostrar descripciones.",
                             "age": "{count} años",
-                            "similarGenres": "Más en el mismo género"
+                            "similarGenres": "Más en el mismo género",
+                            "yourRating": "Tu valoración",
+                            "removeRating": "Eliminar",
+                            "rateHint": "Pulsa 0-9 para valorar directamente",
+                            "ratingSaved": "Valoración guardada",
+                            "ratingRemoved": "Valoración eliminada",
+                            "ratingFailed": "Error al valorar"
                     },
                     "department": {
                             "Acting": "Actuación",
@@ -2911,7 +2998,8 @@ var I18nData = {
                             "qualityHint": "Clic para cambiar la resolución",
                             "favoriteHint": "Añadir a mi lista",
                             "downloadHint": "Descargar a Freebox",
-                            "downloadSeasonHint": "Descargar temporada en Freebox"
+                            "downloadSeasonHint": "Descargar temporada en Freebox",
+                            "userRatingHint": "Tu valoración influye en tus recomendaciones"
                     },
                     "diagnostic": {
                             "title": "Problema de conexión",
@@ -2970,7 +3058,9 @@ var I18nData = {
                             "select": "Sélectionner...",
                             "loading": "Chargement...",
                             "error": "Erreur",
-                            "connectionError": "Erreur de connexion"
+                            "connectionError": "Erreur de connexion",
+                            "cancel": "Annuler",
+                            "close": "Fermer"
                     },
                     "app": {
                             "loading": "Chargement...",
@@ -3017,7 +3107,9 @@ var I18nData = {
                             "categories": "Catégories",
                             "recommended": "Recommandé",
                             "noRecommendations": "Aucune recommandation — regardez ou ajoutez quelques favoris pour commencer",
-                            "computingRecommendations": "Calcul des recommandations..."
+                            "computingRecommendations": "Calcul des recommandations...",
+                            "myRatings": "Mes notes",
+                            "noRatings": "Aucune note pour l’instant"
                     },
                     "guide": {
                             "today": "Aujourd'hui",
@@ -3216,7 +3308,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} secondes",
                             "showRecommended": "Afficher la catégorie « Recommandé »",
                             "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
-                            "exitConfirmation": "Confirmation de sortie"
+                            "exitConfirmation": "Confirmation de sortie",
+                            "tmdbV4ReadToken": "Jeton lecture TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Requis pour connecter un compte TMDB (noter les films).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Compte TMDB",
+                            "tmdbConnect": "Connecter",
+                            "tmdbDisconnect": "Déconnecter {name}",
+                            "tmdbConnectInstructions": "Scannez ce QR code avec votre téléphone et approuvez l’accès sur TMDB :",
+                            "tmdbConnectWaiting": "En attente de l’autorisation...",
+                            "tmdbConnectFailed": "Impossible de démarrer l’authentification",
+                            "tmdbConnectTimeout": "Délai d’autorisation dépassé",
+                            "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
+                            "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries."
                     },
                     "player": {
                             "play": "Lecture",
@@ -3290,7 +3393,13 @@ var I18nData = {
                             "episode": "Épisode",
                             "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
                             "age": "{count} ans",
-                            "similarGenres": "Plus dans le même genre"
+                            "similarGenres": "Plus dans le même genre",
+                            "yourRating": "Votre note",
+                            "removeRating": "Supprimer",
+                            "rateHint": "Appuyez 0-9 pour noter directement",
+                            "ratingSaved": "Note enregistrée",
+                            "ratingRemoved": "Note supprimée",
+                            "ratingFailed": "Échec de la notation"
                     },
                     "department": {
                             "Acting": "Acteur",
@@ -3404,7 +3513,8 @@ var I18nData = {
                             "qualityHint": "Cliquez pour changer la qualité",
                             "favoriteHint": "Ajouter à ma liste",
                             "downloadHint": "Télécharger sur la Freebox",
-                            "downloadSeasonHint": "Télécharger la saison sur la Freebox"
+                            "downloadSeasonHint": "Télécharger la saison sur la Freebox",
+                            "userRatingHint": "Ta note influence tes recommandations"
                     },
                     "diagnostic": {
                             "title": "Problème de connexion",
@@ -3458,7 +3568,9 @@ var I18nData = {
                             "select": "Seleziona...",
                             "loading": "Caricamento...",
                             "error": "Errore",
-                            "connectionError": "Errore di connessione"
+                            "connectionError": "Errore di connessione",
+                            "cancel": "Annulla",
+                            "close": "Chiudi"
                     },
                     "app": {
                             "loading": "Caricamento...",
@@ -3505,7 +3617,9 @@ var I18nData = {
                             "categories": "Categorie",
                             "recommended": "Consigliati",
                             "noRecommendations": "Nessun suggerimento — guarda o aggiungi qualcosa ai preferiti",
-                            "computingRecommendations": "Calcolo dei suggerimenti..."
+                            "computingRecommendations": "Calcolo dei suggerimenti...",
+                            "myRatings": "Le mie valutazioni",
+                            "noRatings": "Nessuna valutazione"
                     },
                     "guide": {
                             "today": "Oggi",
@@ -3699,7 +3813,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} secondi",
                             "showRecommended": "Mostra categoria \"Consigliati\"",
                             "liveAutoFormatSwitch": "Cambio automatico formato live al timeout",
-                            "exitConfirmation": "Conferma di uscita"
+                            "exitConfirmation": "Conferma di uscita",
+                            "tmdbV4ReadToken": "Token di lettura TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Richiesto per connettere un account TMDB (valutare film).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Account TMDB",
+                            "tmdbConnect": "Connetti",
+                            "tmdbDisconnect": "Disconnetti {name}",
+                            "tmdbConnectInstructions": "Scansiona questo codice QR con il telefono e approva l’accesso su TMDB:",
+                            "tmdbConnectWaiting": "In attesa di autorizzazione...",
+                            "tmdbConnectFailed": "Impossibile avviare l’autenticazione",
+                            "tmdbConnectTimeout": "Tempo scaduto per l’autorizzazione",
+                            "tmdbNoV4Token": "Token di lettura v4 richiesto nelle impostazioni sopra",
+                            "tmdbAccountDesc": "Collega il tuo account TMDB per valutare film e serie."
                     },
                     "player": {
                             "play": "Riproduci",
@@ -3773,7 +3898,13 @@ var I18nData = {
                             "episode": "Episodio",
                             "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
                             "age": "{count} anni",
-                            "similarGenres": "Altri dello stesso genere"
+                            "similarGenres": "Altri dello stesso genere",
+                            "yourRating": "Il tuo voto",
+                            "removeRating": "Rimuovi",
+                            "rateHint": "Premi 0-9 per votare direttamente",
+                            "ratingSaved": "Voto salvato",
+                            "ratingRemoved": "Voto rimosso",
+                            "ratingFailed": "Voto non riuscito"
                     },
                     "department": {
                             "Acting": "Recitazione",
@@ -3887,7 +4018,8 @@ var I18nData = {
                             "qualityHint": "Clicca per cambiare la risoluzione",
                             "favoriteHint": "Aggiungi alla mia lista",
                             "downloadHint": "Scarica su Freebox",
-                            "downloadSeasonHint": "Scarica stagione su Freebox"
+                            "downloadSeasonHint": "Scarica stagione su Freebox",
+                            "userRatingHint": "Il tuo voto influenza le raccomandazioni"
                     },
                     "diagnostic": {
                             "title": "Problema di connessione",
@@ -3946,7 +4078,9 @@ var I18nData = {
                             "select": "Selecteer...",
                             "loading": "Laden...",
                             "error": "Fout",
-                            "connectionError": "Verbindingsfout"
+                            "connectionError": "Verbindingsfout",
+                            "cancel": "Annuleren",
+                            "close": "Sluiten"
                     },
                     "app": {
                             "loading": "Laden...",
@@ -3993,7 +4127,9 @@ var I18nData = {
                             "categories": "Categorieën",
                             "recommended": "Aanbevolen",
                             "noRecommendations": "Nog geen aanbevelingen — bekijk of markeer eerst enkele favorieten",
-                            "computingRecommendations": "Aanbevelingen berekenen..."
+                            "computingRecommendations": "Aanbevelingen berekenen...",
+                            "myRatings": "Mijn beoordelingen",
+                            "noRatings": "Nog geen beoordelingen"
                     },
                     "guide": {
                             "today": "Vandaag",
@@ -4187,7 +4323,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} seconden",
                             "showRecommended": "Categorie \"Aanbevolen\" tonen",
                             "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
-                            "exitConfirmation": "Afsluitbevestiging"
+                            "exitConfirmation": "Afsluitbevestiging",
+                            "tmdbV4ReadToken": "TMDB v4 Read-token",
+                            "tmdbV4ReadTokenDesc": "Vereist om een TMDB-account te koppelen (films beoordelen).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "TMDB-account",
+                            "tmdbConnect": "Koppelen",
+                            "tmdbDisconnect": "{name} ontkoppelen",
+                            "tmdbConnectInstructions": "Scan deze QR-code met je telefoon en keur de toegang goed op TMDB:",
+                            "tmdbConnectWaiting": "Wachten op autorisatie...",
+                            "tmdbConnectFailed": "Authenticatie kon niet starten",
+                            "tmdbConnectTimeout": "Autorisatie verlopen",
+                            "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
+                            "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen."
                     },
                     "player": {
                             "play": "Afspelen",
@@ -4261,7 +4408,13 @@ var I18nData = {
                             "episode": "Aflevering",
                             "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven.",
                             "age": "{count} jaar",
-                            "similarGenres": "Meer in hetzelfde genre"
+                            "similarGenres": "Meer in hetzelfde genre",
+                            "yourRating": "Jouw beoordeling",
+                            "removeRating": "Verwijderen",
+                            "rateHint": "Druk 0-9 om direct te beoordelen",
+                            "ratingSaved": "Beoordeling opgeslagen",
+                            "ratingRemoved": "Beoordeling verwijderd",
+                            "ratingFailed": "Beoordeling mislukt"
                     },
                     "department": {
                             "Acting": "Acteerwerk",
@@ -4375,7 +4528,8 @@ var I18nData = {
                             "qualityHint": "Klik om resolutie te wisselen",
                             "favoriteHint": "Toevoegen aan mijn lijst",
                             "downloadHint": "Downloaden naar Freebox",
-                            "downloadSeasonHint": "Seizoen downloaden naar Freebox"
+                            "downloadSeasonHint": "Seizoen downloaden naar Freebox",
+                            "userRatingHint": "Jouw beoordeling beïnvloedt je aanbevelingen"
                     },
                     "diagnostic": {
                             "title": "Verbindingsprobleem",
@@ -4434,7 +4588,9 @@ var I18nData = {
                             "select": "Wybierz...",
                             "loading": "Ładowanie...",
                             "error": "Błąd",
-                            "connectionError": "Błąd połączenia"
+                            "connectionError": "Błąd połączenia",
+                            "cancel": "Anuluj",
+                            "close": "Zamknij"
                     },
                     "app": {
                             "loading": "Ładowanie...",
@@ -4481,7 +4637,9 @@ var I18nData = {
                             "categories": "Kategorie",
                             "recommended": "Polecane",
                             "noRecommendations": "Brak rekomendacji — najpierw obejrzyj lub dodaj coś do ulubionych",
-                            "computingRecommendations": "Obliczanie rekomendacji..."
+                            "computingRecommendations": "Obliczanie rekomendacji...",
+                            "myRatings": "Moje oceny",
+                            "noRatings": "Brak ocen"
                     },
                     "guide": {
                             "today": "Dziś",
@@ -4675,7 +4833,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} sekund",
                             "showRecommended": "Pokaż kategorię „Polecane”",
                             "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout",
-                            "exitConfirmation": "Potwierdzenie wyjścia"
+                            "exitConfirmation": "Potwierdzenie wyjścia",
+                            "tmdbV4ReadToken": "Token odczytu TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Wymagany do połączenia konta TMDB (ocenianie filmów).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Konto TMDB",
+                            "tmdbConnect": "Połącz",
+                            "tmdbDisconnect": "Rozłącz {name}",
+                            "tmdbConnectInstructions": "Zeskanuj ten kod QR telefonem i zatwierdź dostęp w TMDB:",
+                            "tmdbConnectWaiting": "Oczekiwanie na autoryzację...",
+                            "tmdbConnectFailed": "Nie udało się uruchomić uwierzytelniania",
+                            "tmdbConnectTimeout": "Upłynął czas autoryzacji",
+                            "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
+                            "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale."
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -4749,7 +4918,13 @@ var I18nData = {
                             "episode": "Odcinek",
                             "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy.",
                             "age": "{count} lat",
-                            "similarGenres": "Więcej w tym samym gatunku"
+                            "similarGenres": "Więcej w tym samym gatunku",
+                            "yourRating": "Twoja ocena",
+                            "removeRating": "Usuń",
+                            "rateHint": "Naciśnij 0-9, aby ocenić bezpośrednio",
+                            "ratingSaved": "Ocena zapisana",
+                            "ratingRemoved": "Ocena usunięta",
+                            "ratingFailed": "Ocenianie nie powiodło się"
                     },
                     "department": {
                             "Acting": "Aktorstwo",
@@ -4863,7 +5038,8 @@ var I18nData = {
                             "qualityHint": "Kliknij, aby zmienić rozdzielczość",
                             "favoriteHint": "Dodaj do mojej listy",
                             "downloadHint": "Pobierz do Freebox",
-                            "downloadSeasonHint": "Pobierz sezon na Freebox"
+                            "downloadSeasonHint": "Pobierz sezon na Freebox",
+                            "userRatingHint": "Twoja ocena wpływa na rekomendacje"
                     },
                     "diagnostic": {
                             "title": "Problem z połączeniem",
@@ -4922,7 +5098,9 @@ var I18nData = {
                             "select": "Selecionar...",
                             "loading": "Carregando...",
                             "error": "Erro",
-                            "connectionError": "Erro de conexão"
+                            "connectionError": "Erro de conexão",
+                            "cancel": "Cancelar",
+                            "close": "Fechar"
                     },
                     "app": {
                             "loading": "Carregando...",
@@ -4969,7 +5147,9 @@ var I18nData = {
                             "categories": "Categorias",
                             "recommended": "Recomendado",
                             "noRecommendations": "Sem recomendações ainda — veja ou favorite alguns itens primeiro",
-                            "computingRecommendations": "Calculando recomendações..."
+                            "computingRecommendations": "Calculando recomendações...",
+                            "myRatings": "As minhas avaliações",
+                            "noRatings": "Ainda não há avaliações"
                     },
                     "guide": {
                             "today": "Hoje",
@@ -5163,7 +5343,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} segundos",
                             "showRecommended": "Mostrar categoria \"Recomendado\"",
                             "liveAutoFormatSwitch": "Troca auto de formato live no timeout",
-                            "exitConfirmation": "Confirmação de saída"
+                            "exitConfirmation": "Confirmação de saída",
+                            "tmdbV4ReadToken": "Token de leitura TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Necessário para ligar uma conta TMDB (avaliar filmes).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Conta TMDB",
+                            "tmdbConnect": "Ligar",
+                            "tmdbDisconnect": "Desligar {name}",
+                            "tmdbConnectInstructions": "Digitalize este código QR com o seu telemóvel e aprove o acesso no TMDB:",
+                            "tmdbConnectWaiting": "A aguardar autorização...",
+                            "tmdbConnectFailed": "Não foi possível iniciar a autenticação",
+                            "tmdbConnectTimeout": "Tempo de autorização esgotado",
+                            "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
+                            "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries."
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -5237,7 +5428,13 @@ var I18nData = {
                             "episode": "Episódio",
                             "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
                             "age": "{count} anos",
-                            "similarGenres": "Mais do mesmo gênero"
+                            "similarGenres": "Mais do mesmo gênero",
+                            "yourRating": "A sua avaliação",
+                            "removeRating": "Remover",
+                            "rateHint": "Prima 0-9 para avaliar diretamente",
+                            "ratingSaved": "Avaliação guardada",
+                            "ratingRemoved": "Avaliação removida",
+                            "ratingFailed": "Falha na avaliação"
                     },
                     "department": {
                             "Acting": "Atuação",
@@ -5351,7 +5548,8 @@ var I18nData = {
                             "qualityHint": "Clique para mudar a resolução",
                             "favoriteHint": "Adicionar à minha lista",
                             "downloadHint": "Baixar para a Freebox",
-                            "downloadSeasonHint": "Baixar temporada para Freebox"
+                            "downloadSeasonHint": "Baixar temporada para Freebox",
+                            "userRatingHint": "A sua avaliação influencia as recomendações"
                     },
                     "diagnostic": {
                             "title": "Problema de conexão",
@@ -5410,7 +5608,9 @@ var I18nData = {
                             "select": "Выбрать...",
                             "loading": "Загрузка...",
                             "error": "Ошибка",
-                            "connectionError": "Ошибка подключения"
+                            "connectionError": "Ошибка подключения",
+                            "cancel": "Отмена",
+                            "close": "Закрыть"
                     },
                     "app": {
                             "loading": "Загрузка...",
@@ -5457,7 +5657,9 @@ var I18nData = {
                             "categories": "Категории",
                             "recommended": "Рекомендации",
                             "noRecommendations": "Пока нет рекомендаций — сначала посмотрите или добавьте что-то в избранное",
-                            "computingRecommendations": "Подбор рекомендаций..."
+                            "computingRecommendations": "Подбор рекомендаций...",
+                            "myRatings": "Мои оценки",
+                            "noRatings": "Нет оценок"
                     },
                     "guide": {
                             "today": "Сегодня",
@@ -5651,7 +5853,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} секунд",
                             "showRecommended": "Показать категорию «Рекомендации»",
                             "liveAutoFormatSwitch": "Авто-смена формата live при таймауте",
-                            "exitConfirmation": "Подтверждение выхода"
+                            "exitConfirmation": "Подтверждение выхода",
+                            "tmdbV4ReadToken": "Токен чтения TMDB v4",
+                            "tmdbV4ReadTokenDesc": "Необходим для подключения аккаунта TMDB (оценка фильмов).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "Аккаунт TMDB",
+                            "tmdbConnect": "Подключить",
+                            "tmdbDisconnect": "Отключить {name}",
+                            "tmdbConnectInstructions": "Отсканируйте этот QR-код телефоном и подтвердите доступ на TMDB:",
+                            "tmdbConnectWaiting": "Ожидание авторизации...",
+                            "tmdbConnectFailed": "Не удалось запустить аутентификацию",
+                            "tmdbConnectTimeout": "Время авторизации истекло",
+                            "tmdbNoV4Token": "Токен чтения v4 требуется в настройках выше",
+                            "tmdbAccountDesc": "Подключите аккаунт TMDB, чтобы оценивать фильмы и сериалы."
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -5725,7 +5938,13 @@ var I18nData = {
                             "episode": "Эпизод",
                             "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
                             "age": "{count} лет",
-                            "similarGenres": "Ещё в том же жанре"
+                            "similarGenres": "Ещё в том же жанре",
+                            "yourRating": "Ваша оценка",
+                            "removeRating": "Удалить",
+                            "rateHint": "Нажмите 0-9 для прямой оценки",
+                            "ratingSaved": "Оценка сохранена",
+                            "ratingRemoved": "Оценка удалена",
+                            "ratingFailed": "Не удалось оценить"
                     },
                     "department": {
                             "Acting": "Актёрская игра",
@@ -5839,7 +6058,8 @@ var I18nData = {
                             "qualityHint": "Нажмите для смены качества",
                             "favoriteHint": "Добавить в мой список",
                             "downloadHint": "Скачать на Freebox",
-                            "downloadSeasonHint": "Скачать сезон на Freebox"
+                            "downloadSeasonHint": "Скачать сезон на Freebox",
+                            "userRatingHint": "Ваша оценка влияет на рекомендации"
                     },
                     "diagnostic": {
                             "title": "Проблема соединения",
@@ -5898,7 +6118,9 @@ var I18nData = {
                             "select": "Seç...",
                             "loading": "Yükleniyor...",
                             "error": "Hata",
-                            "connectionError": "Bağlantı hatası"
+                            "connectionError": "Bağlantı hatası",
+                            "cancel": "İptal",
+                            "close": "Kapat"
                     },
                     "app": {
                             "loading": "Yükleniyor...",
@@ -5945,7 +6167,9 @@ var I18nData = {
                             "categories": "Kategoriler",
                             "recommended": "Önerilenler",
                             "noRecommendations": "Henüz öneri yok — önce bir şeyler izleyin veya favorilere ekleyin",
-                            "computingRecommendations": "Öneriler hesaplanıyor..."
+                            "computingRecommendations": "Öneriler hesaplanıyor...",
+                            "myRatings": "Puanlarım",
+                            "noRatings": "Henüz puan yok"
                     },
                     "guide": {
                             "today": "Bugün",
@@ -6139,7 +6363,18 @@ var I18nData = {
                             "unitSeconds_other": "{n} saniye",
                             "showRecommended": "\"Önerilenler\" kategorisini göster",
                             "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
-                            "exitConfirmation": "Çıkış onayı"
+                            "exitConfirmation": "Çıkış onayı",
+                            "tmdbV4ReadToken": "TMDB v4 Okuma Token",
+                            "tmdbV4ReadTokenDesc": "TMDB hesabı bağlamak için gerekli (film puanlama).\nthemoviedb.org/settings/api",
+                            "tmdbAccount": "TMDB Hesabı",
+                            "tmdbConnect": "Bağlan",
+                            "tmdbDisconnect": "{name} bağlantısını kes",
+                            "tmdbConnectInstructions": "Bu QR kodunu telefonunla tara ve TMDB’de erişimi onayla:",
+                            "tmdbConnectWaiting": "Yetkilendirme bekleniyor...",
+                            "tmdbConnectFailed": "Kimlik doğrulama başlatılamadı",
+                            "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
+                            "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
+                            "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla."
                     },
                     "player": {
                             "play": "Oynat",
@@ -6213,7 +6448,13 @@ var I18nData = {
                             "episode": "Bölüm",
                             "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
                             "age": "{count} yaşında",
-                            "similarGenres": "Aynı türde daha fazlası"
+                            "similarGenres": "Aynı türde daha fazlası",
+                            "yourRating": "Senin puanın",
+                            "removeRating": "Kaldır",
+                            "rateHint": "Doğrudan puanlamak için 0-9’a bas",
+                            "ratingSaved": "Puan kaydedildi",
+                            "ratingRemoved": "Puan kaldırıldı",
+                            "ratingFailed": "Puanlama başarısız"
                     },
                     "department": {
                             "Acting": "Oyunculuk",
@@ -6327,7 +6568,8 @@ var I18nData = {
                             "qualityHint": "Çözünürlüğü değiştirmek için tıklayın",
                             "favoriteHint": "Listeme ekle",
                             "downloadHint": "Freebox'a indir",
-                            "downloadSeasonHint": "Sezonu Freebox'a indir"
+                            "downloadSeasonHint": "Sezonu Freebox'a indir",
+                            "userRatingHint": "Puanın önerilerini etkiler"
                     },
                     "diagnostic": {
                             "title": "Bağlantı sorunu",

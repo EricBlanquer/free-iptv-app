@@ -208,11 +208,11 @@
             <div class="settings-section" id="apis-section">
                 <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="apis"><span data-i18n="settings.apis">APIs</span><span class="collapse-arrow collapsed">▼</span></div>
                 <div class="collapsible-content collapsed" id="apis-content">
-                    <div class="settings-row">
-                        <span class="settings-label" data-i18n="settings.tmdbKey">TMDB API Key</span>
-                        <input type="text" id="setting-tmdbApiKey" class="settings-input focusable" data-i18n-placeholder="settings.tmdbKey" placeholder="TMDB API Key">
+                    <div class="settings-row" id="tmdb-account-row">
+                        <span class="settings-label" data-i18n="settings.tmdbAccount">TMDB Account</span>
+                        <div id="tmdb-account-btn" class="settings-action focusable" data-action="tmdbConnect" data-i18n="settings.tmdbConnect">Connect</div>
                     </div>
-                    <div class="settings-desc" data-i18n="settings.tmdbDesc">Posters, descriptions, cast. themoviedb.org/settings/api</div>
+                    <div class="settings-desc" id="tmdb-account-desc" data-i18n="settings.tmdbAccountDesc">Connect your TMDB account to rate movies and TV shows.</div>
                     <div class="settings-row">
                         <span class="settings-label" data-i18n="settings.openSubtitlesKey">OpenSubtitles API Key</span>
                         <input type="text" id="setting-openSubtitlesApiKey" class="settings-input focusable" data-i18n-placeholder="settings.openSubtitlesKey" placeholder="OpenSubtitles API Key">
@@ -569,7 +569,21 @@
                 </div>
                 <div id="details-info">
                     <h1 id="details-title" class="focusable" tabindex="0" title="Click to edit and re-search TMDB">Title</h1>
-                    <div id="details-meta"></div>
+                    <div id="details-meta">
+                        <span id="details-meta-parts"></span>
+                        <span id="details-user-rating" class="hidden">
+                            <span class="user-rating-label" data-i18n="details.yourRating">Your rating</span>
+                            <span id="user-rating-stars">
+                                <span class="user-rating-star focusable" data-value="1">☆</span>
+                                <span class="user-rating-star focusable" data-value="2">☆</span>
+                                <span class="user-rating-star focusable" data-value="3">☆</span>
+                                <span class="user-rating-star focusable" data-value="4">☆</span>
+                                <span class="user-rating-star focusable" data-value="5">☆</span>
+                            </span>
+                            <span id="user-rating-value"></span>
+                            <span id="user-rating-remove-btn" class="focusable hidden" data-i18n-title="details.removeRating" title="Remove"><span class="material-symbols-outlined">delete</span></span>
+                        </span>
+                    </div>
                     <div id="details-genres"></div>
                     <p id="details-description" class="focusable"></p>
                     <div id="details-actions">
@@ -834,6 +848,26 @@
         <div class="modal-content tts-voice-modal-content">
             <div class="modal-title" data-i18n="settings.ttsVoice">TTS Voice</div>
             <div id="tts-voice-list"></div>
+        </div>
+    </div>
+
+    <!-- TMDB Connect Modal -->
+    <div id="tmdb-connect-modal" class="modal hidden">
+        <div class="modal-content tmdb-connect-modal-content">
+            <div class="modal-title" data-i18n="settings.tmdbConnect">Connect TMDB</div>
+            <div id="tmdb-connect-step-loading">
+                <div class="tmdb-connect-message" data-i18n="common.loading">Loading...</div>
+            </div>
+            <div id="tmdb-connect-step-code" class="hidden">
+                <div class="tmdb-connect-message" data-i18n="settings.tmdbConnectInstructions">Scan this QR code with your phone and approve access on TMDB:</div>
+                <div class="tmdb-connect-qr" id="tmdb-connect-qr"></div>
+                <div class="tmdb-connect-status" id="tmdb-connect-status" data-i18n="settings.tmdbConnectWaiting">Waiting for authorization...</div>
+                <div class="tmdb-connect-cancel focusable" id="tmdb-connect-cancel-btn" data-i18n="common.cancel">Cancel</div>
+            </div>
+            <div id="tmdb-connect-step-error" class="hidden">
+                <div class="tmdb-connect-message tmdb-connect-error" id="tmdb-connect-error-msg"></div>
+                <div class="tmdb-connect-cancel focusable" id="tmdb-connect-close-btn" data-i18n="common.close">Close</div>
+            </div>
         </div>
     </div>
 

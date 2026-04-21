@@ -18,7 +18,9 @@
         "select": "Selecteer...",
         "loading": "Laden...",
         "error": "Fout",
-        "connectionError": "Verbindingsfout"
+        "connectionError": "Verbindingsfout",
+        "cancel": "Annuleren",
+        "close": "Sluiten"
     },
     "app": {
         "loading": "Laden...",
@@ -65,7 +67,9 @@
         "categories": "Categorieën",
         "recommended": "Aanbevolen",
         "noRecommendations": "Nog geen aanbevelingen — bekijk of markeer eerst enkele favorieten",
-        "computingRecommendations": "Aanbevelingen berekenen..."
+        "computingRecommendations": "Aanbevelingen berekenen...",
+        "myRatings": "Mijn beoordelingen",
+        "noRatings": "Nog geen beoordelingen"
     },
     "guide": {
         "today": "Vandaag",
@@ -259,7 +263,18 @@
         "unitSeconds_other": "{n} seconden",
         "showRecommended": "Categorie \"Aanbevolen\" tonen",
         "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
-        "exitConfirmation": "Afsluitbevestiging"
+        "exitConfirmation": "Afsluitbevestiging",
+        "tmdbV4ReadToken": "TMDB v4 Read-token",
+        "tmdbV4ReadTokenDesc": "Vereist om een TMDB-account te koppelen (films beoordelen).\nthemoviedb.org/settings/api",
+        "tmdbAccount": "TMDB-account",
+        "tmdbConnect": "Koppelen",
+        "tmdbDisconnect": "{name} ontkoppelen",
+        "tmdbConnectInstructions": "Scan deze QR-code met je telefoon en keur de toegang goed op TMDB:",
+        "tmdbConnectWaiting": "Wachten op autorisatie...",
+        "tmdbConnectFailed": "Authenticatie kon niet starten",
+        "tmdbConnectTimeout": "Autorisatie verlopen",
+        "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
+        "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen."
     },
     "player": {
         "play": "Afspelen",
@@ -333,7 +348,13 @@
         "episode": "Aflevering",
         "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven.",
         "age": "{count} jaar",
-        "similarGenres": "Meer in hetzelfde genre"
+        "similarGenres": "Meer in hetzelfde genre",
+        "yourRating": "Jouw beoordeling",
+        "removeRating": "Verwijderen",
+        "rateHint": "Druk 0-9 om direct te beoordelen",
+        "ratingSaved": "Beoordeling opgeslagen",
+        "ratingRemoved": "Beoordeling verwijderd",
+        "ratingFailed": "Beoordeling mislukt"
     },
     "department": {
         "Acting": "Acteerwerk",
@@ -512,7 +533,8 @@
         "qualityHint": "Klik om resolutie te wisselen",
         "favoriteHint": "Toevoegen aan mijn lijst",
         "downloadHint": "Downloaden naar Freebox",
-        "downloadSeasonHint": "Seizoen downloaden naar Freebox"
+        "downloadSeasonHint": "Seizoen downloaden naar Freebox",
+        "userRatingHint": "Jouw beoordeling beïnvloedt je aanbevelingen"
     },
     "diagnostic": {
         "title": "Verbindingsprobleem",

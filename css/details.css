@@ -136,6 +136,79 @@
 .vote-count {
     color: #777;
 }
+
+#details-user-rating {
+    display: inline;
+    color: #aaa;
+}
+
+#details-user-rating::before {
+    content: " · ";
+    color: #aaa;
+}
+
+.user-rating-label {
+    margin-right: 8px;
+    color: #bbb;
+}
+
+#user-rating-stars {
+    display: inline;
+}
+
+.user-rating-star {
+    display: inline-block;
+    color: #555;
+    padding: 0 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.user-rating-star.filled {
+    color: #ffc107;
+}
+
+.user-rating-star.focused {
+    background: rgba(0, 212, 255, 0.25);
+    color: #ffc107;
+    transform: scale(1.25);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+#user-rating-value {
+    color: #ffc107;
+}
+
+#user-rating-value:not(:empty) {
+    margin-left: 6px;
+}
+
+#user-rating-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+#user-rating-remove-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+#user-rating-remove-btn.focused {
+    background: rgba(224, 80, 80, 0.5);
+    color: #fff;
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px #e05050;
+}
+
 #details-genres {
     display: flex;
     flex-wrap: wrap;
@@ -1003,3 +1076,4 @@ body.touch #actor-filmography-section {
     align-items: center;
     justify-content: center;
 }
+
