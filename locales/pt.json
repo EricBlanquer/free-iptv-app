@@ -320,7 +320,8 @@
         "switchingQuality": "Mudando para qualidade inferior",
         "autoFormat": "Auto",
         "notForMe": "Não é para mim",
-        "notForMeDone": "Removido das recomendações"
+        "notForMeDone": "Removido das recomendações",
+        "markUnwatched": "Marcar como não visto"
     },
     "subtitleOptions": {
         "title": "Opções de legendas",

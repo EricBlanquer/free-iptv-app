@@ -318,7 +318,8 @@
         "switchingQuality": "Daha düşük kaliteye geçiş",
         "autoFormat": "Oto",
         "notForMe": "Bana göre değil",
-        "notForMeDone": "Önerilerden kaldırıldı"
+        "notForMeDone": "Önerilerden kaldırıldı",
+        "markUnwatched": "İzlenmedi olarak işaretle"
     },
     "subtitleOptions": {
         "title": "Altyazı seçenekleri",

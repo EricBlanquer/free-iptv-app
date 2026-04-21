@@ -316,7 +316,8 @@
         "switchingQuality": "التبديل إلى جودة أقل",
         "autoFormat": "تلقائي",
         "notForMe": "ليس لي",
-        "notForMeDone": "تمت الإزالة من التوصيات"
+        "notForMeDone": "تمت الإزالة من التوصيات",
+        "markUnwatched": "وضع علامة \"غير مشاهد\""
     },
     "subtitleOptions": {
         "title": "خيارات الترجمة",

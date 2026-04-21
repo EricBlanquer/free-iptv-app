@@ -318,7 +318,8 @@
         "switchingQuality": "Schakelen naar lagere kwaliteit",
         "autoFormat": "Auto",
         "notForMe": "Niet voor mij",
-        "notForMeDone": "Verwijderd uit aanbevelingen"
+        "notForMeDone": "Verwijderd uit aanbevelingen",
+        "markUnwatched": "Markeer als ongezien"
     },
     "subtitleOptions": {
         "title": "Ondertitel opties",

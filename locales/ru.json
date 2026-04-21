@@ -316,7 +316,8 @@
         "switchingQuality": "Переключение на низкое качество",
         "autoFormat": "Авто",
         "notForMe": "Не для меня",
-        "notForMeDone": "Удалено из рекомендаций"
+        "notForMeDone": "Удалено из рекомендаций",
+        "markUnwatched": "Отметить как непросмотренное"
     },
     "subtitleOptions": {
         "title": "Параметры субтитров",

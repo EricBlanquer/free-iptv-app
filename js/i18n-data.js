@@ -1318,7 +1318,8 @@ var I18nData = {
                             "switchingQuality": "التبديل إلى جودة أقل",
                             "autoFormat": "تلقائي",
                             "notForMe": "ليس لي",
-                            "notForMeDone": "تمت الإزالة من التوصيات"
+                            "notForMeDone": "تمت الإزالة من التوصيات",
+                            "markUnwatched": "وضع علامة \"غير مشاهد\""
                     },
                     "subtitleOptions": {
                             "title": "خيارات الترجمة",
@@ -1829,7 +1830,8 @@ var I18nData = {
                             "switchingQuality": "Wechsel zu niedrigerer Qualität",
                             "autoFormat": "Auto",
                             "notForMe": "Nichts für mich",
-                            "notForMeDone": "Aus Empfehlungen entfernt"
+                            "notForMeDone": "Aus Empfehlungen entfernt",
+                            "markUnwatched": "Als ungesehen markieren"
                     },
                     "subtitleOptions": {
                             "title": "Untertitel-Optionen",
@@ -2345,7 +2347,8 @@ var I18nData = {
                             "switchingQuality": "Switching to lower quality",
                             "autoFormat": "Auto",
                             "notForMe": "Not for me",
-                            "notForMeDone": "Removed from recommendations"
+                            "notForMeDone": "Removed from recommendations",
+                            "markUnwatched": "Mark as unwatched"
                     },
                     "subtitleOptions": {
                             "title": "Subtitle options",
@@ -2851,7 +2854,8 @@ var I18nData = {
                             "switchingQuality": "Cambiando a calidad inferior",
                             "autoFormat": "Auto",
                             "notForMe": "No para mí",
-                            "notForMeDone": "Eliminado de las recomendaciones"
+                            "notForMeDone": "Eliminado de las recomendaciones",
+                            "markUnwatched": "Marcar como no vista"
                     },
                     "subtitleOptions": {
                             "title": "Opciones de subtítulos",
@@ -3367,7 +3371,8 @@ var I18nData = {
                             "timeshift": "Différé",
                             "autoFormat": "Auto",
                             "notForMe": "Pas pour moi",
-                            "notForMeDone": "Retiré des recommandations"
+                            "notForMeDone": "Retiré des recommandations",
+                            "markUnwatched": "Marquer comme non vue"
                     },
                     "subtitleOptions": {
                             "title": "Options sous-titres",
@@ -3873,7 +3878,8 @@ var I18nData = {
                             "switchingQuality": "Passaggio a qualità inferiore",
                             "autoFormat": "Auto",
                             "notForMe": "Non fa per me",
-                            "notForMeDone": "Rimosso dai suggerimenti"
+                            "notForMeDone": "Rimosso dai suggerimenti",
+                            "markUnwatched": "Segna come non visto"
                     },
                     "subtitleOptions": {
                             "title": "Opzioni sottotitoli",
@@ -4384,7 +4390,8 @@ var I18nData = {
                             "switchingQuality": "Schakelen naar lagere kwaliteit",
                             "autoFormat": "Auto",
                             "notForMe": "Niet voor mij",
-                            "notForMeDone": "Verwijderd uit aanbevelingen"
+                            "notForMeDone": "Verwijderd uit aanbevelingen",
+                            "markUnwatched": "Markeer als ongezien"
                     },
                     "subtitleOptions": {
                             "title": "Ondertitel opties",
@@ -4895,7 +4902,8 @@ var I18nData = {
                             "switchingQuality": "Przełączanie na niższą jakość",
                             "autoFormat": "Auto",
                             "notForMe": "Nie dla mnie",
-                            "notForMeDone": "Usunięte z rekomendacji"
+                            "notForMeDone": "Usunięte z rekomendacji",
+                            "markUnwatched": "Oznacz jako nieobejrzane"
                     },
                     "subtitleOptions": {
                             "title": "Opcje napisów",
@@ -5406,7 +5414,8 @@ var I18nData = {
                             "switchingQuality": "Mudando para qualidade inferior",
                             "autoFormat": "Auto",
                             "notForMe": "Não é para mim",
-                            "notForMeDone": "Removido das recomendações"
+                            "notForMeDone": "Removido das recomendações",
+                            "markUnwatched": "Marcar como não visto"
                     },
                     "subtitleOptions": {
                             "title": "Opções de legendas",
@@ -5917,7 +5926,8 @@ var I18nData = {
                             "switchingQuality": "Переключение на низкое качество",
                             "autoFormat": "Авто",
                             "notForMe": "Не для меня",
-                            "notForMeDone": "Удалено из рекомендаций"
+                            "notForMeDone": "Удалено из рекомендаций",
+                            "markUnwatched": "Отметить как непросмотренное"
                     },
                     "subtitleOptions": {
                             "title": "Параметры субтитров",
@@ -6428,7 +6438,8 @@ var I18nData = {
                             "switchingQuality": "Daha düşük kaliteye geçiş",
                             "autoFormat": "Oto",
                             "notForMe": "Bana göre değil",
-                            "notForMeDone": "Önerilerden kaldırıldı"
+                            "notForMeDone": "Önerilerden kaldırıldı",
+                            "markUnwatched": "İzlenmedi olarak işaretle"
                     },
                     "subtitleOptions": {
                             "title": "Altyazı seçenekleri",
