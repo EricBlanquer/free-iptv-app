@@ -114,6 +114,19 @@
                         <!-- Dynamically populated -->
                     </div>
                 </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.defaultAudioLang">Default audio</span>
+                    <div class="settings-options" id="playlist-audio-lang-options">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="settings.defaultAudioChannels">Audio channels</span>
+                    <div class="settings-options" id="playlist-audio-channels-options">
+                        <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="stereo" data-i18n="settings.audioChannelsStereo">Stereo</div>
+                        <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="surround" data-i18n="settings.audioChannelsSurround">Surround</div>
+                    </div>
+                </div>
             </div>
             <div id="playlist-m3u-fields" class="settings-section hidden">
                 <div class="settings-row">
@@ -123,8 +136,6 @@
             </div>
             <div class="settings-section">
                 <div class="settings-row">
-                    <div class="settings-action focusable" data-action="cancelPlaylist" data-i18n="settings.cancel">Cancel</div>
-                    <div class="settings-action focusable" data-action="savePlaylist" data-i18n="settings.save">Save</div>
                     <div id="playlist-delete-btn" class="settings-action focusable hidden" data-action="deletePlaylist" data-i18n="settings.delete">Delete</div>
                 </div>
             </div>

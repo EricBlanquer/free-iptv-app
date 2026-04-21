@@ -569,29 +569,50 @@ IPTVApp.prototype.initLanguageOptions = function() {
 
 // Generate subtitle language options for playlist edit
 IPTVApp.prototype.initSubtitleLangOptions = function(selectedLang) {
+    this.initPlaylistLangOptions('playlist-subtitle-lang-options', 'defaultSubtitleLang', selectedLang);
+};
+
+IPTVApp.prototype.initAudioLangOptions = function(selectedLang) {
+    this.initPlaylistLangOptions('playlist-audio-lang-options', 'defaultAudioLang', selectedLang);
+};
+
+IPTVApp.prototype.initPlaylistLangOptions = function(containerId, settingName, selectedLang) {
     var locales = I18n.getAvailableLocales();
-    var container = document.getElementById('playlist-subtitle-lang-options');
+    var container = document.getElementById(containerId);
     if (!container) return;
-    container.innerHTML = '';
-    // Add "disabled" option
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
     var noneOpt = document.createElement('div');
     noneOpt.className = 'settings-option focusable';
     if (!selectedLang) noneOpt.classList.add('selected');
-    noneOpt.dataset.setting = 'defaultSubtitleLang';
+    noneOpt.dataset.setting = settingName;
     noneOpt.dataset.value = '';
     noneOpt.textContent = '-';
     container.appendChild(noneOpt);
-    // Add language options
     locales.forEach(function(loc) {
         var code = loc.toUpperCase();
         var opt = document.createElement('div');
         opt.className = 'settings-option focusable';
         if (selectedLang === code) opt.classList.add('selected');
-        opt.dataset.setting = 'defaultSubtitleLang';
+        opt.dataset.setting = settingName;
         opt.dataset.value = code;
         opt.textContent = I18n.getLocaleFlag(loc) + ' ' + code;
         container.appendChild(opt);
     });
+};
+
+IPTVApp.prototype.initAudioChannelsOptions = function(selectedValue) {
+    var options = document.querySelectorAll('#playlist-audio-channels-options .settings-option');
+    var value = selectedValue || 'stereo';
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].dataset.value === value) {
+            options[i].classList.add('selected');
+        }
+        else {
+            options[i].classList.remove('selected');
+        }
+    }
 };
 
 IPTVApp.prototype.initSettingsUI = function() {
@@ -1381,6 +1402,10 @@ IPTVApp.prototype.showPlaylistEdit = function(playlistId) {
     // Generate and set default subtitle language options
     var defaultSubLang = playlist ? (playlist.defaultSubtitleLang || '') : '';
     this.initSubtitleLangOptions(defaultSubLang);
+    var defaultAudLang = playlist ? (playlist.defaultAudioLang || '') : '';
+    this.initAudioLangOptions(defaultAudLang);
+    var defaultAudChannels = playlist ? (playlist.defaultAudioChannels || 'stereo') : 'stereo';
+    this.initAudioChannelsOptions(defaultAudChannels);
     var deleteBtn = document.getElementById('playlist-delete-btn');
     if (playlist) {
         this.setHidden(deleteBtn, false);
@@ -1430,6 +1455,10 @@ IPTVApp.prototype.savePlaylist = function() {
         // Get selected default subtitle language
         var selectedSubLang = document.querySelector('#playlist-subtitle-lang-options .settings-option.selected');
         playlist.defaultSubtitleLang = selectedSubLang ? selectedSubLang.dataset.value : '';
+        var selectedAudLang = document.querySelector('#playlist-audio-lang-options .settings-option.selected');
+        playlist.defaultAudioLang = selectedAudLang ? selectedAudLang.dataset.value : '';
+        var selectedAudChannels = document.querySelector('#playlist-audio-channels-options .settings-option.selected');
+        playlist.defaultAudioChannels = selectedAudChannels ? selectedAudChannels.dataset.value : 'stereo';
     }
     else {
         playlist.url = document.getElementById('playlist-m3uUrl').value.trim();
@@ -1457,9 +1486,6 @@ IPTVApp.prototype.savePlaylist = function() {
         this.currentScreen = 'home';
         this.focusArea = 'home';
         this.startApp();
-    }
-    else {
-        this.showPlaylists();
     }
 };
 
@@ -1529,8 +1555,19 @@ IPTVApp.prototype.togglePlaylistVisibility = function(playlistId) {
     }
     this.saveSettings();
     this.renderPlaylistsList();
+    this.applyPlaylistValidationCache();
     this.renderPlaylistSelector();
+    this.invalidateFocusables();
     this.updateFocus();
+};
+
+IPTVApp.prototype.applyPlaylistValidationCache = function() {
+    var cache = this.playlistValidationCache || {};
+    for (var id in cache) {
+        if (cache.hasOwnProperty(id)) {
+            this.updatePlaylistValidationUI(id, cache[id]);
+        }
+    }
 };
 
 IPTVApp.prototype.handlePlaylistEditSelect = function() {
@@ -1554,16 +1591,26 @@ IPTVApp.prototype.handlePlaylistEditSelect = function() {
         }
         current.classList.add('selected');
     }
+    else if (current.classList.contains('settings-option') && current.dataset.setting === 'defaultAudioLang') {
+        window.log('ACTION playlist-edit: setAudioLang ' + current.dataset.value);
+        var audLangOpts = document.querySelectorAll('#playlist-audio-lang-options .settings-option');
+        for (var i = 0; i < audLangOpts.length; i++) {
+            audLangOpts[i].classList.remove('selected');
+        }
+        current.classList.add('selected');
+    }
+    else if (current.classList.contains('settings-option') && current.dataset.setting === 'defaultAudioChannels') {
+        window.log('ACTION playlist-edit: setAudioChannels ' + current.dataset.value);
+        var audChOpts = document.querySelectorAll('#playlist-audio-channels-options .settings-option');
+        for (var i = 0; i < audChOpts.length; i++) {
+            audChOpts[i].classList.remove('selected');
+        }
+        current.classList.add('selected');
+    }
     else if (current.classList.contains('settings-action')) {
         var action = current.dataset.action;
         window.log('ACTION playlist-edit: ' + action);
-        if (action === 'savePlaylist') {
-            this.savePlaylist();
-        }
-        else if (action === 'cancelPlaylist') {
-            this.showPlaylists();
-        }
-        else if (action === 'deletePlaylist') {
+        if (action === 'deletePlaylist') {
             this.deletePlaylist();
         }
     }

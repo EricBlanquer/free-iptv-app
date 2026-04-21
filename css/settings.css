@@ -188,11 +188,13 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#playlist-subtitle-lang-options {
+#playlist-subtitle-lang-options,
+#playlist-audio-lang-options {
     max-width: 510px;
 }
 
-#playlist-subtitle-lang-options .settings-option {
+#playlist-subtitle-lang-options .settings-option,
+#playlist-audio-lang-options .settings-option {
     padding: 8px 0;
     margin-right: 6px;
     margin-bottom: 6px;

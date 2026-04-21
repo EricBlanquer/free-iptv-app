@@ -456,7 +456,10 @@ IPTVApp.prototype.backHandlers = {
         this.showSettings();
     },
     'screen:playlist-edit': function() {
-        this.showPlaylists();
+        this.savePlaylist();
+        if (this.currentScreen === 'playlist-edit') {
+            this.showPlaylists();
+        }
     },
     'screen:guide': function() {
         this.stopGuideTimeIndicator();
