@@ -196,8 +196,6 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     for (var vi = 0; vi < oldVersionBtns.length; vi++) {
         oldVersionBtns[vi].parentNode.removeChild(oldVersionBtns[vi]);
     }
-    var breakEl = actionsEl.querySelector('.actions-break');
-    if (breakEl) breakEl.style.display = 'none';
     this.setHidden('play-btn', false);
 };
 
@@ -207,6 +205,23 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
         return result;
     }
     window.log('showDetails: isSeries=' + isSeries + ' hasDuplicateVersions=true count=' + streamData._duplicateVersions.length);
+    var progress = this._findBestVersionProgress(streamData);
+    if (progress) {
+        window.log('showDetails: progress found on version ' + progress.version.id + ' (tag=' + (progress.version.tag || 'default') + ') pos=' + progress.prog.position + ' — skipping version buttons');
+        var vData = progress.version.data;
+        vData._duplicateVersions = streamData._duplicateVersions;
+        this.selectedStream = {
+            id: progress.version.id,
+            type: isSeries ? 'series' : 'vod',
+            data: vData,
+            seriesId: isSeries ? progress.version.id : undefined,
+            _playlistId: vData._playlistId || streamData._playlistId
+        };
+        if (isSeries) result.seriesId = progress.version.id;
+        result.hasVersions = true;
+        this._versionInfosPromise = this._loadVersionInfos(streamData._duplicateVersions);
+        return result;
+    }
     var cleanTitleForPref = this.cleanTitle(this.getStreamTitle(streamData)).toLowerCase();
     var savedPref = isSeries ? this.getSeriesVersionPref(cleanTitleForPref) : this.getMovieVersionPref(cleanTitleForPref);
     window.log('showDetails: cleanTitle=' + cleanTitleForPref + ' savedPref=' + savedPref);
@@ -216,8 +231,6 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
     this.setHidden('play-btn', true);
     var actionsEl = document.getElementById('details-actions');
     var playBtn = document.getElementById('play-btn');
-    var breakEl = actionsEl.querySelector('.actions-break');
-    if (breakEl) breakEl.style.display = '';
     streamData._duplicateVersions.forEach(function(version, idx) {
         var btn = document.createElement('button');
         btn.className = 'version-btn focusable action-btn';
@@ -503,11 +516,6 @@ IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualTy
             this.setHidden(markWatchedBtn, alreadyWatched);
         }
         playBtn.style.opacity = '1';
-    }
-    var actionsEl = document.getElementById('details-actions');
-    var breakEl = actionsEl.querySelector('.actions-break');
-    if (breakEl) {
-        breakEl.style.display = continueBtn.classList.contains('hidden') ? 'none' : '';
     }
 };
 
@@ -2768,8 +2776,6 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     for (var vi = 0; vi < oldVersionBtns.length; vi++) {
         oldVersionBtns[vi].parentNode.removeChild(oldVersionBtns[vi]);
     }
-    var breakEl = actionsEl.querySelector('.actions-break');
-    if (breakEl) breakEl.style.display = 'none';
     // Reset buttons
     var playBtn = document.getElementById('play-btn');
     this.setHidden(playBtn, false);
