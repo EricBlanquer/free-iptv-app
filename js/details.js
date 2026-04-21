@@ -2582,7 +2582,17 @@ IPTVApp.prototype.markAsWatched = function() {
     var historyItem = this.getWatchHistoryItem(streamData || streamId, this.selectedStream._playlistId);
     var isAlreadyWatched = historyItem && historyItem.watched;
     if (isAlreadyWatched) {
-        historyItem.watched = false;
+        if (historyItem._manuallyMarked) {
+            var removeId = historyItem.id;
+            var removePlaylistId = historyItem.playlistId;
+            this.watchHistory = this.watchHistory.filter(function(item) {
+                if (removePlaylistId) return item.id != removeId || item.playlistId != removePlaylistId;
+                return item.id != removeId;
+            });
+        }
+        else {
+            historyItem.watched = false;
+        }
         this.saveWatchHistory();
         this.updateContinueCounter();
         this.updateMarkWatchedButton();
