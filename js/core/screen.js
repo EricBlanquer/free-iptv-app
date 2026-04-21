@@ -306,7 +306,7 @@ IPTVApp.prototype.showScreen = function(screen) {
         if (this._dynamicGridDirty && section) {
             var categoryKey = (this.settings.activePlaylistId || '') + '_' + section;
             var currentCategory = this.selectedCategoryBySection[categoryKey];
-            if (currentCategory === 'favorites' || currentCategory === 'recommended' || currentCategory === 'continue') {
+            if (currentCategory) {
                 this.loadStreams(currentCategory);
             }
         }

@@ -359,7 +359,8 @@
         "timeshift": "Différé",
         "autoFormat": "Auto",
         "notForMe": "Pas pour moi",
-        "notForMeDone": "Retiré des recommandations"
+        "notForMeDone": "Retiré des recommandations",
+        "markUnwatched": "Marquer comme non vue"
     },
     "subtitleOptions": {
         "title": "Options sous-titres",

@@ -347,7 +347,8 @@
         "switchingQuality": "Switching to lower quality",
         "autoFormat": "Auto",
         "notForMe": "Not for me",
-        "notForMeDone": "Removed from recommendations"
+        "notForMeDone": "Removed from recommendations",
+        "markUnwatched": "Mark as unwatched"
     },
     "subtitleOptions": {
         "title": "Subtitle options",

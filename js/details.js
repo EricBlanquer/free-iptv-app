@@ -511,8 +511,11 @@ IPTVApp.prototype._setupDetailsButtons = function(streamId, streamData, actualTy
         else {
             playBtn.textContent = I18n.t('player.play', 'Play');
             this.setHidden(continueBtn, true);
+            this.setHidden(markWatchedBtn, false);
             var alreadyWatched = vodProg && vodProg.watched;
-            this.setHidden(markWatchedBtn, alreadyWatched);
+            markWatchedBtn.textContent = alreadyWatched
+                ? I18n.t('player.markUnwatched', 'Mark as unwatched')
+                : I18n.t('player.markWatched', 'Mark as watched');
         }
         playBtn.style.opacity = '1';
     }
@@ -559,9 +562,12 @@ IPTVApp.prototype._showDetailsSeries = function(streamId, streamData, seriesId, 
     if (!hasEpisodeFromHistory) {
         this.setHidden(playBtn, true);
         this.setHidden(continueBtn, true);
+        this.setHidden(markWatchedBtn, false);
         var seriesHistoryItem = streamData ? this.getWatchHistoryItem(streamData, this.selectedStream && this.selectedStream._playlistId) : null;
         var seriesWatched = seriesHistoryItem && seriesHistoryItem.watched;
-        this.setHidden(markWatchedBtn, seriesWatched);
+        markWatchedBtn.textContent = seriesWatched
+            ? I18n.t('player.markUnwatched', 'Mark as unwatched')
+            : I18n.t('player.markWatched', 'Mark as watched');
     }
     var seriesIdToLoad = seriesId || (streamData && streamData.series_id) || (isFromDownload ? null : streamId);
     if (this.selectedStream) {
@@ -690,15 +696,10 @@ IPTVApp.prototype.renderVodInfoFromProvider = function(data) {
         setDescription(data.plot, 'providerData');
         this.preloadTTS(data.plot);
     }
-    // Display metadata (year, duration, rating)
+    // Display metadata (duration, rating) — year shown in title
     var metaEl = document.getElementById('details-meta-parts');
     metaEl.textContent = '';
     var metaParts = [];
-    var releaseDate = data.releaseDate || data.release_date || data.releasedate;
-    if (releaseDate) {
-        var year = releaseDate.substring(0, 4);
-        if (year) metaParts.push(year);
-    }
     if (data.episode_run_time || data.duration) {
         var duration = data.episode_run_time || data.duration;
         metaParts.push(duration + ' min');
@@ -772,14 +773,9 @@ IPTVApp.prototype.renderVodInfoFromProvider = function(data) {
 IPTVApp.prototype.displayBasicMetadata = function(streamData, title) {
     var metaEl = document.getElementById('details-meta-parts');
     metaEl.textContent = '';
-    var year = this.extractYear(title);
-    if (year) {
-        metaEl.appendChild(document.createTextNode(year));
-    }
     if (streamData) {
         var rating = parseFloat(streamData.rating) || 0;
         if (rating > 0) {
-            if (year) metaEl.appendChild(document.createTextNode(' · '));
             var ratingContainer = document.createElement('span');
             ratingContainer.id = 'details-rating-container';
             ratingContainer.dataset.providerRating = rating;
@@ -799,11 +795,9 @@ IPTVApp.prototype._renderTMDBMeta = function(tmdbInfo, type, providerRating, mat
     metaEl.textContent = '';
     var metaParts = [];
     if (type === 'movie') {
-        if (tmdbInfo.release_date) metaParts.push(tmdbInfo.release_date.substring(0, 4));
         if (tmdbInfo.runtime) metaParts.push(TMDB.formatRuntime(tmdbInfo.runtime));
     }
     else {
-        if (tmdbInfo.first_air_date) metaParts.push(tmdbInfo.first_air_date.substring(0, 4));
         if (tmdbInfo.number_of_seasons) {
             metaParts.push(tmdbInfo.number_of_seasons + ' saison' + (tmdbInfo.number_of_seasons > 1 ? 's' : ''));
         }
@@ -2581,44 +2575,61 @@ IPTVApp.prototype.playVersion = function(versionIndex) {
 };
 
 IPTVApp.prototype.markAsWatched = function() {
-    if (this.selectedStream) {
-        var streamId = this.selectedStream.id;
-        var streamData = this.selectedStream.data;
-        var type = this.selectedStream.type;
-        // Mark as watched in watchHistory
-        var historyItem = this.getWatchHistoryItem(streamData || streamId, this.selectedStream._playlistId);
-        var wasNew = false;
-        if (!historyItem && streamData) {
-            var histType = (type === 'series' || type === 'episode') ? 'series' : 'vod';
-            this.addToWatchHistory(streamData, histType, 0);
-            historyItem = this.getWatchHistoryItem(streamData, this.selectedStream._playlistId);
-            wasNew = true;
-        }
-        if (historyItem) {
-            historyItem.watched = true;
-            if (wasNew) historyItem._manuallyMarked = true;
-            this.saveWatchHistory();
-            this.updateContinueCounter();
-        }
-        if (this.currentStreamType === 'history') {
-            this.showScreen('browse');
-            this.currentScreen = 'browse';
-            this.showContinueInGrid();
-            var gridItems = document.querySelectorAll('#content-grid .grid-item');
-            if (gridItems.length > 0) {
-                this.focusArea = 'grid';
-                this.focusIndex = Math.max(0, Math.min(this.lastGridIndex - 1, gridItems.length - 1));
-            }
-            else {
-                this.focusArea = 'sidebar';
-                this.focusIndex = 0;
-            }
-            this.updateFocus();
+    if (!this.selectedStream) return;
+    var streamId = this.selectedStream.id;
+    var streamData = this.selectedStream.data;
+    var type = this.selectedStream.type;
+    var historyItem = this.getWatchHistoryItem(streamData || streamId, this.selectedStream._playlistId);
+    var isAlreadyWatched = historyItem && historyItem.watched;
+    if (isAlreadyWatched) {
+        historyItem.watched = false;
+        this.saveWatchHistory();
+        this.updateContinueCounter();
+        this.goBack();
+        return;
+    }
+    var wasNew = false;
+    if (!historyItem && streamData) {
+        var histType = (type === 'series' || type === 'episode') ? 'series' : 'vod';
+        this.addToWatchHistory(streamData, histType, 0);
+        historyItem = this.getWatchHistoryItem(streamData, this.selectedStream._playlistId);
+        wasNew = true;
+    }
+    if (historyItem) {
+        historyItem.watched = true;
+        if (wasNew) historyItem._manuallyMarked = true;
+        this.saveWatchHistory();
+        this.updateContinueCounter();
+    }
+    if (this.currentStreamType === 'history') {
+        this.showScreen('browse');
+        this.currentScreen = 'browse';
+        this.showContinueInGrid();
+        var gridItems = document.querySelectorAll('#content-grid .grid-item');
+        if (gridItems.length > 0) {
+            this.focusArea = 'grid';
+            this.focusIndex = Math.max(0, Math.min(this.lastGridIndex - 1, gridItems.length - 1));
         }
         else {
-            this.goBack();
+            this.focusArea = 'sidebar';
+            this.focusIndex = 0;
         }
+        this.updateFocus();
     }
+    else {
+        this.goBack();
+    }
+};
+
+IPTVApp.prototype.updateMarkWatchedButton = function() {
+    var btn = document.getElementById('mark-watched-btn');
+    if (!btn || !this.selectedStream) return;
+    var streamData = this.selectedStream.data;
+    var historyItem = this.getWatchHistoryItem(streamData || this.selectedStream.id, this.selectedStream._playlistId);
+    var isWatched = historyItem && historyItem.watched;
+    btn.textContent = isWatched
+        ? I18n.t('player.markUnwatched', 'Mark as unwatched')
+        : I18n.t('player.markWatched', 'Mark as watched');
 };
 
 // Actor screen

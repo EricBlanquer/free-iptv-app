@@ -318,7 +318,8 @@
         "switchingQuality": "Wechsel zu niedrigerer Qualität",
         "autoFormat": "Auto",
         "notForMe": "Nichts für mich",
-        "notForMeDone": "Aus Empfehlungen entfernt"
+        "notForMeDone": "Aus Empfehlungen entfernt",
+        "markUnwatched": "Als ungesehen markieren"
     },
     "subtitleOptions": {
         "title": "Untertitel-Optionen",

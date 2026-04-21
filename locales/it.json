@@ -315,7 +315,8 @@
         "switchingQuality": "Passaggio a qualità inferiore",
         "autoFormat": "Auto",
         "notForMe": "Non fa per me",
-        "notForMeDone": "Rimosso dai suggerimenti"
+        "notForMeDone": "Rimosso dai suggerimenti",
+        "markUnwatched": "Segna come non visto"
     },
     "subtitleOptions": {
         "title": "Opzioni sottotitoli",

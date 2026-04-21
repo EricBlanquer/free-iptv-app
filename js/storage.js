@@ -1439,6 +1439,7 @@ IPTVApp.prototype.updateLocalTMDBRating = function(tmdbId, type, value, title, y
         delete this.myTMDBRatings[bucket][tmdbId];
     }
     this.saveMyTMDBRatings();
+    if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
 
 IPTVApp.prototype.getMyTMDBRatingsCount = function(section) {
