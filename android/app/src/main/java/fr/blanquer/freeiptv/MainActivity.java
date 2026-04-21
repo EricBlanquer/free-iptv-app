@@ -403,6 +403,22 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void openAuthWebView(String url) {
+            if (url == null || url.isEmpty()) return;
+            runOnUiThread(() -> {
+                try {
+                    android.content.Intent intent = new android.content.Intent(MainActivity.this, AuthWebViewActivity.class);
+                    intent.putExtra(AuthWebViewActivity.EXTRA_URL, url);
+                    startActivity(intent);
+                }
+                catch (Exception ex) {
+                    mWebView.evaluateJavascript(
+                        "window.log && window.log('ERROR openAuthWebView: " + ex.getMessage() + "');", null);
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void forceCheckUpdates() {
             if (mWebUpdater == null) return;
             runOnUiThread(() -> mWebView.evaluateJavascript(

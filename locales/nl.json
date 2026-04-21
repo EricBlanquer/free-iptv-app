@@ -274,7 +274,8 @@
         "tmdbConnectFailed": "Authenticatie kon niet starten",
         "tmdbConnectTimeout": "Autorisatie verlopen",
         "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
-        "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen."
+        "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen.",
+        "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren."
     },
     "player": {
         "play": "Afspelen",

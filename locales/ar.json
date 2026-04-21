@@ -272,7 +272,8 @@
         "tmdbConnectFailed": "تعذر بدء المصادقة",
         "tmdbConnectTimeout": "انتهت مهلة التفويض",
         "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
-        "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات."
+        "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات.",
+        "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا."
     },
     "player": {
         "play": "تشغيل",

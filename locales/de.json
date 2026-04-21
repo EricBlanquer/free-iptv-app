@@ -274,7 +274,8 @@
         "tmdbConnectFailed": "Authentifizierung konnte nicht gestartet werden",
         "tmdbConnectTimeout": "Zeitüberschreitung bei der Autorisierung",
         "tmdbNoV4Token": "v4 Read-Token in den Einstellungen oben erforderlich",
-        "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten."
+        "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten.",
+        "tmdbConnectInstructionsAndroid": "Erlaube den Zugriff auf der geöffneten Seite und schließe sie, um zurückzukehren."
     },
     "player": {
         "play": "Abspielen",

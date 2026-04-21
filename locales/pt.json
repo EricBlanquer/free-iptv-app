@@ -276,7 +276,8 @@
         "tmdbConnectFailed": "Não foi possível iniciar a autenticação",
         "tmdbConnectTimeout": "Tempo de autorização esgotado",
         "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
-        "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries."
+        "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries.",
+        "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui."
     },
     "player": {
         "play": "Reproduzir",
