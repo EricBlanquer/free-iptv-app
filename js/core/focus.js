@@ -28,6 +28,9 @@ IPTVApp.prototype.bindKeys = function() {
     }
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
+        if (key === 37 || key === 38 || key === 39 || key === 40) {
+            self._arrowHeld = true;
+        }
         var activeEl = document.activeElement;
         var isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
         if (isInput) {
@@ -326,6 +329,16 @@ IPTVApp.prototype.bindKeys = function() {
         if (key === 37 || key === 39 || key === 417 || key === 412) {
             if (self.currentScreen === 'player') {
                 self.stopSeek();
+            }
+        }
+        if (key === 37 || key === 38 || key === 39 || key === 40) {
+            self._arrowHeld = false;
+            var grid = document.getElementById('content-grid');
+            if (grid && grid.offsetParent !== null) {
+                clearTimeout(self.imageLoadTimer);
+                self._trimExcessDomItems();
+                self.loadVisibleImages();
+                self.loadVisibleEPG();
             }
         }
     });
@@ -1349,6 +1362,7 @@ IPTVApp.prototype.updateFocus = function() {
             var self = this;
             clearTimeout(this.imageLoadTimer);
             this.imageLoadTimer = setTimeout(function() {
+                if (self._arrowHeld) return;
                 self.loadVisibleImages();
                 self.loadVisibleEPG();
             }, 250);

@@ -74,7 +74,7 @@ class IPTVApp {
         this.currentStreams = [];
         this.currentStreamType = '';
         this.displayedCount = 0;
-        this.itemsPerBatch = 15;
+        this.itemsPerBatch = 5;
         this.lastNavTime = 0;
         this.navThrottle = 80;
         this.imageLoadTimer = null;
