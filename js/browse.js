@@ -263,23 +263,24 @@ IPTVApp.prototype.loadVisibleImages = function(forceFromStart) {
     var self = this;
     var grid = document.getElementById('content-grid');
     var items = document.querySelectorAll('#content-grid .grid-item');
-    var cols = this.gridColumns;
+    var isListView = grid ? grid.classList.contains('list-view') : false;
+    var cols = isListView ? 1 : this.gridColumns;
     var focusIdx = (this.focusArea === 'grid' && !forceFromStart) ? this.focusIndex : 0;
+    var firstItem = items[0];
+    var rowHeight = firstItem ? firstItem.offsetHeight + 10 : (isListView ? 95 : 300);
+    var viewportHeight = grid ? grid.clientHeight : 720;
+    var visibleRows = Math.max(3, Math.ceil(viewportHeight / rowHeight));
     var startIdx, endIdx;
     if (forceFromStart) {
         startIdx = 0;
-        endIdx = Math.min(items.length, cols * 3);
+        endIdx = Math.min(items.length, (visibleRows + 3) * cols);
     }
     else if (grid && items.length > 0 && grid.scrollTop > 0) {
         var scrollTop = grid.scrollTop;
-        var viewportHeight = grid.clientHeight;
-        var firstItem = items[0];
-        var rowHeight = firstItem ? firstItem.offsetHeight + 10 : 300;
         var topSpacer = document.getElementById('grid-top-spacer');
         var spacerHeight = topSpacer ? topSpacer.offsetHeight : 0;
         var visibleTop = Math.max(0, scrollTop - spacerHeight);
         var firstVisibleRow = Math.floor(visibleTop / rowHeight);
-        var visibleRows = Math.ceil(viewportHeight / rowHeight) + 1;
         var startRow = Math.max(0, firstVisibleRow - 1);
         var endRow = firstVisibleRow + visibleRows + 2;
         startIdx = Math.min(items.length, startRow * cols);
@@ -288,12 +289,13 @@ IPTVApp.prototype.loadVisibleImages = function(forceFromStart) {
     else {
         var focusRow = Math.floor(focusIdx / cols);
         var startRow = Math.max(0, focusRow - 2);
-        var endRow = focusRow + 4;
+        var endRow = focusRow + visibleRows + 2;
         startIdx = startRow * cols;
         endIdx = Math.min(items.length, endRow * cols);
     }
-    var unloadStart = Math.min(items.length, Math.max(0, startIdx - cols * 3));
-    var unloadEnd = Math.min(items.length, endIdx + cols * 3);
+    var unloadBuffer = Math.max(cols * 3, visibleRows * cols);
+    var unloadStart = Math.min(items.length, Math.max(0, startIdx - unloadBuffer));
+    var unloadEnd = Math.min(items.length, endIdx + unloadBuffer);
     var unloaded = 0;
     for (var u = 0; u < unloadStart; u++) {
         if (!items[u]) continue;
@@ -505,14 +507,20 @@ IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, 
 IPTVApp.prototype.loadVisibleGenres = function() {
     if (this.currentSection === 'live' || this.currentSection === 'sport') return;
     var self = this;
+    var grid = document.getElementById('content-grid');
     var items = document.querySelectorAll('#content-grid .grid-item');
-    var cols = this.gridColumns;
+    var isListView = grid ? grid.classList.contains('list-view') : false;
+    var cols = isListView ? 1 : this.gridColumns;
+    var firstItem = items[0];
+    var rowHeight = firstItem ? firstItem.offsetHeight + 10 : (isListView ? 95 : 300);
+    var viewportHeight = grid ? grid.clientHeight : 720;
+    var visibleRows = Math.max(2, Math.ceil(viewportHeight / rowHeight));
     var startIdx = 0;
-    var endIdx = Math.min(items.length, cols * 2);
+    var endIdx = Math.min(items.length, visibleRows * cols);
     if (this.focusArea === 'grid') {
         var focusRow = Math.floor(this.focusIndex / cols);
         startIdx = focusRow * cols;
-        endIdx = Math.min(items.length, (focusRow + 2) * cols);
+        endIdx = Math.min(items.length, (focusRow + visibleRows) * cols);
     }
     var streamLookup = {};
     for (var si = 0; si < self.currentStreams.length; si++) {
@@ -685,14 +693,20 @@ IPTVApp.prototype.loadVisibleEPG = function() {
     if (this.currentSection !== 'live' && this.currentSection !== 'sport') return;
     if (!this.api || !this.api.getShortEPG) return;
     var self = this;
+    var grid = document.getElementById('content-grid');
     var items = document.querySelectorAll('#content-grid .grid-item');
-    var cols = this.gridColumns;
+    var isListView = grid ? grid.classList.contains('list-view') : false;
+    var cols = isListView ? 1 : this.gridColumns;
+    var firstItem = items[0];
+    var rowHeight = firstItem ? firstItem.offsetHeight + 10 : (isListView ? 95 : 300);
+    var viewportHeight = grid ? grid.clientHeight : 720;
+    var visibleRows = Math.max(3, Math.ceil(viewportHeight / rowHeight));
     var startIdx = 0;
-    var endIdx = Math.min(items.length, cols * 3);
+    var endIdx = Math.min(items.length, visibleRows * cols);
     if (this.focusArea === 'grid') {
         var focusRow = Math.floor(this.focusIndex / cols);
         startIdx = Math.max(0, focusRow - 1) * cols;
-        endIdx = Math.min(items.length, (focusRow + 3) * cols);
+        endIdx = Math.min(items.length, (focusRow + visibleRows) * cols);
     }
     for (var i = startIdx; i < endIdx; i++) {
         var item = items[i];
@@ -1616,10 +1630,8 @@ IPTVApp.prototype.updateGridSpacer = function() {
         spacer.style.height = '0';
         return;
     }
-    // Estimate item height (grid: image ~220px + title ~40px + margin ~15px = 275px)
-    // List view: min-height 80px + margin-bottom 15px = 95px
     var isListView = container.classList.contains('list-view');
-    var itemHeight = isListView ? 95 : 275;
+    var itemHeight = this._gridRowHeight || (isListView ? 95 : 275);
     var cols = isListView ? 1 : this.gridColumns;
     var remainingRows = Math.ceil(remainingItems / cols);
     spacer.style.height = (remainingRows * itemHeight) + 'px';
@@ -2555,7 +2567,8 @@ IPTVApp.prototype.initGridScrollLoader = function() {
     var ensureItems = function() {
         if (!self.currentStreams) return;
         var rowHeight = self._gridRowHeight || 300;
-        var cols = self.gridColumns || 5;
+        var isListView = grid.classList.contains('list-view');
+        var cols = isListView ? 1 : (self.gridColumns || 5);
         var totalStreams = self.currentStreams.length;
         var domOffset = self._domOffset || 0;
         var viewportFirstRow = Math.floor(grid.scrollTop / rowHeight);
@@ -2939,7 +2952,8 @@ IPTVApp.prototype._createGridItem = function(stream) {
 IPTVApp.prototype._prependGridItems = function() {
     var container = document.getElementById('content-grid');
     if (!container) return 0;
-    var cols = this.gridColumns;
+    var isListView = container.classList.contains('list-view');
+    var cols = isListView ? 1 : this.gridColumns;
     var batchSize = cols * 3;
     var startIdx = Math.max(0, this._domOffset - batchSize);
     var endIdx = this._domOffset;
@@ -2963,7 +2977,8 @@ IPTVApp.prototype._prependGridItems = function() {
 IPTVApp.prototype._syncTopSpacer = function() {
     var container = document.getElementById('content-grid');
     if (!container) return;
-    var cols = this.gridColumns || 5;
+    var isListView = container.classList.contains('list-view');
+    var cols = isListView ? 1 : (this.gridColumns || 5);
     var rowHeight = this._gridRowHeight || 300;
     var targetHeight = Math.max(0, Math.floor((this._domOffset || 0) / cols) * rowHeight);
     var topSpacer = document.getElementById('grid-top-spacer');
@@ -2986,7 +3001,8 @@ IPTVApp.prototype._jumpToIndex = function(targetIndex) {
     if (!this.currentStreams) return;
     var container = document.getElementById('content-grid');
     if (!container) return;
-    var cols = this.gridColumns || 5;
+    var isListView = container.classList.contains('list-view');
+    var cols = isListView ? 1 : (this.gridColumns || 5);
     var rowsBefore = 2;
     var rowsAfter = 6;
     var startIndex = Math.max(0, Math.floor(targetIndex / cols) * cols - rowsBefore * cols);
@@ -3062,7 +3078,8 @@ IPTVApp.prototype._trimExcessDomItems = function() {
         }
     }
     var rowHeight = this._gridRowHeight || 300;
-    var cols = this.gridColumns;
+    var isListView = container.classList.contains('list-view');
+    var cols = isListView ? 1 : this.gridColumns;
     var existingTopSpacer = document.getElementById('grid-top-spacer');
     var topSpacerH = existingTopSpacer ? existingTopSpacer.offsetHeight : 0;
     var firstVisibleRow = Math.floor(Math.max(0, container.scrollTop - topSpacerH) / rowHeight);
@@ -3082,6 +3099,7 @@ IPTVApp.prototype._trimExcessDomItems = function() {
     var topRemoveCount = keepStart;
     var bottomRemoveCount = itemsLen - keepEnd;
     if (topRemoveCount <= 0 && bottomRemoveCount <= 0) return;
+    var savedScrollTop = container.scrollTop;
     if (bottomRemoveCount > 0) {
         for (var b = itemsLen - 1; b >= keepEnd; b--) {
             if (items[b]) items[b].remove();
@@ -3090,15 +3108,16 @@ IPTVApp.prototype._trimExcessDomItems = function() {
         this.updateGridSpacer();
     }
     if (topRemoveCount > 0) {
+        this._domOffset = (this._domOffset || 0) + topRemoveCount;
+        this._syncTopSpacer();
         for (var t = 0; t < topRemoveCount; t++) {
             if (items[t]) items[t].remove();
         }
         this.focusIndex = Math.max(0, this.focusIndex - topRemoveCount);
-        this._domOffset = (this._domOffset || 0) + topRemoveCount;
-        this._syncTopSpacer();
     }
+    container.scrollTop = savedScrollTop;
     this.invalidateFocusables();
-    window.log('MEM', 'Trimmed top=' + topRemoveCount + ' bottom=' + bottomRemoveCount + ' (DOM now ' + (itemsLen - topRemoveCount - bottomRemoveCount) + ', offset ' + this._domOffset + ')');
+    window.log('MEM', 'Trimmed top=' + topRemoveCount + ' bottom=' + bottomRemoveCount + ' (DOM now ' + (itemsLen - topRemoveCount - bottomRemoveCount) + ', offset ' + this._domOffset + ' scroll ' + savedScrollTop + ')');
 };
 
 IPTVApp.prototype.getFilteredContinueHistory = function(section) {
