@@ -258,6 +258,17 @@ IPTVApp.prototype.getCustomCategoryPatterns = function(categoryId) {
     });
 };
 
+// True while the grid can still scroll further in either direction. When false
+// (top or bottom reached), the `_arrowHeld` block is useless — no more scroll
+// will come, so pending loads should fire even with the key still pressed.
+IPTVApp.prototype._canScrollMore = function() {
+    var grid = document.getElementById('content-grid');
+    if (!grid) return false;
+    if (grid.scrollTop <= 5) return false;
+    if (grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 5) return false;
+    return true;
+};
+
 // Compute the DOM index range that covers the visible viewport plus a small buffer.
 // Shared by loadVisibleImages / loadVisibleGenres / loadVisibleEPG so they all act
 // on the same set of items (TMDB fallback must cover every poster on screen, not
@@ -1753,6 +1764,12 @@ IPTVApp.prototype.setViewMode = function(mode) {
     if (mode === 'list' && this.displayedCount < 20) {
         this.loadMoreItems();
     }
+    // Grid and list don't show the same number of visible items (grid = cols ×
+    // rows, list = 1 × rows); re-compute visible range and fetch any missing
+    // posters/genres for items newly in view.
+    this._trimExcessDomItems();
+    this.loadVisibleImages();
+    this.loadVisibleEPG();
 };
 
 IPTVApp.prototype.isSD = function(stream) {
@@ -2607,7 +2624,7 @@ IPTVApp.prototype.initGridScrollLoader = function() {
         if (imageTimer) clearTimeout(imageTimer);
         imageTimer = setTimeout(function() {
             imageTimer = null;
-            if (self._arrowHeld) return;
+            if (self._arrowHeld && self.focusArea === 'grid' && self._canScrollMore()) return;
             self._trimExcessDomItems();
             self.loadVisibleImages();
         }, 250);
