@@ -615,4 +615,87 @@ describe('bug: poster load/unload ignores list-view when counting items', () => 
         cols = grid.classList.contains('list-view') ? 1 : gridColumns;
         expect(cols).toBe(5);
     });
+
+    // loadVisibleGenres / loadVisibleEPG originally only loaded around focusRow
+    // (startIdx = focusRow * cols, endIdx = (focusRow + visibleRows) * cols).
+    // When the user scrolls to the very bottom of a list-view category, focus
+    // sits on the LAST item, so that formula collapses to a single-item range —
+    // every other visible row is skipped, and since the provider often has no
+    // poster URL, only the focused item ever gets a TMDB-fetched poster.
+    // Fix: the genre/EPG fetch must cover the same scroll-window that
+    // loadVisibleImages already uses.
+    it('focus at end of list: old genre-range only covers focus row', () => {
+        // 58 items, focus on the last one (index 57), list-view
+        var focusRow = 57;
+        var visibleRows = 12;
+        var cols = 1;
+        var items = 58;
+        var buggyStart = focusRow * cols;
+        var buggyEnd = Math.min(items, (focusRow + visibleRows) * cols);
+        expect(buggyEnd - buggyStart).toBe(1); // only the focused row
+    });
+
+    it('focus at end of list: scroll-window covers every visible row', () => {
+        // Same scenario, using the scroll-aware range (no top spacer since
+        // no trim happened, all 58 items are in DOM)
+        var scrollTop = 47 * 65;
+        var fixed = rangeFromScroll(58, 1, scrollTop, 720, 65);
+        expect(fixed.startIdx).toBe(46);
+        expect(fixed.endIdx).toBe(58);
+        expect(fixed.endIdx - fixed.startIdx).toBe(12);
+    });
+
+    // Unload of a TMDB-applied poster must also clear genreLoaded, otherwise
+    // loadVisibleGenres skips the item on revisit and the poster never comes
+    // back. Reproduces the scroll-down-then-back-to-top "no posters" bug.
+    it('unload of tmdb poster must clear genreLoaded so it can be re-applied', () => {
+        document.body.textContent = '';
+        var item = document.createElement('div');
+        item.className = 'grid-item';
+        item.dataset.genreLoaded = 'done';
+        var imgDiv = document.createElement('div');
+        imgDiv.className = 'grid-item-image';
+        imgDiv.dataset.loaded = 'tmdb';
+        imgDiv.style.backgroundImage = 'url("https://image.tmdb.org/t/p/w300/x.jpg")';
+        item.appendChild(imgDiv);
+        document.body.appendChild(item);
+
+        // Simulate the unload pass of loadVisibleImages
+        var uDiv = item.firstElementChild;
+        var loadState = uDiv.dataset.loaded;
+        if (loadState === 'ok' || loadState === 'tmdb') {
+            uDiv.style.backgroundImage = '';
+            delete uDiv.dataset.loaded;
+            if (loadState === 'tmdb') delete item.dataset.genreLoaded;
+        }
+
+        expect(imgDiv.style.backgroundImage).toBe('');
+        expect(imgDiv.dataset.loaded).toBeUndefined();
+        expect(item.dataset.genreLoaded).toBeUndefined();
+    });
+
+    it('unload of provider poster keeps genreLoaded (only TMDB unload clears it)', () => {
+        document.body.textContent = '';
+        var item = document.createElement('div');
+        item.className = 'grid-item';
+        item.dataset.genreLoaded = 'done';
+        var imgDiv = document.createElement('div');
+        imgDiv.className = 'grid-item-image';
+        imgDiv.dataset.loaded = 'ok';
+        imgDiv.style.backgroundImage = 'url("http://provider.example/x.jpg")';
+        item.appendChild(imgDiv);
+        document.body.appendChild(item);
+
+        var uDiv = item.firstElementChild;
+        var loadState = uDiv.dataset.loaded;
+        if (loadState === 'ok' || loadState === 'tmdb') {
+            uDiv.style.backgroundImage = '';
+            delete uDiv.dataset.loaded;
+            if (loadState === 'tmdb') delete item.dataset.genreLoaded;
+        }
+
+        // Provider images still have their imageUrl; loadVisibleImages re-fetches
+        // from the URL on revisit, so genreLoaded doesn't need clearing.
+        expect(item.dataset.genreLoaded).toBe('done');
+    });
 });
