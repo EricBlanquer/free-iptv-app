@@ -1362,7 +1362,7 @@ IPTVApp.prototype.updateFocus = function() {
             var self = this;
             clearTimeout(this.imageLoadTimer);
             this.imageLoadTimer = setTimeout(function() {
-                if (self._arrowHeld) return;
+                if (self._arrowHeld && self.focusArea === 'grid' && self._canScrollMore && self._canScrollMore()) return;
                 self.loadVisibleImages();
                 self.loadVisibleEPG();
             }, 250);
