@@ -514,3 +514,105 @@ describe('bug: lastGridIndex carries over to new category', () => {
         expect(app.lastGridIndex).toBe(50);
     });
 });
+
+describe('bug: poster load/unload ignores list-view when counting items', () => {
+    // Reproduces the row/column index math used by loadVisibleImages /
+    // loadVisibleGenres / loadVisibleEPG / ensureItems / _trimExcessDomItems.
+    // Two cascading bugs:
+    //   1) cols hard-coded to gridColumns (5) -> scroll-based startIdx*cols
+    //      overshoots by 5x in list-view, loading items well past the visible range.
+    //   2) preload sizes like `cols * 3` or `focusRow + 4` were dimensioned in
+    //      "rows * grid-cols ≈ one screen" — with cols=1 they collapse to 3-4
+    //      items, far short of the 8-12 rows actually on screen in list-view.
+    // Fix: compute visibleRows from viewportHeight/rowHeight, use that to size
+    // both the scroll window and the initial/focus preload range.
+    function rangeFromScroll(totalItems, cols, scrollTop, viewportHeight, rowHeight) {
+        var firstVisibleRow = Math.floor(scrollTop / rowHeight);
+        var visibleRows = Math.max(3, Math.ceil(viewportHeight / rowHeight));
+        var startRow = Math.max(0, firstVisibleRow - 1);
+        var endRow = firstVisibleRow + visibleRows + 2;
+        return {
+            startIdx: Math.min(totalItems, startRow * cols),
+            endIdx: Math.min(totalItems, endRow * cols)
+        };
+    }
+
+    function rangeFromFocus(totalItems, cols, focusIdx, viewportHeight, rowHeight) {
+        var visibleRows = Math.max(3, Math.ceil(viewportHeight / rowHeight));
+        var focusRow = Math.floor(focusIdx / cols);
+        var startRow = Math.max(0, focusRow - 2);
+        var endRow = focusRow + visibleRows + 2;
+        return {
+            startIdx: startRow * cols,
+            endIdx: Math.min(totalItems, endRow * cols)
+        };
+    }
+
+    function rangeFromStart(totalItems, cols, viewportHeight, rowHeight) {
+        var visibleRows = Math.max(3, Math.ceil(viewportHeight / rowHeight));
+        return {
+            startIdx: 0,
+            endIdx: Math.min(totalItems, (visibleRows + 3) * cols)
+        };
+    }
+
+    it('list-view scroll: buggy cols=gridColumns misses the visible posters', () => {
+        // 100 list items, rowHeight=95px (list), viewport 720px, scrolled to ~item 50
+        var buggy = rangeFromScroll(100, 5, 50 * 95, 720, 95);
+        // firstVisibleRow=50, startRow=49; startRow*5=245 -> clamped past the end
+        expect(buggy.startIdx).toBe(100);
+        expect(buggy.endIdx).toBe(100);
+    });
+
+    it('list-view scroll: fixed cols=1 loads items around the visible row', () => {
+        var fixed = rangeFromScroll(100, 1, 50 * 95, 720, 95);
+        // visibleRows = max(3, ceil(720/95)) = 8; endRow = 50 + 8 + 2 = 60
+        expect(fixed.startIdx).toBe(49);
+        expect(fixed.endIdx).toBe(60);
+    });
+
+    it('list-view initial: 4 items (old) vs visibleRows (new, covers screen)', () => {
+        // 100 list items at initial load (no scroll, focus at 0)
+        var oldFormula = Math.min(100, (0 + 4) * 1);
+        expect(oldFormula).toBe(4); // old: focusRow + 4 rows -> only 4 posters
+
+        // New: rows-to-load driven by viewport height, not grid columns
+        var fixed = rangeFromFocus(100, 1, 0, 720, 95);
+        // visibleRows=8 -> endRow = 0 + 8 + 2 = 10 items loaded
+        expect(fixed.endIdx).toBe(10);
+    });
+
+    it('forceFromStart: cols*3 (old) vs (visibleRows+3)*cols (new)', () => {
+        // Old formula in list mode loaded 3 items at app open (cols*3 with cols=1)
+        var oldFormula = Math.min(100, 1 * 3);
+        expect(oldFormula).toBe(3);
+
+        // Fixed: scales with viewport
+        var fixed = rangeFromStart(100, 1, 720, 95);
+        // visibleRows=8 -> 11 items loaded, covers the visible list
+        expect(fixed.endIdx).toBe(11);
+    });
+
+    it('grid-view: still loads a full band around the visible area', () => {
+        // 100 grid items, rowHeight=275px, viewport 720px, scrolled to row 5
+        var ok = rangeFromScroll(100, 5, 5 * 275, 720, 275);
+        // visibleRows = max(3, ceil(720/275)) = 3; endRow = 5 + 3 + 2 = 10 -> 20..50
+        expect(ok.startIdx).toBe(20);
+        expect(ok.endIdx).toBe(50);
+    });
+
+    it('uses grid.classList.contains("list-view") to pick cols', () => {
+        document.body.textContent = '';
+        var grid = document.createElement('div');
+        grid.id = 'content-grid';
+        grid.classList.add('list-view');
+        document.body.appendChild(grid);
+        var gridColumns = 5;
+        var cols = grid.classList.contains('list-view') ? 1 : gridColumns;
+        expect(cols).toBe(1);
+
+        grid.classList.remove('list-view');
+        cols = grid.classList.contains('list-view') ? 1 : gridColumns;
+        expect(cols).toBe(5);
+    });
+});

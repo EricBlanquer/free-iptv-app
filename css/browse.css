@@ -365,6 +365,12 @@
     font-size: 48px;
 }
 
+#grid-spacer,
+#grid-top-spacer {
+    grid-column: 1 / -1;
+    flex-shrink: 0;
+}
+
 #content-grid .grid-item {
     margin: 0 5px 10px 5px;
 }
