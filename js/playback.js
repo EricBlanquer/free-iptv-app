@@ -256,6 +256,29 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     var self = this;
     var playlistId = stream ? stream._playlistId : null;
     window.log('playStream: id=' + streamId + ' type=' + type + ' playlistId=' + playlistId + ' section=' + this.currentSection);
+    // Pre-flight offline check BEFORE any screen transition or AVPlay call.
+    // AVPlay hangs silently on network errors ("Lancement de la lecture..."
+    // stuck forever), and even showing the player screen briefly is jarring.
+    var previewUrl = (stream && stream.url) ? stream.url : '';
+    if (!previewUrl && this.api && type === 'live' && stream && stream.stream_id) {
+        previewUrl = this.api.getLiveStreamUrl(stream.stream_id, (this.settings.liveFormat || 'ts'));
+    }
+    if (/^https?:\/\//i.test(previewUrl) && window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
+        window.NetworkDiagnostic.checkInternet().then(function(r) {
+            if (!r || !r.ok) {
+                self.showToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
+                return;
+            }
+            self._doPlayStream(streamId, type, stream, startPosition);
+        });
+        return;
+    }
+    this._doPlayStream(streamId, type, stream, startPosition);
+};
+
+IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition) {
+    var self = this;
+    var playlistId = stream ? stream._playlistId : null;
     if (this.settings.freeboxEnabled && FreeboxAPI.isConfigured() && FreeboxAPI.hasActiveDownloads()) {
         var hasProviderDownloads = this.hasActiveDownloadsForProvider(playlistId);
         if (hasProviderDownloads && this.getActiveStreamCount(playlistId) >= this.getMaxConnections(playlistId)) {
@@ -632,6 +655,10 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
         // All retries exhausted - check connection limit before showing generic message
         self._errorRetryCount = 0;
         self.showLoading(false);
+        var showErrAndStop = function(msg) {
+            self.showToast(msg);
+            setTimeout(function() { self.stopPlayback(); }, 100);
+        };
         if (apiToUse && apiToUse.getAccountInfo) {
             apiToUse.getAccountInfo().then(function(info) {
                 var msg;
@@ -641,13 +668,21 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
                 else {
                     msg = I18n.t('player.playbackError', 'Playback error');
                 }
-                self.showToast(msg);
-                setTimeout(function() { self.stopPlayback(); }, 100);
+                showErrAndStop(msg);
+            });
+        }
+        else if (window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
+            window.NetworkDiagnostic.checkInternet().then(function(r) {
+                if (!r || !r.ok) {
+                    showErrAndStop(I18n.t('player.noInternet', 'No internet connection — check your network'));
+                }
+                else {
+                    showErrAndStop(I18n.t('player.playbackError', 'Playback error'));
+                }
             });
         }
         else {
-            self.showToast(I18n.t('player.playbackError', 'Playback error'));
-            setTimeout(function() { self.stopPlayback(); }, 100);
+            showErrAndStop(I18n.t('player.playbackError', 'Playback error'));
         }
     };
     this.player.onBufferProgress = function(percent) {

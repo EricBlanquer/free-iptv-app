@@ -314,6 +314,7 @@
         "tryingNative": "Natieve speler proberen...",
         "reconnecting": "Opnieuw verbinden...",
         "streamUnavailable": "Stream niet beschikbaar",
+        "noInternet": "Geen internetverbinding — controleer je netwerk",
         "connectionLimit": "Verbindingslimiet bereikt ({active}/{max}). Sluit andere streams en probeer opnieuw",
         "options": "Opties",
         "liveBtn": "Live",

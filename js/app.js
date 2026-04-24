@@ -438,7 +438,7 @@ class IPTVApp {
             id: this.getNextPlaylistId(),
             name: I18n.t('welcome.demoName', 'Free IPTV Demo'),
             type: 'm3u',
-            url: 'https://iptv.blanquer.org/playlist.m3u'
+            url: 'assets/demo-playlist.m3u'
         };
         this.settings.playlists.push(playlist);
         this.settings.activePlaylistId = playlist.id;
@@ -639,6 +639,11 @@ class IPTVApp {
                 self.updateHomeMenuVisibility();
                 document.getElementById('home-grid').style.visibility = '';
                 done();
+                var isRemoteUrl = /^https?:\/\//i.test(playlist.url || '');
+                if (isRemoteUrl && window.NetworkDiagnostic && window.NetworkDiagnostic.runAndShow) {
+                    try { window.NetworkDiagnostic.runAndShow(self, playlist.url, 'm3u_failed'); }
+                    catch (ex) { window.log('ERROR', 'diagnostic: ' + (ex.message || ex)); }
+                }
             });
         }
         else {

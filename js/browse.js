@@ -935,8 +935,10 @@ IPTVApp.prototype._renderCategoryContent = function(categories, streams, section
             delete this.selectedCategoryBySection[categoryKey];
             this.saveSelectedCategories();
         }
+        var activePl = this.getActivePlaylist && this.getActivePlaylist();
+        var isM3U = activePl && activePl.type === 'm3u';
         var tntChannels = I18n.getTntChannels();
-        var hasTnt = section === 'live' && tntChannels.length > 0 && this.getTntStreamsCount(streams, tntChannels) > 0;
+        var hasTnt = !isM3U && section === 'live' && tntChannels.length > 0 && this.getTntStreamsCount(streams, tntChannels) > 0;
         if (hasTnt) {
             this.showTntInGrid();
             this.updateCategorySelection('tnt');
@@ -1329,15 +1331,21 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
     document.getElementById('search-year').style.display = isLive ? 'none' : '';
     document.getElementById('search-actor').style.display = (!isLive && TMDB.isEnabled()) ? '' : 'none';
     document.getElementById('rating-filters').style.display = isLive ? 'none' : '';
-    document.getElementById('sort-filters').style.display = isLive ? 'none' : '';
+    document.getElementById('sort-filters').style.display = '';
+    var yearSortBtn = document.querySelector('.sort-btn[data-sort-group="year"]');
+    if (yearSortBtn) yearSortBtn.style.display = isLive ? 'none' : '';
     // Check TNT availability for live section
     var hasTnt = false;
     var tntCount = 0;
     if (section === 'live') {
-        var tntChannels = I18n.getTntChannels();
-        if (tntChannels.length > 0) {
-            tntCount = this.getTntStreamsCount(streams, tntChannels);
-            hasTnt = tntCount > 0;
+        var activePlaylist = this.getActivePlaylist && this.getActivePlaylist();
+        var isM3UPlaylist = activePlaylist && activePlaylist.type === 'm3u';
+        if (!isM3UPlaylist) {
+            var tntChannels = I18n.getTntChannels();
+            if (tntChannels.length > 0) {
+                tntCount = this.getTntStreamsCount(streams, tntChannels);
+                hasTnt = tntCount > 0;
+            }
         }
     }
     // Determine default selection: saved > TNT > All
@@ -1950,7 +1958,10 @@ IPTVApp.prototype.applyFilters = function() {
     self.currentStreams = streams;
     self._streamLookup = null;
     self.displayedCount = 0;
-    document.getElementById('content-grid').textContent = '';
+    self._domOffset = 0;
+    var gridEl = document.getElementById('content-grid');
+    gridEl.textContent = '';
+    gridEl.scrollTop = 0;
     requestAnimationFrame(function() {
         if (self._filterGeneration !== generation) return;
         var wasLoading = self._gridLoading;
@@ -2621,13 +2632,42 @@ IPTVApp.prototype.initGridScrollLoader = function() {
             ensurePending = true;
             setTimeout(runEnsure, ENSURE_INTERVAL - sinceLast);
         }
+        // Mouse/touch scroll (arrow keys use keydown/keyup and their own nav
+        // logic): keep the focus on the first fully visible item so PageUp/Down
+        // and arrow keys have a meaningful reference point after scrolling.
+        // We update the .focused class inline WITHOUT calling updateFocus —
+        // updateFocus's scrollIntoView adjust would fight the user's scroll.
+        if (!self._arrowHeld && self.focusArea === 'grid') {
+            var isListView = grid.classList.contains('list-view');
+            var cols = isListView ? 1 : (self.gridColumns || 5);
+            var rowHeight = self._gridRowHeight || (isListView ? 88 : 300);
+            var topSpacer = document.getElementById('grid-top-spacer');
+            var spacerH = topSpacer ? topSpacer.offsetHeight : 0;
+            var visibleTopY = Math.max(0, grid.scrollTop - spacerH);
+            var firstVisibleLocalRow = Math.floor(visibleTopY / rowHeight);
+            var newFocus = firstVisibleLocalRow * cols;
+            var focusables = self.getFocusables();
+            if (newFocus >= 0 && newFocus < focusables.length && newFocus !== self.focusIndex) {
+                if (self._lastFocusedEl) self._lastFocusedEl.classList.remove('focused');
+                self.focusIndex = newFocus;
+                var newEl = focusables[newFocus];
+                if (newEl) {
+                    newEl.classList.add('focused');
+                    self._lastFocusedEl = newEl;
+                }
+            }
+        }
         if (imageTimer) clearTimeout(imageTimer);
+        // Arrow-key scroll: long debounce so images load only on keyup (avoids
+        // blocking the UI during fast key repeats). Mouse/touch scroll: short
+        // debounce so posters keep appearing while the user scrolls.
+        var debounce = self._arrowHeld ? 250 : 80;
         imageTimer = setTimeout(function() {
             imageTimer = null;
             if (self._arrowHeld && self.focusArea === 'grid' && self._canScrollMore()) return;
             self._trimExcessDomItems();
             self.loadVisibleImages();
-        }, 250);
+        }, debounce);
     });
 };
 
@@ -3012,8 +3052,10 @@ IPTVApp.prototype._jumpToIndex = function(targetIndex) {
     if (!container) return;
     var isListView = container.classList.contains('list-view');
     var cols = isListView ? 1 : (this.gridColumns || 5);
+    var rowHeight = this._gridRowHeight || (isListView ? 88 : 300);
+    var viewportRows = Math.max(6, Math.ceil((container.clientHeight + 600) / rowHeight));
     var rowsBefore = 2;
-    var rowsAfter = 6;
+    var rowsAfter = viewportRows;
     var startIndex = Math.max(0, Math.floor(targetIndex / cols) * cols - rowsBefore * cols);
     var endIndex = Math.min(startIndex + (rowsBefore + rowsAfter) * cols, this.currentStreams.length);
     while (container.firstChild) container.removeChild(container.firstChild);
@@ -3075,6 +3117,12 @@ IPTVApp.prototype.loadMoreItems = function() {
     }
     var isFirstBatch = (startIndex === 0);
     this.displayedCount = endIndex;
+    if (isFirstBatch && !this._gridRowHeight) {
+        var firstCreated = container.querySelector('.grid-item');
+        if (firstCreated && firstCreated.offsetHeight > 0) {
+            this._gridRowHeight = firstCreated.offsetHeight + 10;
+        }
+    }
     this.updateGridSpacer();
     this.invalidateFocusables();
     if (isFirstBatch) {

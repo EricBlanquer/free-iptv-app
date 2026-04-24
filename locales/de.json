@@ -314,6 +314,7 @@
         "tryingNative": "Nativen Player versuchen...",
         "reconnecting": "Verbindung wird wiederhergestellt...",
         "streamUnavailable": "Stream nicht verfügbar",
+        "noInternet": "Keine Internetverbindung — Netzwerk prüfen",
         "connectionLimit": "Verbindungslimit erreicht ({active}/{max}). Andere Streams schließen und erneut versuchen",
         "options": "Optionen",
         "liveBtn": "Live",

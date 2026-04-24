@@ -1,0 +1,120 @@
+=== Submission ===
+Version: 1.0.6
+Date: 2026-04-24
+Type: Resubmission after v1.0.5 rejection
+
+=== Note for Tester ===
+WHAT'S NEW
+
+Fixes the v1.0.5 rejection ("No data available" on demo). The demo playlist is now bundled inside the .wgt (no external server required). Added offline detection: clicking a channel without internet shows a clear "No internet connection" message instead of hanging on the loading spinner. Material Symbols font and channel logos are now embedded (no CDN dependency). New: Page Up/Down keys to scroll by page, alphabetical sort on Live channels, mouse/touch scroll with focus tracking.
+
+HOW TO TEST
+
+No login or account required.
+
+Option A — Try the bundled demo (recommended):
+  1. On first launch, accept "Would you like to try a demo playlist?".
+  2. App auto-jumps to Live TV with 7 channels (DW family, France 24 FR/EN, Al Jazeera English).
+  3. Click any channel — should start playing within seconds.
+
+Option B — Configure manually:
+  Settings > Playlists > Add Playlist, enter an M3U URL, or Xtream credentials (server URL, username, password).
+
+=== English ===
+- Fix "No data available" when trying the demo playlist offline or in restricted networks (playlist now bundled locally).
+- New: clear "No internet connection" message when attempting to play a channel without network, instead of a stuck loading spinner.
+- New: Page Up and Page Down keys to scroll the channel list by full pages.
+- New: alphabetical sort button on the Live TV section.
+- New: smooth mouse and touch scrolling with automatic focus tracking.
+- Channel logos and icon font are now embedded in the app (no external downloads needed).
+- Various fixes to the grid view (empty grid after fast scrolling, row height measurement).
+
+=== German ===
+- Behebung von "Keine Daten verfügbar" beim Testen der Demo-Wiedergabeliste offline oder in eingeschränkten Netzwerken (Wiedergabeliste jetzt lokal integriert).
+- Neu: klare Meldung "Keine Internetverbindung" beim Abspielen eines Kanals ohne Netzwerk, statt eines hängenden Lade-Spinners.
+- Neu: Bild-auf/Bild-ab-Tasten zum seitenweisen Blättern der Senderliste.
+- Neu: alphabetische Sortierschaltfläche im Bereich Live-TV.
+- Neu: flüssiges Scrollen mit Maus und Touch mit automatischer Fokusverfolgung.
+- Sender-Logos und Symbol-Schriftart sind jetzt in der App eingebettet (keine externen Downloads erforderlich).
+- Diverse Grid-Korrekturen (leeres Grid nach schnellem Scrollen, Zeilenhöhe).
+
+=== Arabic ===
+- إصلاح "لا توجد بيانات متاحة" عند تجربة قائمة التشغيل التجريبية دون إنترنت أو في شبكات مقيدة (قائمة التشغيل مضمنة الآن محلياً).
+- جديد: رسالة واضحة "لا يوجد اتصال بالإنترنت" عند محاولة تشغيل قناة بدون شبكة، بدلاً من دوران تحميل عالق.
+- جديد: مفاتيح Page Up و Page Down للتمرير بصفحة كاملة في قائمة القنوات.
+- جديد: زر فرز أبجدي في قسم البث المباشر.
+- جديد: تمرير سلس بالفأرة واللمس مع تتبع تلقائي للتركيز.
+- شعارات القنوات وخط الأيقونات مضمنة الآن في التطبيق (لا حاجة لتنزيلات خارجية).
+- إصلاحات متنوعة في عرض الشبكة (شبكة فارغة بعد التمرير السريع، قياس ارتفاع الصف).
+
+=== Spanish ===
+- Corrección de "No hay datos disponibles" al probar la lista de reproducción demo sin conexión o en redes restringidas (lista ahora incluida localmente).
+- Nuevo: mensaje claro "Sin conexión a internet" al intentar reproducir un canal sin red, en lugar de un indicador de carga bloqueado.
+- Nuevo: teclas Av Pág / Re Pág para desplazar la lista de canales por páginas completas.
+- Nuevo: botón de orden alfabético en la sección TV en directo.
+- Nuevo: desplazamiento suave con ratón y táctil con seguimiento automático del foco.
+- Los logotipos de canales y la fuente de iconos están ahora integrados en la app (sin descargas externas).
+- Varias correcciones en la vista de cuadrícula (cuadrícula vacía tras desplazamiento rápido, altura de fila).
+
+=== French ===
+- Correction du message "Aucune donnée disponible" lors de l'essai de la playlist de démo hors ligne ou sur un réseau restreint (playlist maintenant embarquée localement).
+- Nouveau : message clair "Pas de connexion internet" lors d'une tentative de lecture sans réseau, au lieu d'un indicateur de chargement bloqué.
+- Nouveau : touches Page Up / Page Down pour parcourir la liste des chaînes par pages entières.
+- Nouveau : bouton de tri alphabétique dans la section TV en direct.
+- Nouveau : défilement fluide à la souris et au toucher avec suivi automatique du focus.
+- Les logos des chaînes et la police d'icônes sont maintenant embarqués dans l'app (plus de téléchargements externes).
+- Corrections diverses dans la grille (grille vide après défilement rapide, mesure de hauteur de ligne).
+
+=== Italian ===
+- Correzione di "Nessun dato disponibile" durante il test della playlist demo offline o su reti limitate (playlist ora inclusa localmente).
+- Nuovo: messaggio chiaro "Nessuna connessione internet" quando si prova a riprodurre un canale senza rete, invece di un indicatore di caricamento bloccato.
+- Nuovo: tasti Pag Su / Pag Giù per scorrere l'elenco dei canali per pagine intere.
+- Nuovo: pulsante di ordinamento alfabetico nella sezione TV in diretta.
+- Nuovo: scorrimento fluido con mouse e touch con tracciamento automatico del focus.
+- I loghi dei canali e il font delle icone sono ora inclusi nell'app (nessun download esterno).
+- Correzioni varie nella vista a griglia (griglia vuota dopo scorrimento rapido, altezza riga).
+
+=== Dutch ===
+- Oplossing voor "Geen gegevens beschikbaar" bij het testen van de demo-afspeellijst offline of op beperkte netwerken (afspeellijst nu lokaal ingebouwd).
+- Nieuw: duidelijk bericht "Geen internetverbinding" bij het proberen af te spelen van een kanaal zonder netwerk, in plaats van een vastgelopen laadindicator.
+- Nieuw: Page Up / Page Down toetsen om de kanaallijst per volledige pagina te doorlopen.
+- Nieuw: alfabetische sorteerknop in de Live TV sectie.
+- Nieuw: soepel scrollen met muis en touch met automatische focus-tracking.
+- Kanaal-logo's en het icon-lettertype zijn nu ingebouwd in de app (geen externe downloads).
+- Diverse rastercorrecties (leeg raster na snel scrollen, rijhoogtemeting).
+
+=== Polish ===
+- Naprawa "Brak dostępnych danych" podczas testowania demonstracyjnej listy odtwarzania bez połączenia lub w ograniczonych sieciach (lista jest teraz dołączona lokalnie).
+- Nowe: czytelny komunikat "Brak połączenia z internetem" przy próbie odtwarzania kanału bez sieci, zamiast zawieszonego wskaźnika ładowania.
+- Nowe: klawisze Page Up / Page Down do przewijania listy kanałów pełnymi stronami.
+- Nowe: przycisk sortowania alfabetycznego w sekcji TV na żywo.
+- Nowe: płynne przewijanie myszą i dotykiem z automatycznym śledzeniem fokusa.
+- Loga kanałów i czcionka ikon są teraz wbudowane w aplikację (bez zewnętrznych pobrań).
+- Różne poprawki widoku siatki (pusta siatka po szybkim przewijaniu, pomiar wysokości wiersza).
+
+=== Portuguese ===
+- Correção de "Nenhum dado disponível" ao testar a playlist de demonstração offline ou em redes restritas (playlist agora incluída localmente).
+- Novo: mensagem clara "Sem conexão à internet" ao tentar reproduzir um canal sem rede, em vez de um indicador de carregamento travado.
+- Novo: teclas Page Up / Page Down para rolar a lista de canais por páginas inteiras.
+- Novo: botão de ordenação alfabética na seção TV ao vivo.
+- Novo: rolagem suave com mouse e toque com rastreamento automático de foco.
+- Os logotipos dos canais e a fonte de ícones agora estão incorporados no app (sem downloads externos).
+- Várias correções na visualização em grade (grade vazia após rolagem rápida, altura da linha).
+
+=== Russian ===
+- Исправление "Нет доступных данных" при тестировании демо-плейлиста в офлайн-режиме или в ограниченных сетях (плейлист теперь встроен локально).
+- Новое: понятное сообщение "Нет подключения к интернету" при попытке воспроизведения канала без сети вместо зависшего индикатора загрузки.
+- Новое: клавиши Page Up / Page Down для прокрутки списка каналов по целым страницам.
+- Новое: кнопка алфавитной сортировки в разделе прямого эфира.
+- Новое: плавная прокрутка мышью и касанием с автоматическим отслеживанием фокуса.
+- Логотипы каналов и шрифт иконок теперь встроены в приложение (без внешних загрузок).
+- Различные исправления сетки (пустая сетка после быстрой прокрутки, измерение высоты строки).
+
+=== Turkish ===
+- Demo oynatma listesi çevrimdışı veya kısıtlı ağlarda denendiğinde "Veri yok" hatasının düzeltilmesi (oynatma listesi artık yerel olarak dahil edildi).
+- Yeni: ağ olmadan bir kanalı oynatma denemesinde, sıkışmış yükleme göstergesi yerine net "İnternet bağlantısı yok" mesajı.
+- Yeni: kanal listesini tam sayfa olarak kaydırmak için Page Up / Page Down tuşları.
+- Yeni: Canlı TV bölümünde alfabetik sıralama düğmesi.
+- Yeni: otomatik odak takibi ile akıcı fare ve dokunmatik kaydırma.
+- Kanal logoları ve simge yazı tipi artık uygulamaya gömülüdür (harici indirme yok).
+- Izgara görünümünde çeşitli düzeltmeler (hızlı kaydırmadan sonra boş ızgara, satır yüksekliği).

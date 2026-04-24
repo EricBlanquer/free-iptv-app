@@ -316,6 +316,7 @@
         "tryingNative": "Tentando reprodutor nativo...",
         "reconnecting": "Reconectando...",
         "streamUnavailable": "Stream indisponível",
+        "noInternet": "Sem conexão à internet — verifique sua rede",
         "connectionLimit": "Limite de conexões atingido ({active}/{max}). Feche outros streams e tente novamente",
         "options": "Opções",
         "liveBtn": "Ao vivo",

@@ -314,6 +314,7 @@
         "tryingNative": "Yerel oynatıcı deneniyor...",
         "reconnecting": "Yeniden bağlanıyor...",
         "streamUnavailable": "Yayın kullanılamıyor",
+        "noInternet": "İnternet bağlantısı yok — ağınızı kontrol edin",
         "connectionLimit": "Bağlantı sınırına ulaşıldı ({active}/{max}). Diğer akışları kapatın ve tekrar deneyin",
         "options": "Seçenekler",
         "liveBtn": "Canlı",

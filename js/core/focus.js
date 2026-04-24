@@ -28,6 +28,7 @@ IPTVApp.prototype.bindKeys = function() {
     }
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
+        window.log('KEY', 'keydown key=' + key + ' focusArea=' + self.focusArea);
         if (key === 37 || key === 38 || key === 39 || key === 40) {
             self._arrowHeld = true;
         }
@@ -183,6 +184,12 @@ IPTVApp.prototype.bindKeys = function() {
                 } else {
                     self.select();
                 }
+                break;
+            case 33:
+                self.navigatePage('up');
+                break;
+            case 34:
+                self.navigatePage('down');
                 break;
             case 10009:
             case 8:
@@ -342,6 +349,79 @@ IPTVApp.prototype.bindKeys = function() {
             }
         }
     });
+};
+
+IPTVApp.prototype.navigatePage = function(direction) {
+    window.log('KEY', 'navigatePage dir=' + direction + ' focusArea=' + this.focusArea);
+    if (this.focusArea === 'grid') {
+        this._navigateGridPage(direction);
+    }
+    else if (this.focusArea === 'sidebar') {
+        this._navigateSidebarPage(direction);
+    }
+};
+
+IPTVApp.prototype._navigateGridPage = function(direction) {
+    var grid = document.getElementById('content-grid');
+    if (!grid || !this.currentStreams) {
+        window.log('KEY', '_navigateGridPage: no grid or streams');
+        return;
+    }
+    var isListView = grid.classList.contains('list-view');
+    var cols = isListView ? 1 : (this.gridColumns || 5);
+    var rowHeight = this._gridRowHeight || (isListView ? 88 : 300);
+    var viewportRows = Math.max(1, Math.floor(grid.clientHeight / rowHeight));
+    var jumpRows = Math.max(1, viewportRows - 1);
+    // Use the viewport scroll position as the reference, not focus — mouse-wheel
+    // scroll moves the viewport without updating focusIndex, so focus-based math
+    // would give target=current and no movement.
+    var topSpacer = document.getElementById('grid-top-spacer');
+    var spacerH = topSpacer ? topSpacer.offsetHeight : 0;
+    var visibleTopY = Math.max(0, grid.scrollTop - spacerH);
+    var firstVisibleLocalRow = Math.floor(visibleTopY / rowHeight);
+    var viewportAbsoluteStart = (this._domOffset || 0) + firstVisibleLocalRow * cols;
+    var targetAbsolute;
+    if (direction === 'down') {
+        targetAbsolute = Math.min(this.currentStreams.length - 1, viewportAbsoluteStart + jumpRows * cols);
+    }
+    else {
+        targetAbsolute = Math.max(0, viewportAbsoluteStart - jumpRows * cols);
+    }
+    window.log('KEY', '_navigateGridPage dir=' + direction + ' viewStart=' + viewportAbsoluteStart + ' target=' + targetAbsolute + ' jumpRows=' + jumpRows + ' viewportRows=' + viewportRows + ' rowH=' + rowHeight + ' clientH=' + grid.clientHeight);
+    var focusables = this.getFocusables();
+    var targetLocalIndex = targetAbsolute - (this._domOffset || 0);
+    if (targetLocalIndex < 0 || targetLocalIndex >= focusables.length) {
+        window.log('KEY', '_navigateGridPage: jumping to ' + targetAbsolute);
+        this._jumpToIndex(targetAbsolute);
+    }
+    else {
+        this.focusIndex = targetLocalIndex;
+        this.updateFocus();
+    }
+    // Force the grid to scroll so the target row becomes the FIRST visible row
+    // (updateFocus uses scrollIntoView which no-ops when already in viewport —
+    // that would leave the viewport in place when the target is already shown).
+    var finalSpacer = document.getElementById('grid-top-spacer');
+    var finalSpacerH = finalSpacer ? finalSpacer.offsetHeight : 0;
+    var finalLocalRow = Math.floor((targetAbsolute - (this._domOffset || 0)) / cols);
+    grid.scrollTop = Math.max(0, finalLocalRow * rowHeight + finalSpacerH);
+};
+
+IPTVApp.prototype._navigateSidebarPage = function(direction) {
+    var sidebar = document.getElementById('category-list');
+    if (!sidebar) return;
+    var item = sidebar.querySelector('.category-item');
+    var itemHeight = item ? item.offsetHeight : 40;
+    var step = Math.max(1, Math.floor(sidebar.clientHeight / itemHeight) - 1);
+    var focusables = this.getFocusables();
+    if (!focusables.length) return;
+    if (direction === 'down') {
+        this.focusIndex = Math.min(focusables.length - 1, this.focusIndex + step);
+    }
+    else {
+        this.focusIndex = Math.max(0, this.focusIndex - step);
+    }
+    this.updateFocus();
 };
 
 IPTVApp.prototype.scrollableTextNav = function(el, direction) {

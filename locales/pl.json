@@ -313,6 +313,7 @@
         "tryingNative": "Próbuję natywnego odtwarzacza...",
         "reconnecting": "Ponowne łączenie...",
         "streamUnavailable": "Strumień niedostępny",
+        "noInternet": "Brak połączenia z internetem — sprawdź sieć",
         "connectionLimit": "Osiągnięto limit połączeń ({active}/{max}). Zamknij inne strumienie i spróbuj ponownie",
         "options": "Opcje",
         "liveBtn": "Na żywo",

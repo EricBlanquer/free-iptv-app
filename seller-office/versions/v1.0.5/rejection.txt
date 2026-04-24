@@ -1,0 +1,71 @@
+=== Rejected ===
+Date: 2026-04-22
+Reviewer: Samsung Apps TV
+App Version: V1.0.5
+App ID: 3202603044645
+
+=== Reason ===
+CRITICAL: Unable to play content.
+We were unable to use the playback of the app.
+When we selected the demo option the next error was displayed: "No data available".
+Fix this issue and re-submit the app for these models in order to start certification process again.
+
+=== Rejected Model Groups ===
+26TV_STANDARD1 (Tizen 10.0), 26TV_PREMIUM2 (Tizen 10.0), 26TV_PREMIUM1 (Tizen 10.0), 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1 (Tizen 9.0), 25TV_PREMIUM4 (Tizen 9.0), 25TV_PREMIUM3 (Tizen 9.0), 25TV_PREMIUM2 (Tizen 9.0),
+25TV_PREMIUM1 (Tizen 9.0), 25TV_BASIC3 (Tizen 9.0), 25TV_BASIC2 (Tizen 9.0), 25TV_BASIC1 (Tizen 9.0),
+24TV_STANDARD3 (Tizen 9.0 (+1)), 24TV_STANDARD2 (Tizen 9.0 (+1)), 24TV_STANDARD1 (Tizen 9.0 (+1)),
+24TV_PREMIUM6 (Tizen 9.0 (+1)), 24TV_PREMIUM5 (Tizen 9.0 (+1)), 24TV_PREMIUM4 (Tizen 9.0 (+1)),
+24TV_PREMIUM2 (Tizen 9.0 (+1)), 24TV_PREMIUM1 (Tizen 9.0 (+1)),
+24TV_BASIC4 (Tizen 8.0), 24TV_BASIC3 (Tizen 9.0 (+1)),
+24TV_BASIC2_LIC2 (Tizen 8.0), 24TV_BASIC2_LIC (Tizen 8.0), 24TV_BASIC2 (Tizen 9.0 (+1)),
+23TV_BASIC1_LIC2 (Tizen 7.0), 23TV_BASIC1_LIC (Tizen 7.0)
+
+=== Root Cause Analysis ===
+The v1.0.5 demo playlist used a remote URL `https://iptv.blanquer.org/playlist.m3u`
+that dynamically geo-filtered content via `playlist.php` (IP-based lookup).
+Samsung's testing environment could not reach this server — confirmed by
+admin-devices API showing zero device registrations from Korea during the review
+period (2026-04-20 to 2026-04-24). All 6 devices seen in logs were French or Italian.
+When the demo fetch failed, the app silently caught the error and rendered an
+empty grid, which triggered the generic `errors.noData` message → "No data available".
+No diagnostic feedback was shown to the tester, and there was no way to recover.
+Two underlying issues: (1) the demo depended entirely on an external server
+unreachable from the reviewer's network; (2) silent catch hid the real cause.
+
+=== Resolution ===
+Resubmitted as v1.0.6 with the following fixes:
+
+1. **Bundled demo playlist** (assets/demo-playlist.m3u): 7 channels on well-known
+   public CDNs (DW family on Akamai, France 24 FR/EN on france24.com nginx,
+   Al Jazeera English on Google-Edge). No external server dependency for the
+   demo list itself — only the individual stream URLs require internet.
+
+2. **Bundled logos** (assets/logos/*.png): DW, France 24, Al Jazeera logos are
+   embedded so tvg-logo rendering doesn't depend on upload.wikimedia.org.
+
+3. **Bundled Material Symbols font** (assets/material-symbols.ttf, 930KB):
+   removed dependency on fonts.googleapis.com — icons render correctly offline.
+
+4. **Pre-flight offline check** (js/playback.js playStream): before opening
+   AVPlay on any remote stream, probe internet reachability (1.1.1.1 with 3s
+   timeout). If offline, show "No internet connection" toast instead of
+   hanging on "Launching playback..." forever. AVPlay hangs silently on
+   network errors, which was unrecoverable without this check.
+
+5. **Network diagnostic enrichment** (js/core/diagnostic.js): runAndShow
+   now also works for M3U playlists (previously gated to provider URLs),
+   exposes checkInternet publicly, and is triggered on M3U load failure for
+   remote URLs (skips local bundled paths).
+
+6. **Hidden TNT category for M3U playlists**: the auto-detected TNT section
+   was irrelevant for M3U mode (small demo or user-configured list).
+
+7. **i18n**: new key `player.noInternet` in all 11 languages.
+
+8. **Stream playback errors**: when all retries exhaust on a generic error,
+   probe internet to distinguish offline vs real stream failure. Provider
+   branch (connectionLimit) unchanged.
+
+Resubmit version: v1.0.6
+WGT: ~/Bureau/FreeIPTV-1.0.6.wgt
