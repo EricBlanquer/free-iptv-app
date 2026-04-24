@@ -96,6 +96,34 @@ IPTVApp.prototype.playVodFromHistory = function(historyData) {
     }
 };
 
+IPTVApp.prototype._catalogStreamForHistory = function(streamId, playlistId, historyType) {
+    var section = (historyType === 'series' || historyType === 'episode') ? 'series' : 'vod';
+    var streams = this.getStreams(section);
+    for (var i = 0; i < streams.length; i++) {
+        var s = streams[i];
+        if (!this.sameId(s.stream_id, streamId)) continue;
+        if (playlistId && s._playlistId && !this.sameId(s._playlistId, playlistId)) continue;
+        return s;
+    }
+    return null;
+};
+
+IPTVApp.prototype._enrichHistoryStream = function(virtualStream, historyItem) {
+    if (historyItem.containerExtension && !virtualStream.container_extension) {
+        virtualStream.container_extension = historyItem.containerExtension;
+    }
+    var catalogStream = this._catalogStreamForHistory(historyItem.id, historyItem.playlistId, historyItem.type);
+    if (catalogStream) {
+        if (!virtualStream.container_extension && catalogStream.container_extension) {
+            virtualStream.container_extension = catalogStream.container_extension;
+        }
+        if (!virtualStream.url && catalogStream.url) {
+            virtualStream.url = catalogStream.url;
+        }
+    }
+    return virtualStream;
+};
+
 IPTVApp.prototype.addToWatchHistory = function(stream, type, position) {
     var genre = (stream.genre || stream.category_name || '').toLowerCase();
     if (genre.indexOf('adult') !== -1) {
@@ -110,7 +138,8 @@ IPTVApp.prototype.addToWatchHistory = function(stream, type, position) {
         type: type,
         position: position || 0,
         date: Date.now(),
-        playlistId: stream._playlistId || this.settings.activePlaylistId || null
+        playlistId: stream._playlistId || this.settings.activePlaylistId || null,
+        containerExtension: stream.container_extension || null
     };
     if (this.tmdbInfo && this.tmdbInfo.id) {
         historyItem.tmdbId = this.tmdbInfo.id;
@@ -191,7 +220,7 @@ IPTVApp.prototype.showContinueInGrid = function() {
             var itemPlaylistId = item.playlistId;
             seriesId = epToSeries[itemPlaylistId + '_' + episodeId] || null;
         }
-        return {
+        var virtual = {
             stream_id: item.id,
             series_id: seriesId,
             name: item.name,
@@ -207,6 +236,7 @@ IPTVApp.prototype.showContinueInGrid = function() {
             _tmdbId: item.tmdbId || null,
             _tmdbType: item.tmdbType || null
         };
+        return self._enrichHistoryStream(virtual, item);
     });
     this.showStreamGrid(streams, 'history');
 };
@@ -360,7 +390,7 @@ IPTVApp.prototype.showHistoryScreen = function() {
                 duration = epProgress.duration;
             }
         }
-        historyItems.push({
+        var virtual = {
             stream_id: item.id,
             series_id: item.seriesId || null,
             name: item.name,
@@ -379,7 +409,8 @@ IPTVApp.prototype.showHistoryScreen = function() {
             _timestamp: item.date || 0,
             _historyIndex: i,
             _playlistId: item.playlistId || null
-        });
+        };
+        historyItems.push(this._enrichHistoryStream(virtual, item));
     }
     if (historyItems.length === 0) {
         this.showEmptyMessage('content-grid', 'home.noHistory', 'No viewing history');

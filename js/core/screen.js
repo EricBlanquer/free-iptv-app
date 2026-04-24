@@ -315,7 +315,7 @@ IPTVApp.prototype.showScreen = function(screen) {
 };
 
 IPTVApp.prototype.showLoading = function(show, posterUrl, message) {
-    if (typeof posterUrl === 'string' && posterUrl.indexOf('http') !== 0 && posterUrl.indexOf('/') !== 0 && posterUrl.indexOf('data:') !== 0) {
+    if (typeof posterUrl === 'string' && posterUrl.indexOf('http') !== 0 && posterUrl.indexOf('/') === -1 && posterUrl.indexOf('data:') !== 0) {
         message = posterUrl;
         posterUrl = null;
     }

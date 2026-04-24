@@ -1,0 +1,15 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="DWEnglish.de" tvg-logo="assets/logos/dw.png" group-title="News",DW English
+https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8
+#EXTINF:-1 tvg-id="DWEnglishLive.de" tvg-logo="assets/logos/dw.png" group-title="News",DW English Live
+https://dwamdstream101.akamaized.net/hls/live/2015524/dwstream101/index.m3u8
+#EXTINF:-1 tvg-id="DWArabia.de" tvg-logo="assets/logos/dw.png" group-title="News",DW Arabic
+https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/index.m3u8
+#EXTINF:-1 tvg-id="DWAsia.de" tvg-logo="assets/logos/dw.png" group-title="News",DW Asia
+https://dwamdstream104.akamaized.net/hls/live/2015530/dwstream104/index.m3u8
+#EXTINF:-1 tvg-id="France24FR.fr" tvg-logo="assets/logos/france24.png" group-title="News",France 24 Français
+https://live.france24.com/hls/live/2037179-b/F24_FR_HI_HLS/master_5000.m3u8
+#EXTINF:-1 tvg-id="France24EN.fr" tvg-logo="assets/logos/france24.png" group-title="News",France 24 English
+https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8
+#EXTINF:-1 tvg-id="AlJazeera.qa" tvg-logo="assets/logos/aljazeera.png" group-title="News",Al Jazeera English
+https://live-hls-apps-aje-fa.getaj.net/AJE/index.m3u8

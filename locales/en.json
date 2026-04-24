@@ -334,6 +334,7 @@
         "tryingNative": "Trying native player...",
         "reconnecting": "Reconnecting...",
         "streamUnavailable": "Stream unavailable",
+        "noInternet": "No internet connection — check your network",
         "connectionLimit": "Connection limit reached ({active}/{max}). Close other streams and try again",
         "replay": "Replay",
         "pauseDuration": "Pause",

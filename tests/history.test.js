@@ -162,6 +162,106 @@ describe('addToWatchHistory', () => {
         app.addToWatchHistory(stream, 'vod');
         expect(app.watchHistory[0].position).toBe(0);
     });
+
+    it('should store container_extension so playback can reconstruct the correct URL', () => {
+        var stream = { stream_id: 42, name: 'Film MP4', cover: '', container_extension: 'mp4' };
+        app.addToWatchHistory(stream, 'vod', 0);
+        expect(app.watchHistory[0].containerExtension).toBe('mp4');
+    });
+
+    it('should store containerExtension as null when stream has none', () => {
+        var stream = { stream_id: 42, name: 'No ext', cover: '' };
+        app.addToWatchHistory(stream, 'vod', 0);
+        expect(app.watchHistory[0].containerExtension).toBeNull();
+    });
+});
+
+describe('_enrichHistoryStream (Continue/History lookup fix)', () => {
+    var app;
+    beforeEach(() => {
+        app = new IPTVApp();
+        app.data = { vod: { streams: [] }, series: { streams: [] } };
+        app.api = null;
+        app.getStreams = function(section) {
+            return (this.data[section] && this.data[section].streams) || [];
+        };
+    });
+
+    it('should propagate containerExtension from history item to virtual stream', () => {
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod', containerExtension: 'mp4' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBe('mp4');
+    });
+
+    it('should fallback to catalog lookup when history item has no containerExtension (legacy entries)', () => {
+        app.data.vod.streams = [
+            { stream_id: 10, _playlistId: 'p1', container_extension: 'mp4' }
+        ];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod', containerExtension: null };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBe('mp4');
+    });
+
+    it('should match catalog stream by BOTH stream_id and playlistId (avoid cross-provider false match)', () => {
+        app.data.vod.streams = [
+            { stream_id: 10, _playlistId: 'p2', container_extension: 'avi' },
+            { stream_id: 10, _playlistId: 'p1', container_extension: 'mp4' }
+        ];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod', containerExtension: null };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBe('mp4');
+    });
+
+    it('should propagate M3U direct url from catalog', () => {
+        app.data.vod.streams = [
+            { stream_id: 10, _playlistId: 'p1', url: 'http://m3u.example/movie.mp4' }
+        ];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.url).toBe('http://m3u.example/movie.mp4');
+    });
+
+    it('should prefer stored containerExtension over catalog (historical snapshot wins)', () => {
+        app.data.vod.streams = [
+            { stream_id: 10, _playlistId: 'p1', container_extension: 'mkv' }
+        ];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod', containerExtension: 'mp4' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBe('mp4');
+    });
+
+    it('should not overwrite existing url on virtual stream', () => {
+        app.data.vod.streams = [
+            { stream_id: 10, _playlistId: 'p1', url: 'http://wrong.example/x.mp4' }
+        ];
+        var virtual = { stream_id: 10, url: 'http://correct.example/x.mp4' };
+        var item = { id: 10, playlistId: 'p1', type: 'vod' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.url).toBe('http://correct.example/x.mp4');
+    });
+
+    it('should leave virtual stream untouched when catalog has no match and no stored ext', () => {
+        app.data.vod.streams = [];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'vod' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBeUndefined();
+        expect(virtual.url).toBeUndefined();
+    });
+
+    it('should look up in series section for series history items', () => {
+        app.data.vod.streams = [{ stream_id: 10, _playlistId: 'p1', container_extension: 'mp4' }];
+        app.data.series.streams = [{ stream_id: 10, _playlistId: 'p1', container_extension: 'mkv' }];
+        var virtual = { stream_id: 10 };
+        var item = { id: 10, playlistId: 'p1', type: 'series' };
+        app._enrichHistoryStream(virtual, item);
+        expect(virtual.container_extension).toBe('mkv');
+    });
 });
 
 describe('removeFromWatchHistory', () => {

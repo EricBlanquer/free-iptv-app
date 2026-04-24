@@ -311,6 +311,7 @@
         "tryingNative": "Provo lettore nativo...",
         "reconnecting": "Riconnessione...",
         "streamUnavailable": "Stream non disponibile",
+        "noInternet": "Nessuna connessione internet — controlla la rete",
         "connectionLimit": "Limite di connessioni raggiunto ({active}/{max}). Chiudere gli altri stream e riprovare",
         "options": "Opzioni",
         "liveBtn": "Diretta",

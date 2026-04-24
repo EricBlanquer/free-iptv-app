@@ -411,19 +411,21 @@
         if (app._diagnosticInProgress) return Promise.resolve();
         app._diagnosticInProgress = true;
         var playlist = app.getActivePlaylist && app.getActivePlaylist();
-        if (!playlist || !playlist.serverUrl) {
+        var target = (playlist && playlist.serverUrl) || (playlist && playlist.url) || url;
+        if (!target) {
             app._diagnosticInProgress = false;
             return Promise.resolve();
         }
+        var hasProxy = !!(playlist && playlist.serverUrl && app.settings.proxyEnabled && app.settings.proxyUrl);
         var ctx = {
             url: url,
-            server: playlist.serverUrl,
+            server: target,
             proxyUrl: app.settings.proxyUrl || '',
-            hasProxy: !!(app.settings.proxyEnabled && app.settings.proxyUrl),
+            hasProxy: hasProxy,
             app: app,
             errorType: errorType || 'timeout'
         };
-        window.log('DIAG start server=' + playlist.serverUrl + ' hasProxy=' + ctx.hasProxy + ' errorType=' + ctx.errorType);
+        window.log('DIAG start target=' + target + ' hasProxy=' + ctx.hasProxy + ' errorType=' + ctx.errorType);
         return run(ctx).then(function(result) {
             window.log('DIAG result problem=' + result.problem);
             showResultModal(app, result);
@@ -456,6 +458,7 @@
 
     window.NetworkDiagnostic = {
         run: run,
-        runAndShow: runAndShow
+        runAndShow: runAndShow,
+        checkInternet: checkInternet
     };
 })();

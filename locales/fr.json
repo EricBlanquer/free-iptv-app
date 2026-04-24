@@ -347,6 +347,7 @@
         "reconnecting": "Reconnexion...",
         "switchingQuality": "Bascule qualité inférieure",
         "streamUnavailable": "Flux indisponible",
+        "noInternet": "Pas de connexion internet — vérifiez votre réseau",
         "connectionLimit": "Limite de connexions atteinte ({active}/{max}). Fermez les autres flux et réessayez",
         "replay": "Replay",
         "pauseDuration": "Pause",

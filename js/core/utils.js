@@ -207,6 +207,7 @@ IPTVApp.prototype.getBufferConfig = function() {
 IPTVApp.prototype.proxyImageUrl = function(url) {
     if (!url || !this.getStreamProxyUrl()) return url;
     if (url.indexOf('tmdb.org') !== -1) return url;
+    if (!/^https?:\/\//i.test(url)) return url;
     return this.settings.proxyUrl.replace(/\/+$/, '') + '/image?url=' + encodeURIComponent(url) + proxyDuidParam();
 };
 
