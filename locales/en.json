@@ -308,7 +308,9 @@
         "tmdbConnectTimeout": "Authorization timed out",
         "tmdbNoV4Token": "v4 Read Token required in settings above",
         "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows.",
-        "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here."
+        "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here.",
+        "back": "Back",
+        "close": "Close"
     },
     "player": {
         "play": "Play",
@@ -353,7 +355,16 @@
         "autoFormat": "Auto",
         "notForMe": "Not for me",
         "notForMeDone": "Removed from recommendations",
-        "markUnwatched": "Mark as unwatched"
+        "markUnwatched": "Mark as unwatched",
+        "streamCorrupted": "Stream file is corrupted or unreachable on provider",
+        "streamNotFound": "Stream not found on provider",
+        "bandwidthLimit": "Provider bandwidth limit reached",
+        "providerError": "Provider server error",
+        "authFailed": "Authentication failed — check your subscription",
+        "streamErrorTitle": "Stream error",
+        "copyDetails": "Copy details",
+        "detailsCopied": "Error details copied",
+        "scanToReport": "Scan this QR code with your phone to copy the error details"
     },
     "subtitleOptions": {
         "title": "Subtitle options",

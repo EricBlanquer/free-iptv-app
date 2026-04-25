@@ -279,7 +279,9 @@
         "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
         "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
         "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla.",
-        "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat."
+        "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat.",
+        "back": "Geri",
+        "close": "Kapat"
     },
     "player": {
         "play": "Oynat",
@@ -324,7 +326,16 @@
         "autoFormat": "Oto",
         "notForMe": "Bana göre değil",
         "notForMeDone": "Önerilerden kaldırıldı",
-        "markUnwatched": "İzlenmedi olarak işaretle"
+        "markUnwatched": "İzlenmedi olarak işaretle",
+        "streamCorrupted": "Yayın dosyası bozuk veya sağlayıcıda erişilemiyor",
+        "streamNotFound": "Sağlayıcıda yayın bulunamadı",
+        "bandwidthLimit": "Sağlayıcı bant genişliği sınırına ulaşıldı",
+        "providerError": "Sağlayıcı sunucu hatası",
+        "authFailed": "Kimlik doğrulama başarısız — aboneliğinizi kontrol edin",
+        "streamErrorTitle": "Yayın hatası",
+        "copyDetails": "Detayları kopyala",
+        "detailsCopied": "Detaylar kopyalandı",
+        "scanToReport": "Hata ayrıntılarını kopyalamak için bu QR kodunu telefonunuzla tarayın"
     },
     "subtitleOptions": {
         "title": "Altyazı seçenekleri",

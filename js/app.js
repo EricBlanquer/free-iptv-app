@@ -962,6 +962,27 @@ class IPTVApp {
         var streamName = this.getStreamTitle(nextStream);
         window.log('PLAYER', 'Channel change: ' + direction + ', playing ' + streamName);
         this.playStream(streamId, 'live', nextStream);
+        // Sync grid focus + scroll position with the channel that's now playing.
+        // The DOM grid may include pseudo-cards (e.g. "Guide TV" at index 0)
+        // before the actual channel items. The offset (lastGridIndex - oldChannelIdx)
+        // captures that, so newDomIdx = newChannelIdx + offset.
+        var prevDomIdx = (typeof this.lastGridIndex === 'number') ? this.lastGridIndex : this.focusIndex;
+        var pseudoOffset = prevDomIdx - currentIndex;
+        if (pseudoOffset < 0) pseudoOffset = 0;
+        var newGridIdx = nextIndex + pseudoOffset;
+        this.focusIndex = newGridIdx;
+        this.lastGridIndex = newGridIdx;
+        var grid = document.getElementById('content-grid');
+        if (grid) {
+            var isListView = grid.classList.contains('list-view');
+            var cols = isListView ? 1 : (this.gridColumns || 5);
+            var rowHeight = this._gridRowHeight || (isListView ? 88 : 300);
+            var rowOfTarget = Math.floor(newGridIdx / cols);
+            this._programmaticScroll = true;
+            grid.scrollTop = Math.max(0, (rowOfTarget - 1) * rowHeight);
+            var selfScroll = this;
+            setTimeout(function() { selfScroll._programmaticScroll = false; }, 300);
+        }
     }
 
 

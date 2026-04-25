@@ -320,7 +320,9 @@
         "tmdbConnectTimeout": "Délai d’autorisation dépassé",
         "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
         "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries.",
-        "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici."
+        "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici.",
+        "back": "Retour",
+        "close": "Fermer"
     },
     "player": {
         "play": "Lecture",
@@ -365,7 +367,16 @@
         "autoFormat": "Auto",
         "notForMe": "Pas pour moi",
         "notForMeDone": "Retiré des recommandations",
-        "markUnwatched": "Marquer comme non vue"
+        "markUnwatched": "Marquer comme non vue",
+        "streamCorrupted": "Le fichier du flux est corrompu ou inaccessible chez le fournisseur",
+        "streamNotFound": "Flux introuvable chez le fournisseur",
+        "bandwidthLimit": "Limite de bande passante du fournisseur atteinte",
+        "providerError": "Erreur du serveur fournisseur",
+        "authFailed": "Authentification échouée — vérifiez votre abonnement",
+        "streamErrorTitle": "Erreur de lecture",
+        "copyDetails": "Copier les détails",
+        "detailsCopied": "Détails copiés",
+        "scanToReport": "Scannez ce QR code avec votre téléphone pour copier les détails de l'erreur"
     },
     "subtitleOptions": {
         "title": "Options sous-titres",

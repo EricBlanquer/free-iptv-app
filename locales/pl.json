@@ -278,7 +278,9 @@
         "tmdbConnectTimeout": "Upłynął czas autoryzacji",
         "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
         "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale.",
-        "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj."
+        "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj.",
+        "back": "Wstecz",
+        "close": "Zamknij"
     },
     "player": {
         "play": "Odtwórz",
@@ -323,7 +325,16 @@
         "autoFormat": "Auto",
         "notForMe": "Nie dla mnie",
         "notForMeDone": "Usunięte z rekomendacji",
-        "markUnwatched": "Oznacz jako nieobejrzane"
+        "markUnwatched": "Oznacz jako nieobejrzane",
+        "streamCorrupted": "Plik strumienia jest uszkodzony lub niedostępny u dostawcy",
+        "streamNotFound": "Nie znaleziono strumienia u dostawcy",
+        "bandwidthLimit": "Osiągnięto limit pasma dostawcy",
+        "providerError": "Błąd serwera dostawcy",
+        "authFailed": "Uwierzytelnienie nie powiodło się — sprawdź subskrypcję",
+        "streamErrorTitle": "Błąd strumienia",
+        "copyDetails": "Kopiuj szczegóły",
+        "detailsCopied": "Szczegóły skopiowane",
+        "scanToReport": "Zeskanuj ten kod QR telefonem, aby skopiować szczegóły błędu"
     },
     "subtitleOptions": {
         "title": "Opcje napisów",

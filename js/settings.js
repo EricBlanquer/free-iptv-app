@@ -405,7 +405,7 @@ IPTVApp.prototype.renderTMDBConnectCode = function(requestToken) {
         if (instructionsEl) instructionsEl.textContent = I18n.t('settings.tmdbConnectInstructions', 'Scan this QR code with your phone and approve access on TMDB:');
         var qrImg = document.createElement('img');
         qrImg.alt = 'QR';
-        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=0&ecc=L&data=' + encodeURIComponent(authUrl);
+        qrImg.src = this.makeQrDataUrl(authUrl, 500);
         qrEl.appendChild(qrImg);
     }
     this.setHidden(document.getElementById('tmdb-connect-step-loading'), true);
@@ -755,10 +755,9 @@ IPTVApp.prototype.updatePairingQR = function() {
     var configUrl = 'https://iptv.blanquer.org?l=' + locale;
     var qrContainer = document.getElementById('settings-qr-code');
     if (qrContainer) {
-        var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(configUrl);
         while (qrContainer.firstChild) qrContainer.removeChild(qrContainer.firstChild);
         var qrImg = document.createElement('img');
-        qrImg.src = qrApiUrl;
+        qrImg.src = this.makeQrDataUrl(configUrl, 100);
         qrImg.alt = 'QR Code';
         qrContainer.appendChild(qrImg);
     }
@@ -784,10 +783,9 @@ IPTVApp.prototype.initPairingCode = function() {
     var qrUrl = configUrl + '&code=' + code;
     var qrContainer = document.getElementById('settings-qr-code');
     if (qrContainer) {
-        var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(qrUrl);
         while (qrContainer.firstChild) qrContainer.removeChild(qrContainer.firstChild);
         var qrImg = document.createElement('img');
-        qrImg.src = qrApiUrl;
+        qrImg.src = this.makeQrDataUrl(qrUrl, 100);
         qrImg.alt = 'QR Code';
         qrContainer.appendChild(qrImg);
     }
@@ -1574,6 +1572,11 @@ IPTVApp.prototype.handlePlaylistEditSelect = function() {
     var focusables = this.getFocusables();
     var current = focusables[this.focusIndex];
     if (!current) return;
+    if (current.dataset && current.dataset.action === 'playlist-edit-back') {
+        window.log('ACTION playlist-edit: back');
+        this.goBack();
+        return;
+    }
     if (current.classList.contains('settings-input') || current.tagName === 'INPUT') {
         window.log('ACTION playlist-edit: open-keyboard ' + current.id);
         this.openKeyboard(current.id);
@@ -2747,6 +2750,8 @@ IPTVApp.prototype.showConfirmModal = function(message, action, options) {
         noBtn.textContent = I18n.t('settings.cancel', 'Cancel');
     }
     yesBtn.style.display = opts.hideYes ? 'none' : '';
+    modal.classList.remove('stream-error-modal');
+    if (opts.modalClass) modal.classList.add(opts.modalClass);
     this.setHidden(modal, false);
     this.focusArea = 'confirm-modal';
     this.focusIndex = opts.hideYes ? 0 : (opts.focusYes ? 1 : 0);

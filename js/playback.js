@@ -556,25 +556,39 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
                 return;
             }
             self.showLoading(false);
+            var errCtx = {
+                status: error.status || 0,
+                url: url,
+                title: stream ? self.getStreamTitle(stream) : '',
+                providerUser: (apiToUse && apiToUse.username) ? apiToUse.username : '',
+                providerPassword: (apiToUse && apiToUse.password) ? apiToUse.password : ''
+            };
+            var httpErrIsLive = (type === 'live');
             if (apiToUse && apiToUse.getAccountInfo) {
                 apiToUse.getAccountInfo().then(function(info) {
-                    var msg;
-                    if (info && info.max_connections && parseInt(info.active_cons) >= parseInt(info.max_connections)) {
-                        msg = I18n.t('player.connectionLimit', 'Connection limit reached', { active: info.active_cons, max: info.max_connections });
+                    if (info && info.max_connections && parseInt(info.active_cons) > parseInt(info.max_connections)) {
+                        self.showToast(I18n.t('player.connectionLimit', 'Connection limit reached', { active: info.active_cons, max: info.max_connections }));
+                        setTimeout(function() { self.stopPlayback(); }, 100);
+                    }
+                    else if (httpErrIsLive) {
+                        var liveMsg = I18n.t('player.streamUnavailable', 'Stream unavailable');
+                        if (error.status) liveMsg += ' (HTTP ' + error.status + ')';
+                        self.showToast(liveMsg);
+                        setTimeout(function() { self.stopPlayback(); }, 100);
                     }
                     else {
-                        msg = I18n.t('player.streamUnavailable', 'Stream unavailable');
-                        if (error.status) msg += ' (HTTP ' + error.status + ')';
+                        self.showStreamErrorModal(errCtx);
                     }
-                    self.showToast(msg);
-                    setTimeout(function() { self.stopPlayback(); }, 100);
                 });
             }
-            else {
-                var msg = I18n.t('player.streamUnavailable', 'Stream unavailable');
-                if (error.status) msg += ' (HTTP ' + error.status + ')';
-                self.showToast(msg);
+            else if (httpErrIsLive) {
+                var liveMsg2 = I18n.t('player.streamUnavailable', 'Stream unavailable');
+                if (error.status) liveMsg2 += ' (HTTP ' + error.status + ')';
+                self.showToast(liveMsg2);
                 setTimeout(function() { self.stopPlayback(); }, 100);
+            }
+            else {
+                self.showStreamErrorModal(errCtx);
             }
             return;
         }
@@ -647,42 +661,98 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
             self.showLoading(false);
             self.showToast(I18n.t('player.reconnecting', 'Reconnecting...') + ' (' + self._errorRetryCount + '/' + maxRetries + ')', 3000, false, 'discreet');
             self.player.stop();
-            setTimeout(function() {
+            if (self._retryTimer) clearTimeout(self._retryTimer);
+            self._retryTimer = setTimeout(function() {
+                self._retryTimer = null;
+                if (!self.currentPlayingStream) return;
                 self.player.play(url, type === 'live', resumePosition);
             }, retryDelay);
             return;
         }
-        // All retries exhausted - check connection limit before showing generic message
+        // All retries exhausted — the HTML5 error event doesn't carry the real
+        // HTTP status (only {isTrusted:true}). Probe the URL to find out why,
+        // then show the enriched modal (QR code + specific message).
         self._errorRetryCount = 0;
         self.showLoading(false);
-        var showErrAndStop = function(msg) {
+        var errCtx = {
+            status: 0,
+            url: url,
+            title: stream ? self.getStreamTitle(stream) : '',
+            providerUser: (apiToUse && apiToUse.username) ? apiToUse.username : '',
+            providerPassword: (apiToUse && apiToUse.password) ? apiToUse.password : ''
+        };
+        var finishWithToast = function(msg) {
             self.showToast(msg);
             setTimeout(function() { self.stopPlayback(); }, 100);
         };
+        var finishWithModal = function(status) {
+            if (type === 'live') {
+                var liveMsg = I18n.t('player.streamUnavailable', 'Stream unavailable');
+                if (status) liveMsg += ' (HTTP ' + status + ')';
+                finishWithToast(liveMsg);
+                return;
+            }
+            errCtx.status = status || 0;
+            self.showStreamErrorModal(errCtx);
+        };
+        var probeThenShow = function() {
+            if (!/^https?:\/\//i.test(url || '')) {
+                finishWithModal(0);
+                return;
+            }
+            try {
+                var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var opts = { method: 'GET', redirect: 'follow', cache: 'no-store' };
+                if (ctrl) opts.signal = ctrl.signal;
+                var probeTimer = setTimeout(function() {
+                    if (ctrl) try { ctrl.abort(); } catch (ex) {}
+                }, 5000);
+                fetch(url, opts).then(function(r) {
+                    clearTimeout(probeTimer);
+                    if (ctrl) try { ctrl.abort(); } catch (ex) {}
+                    var chain = [];
+                    if (r.redirected && r.url && r.url !== url) {
+                        chain.push({ url: url, status: 302 });
+                        chain.push({ url: r.url, status: r.status || 0 });
+                    }
+                    else {
+                        chain.push({ url: url, status: r.status || 0 });
+                    }
+                    errCtx.requestChain = chain;
+                    finishWithModal(r.status || 0);
+                }).catch(function() {
+                    clearTimeout(probeTimer);
+                    if (window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
+                        window.NetworkDiagnostic.checkInternet().then(function(n) {
+                            if (!n || !n.ok) {
+                                finishWithToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
+                            }
+                            else {
+                                finishWithModal(0);
+                            }
+                        });
+                    }
+                    else {
+                        finishWithModal(0);
+                    }
+                });
+            }
+            catch (ex) {
+                finishWithModal(0);
+            }
+        };
         if (apiToUse && apiToUse.getAccountInfo) {
             apiToUse.getAccountInfo().then(function(info) {
-                var msg;
-                if (info && info.max_connections && parseInt(info.active_cons) >= parseInt(info.max_connections)) {
-                    msg = I18n.t('player.connectionLimit', 'Connection limit reached', { active: info.active_cons, max: info.max_connections });
+                if (info && info.max_connections && parseInt(info.active_cons) > parseInt(info.max_connections)) {
+                    finishWithToast(I18n.t('player.connectionLimit', 'Connection limit reached', { active: info.active_cons, max: info.max_connections }));
                 }
                 else {
-                    msg = I18n.t('player.playbackError', 'Playback error');
-                }
-                showErrAndStop(msg);
-            });
-        }
-        else if (window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
-            window.NetworkDiagnostic.checkInternet().then(function(r) {
-                if (!r || !r.ok) {
-                    showErrAndStop(I18n.t('player.noInternet', 'No internet connection — check your network'));
-                }
-                else {
-                    showErrAndStop(I18n.t('player.playbackError', 'Playback error'));
+                    probeThenShow();
                 }
             });
         }
         else {
-            showErrAndStop(I18n.t('player.playbackError', 'Playback error'));
+            probeThenShow();
         }
     };
     this.player.onBufferProgress = function(percent) {
@@ -792,6 +862,13 @@ IPTVApp.prototype.updateWatchPosition = function(stream, type, position, force) 
 
 IPTVApp.prototype.stopPlayback = function() {
     this.clearTimer('overlayTimer');
+    // Cancel any pending retry so a Back press after an error stops the
+    // reconnection loop immediately instead of re-launching the broken stream.
+    if (this._retryTimer) {
+        clearTimeout(this._retryTimer);
+        this._retryTimer = null;
+    }
+    this._errorRetryCount = 0;
     // Stop pause counter timer
     if (this.pauseCounterInterval) {
         clearInterval(this.pauseCounterInterval);
@@ -892,6 +969,20 @@ IPTVApp.prototype.stopPlayback = function() {
         this.updateContinueCounter();
         this.focusArea = 'grid';
         this.focusIndex = this.lastGridIndex || 0;
+        // Scroll the grid so the focused row is visible. Doing it here (not in
+        // changeChannel) because the grid is display:none while on the player
+        // screen, and scrollTop changes on hidden elements are silently ignored.
+        var gridEl = document.getElementById('content-grid');
+        if (gridEl && this.focusIndex > 0) {
+            var isListView = gridEl.classList.contains('list-view');
+            var cols = isListView ? 1 : (this.gridColumns || 5);
+            var rowHeight = this._gridRowHeight || (isListView ? 88 : 300);
+            var rowOfTarget = Math.floor(this.focusIndex / cols);
+            this._programmaticScroll = true;
+            gridEl.scrollTop = Math.max(0, (rowOfTarget - 1) * rowHeight);
+            var selfScroll = this;
+            setTimeout(function() { selfScroll._programmaticScroll = false; }, 300);
+        }
         this.updateFocus();
     }
 };

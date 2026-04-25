@@ -186,10 +186,20 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 break;
             case 33:
-                self.navigatePage('up');
+                if (self.currentScreen === 'player' && self.currentPlayingType === 'live') {
+                    self.changeChannel(-1);
+                }
+                else {
+                    self.navigatePage('up');
+                }
                 break;
             case 34:
-                self.navigatePage('down');
+                if (self.currentScreen === 'player' && self.currentPlayingType === 'live') {
+                    self.changeChannel(1);
+                }
+                else {
+                    self.navigatePage('down');
+                }
                 break;
             case 10009:
             case 8:

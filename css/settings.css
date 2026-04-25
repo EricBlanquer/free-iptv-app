@@ -1321,3 +1321,77 @@
     border-color: rgba(76, 175, 80, 0.5);
     color: #8bc34a;
 }
+
+.playlist-edit-back-btn {
+    display: inline-flex;
+    align-items: center;
+    margin: 10px 20px;
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid transparent;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.playlist-edit-back-btn .material-symbols-outlined {
+    margin-right: 6px;
+}
+.playlist-edit-back-btn.focused {
+    background: rgba(255,255,255,0.18);
+    border-color: #00b4d8;
+}
+
+.stream-error-content {
+    text-align: center;
+}
+.stream-error-headline {
+    margin-bottom: 14px;
+    color: #ff8a80;
+}
+.stream-error-qr {
+    width: 240px;
+    height: 240px;
+    margin: 10px auto;
+    display: block;
+    background: #fff;
+    padding: 10px;
+    border-radius: 6px;
+}
+.stream-error-hint {
+    margin-top: 8px;
+    color: #999;
+    font-style: italic;
+}
+
+.stream-error-modal .modal-content {
+    max-width: 720px;
+    padding: 18px 32px;
+}
+.stream-error-modal .stream-error-headline {
+    margin-bottom: 10px;
+    color: #ff8a80;
+    font-size: 0.95em;
+}
+.stream-error-modal .stream-error-qr {
+    width: 280px;
+    height: 280px;
+    padding: 8px;
+}
+
+.stream-error-modal #confirm-modal-buttons .modal-btn {
+    padding: 8px 14px !important;
+    min-width: 50px;
+    margin: 0 8px;
+    font-size: 18px;
+}
+.stream-error-modal #confirm-modal-buttons .material-symbols-outlined {
+    font-size: 20px;
+    vertical-align: middle;
+}
+.stream-error-modal .close-countdown {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 0.85em;
+    vertical-align: middle;
+    opacity: 0.8;
+}
