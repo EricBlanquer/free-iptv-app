@@ -80,6 +80,7 @@
 
     <!-- Playlist Edit Screen -->
     <div id="playlist-edit-screen" class="screen">
+        <button id="playlist-edit-back-btn" class="playlist-edit-back-btn focusable" data-action="playlist-edit-back"><span class="material-symbols-outlined">arrow_back</span> <span data-i18n="settings.back">Back</span></button>
         <h1 id="playlist-edit-title" data-i18n="settings.editPlaylist">Edit playlist</h1>
         <div id="playlist-edit-container">
             <div class="settings-section">
@@ -1178,6 +1179,7 @@
         })();
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" async onerror="this.remove()"></script>
+    <script src="js/vendor/qrcode.js"></script>
     <script src="js/i18n-data.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/provider.js"></script>

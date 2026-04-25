@@ -2637,7 +2637,10 @@ IPTVApp.prototype.initGridScrollLoader = function() {
         // and arrow keys have a meaningful reference point after scrolling.
         // We update the .focused class inline WITHOUT calling updateFocus —
         // updateFocus's scrollIntoView adjust would fight the user's scroll.
-        if (!self._arrowHeld && self.focusArea === 'grid') {
+        // Skip when scroll was programmatic (stopPlayback / changeChannel set
+        // scrollTop after computing focusIndex; without this guard the handler
+        // would overwrite the computed focus with the first-visible row).
+        if (!self._arrowHeld && !self._programmaticScroll && self.focusArea === 'grid') {
             var isListView = grid.classList.contains('list-view');
             var cols = isListView ? 1 : (self.gridColumns || 5);
             var rowHeight = self._gridRowHeight || (isListView ? 88 : 300);

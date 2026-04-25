@@ -204,6 +204,157 @@ IPTVApp.prototype.getBufferConfig = function() {
     return presets[preset] || presets.standard;
 };
 
+IPTVApp.prototype.makeQrDataUrl = function(text, sizePx) {
+    if (typeof qrcode !== 'function') return '';
+    var qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    var cellSize = Math.max(2, Math.floor(sizePx / qr.getModuleCount()));
+    return qr.createDataURL(cellSize, 0);
+};
+
+IPTVApp.prototype.copyToClipboard = function(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+            return true;
+        }
+    }
+    catch (ex) { /* fall through */ }
+    try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        return true;
+    }
+    catch (ex) { return false; }
+};
+
+IPTVApp.prototype.showStreamErrorModal = function(ctx) {
+    var self = this;
+    var status = ctx.status || 0;
+    var reasonKey, reasonDefault;
+    if (status === 400) { reasonKey = 'player.streamCorrupted'; reasonDefault = 'Stream file is corrupted or unreachable on provider'; }
+    else if (status === 401 || status === 403) { reasonKey = 'player.authFailed'; reasonDefault = 'Authentication failed — check your subscription'; }
+    else if (status === 404 || status === 551) { reasonKey = 'player.streamNotFound'; reasonDefault = 'Stream not found on provider'; }
+    else if (status === 509) { reasonKey = 'player.bandwidthLimit'; reasonDefault = 'Provider bandwidth limit reached'; }
+    else if (status >= 500 && status < 600) { reasonKey = 'player.providerError'; reasonDefault = 'Provider server error'; }
+    else { reasonKey = 'player.streamUnavailable'; reasonDefault = 'Stream unavailable'; }
+    var reason = I18n.t(reasonKey, reasonDefault);
+    var headline = status > 0 ? (reason + ' (HTTP ' + status + ')') : reason;
+    var redactPw = function(u) {
+        if (!u) return '';
+        if (ctx.providerPassword) u = u.split(ctx.providerPassword).join('******');
+        return u;
+    };
+    var httpReason = function(s) {
+        var map = { 200: 'OK', 204: 'No Content', 301: 'Moved Permanently', 302: 'Found',
+            303: 'See Other', 304: 'Not Modified', 307: 'Temporary Redirect', 308: 'Permanent Redirect',
+            400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found',
+            408: 'Request Timeout', 429: 'Too Many Requests', 500: 'Internal Server Error',
+            502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout',
+            509: 'Bandwidth Limit Exceeded', 551: 'File Not Found' };
+        return map[s] || (s >= 500 ? 'Server Error' : s >= 400 ? 'Client Error' : 'Unknown');
+    };
+    var chain = [];
+    if (ctx.requestChain && ctx.requestChain.length) {
+        ctx.requestChain.forEach(function(step) {
+            chain.push('GET ' + redactPw(step.url) + ' ' + step.status + ' (' + httpReason(step.status) + ')');
+        });
+    }
+    else if (ctx.url) {
+        chain.push('GET ' + redactPw(ctx.url) + ' ' + (status || 'n/a') + (status ? ' (' + httpReason(status) + ')' : ''));
+    }
+    var details = [ctx.title || 'Unknown']
+        .concat(chain)
+        .concat([
+            ctx.providerUser ? 'User: ' + ctx.providerUser : '',
+            'Date: ' + new Date().toISOString()
+        ])
+        .filter(Boolean)
+        .join('\r\n');
+    if (this.stopPlayback && (this.currentScreen === 'player')) {
+        this.stopPlayback();
+    }
+    var showModal = function() {
+        var container = document.createElement('div');
+        container.className = 'stream-error-content';
+        var msg = document.createElement('div');
+        msg.className = 'stream-error-headline';
+        msg.textContent = headline;
+        container.appendChild(msg);
+        var qrSrc = self.makeQrDataUrl(details, 300);
+        if (qrSrc) {
+            var qrImg = document.createElement('img');
+            qrImg.className = 'stream-error-qr';
+            qrImg.src = qrSrc;
+            qrImg.alt = 'QR';
+            container.appendChild(qrImg);
+        }
+        var autoClose = null;
+        var cancelAutoClose = function() {
+            if (autoClose) { clearTimeout(autoClose); autoClose = null; }
+        };
+        var copyAction = function() {
+            cancelAutoClose();
+            if (self.copyToClipboard(details)) {
+                self.showToast(I18n.t('player.detailsCopied', 'Error details copied'));
+            }
+        };
+        var closeAction = function() {
+            cancelAutoClose();
+        };
+        self.showConfirmModal('', copyAction, {
+            title: I18n.t('player.streamErrorTitle', 'Stream error'),
+            html: container,
+            yesLabel: I18n.t('player.copyDetails', 'Copy details'),
+            noLabel: I18n.t('settings.close', 'Close'),
+            noAction: closeAction,
+            focusYes: false,
+            modalClass: 'stream-error-modal'
+        });
+        var closeBtn = document.getElementById('confirm-no-btn');
+        var countdownEl = null;
+        if (closeBtn) {
+            countdownEl = document.createElement('span');
+            countdownEl.className = 'close-countdown';
+            closeBtn.appendChild(countdownEl);
+        }
+        var remaining = 10;
+        var countdownTimer = null;
+        var updateCountdown = function() {
+            if (countdownEl) countdownEl.textContent = remaining + 's';
+        };
+        updateCountdown();
+        countdownTimer = setInterval(function() {
+            remaining--;
+            updateCountdown();
+            if (remaining <= 0) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+        }, 1000);
+        cancelAutoClose = function() {
+            if (autoClose) { clearTimeout(autoClose); autoClose = null; }
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            if (countdownEl && countdownEl.parentNode) countdownEl.parentNode.removeChild(countdownEl);
+        };
+        autoClose = setTimeout(function() {
+            autoClose = null;
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            if (self.focusArea === 'confirm-modal') {
+                self.hideConfirmModal();
+            }
+        }, 10000);
+    };
+    setTimeout(showModal, 150);
+};
+
 IPTVApp.prototype.proxyImageUrl = function(url) {
     if (!url || !this.getStreamProxyUrl()) return url;
     if (url.indexOf('tmdb.org') !== -1) return url;

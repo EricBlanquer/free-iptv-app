@@ -279,7 +279,9 @@
         "tmdbConnectTimeout": "Autorisatie verlopen",
         "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
         "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen.",
-        "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren."
+        "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren.",
+        "back": "Terug",
+        "close": "Sluiten"
     },
     "player": {
         "play": "Afspelen",
@@ -324,7 +326,16 @@
         "autoFormat": "Auto",
         "notForMe": "Niet voor mij",
         "notForMeDone": "Verwijderd uit aanbevelingen",
-        "markUnwatched": "Markeer als ongezien"
+        "markUnwatched": "Markeer als ongezien",
+        "streamCorrupted": "Het streambestand is beschadigd of niet bereikbaar bij de provider",
+        "streamNotFound": "Stream niet gevonden bij provider",
+        "bandwidthLimit": "Bandbreedtelimiet provider bereikt",
+        "providerError": "Serverfout provider",
+        "authFailed": "Authenticatie mislukt — controleer je abonnement",
+        "streamErrorTitle": "Streamfout",
+        "copyDetails": "Details kopiëren",
+        "detailsCopied": "Details gekopieerd",
+        "scanToReport": "Scan deze QR-code met je telefoon om de foutdetails te kopiëren"
     },
     "subtitleOptions": {
         "title": "Ondertitel opties",

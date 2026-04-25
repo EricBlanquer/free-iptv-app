@@ -1279,7 +1279,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "انتهت مهلة التفويض",
                             "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
                             "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات.",
-                            "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا."
+                            "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا.",
+                            "back": "رجوع",
+                            "close": "إغلاق"
                     },
                     "player": {
                             "play": "تشغيل",
@@ -1324,7 +1326,16 @@ var I18nData = {
                             "autoFormat": "تلقائي",
                             "notForMe": "ليس لي",
                             "notForMeDone": "تمت الإزالة من التوصيات",
-                            "markUnwatched": "وضع علامة \"غير مشاهد\""
+                            "markUnwatched": "وضع علامة \"غير مشاهد\"",
+                            "streamCorrupted": "ملف البث تالف أو غير قابل للوصول لدى المزود",
+                            "streamNotFound": "لم يتم العثور على البث لدى المزود",
+                            "bandwidthLimit": "تم الوصول إلى حد عرض النطاق الترددي للمزود",
+                            "providerError": "خطأ في خادم المزود",
+                            "authFailed": "فشل المصادقة — تحقق من اشتراكك",
+                            "streamErrorTitle": "خطأ في البث",
+                            "copyDetails": "نسخ التفاصيل",
+                            "detailsCopied": "تم نسخ التفاصيل",
+                            "scanToReport": "امسح رمز QR هذا بهاتفك لنسخ تفاصيل الخطأ"
                     },
                     "subtitleOptions": {
                             "title": "خيارات الترجمة",
@@ -1796,7 +1807,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Zeitüberschreitung bei der Autorisierung",
                             "tmdbNoV4Token": "v4 Read-Token in den Einstellungen oben erforderlich",
                             "tmdbAccountDesc": "Verbinde dein TMDB-Konto, um Filme und Serien zu bewerten.",
-                            "tmdbConnectInstructionsAndroid": "Erlaube den Zugriff auf der geöffneten Seite und schließe sie, um zurückzukehren."
+                            "tmdbConnectInstructionsAndroid": "Erlaube den Zugriff auf der geöffneten Seite und schließe sie, um zurückzukehren.",
+                            "back": "Zurück",
+                            "close": "Schließen"
                     },
                     "player": {
                             "play": "Abspielen",
@@ -1841,7 +1854,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Nichts für mich",
                             "notForMeDone": "Aus Empfehlungen entfernt",
-                            "markUnwatched": "Als ungesehen markieren"
+                            "markUnwatched": "Als ungesehen markieren",
+                            "streamCorrupted": "Die Stream-Datei ist beschädigt oder beim Anbieter nicht erreichbar",
+                            "streamNotFound": "Stream beim Anbieter nicht gefunden",
+                            "bandwidthLimit": "Bandbreitenlimit des Anbieters erreicht",
+                            "providerError": "Anbieter-Serverfehler",
+                            "authFailed": "Authentifizierung fehlgeschlagen — Abonnement prüfen",
+                            "streamErrorTitle": "Stream-Fehler",
+                            "copyDetails": "Details kopieren",
+                            "detailsCopied": "Details kopiert",
+                            "scanToReport": "Scannen Sie diesen QR-Code mit Ihrem Handy, um die Fehlerdetails zu kopieren"
                     },
                     "subtitleOptions": {
                             "title": "Untertitel-Optionen",
@@ -2318,7 +2340,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Authorization timed out",
                             "tmdbNoV4Token": "v4 Read Token required in settings above",
                             "tmdbAccountDesc": "Connect your TMDB account to rate movies and TV shows.",
-                            "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here."
+                            "tmdbConnectInstructionsAndroid": "Approve access in the opened page, then close it to return here.",
+                            "back": "Back",
+                            "close": "Close"
                     },
                     "player": {
                             "play": "Play",
@@ -2363,7 +2387,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Not for me",
                             "notForMeDone": "Removed from recommendations",
-                            "markUnwatched": "Mark as unwatched"
+                            "markUnwatched": "Mark as unwatched",
+                            "streamCorrupted": "Stream file is corrupted or unreachable on provider",
+                            "streamNotFound": "Stream not found on provider",
+                            "bandwidthLimit": "Provider bandwidth limit reached",
+                            "providerError": "Provider server error",
+                            "authFailed": "Authentication failed — check your subscription",
+                            "streamErrorTitle": "Stream error",
+                            "copyDetails": "Copy details",
+                            "detailsCopied": "Error details copied",
+                            "scanToReport": "Scan this QR code with your phone to copy the error details"
                     },
                     "subtitleOptions": {
                             "title": "Subtitle options",
@@ -2830,7 +2863,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Tiempo de autorización agotado",
                             "tmdbNoV4Token": "Token de lectura v4 requerido en los ajustes de arriba",
                             "tmdbAccountDesc": "Conecta tu cuenta TMDB para valorar películas y series.",
-                            "tmdbConnectInstructionsAndroid": "Aprueba el acceso en la página abierta y ciérrala para volver aquí."
+                            "tmdbConnectInstructionsAndroid": "Aprueba el acceso en la página abierta y ciérrala para volver aquí.",
+                            "back": "Atrás",
+                            "close": "Cerrar"
                     },
                     "player": {
                             "play": "Reproducir",
@@ -2875,7 +2910,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "No para mí",
                             "notForMeDone": "Eliminado de las recomendaciones",
-                            "markUnwatched": "Marcar como no vista"
+                            "markUnwatched": "Marcar como no vista",
+                            "streamCorrupted": "El archivo del flujo está corrupto o inaccesible en el proveedor",
+                            "streamNotFound": "Flujo no encontrado en el proveedor",
+                            "bandwidthLimit": "Se alcanzó el límite de ancho de banda del proveedor",
+                            "providerError": "Error del servidor del proveedor",
+                            "authFailed": "Autenticación fallida — verifique su suscripción",
+                            "streamErrorTitle": "Error de flujo",
+                            "copyDetails": "Copiar detalles",
+                            "detailsCopied": "Detalles copiados",
+                            "scanToReport": "Escanee este código QR con su teléfono para copiar los detalles del error"
                     },
                     "subtitleOptions": {
                             "title": "Opciones de subtítulos",
@@ -3352,7 +3396,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Délai d’autorisation dépassé",
                             "tmdbNoV4Token": "Jeton de lecture v4 requis dans les paramètres ci-dessus",
                             "tmdbAccountDesc": "Connectez votre compte TMDB pour noter films et séries.",
-                            "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici."
+                            "tmdbConnectInstructionsAndroid": "Approuvez l’accès dans la page ouverte, puis fermez-la pour revenir ici.",
+                            "back": "Retour",
+                            "close": "Fermer"
                     },
                     "player": {
                             "play": "Lecture",
@@ -3397,7 +3443,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Pas pour moi",
                             "notForMeDone": "Retiré des recommandations",
-                            "markUnwatched": "Marquer comme non vue"
+                            "markUnwatched": "Marquer comme non vue",
+                            "streamCorrupted": "Le fichier du flux est corrompu ou inaccessible chez le fournisseur",
+                            "streamNotFound": "Flux introuvable chez le fournisseur",
+                            "bandwidthLimit": "Limite de bande passante du fournisseur atteinte",
+                            "providerError": "Erreur du serveur fournisseur",
+                            "authFailed": "Authentification échouée — vérifiez votre abonnement",
+                            "streamErrorTitle": "Erreur de lecture",
+                            "copyDetails": "Copier les détails",
+                            "detailsCopied": "Détails copiés",
+                            "scanToReport": "Scannez ce QR code avec votre téléphone pour copier les détails de l'erreur"
                     },
                     "subtitleOptions": {
                             "title": "Options sous-titres",
@@ -3864,7 +3919,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Tempo scaduto per l’autorizzazione",
                             "tmdbNoV4Token": "Token di lettura v4 richiesto nelle impostazioni sopra",
                             "tmdbAccountDesc": "Collega il tuo account TMDB per valutare film e serie.",
-                            "tmdbConnectInstructionsAndroid": "Approva l’accesso nella pagina aperta, poi chiudila per tornare qui."
+                            "tmdbConnectInstructionsAndroid": "Approva l’accesso nella pagina aperta, poi chiudila per tornare qui.",
+                            "back": "Indietro",
+                            "close": "Chiudi"
                     },
                     "player": {
                             "play": "Riproduci",
@@ -3909,7 +3966,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Non fa per me",
                             "notForMeDone": "Rimosso dai suggerimenti",
-                            "markUnwatched": "Segna come non visto"
+                            "markUnwatched": "Segna come non visto",
+                            "streamCorrupted": "Il file dello stream è corrotto o non raggiungibile sul provider",
+                            "streamNotFound": "Stream non trovato sul provider",
+                            "bandwidthLimit": "Limite di larghezza di banda del provider raggiunto",
+                            "providerError": "Errore del server provider",
+                            "authFailed": "Autenticazione fallita — verifica il tuo abbonamento",
+                            "streamErrorTitle": "Errore stream",
+                            "copyDetails": "Copia dettagli",
+                            "detailsCopied": "Dettagli copiati",
+                            "scanToReport": "Scansiona questo codice QR con il telefono per copiare i dettagli dell errore"
                     },
                     "subtitleOptions": {
                             "title": "Opzioni sottotitoli",
@@ -4381,7 +4447,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Autorisatie verlopen",
                             "tmdbNoV4Token": "v4 Read-token vereist in instellingen hierboven",
                             "tmdbAccountDesc": "Koppel je TMDB-account om films en series te beoordelen.",
-                            "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren."
+                            "tmdbConnectInstructionsAndroid": "Keur de toegang goed op de geopende pagina en sluit deze om terug te keren.",
+                            "back": "Terug",
+                            "close": "Sluiten"
                     },
                     "player": {
                             "play": "Afspelen",
@@ -4426,7 +4494,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Niet voor mij",
                             "notForMeDone": "Verwijderd uit aanbevelingen",
-                            "markUnwatched": "Markeer als ongezien"
+                            "markUnwatched": "Markeer als ongezien",
+                            "streamCorrupted": "Het streambestand is beschadigd of niet bereikbaar bij de provider",
+                            "streamNotFound": "Stream niet gevonden bij provider",
+                            "bandwidthLimit": "Bandbreedtelimiet provider bereikt",
+                            "providerError": "Serverfout provider",
+                            "authFailed": "Authenticatie mislukt — controleer je abonnement",
+                            "streamErrorTitle": "Streamfout",
+                            "copyDetails": "Details kopiëren",
+                            "detailsCopied": "Details gekopieerd",
+                            "scanToReport": "Scan deze QR-code met je telefoon om de foutdetails te kopiëren"
                     },
                     "subtitleOptions": {
                             "title": "Ondertitel opties",
@@ -4898,7 +4975,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Upłynął czas autoryzacji",
                             "tmdbNoV4Token": "Token odczytu v4 wymagany w ustawieniach powyżej",
                             "tmdbAccountDesc": "Połącz konto TMDB, aby oceniać filmy i seriale.",
-                            "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj."
+                            "tmdbConnectInstructionsAndroid": "Zatwierdź dostęp na otwartej stronie i zamknij ją, aby wrócić tutaj.",
+                            "back": "Wstecz",
+                            "close": "Zamknij"
                     },
                     "player": {
                             "play": "Odtwórz",
@@ -4943,7 +5022,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Nie dla mnie",
                             "notForMeDone": "Usunięte z rekomendacji",
-                            "markUnwatched": "Oznacz jako nieobejrzane"
+                            "markUnwatched": "Oznacz jako nieobejrzane",
+                            "streamCorrupted": "Plik strumienia jest uszkodzony lub niedostępny u dostawcy",
+                            "streamNotFound": "Nie znaleziono strumienia u dostawcy",
+                            "bandwidthLimit": "Osiągnięto limit pasma dostawcy",
+                            "providerError": "Błąd serwera dostawcy",
+                            "authFailed": "Uwierzytelnienie nie powiodło się — sprawdź subskrypcję",
+                            "streamErrorTitle": "Błąd strumienia",
+                            "copyDetails": "Kopiuj szczegóły",
+                            "detailsCopied": "Szczegóły skopiowane",
+                            "scanToReport": "Zeskanuj ten kod QR telefonem, aby skopiować szczegóły błędu"
                     },
                     "subtitleOptions": {
                             "title": "Opcje napisów",
@@ -5415,7 +5503,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Tempo de autorização esgotado",
                             "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
                             "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries.",
-                            "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui."
+                            "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui.",
+                            "back": "Voltar",
+                            "close": "Fechar"
                     },
                     "player": {
                             "play": "Reproduzir",
@@ -5460,7 +5550,16 @@ var I18nData = {
                             "autoFormat": "Auto",
                             "notForMe": "Não é para mim",
                             "notForMeDone": "Removido das recomendações",
-                            "markUnwatched": "Marcar como não visto"
+                            "markUnwatched": "Marcar como não visto",
+                            "streamCorrupted": "O arquivo do stream está corrompido ou inacessível no provedor",
+                            "streamNotFound": "Stream não encontrado no provedor",
+                            "bandwidthLimit": "Limite de largura de banda do provedor atingido",
+                            "providerError": "Erro do servidor provedor",
+                            "authFailed": "Falha na autenticação — verifique sua assinatura",
+                            "streamErrorTitle": "Erro de stream",
+                            "copyDetails": "Copiar detalhes",
+                            "detailsCopied": "Detalhes copiados",
+                            "scanToReport": "Escaneie este QR code com seu celular para copiar os detalhes do erro"
                     },
                     "subtitleOptions": {
                             "title": "Opções de legendas",
@@ -5932,7 +6031,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Время авторизации истекло",
                             "tmdbNoV4Token": "Токен чтения v4 требуется в настройках выше",
                             "tmdbAccountDesc": "Подключите аккаунт TMDB, чтобы оценивать фильмы и сериалы.",
-                            "tmdbConnectInstructionsAndroid": "Подтвердите доступ на открытой странице, затем закройте её, чтобы вернуться."
+                            "tmdbConnectInstructionsAndroid": "Подтвердите доступ на открытой странице, затем закройте её, чтобы вернуться.",
+                            "back": "Назад",
+                            "close": "Закрыть"
                     },
                     "player": {
                             "play": "Воспроизвести",
@@ -5977,7 +6078,16 @@ var I18nData = {
                             "autoFormat": "Авто",
                             "notForMe": "Не для меня",
                             "notForMeDone": "Удалено из рекомендаций",
-                            "markUnwatched": "Отметить как непросмотренное"
+                            "markUnwatched": "Отметить как непросмотренное",
+                            "streamCorrupted": "Файл потока поврежден или недоступен у провайдера",
+                            "streamNotFound": "Поток не найден у провайдера",
+                            "bandwidthLimit": "Достигнут лимит пропускной способности провайдера",
+                            "providerError": "Ошибка сервера провайдера",
+                            "authFailed": "Ошибка аутентификации — проверьте подписку",
+                            "streamErrorTitle": "Ошибка потока",
+                            "copyDetails": "Копировать детали",
+                            "detailsCopied": "Детали скопированы",
+                            "scanToReport": "Отсканируйте этот QR-код телефоном, чтобы скопировать детали ошибки"
                     },
                     "subtitleOptions": {
                             "title": "Параметры субтитров",
@@ -6449,7 +6559,9 @@ var I18nData = {
                             "tmdbConnectTimeout": "Yetkilendirme süresi doldu",
                             "tmdbNoV4Token": "Yukarıdaki ayarlarda v4 Okuma Token gerekli",
                             "tmdbAccountDesc": "Film ve dizileri puanlamak için TMDB hesabını bağla.",
-                            "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat."
+                            "tmdbConnectInstructionsAndroid": "Açılan sayfada erişimi onayla, ardından buraya dönmek için kapat.",
+                            "back": "Geri",
+                            "close": "Kapat"
                     },
                     "player": {
                             "play": "Oynat",
@@ -6494,7 +6606,16 @@ var I18nData = {
                             "autoFormat": "Oto",
                             "notForMe": "Bana göre değil",
                             "notForMeDone": "Önerilerden kaldırıldı",
-                            "markUnwatched": "İzlenmedi olarak işaretle"
+                            "markUnwatched": "İzlenmedi olarak işaretle",
+                            "streamCorrupted": "Yayın dosyası bozuk veya sağlayıcıda erişilemiyor",
+                            "streamNotFound": "Sağlayıcıda yayın bulunamadı",
+                            "bandwidthLimit": "Sağlayıcı bant genişliği sınırına ulaşıldı",
+                            "providerError": "Sağlayıcı sunucu hatası",
+                            "authFailed": "Kimlik doğrulama başarısız — aboneliğinizi kontrol edin",
+                            "streamErrorTitle": "Yayın hatası",
+                            "copyDetails": "Detayları kopyala",
+                            "detailsCopied": "Detaylar kopyalandı",
+                            "scanToReport": "Hata ayrıntılarını kopyalamak için bu QR kodunu telefonunuzla tarayın"
                     },
                     "subtitleOptions": {
                             "title": "Altyazı seçenekleri",

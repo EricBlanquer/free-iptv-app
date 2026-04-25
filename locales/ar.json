@@ -277,7 +277,9 @@
         "tmdbConnectTimeout": "انتهت مهلة التفويض",
         "tmdbNoV4Token": "رمز قراءة v4 مطلوب في الإعدادات أعلاه",
         "tmdbAccountDesc": "اربط حساب TMDB لتقييم الأفلام والمسلسلات.",
-        "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا."
+        "tmdbConnectInstructionsAndroid": "وافق على الوصول في الصفحة المفتوحة ثم أغلقها للعودة إلى هنا.",
+        "back": "رجوع",
+        "close": "إغلاق"
     },
     "player": {
         "play": "تشغيل",
@@ -322,7 +324,16 @@
         "autoFormat": "تلقائي",
         "notForMe": "ليس لي",
         "notForMeDone": "تمت الإزالة من التوصيات",
-        "markUnwatched": "وضع علامة \"غير مشاهد\""
+        "markUnwatched": "وضع علامة \"غير مشاهد\"",
+        "streamCorrupted": "ملف البث تالف أو غير قابل للوصول لدى المزود",
+        "streamNotFound": "لم يتم العثور على البث لدى المزود",
+        "bandwidthLimit": "تم الوصول إلى حد عرض النطاق الترددي للمزود",
+        "providerError": "خطأ في خادم المزود",
+        "authFailed": "فشل المصادقة — تحقق من اشتراكك",
+        "streamErrorTitle": "خطأ في البث",
+        "copyDetails": "نسخ التفاصيل",
+        "detailsCopied": "تم نسخ التفاصيل",
+        "scanToReport": "امسح رمز QR هذا بهاتفك لنسخ تفاصيل الخطأ"
     },
     "subtitleOptions": {
         "title": "خيارات الترجمة",

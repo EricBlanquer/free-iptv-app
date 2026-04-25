@@ -281,7 +281,9 @@
         "tmdbConnectTimeout": "Tempo de autorização esgotado",
         "tmdbNoV4Token": "Token de leitura v4 necessário nas definições acima",
         "tmdbAccountDesc": "Ligue a sua conta TMDB para avaliar filmes e séries.",
-        "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui."
+        "tmdbConnectInstructionsAndroid": "Aprove o acesso na página aberta e feche-a para voltar aqui.",
+        "back": "Voltar",
+        "close": "Fechar"
     },
     "player": {
         "play": "Reproduzir",
@@ -326,7 +328,16 @@
         "autoFormat": "Auto",
         "notForMe": "Não é para mim",
         "notForMeDone": "Removido das recomendações",
-        "markUnwatched": "Marcar como não visto"
+        "markUnwatched": "Marcar como não visto",
+        "streamCorrupted": "O arquivo do stream está corrompido ou inacessível no provedor",
+        "streamNotFound": "Stream não encontrado no provedor",
+        "bandwidthLimit": "Limite de largura de banda do provedor atingido",
+        "providerError": "Erro do servidor provedor",
+        "authFailed": "Falha na autenticação — verifique sua assinatura",
+        "streamErrorTitle": "Erro de stream",
+        "copyDetails": "Copiar detalhes",
+        "detailsCopied": "Detalhes copiados",
+        "scanToReport": "Escaneie este QR code com seu celular para copiar os detalhes do erro"
     },
     "subtitleOptions": {
         "title": "Opções de legendas",
