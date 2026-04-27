@@ -103,6 +103,15 @@
             display: block;
             margin-top: 2px;
         }
+        .device-ua {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #555;
+            display: block;
+            margin-top: 3px;
+            word-break: break-all;
+            white-space: normal;
+        }
         .comment-input {
             width: 220px;
             min-height: 36px;
@@ -119,6 +128,32 @@
         .comment-input.saved { border-color: #4CAF50; }
         .email { color: #00d4ff; }
         .date { color: #888; font-size: 13px; }
+        .badge-paid, .badge-gift {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+        .badge-paid { background: rgba(76,175,80,0.2); color: #4CAF50; border: 1px solid rgba(76,175,80,0.4); }
+        .badge-gift { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.4); }
+        .filters { margin-bottom: 10px; }
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: #aaa;
+            font-size: 13px;
+            cursor: pointer;
+            margin-right: 6px;
+            font-family: 'Outfit', sans-serif;
+        }
+        .filter-btn:hover { color: #fff; }
+        .filter-btn.active { background: rgba(0,212,255,0.15); color: #00d4ff; border-color: rgba(0,212,255,0.4); }
         .stats {
             display: flex;
             flex-wrap: wrap;
@@ -192,6 +227,11 @@
             <div class="stats" id="stats"></div>
 
             <h2>Devices</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="paid">Paid</button>
+                <button class="filter-btn" data-filter="gifted">Gifted</button>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -241,8 +281,9 @@
         var confirmCallback = null;
         var devicesCache = [];
         var licenseByDeviceCache = {};
-        var sortKey = 'installDate';
+        var sortKey = 'lastSeen';
         var sortDir = -1;
+        var filterMode = 'all';
 
         function logout() {
             localStorage.removeItem('adminSecret');
@@ -299,10 +340,20 @@
                 var licenses = licensesData.licenses || [];
                 var devices = devicesData.devices || [];
 
+                var licenseByDevice = {};
+                licenses.forEach(function(lic) {
+                    if (lic.used && lic.deviceId) licenseByDevice[lic.deviceId] = lic;
+                });
+
                 var totalLicenses = licenses.length;
                 var usedLicenses = licenses.filter(function(l) { return l.used; }).length;
                 var totalDevices = devices.length;
                 var licensedDevices = devices.filter(function(d) { return d.licenseCode; }).length;
+                var paidDevices = devices.filter(function(d) {
+                    var lic = licenseByDevice[d.deviceId];
+                    return d.licenseCode && lic && lic.payerEmail;
+                }).length;
+                var giftedDevices = licensedDevices - paidDevices;
 
                 var statsEl = document.getElementById('stats');
                 statsEl.textContent = '';
@@ -310,6 +361,8 @@
                 var statsData = [
                     { value: totalDevices, label: 'Devices' },
                     { value: licensedDevices, label: 'Licensed' },
+                    { value: paidDevices, label: 'Paid' },
+                    { value: giftedDevices, label: 'Gifted' },
                     { value: totalDevices - licensedDevices, label: 'Unlicensed' },
                     { value: totalLicenses - usedLicenses, label: 'Available codes' }
                 ];
@@ -326,11 +379,6 @@
                     box.appendChild(val);
                     box.appendChild(lbl);
                     statsEl.appendChild(box);
-                });
-
-                var licenseByDevice = {};
-                licenses.forEach(function(lic) {
-                    if (lic.used && lic.deviceId) licenseByDevice[lic.deviceId] = lic;
                 });
 
                 devicesCache = devices;
@@ -386,6 +434,15 @@
                 return 0;
             });
 
+            sorted = sorted.filter(function(dev) {
+                if (filterMode === 'all') return true;
+                var lic = licenseByDeviceCache[dev.deviceId];
+                var isPaid = !!(lic && lic.payerEmail);
+                if (filterMode === 'paid') return isPaid;
+                if (filterMode === 'gifted') return dev.licenseCode && !isPaid;
+                return true;
+            });
+
             var headers = document.querySelectorAll('th.sortable');
             headers.forEach(function(th) {
                 var arrow = th.querySelector('.arrow');
@@ -398,6 +455,13 @@
                 var tdDev = document.createElement('td');
                 tdDev.className = 'device-id';
                 tdDev.textContent = dev.deviceId;
+                if (dev.lastUserAgent) {
+                    var uaSpan = document.createElement('span');
+                    uaSpan.className = 'device-ua';
+                    uaSpan.textContent = dev.lastUserAgent;
+                    uaSpan.title = dev.lastUserAgent;
+                    tdDev.appendChild(uaSpan);
+                }
 
                 var tdLic = document.createElement('td');
                 if (dev.licenseCode) {
@@ -405,6 +469,17 @@
                     licSpan.className = 'code';
                     licSpan.textContent = dev.licenseCode;
                     tdLic.appendChild(licSpan);
+                    var lic = licenseByDeviceCache[dev.deviceId];
+                    var badge = document.createElement('span');
+                    if (lic && lic.payerEmail) {
+                        badge.className = 'badge-paid';
+                        badge.textContent = 'PAID';
+                        badge.title = lic.payerEmail;
+                    } else {
+                        badge.className = 'badge-gift';
+                        badge.textContent = 'GIFT';
+                    }
+                    tdLic.appendChild(badge);
                 }
                 else {
                     var genBtn = document.createElement('button');
@@ -492,6 +567,16 @@
                     sortKey = key;
                     sortDir = 1;
                 }
+                renderDevices();
+            });
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                filterMode = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(function(b) {
+                    b.classList.toggle('active', b === btn);
+                });
                 renderDevices();
             });
         });

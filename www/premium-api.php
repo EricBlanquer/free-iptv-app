@@ -86,6 +86,9 @@ switch ($action) {
                     $data['isp'] = $geo['isp'];
                 }
                 $data['lastSeen'] = round(microtime(true) * 1000);
+                if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+                    $data['lastUserAgent'] = mb_substr($_SERVER['HTTP_USER_AGENT'], 0, 500);
+                }
                 writeJson('device_' . safeFilename($deviceId), $data);
             }
         }
@@ -111,6 +114,9 @@ switch ($action) {
             }
         }
         $body['lastSeen'] = round(microtime(true) * 1000);
+        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            $body['lastUserAgent'] = mb_substr($_SERVER['HTTP_USER_AGENT'], 0, 500);
+        }
         writeJson('device_' . safeFilename($deviceId), $body);
         jsonResponse(['ok' => true]);
         break;
