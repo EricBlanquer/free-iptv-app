@@ -152,6 +152,7 @@
         "playlistName": "Nazwa (opcjonalnie)",
         "playlistType": "Typ",
         "m3uUrl": "URL M3U",
+        "xtreamDetected": "Wykryto konto Xtream, automatycznie przekonwertowano",
         "services": "Usługi (opcjonalne)",
         "servicesEnabled": "Włącz usługi",
         "streamProxy": "Proxy strumieni",

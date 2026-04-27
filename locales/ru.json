@@ -151,6 +151,7 @@
         "playlistName": "Название (необязательно)",
         "playlistType": "Тип",
         "m3uUrl": "M3U URL",
+        "xtreamDetected": "Обнаружен аккаунт Xtream, автоматически преобразован",
         "services": "Сервисы (необязательно)",
         "servicesEnabled": "Включить сервисы",
         "streamProxy": "Прокси потоков",

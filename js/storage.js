@@ -715,6 +715,124 @@ IPTVApp.prototype.saveProviderCache = function(playlistId, data) {
     });
 };
 
+IPTVApp.prototype.getM3UCacheKey = function(playlistId) {
+    return 'm3u_' + (playlistId || 'default');
+};
+
+IPTVApp.prototype.loadM3UCache = function(playlistId) {
+    var self = this;
+    var key = this.getM3UCacheKey(playlistId);
+    return this.initProviderCacheDB().then(function(db) {
+        if (!db) return null;
+        return new Promise(function(resolve) {
+            try {
+                var transaction = db.transaction([PROVIDER_CACHE_STORE_NAME], 'readonly');
+                var store = transaction.objectStore(PROVIDER_CACHE_STORE_NAME);
+                var request = store.get(key);
+                request.onsuccess = function(event) {
+                    var cache = event.target.result;
+                    if (!cache) {
+                        window.log('CACHE', 'M3U cache miss for ' + playlistId);
+                        resolve(null);
+                        return;
+                    }
+                    var currentLang = self.getEffectiveProviderLanguage();
+                    if (cache.providerLanguage !== currentLang) {
+                        window.log('CACHE', 'M3U cache INVALID for ' + playlistId + ' (lang ' + cache.providerLanguage + ' -> ' + currentLang + ')');
+                        resolve(null);
+                        return;
+                    }
+                    var ageMinutes = cache.timestamp ? Math.round((Date.now() - cache.timestamp) / 60000) : 0;
+                    var needsRefresh = !cache.timestamp || Date.now() - cache.timestamp > PROVIDER_CACHE_TTL;
+                    if (needsRefresh) {
+                        window.log('CACHE', 'M3U cache stale for ' + playlistId + ' (age: ' + ageMinutes + 'min), will refresh in background');
+                        cache.data._needsRefresh = true;
+                    }
+                    else {
+                        window.log('CACHE', 'M3U cache hit for ' + playlistId + ' (age: ' + ageMinutes + 'min)');
+                    }
+                    cache.data._cacheTimestamp = cache.timestamp;
+                    cache.data._cacheSource = 'cache';
+                    resolve(cache.data);
+                };
+                request.onerror = function() { resolve(null); };
+            }
+            catch (e) {
+                window.log('ERROR', 'loadM3UCache: ' + e.message);
+                resolve(null);
+            }
+        });
+    });
+};
+
+IPTVApp.prototype.saveM3UCache = function(playlistId, data) {
+    var self = this;
+    var key = this.getM3UCacheKey(playlistId);
+    var timestamp = Date.now();
+    var providerLanguage = this.getEffectiveProviderLanguage();
+    return this.initProviderCacheDB().then(function(db) {
+        if (!db) {
+            window.log('CACHE', 'M3U cache save skipped (no IndexedDB)');
+            return false;
+        }
+        return new Promise(function(resolve) {
+            try {
+                var dataSize = JSON.stringify(data).length;
+                window.log('CACHE', 'saveM3UCache: writing ' + Math.round(dataSize / 1024) + 'KB for ' + playlistId + ' (lang=' + providerLanguage + ')');
+                var transaction = db.transaction([PROVIDER_CACHE_STORE_NAME], 'readwrite');
+                var store = transaction.objectStore(PROVIDER_CACHE_STORE_NAME);
+                var cache = {
+                    playlistId: key,
+                    timestamp: timestamp,
+                    providerLanguage: providerLanguage,
+                    data: data
+                };
+                transaction.oncomplete = function() {
+                    window.log('CACHE', 'M3U cache saved for ' + playlistId);
+                    resolve(true);
+                };
+                transaction.onabort = function() {
+                    window.log('ERROR', 'M3U cache save ABORTED for ' + playlistId + ': ' + (transaction.error ? transaction.error.message || transaction.error : 'unknown'));
+                    resolve(false);
+                };
+                transaction.onerror = function(event) {
+                    window.log('ERROR', 'M3U cache save error: ' + (event.target.error ? event.target.error.message || event.target.error : 'unknown'));
+                    resolve(false);
+                };
+                store.delete(key);
+                store.put(cache);
+            }
+            catch (e) {
+                window.log('ERROR', 'saveM3UCache: ' + e.message);
+                resolve(false);
+            }
+        });
+    });
+};
+
+IPTVApp.prototype.clearM3UCache = function(playlistId) {
+    var self = this;
+    return this.initProviderCacheDB().then(function(db) {
+        if (!db) return;
+        return new Promise(function(resolve) {
+            try {
+                var transaction = db.transaction([PROVIDER_CACHE_STORE_NAME], 'readwrite');
+                var store = transaction.objectStore(PROVIDER_CACHE_STORE_NAME);
+                store.delete(self.getM3UCacheKey(playlistId));
+                transaction.oncomplete = function() {
+                    window.log('CACHE', 'M3U cache cleared for ' + playlistId);
+                    resolve();
+                };
+                transaction.onerror = function() { resolve(); };
+            }
+            catch (e) {
+                window.log('ERROR', 'clearM3UCache: ' + e.message);
+                resolve();
+            }
+        });
+    });
+};
+
 IPTVApp.prototype.updateProviderCacheTimestamp = function(playlistId, timestamp) {
     var key = this.getProviderCacheKey(playlistId);
     this.initProviderCacheDB().then(function(db) {

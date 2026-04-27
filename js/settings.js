@@ -1459,14 +1459,36 @@ IPTVApp.prototype.savePlaylist = function() {
         playlist.defaultAudioChannels = selectedAudChannels ? selectedAudChannels.dataset.value : 'stereo';
     }
     else {
-        playlist.url = document.getElementById('playlist-m3uUrl').value.trim();
-        if (!playlist.url) {
+        var m3uUrl = document.getElementById('playlist-m3uUrl').value.trim();
+        if (!m3uUrl) {
             return;
+        }
+        var xt = this.detectXtreamFromM3UUrl(m3uUrl);
+        if (xt) {
+            window.log('savePlaylist: Xtream detected in M3U URL, converting to provider');
+            type = 'provider';
+            playlist.type = 'provider';
+            playlist.serverUrl = xt.serverUrl;
+            playlist.username = xt.username;
+            playlist.password = xt.password;
+            if (typeof this.showToast === 'function') {
+                this.showToast(I18n.t('settings.xtreamDetected', 'Xtream account detected, converted automatically'), 4000);
+            }
+        }
+        else {
+            playlist.url = m3uUrl;
         }
     }
     var found = false;
     for (var i = 0; i < this.settings.playlists.length; i++) {
         if (this.sameId(this.settings.playlists[i].id, playlist.id)) {
+            var oldPlaylist = this.settings.playlists[i];
+            var typeChanged = oldPlaylist.type !== type;
+            var m3uUrlChanged = type === 'm3u' && oldPlaylist.type === 'm3u' && oldPlaylist.url !== playlist.url;
+            if (typeChanged || m3uUrlChanged) {
+                this.clearM3UCache(playlist.id);
+                this.clearProviderCache(playlist.id);
+            }
             this.settings.playlists[i] = playlist;
             found = true;
             break;
@@ -1490,6 +1512,8 @@ IPTVApp.prototype.savePlaylist = function() {
 IPTVApp.prototype.deletePlaylist = function() {
     window.log('ACTION deletePlaylist: ' + this.editingPlaylistId);
     if (!this.editingPlaylistId) return;
+    this.clearM3UCache(this.editingPlaylistId);
+    this.clearProviderCache(this.editingPlaylistId);
     var newPlaylists = [];
     for (var i = 0; i < this.settings.playlists.length; i++) {
         if (!this.sameId(this.settings.playlists[i].id, this.editingPlaylistId)) {
@@ -1620,52 +1644,55 @@ IPTVApp.prototype.handlePlaylistEditSelect = function() {
 };
 
 // M3U Parser
-IPTVApp.prototype.loadM3UPlaylist = function(url) {
-    var self = this;
-    window.log('loadM3UPlaylist: loading ' + url);
-    return new Promise(function(resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                window.log('loadM3UPlaylist: status=' + xhr.status + ' length=' + (xhr.responseText ? xhr.responseText.length : 0));
-                if (xhr.status === 200) {
-                    try {
-                        self.parseM3U(xhr.responseText);
-                        window.log('loadM3UPlaylist: parsed successfully, categories=' + self.data.live.categories.length + ' streams=' + self.data.live.streams.length);
-                        resolve();
-                    }
-                    catch (e) {
-                        window.log('ERROR loadM3UPlaylist: parse: ' + e.message);
-                        reject(e);
-                    }
-                }
-                else {
-                    reject(new Error('Failed to load M3U: ' + xhr.status));
-                }
-            }
-        };
-        xhr.onerror = function() {
-            window.log('ERROR', 'loadM3UPlaylist: network error');
-            reject(new Error('Network error loading M3U'));
-        };
-        xhr.send();
-    });
+var M3U_TIMEOUT_MS = 600000;
+
+IPTVApp.prototype.detectXtreamFromM3UUrl = function(url) {
+    if (!url || typeof url !== 'string') return null;
+    var m = url.match(/^(https?:\/\/[^\/?#]+)\/get\.php\?(.+)$/i);
+    if (!m) return null;
+    var server = m[1];
+    var queryStr = m[2].split('#')[0];
+    var params = {};
+    var pairs = queryStr.split('&');
+    for (var i = 0; i < pairs.length; i++) {
+        var eq = pairs[i].indexOf('=');
+        if (eq > 0) {
+            var k = decodeURIComponent(pairs[i].substring(0, eq)).toLowerCase();
+            var v = decodeURIComponent(pairs[i].substring(eq + 1));
+            params[k] = v;
+        }
+    }
+    if (!params.username || !params.password) return null;
+    var type = (params.type || '').toLowerCase();
+    if (type !== 'm3u' && type !== 'm3u_plus') return null;
+    return {
+        serverUrl: server,
+        username: params.username,
+        password: params.password
+    };
 };
 
-IPTVApp.prototype.parseM3U = function(content) {
-    var lines = content.split('\n');
+IPTVApp.prototype._makeM3UParser = function() {
+    var self = this;
     var categories = {};
     var streams = [];
-    var currentInfo = null;
     var streamId = 1;
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (line.startsWith('#EXTINF:')) {
-            currentInfo = this.parseExtInf(line);
+    var droppedCount = 0;
+    var currentInfo = null;
+    var processLine = function(rawLine) {
+        var line = rawLine.charAt(rawLine.length - 1) === '\r' ? rawLine.substring(0, rawLine.length - 1) : rawLine;
+        line = line.trim();
+        if (!line) return;
+        if (line.indexOf('#EXTINF:') === 0) {
+            currentInfo = self.parseExtInf(line);
         }
-        else if (line && !line.startsWith('#') && currentInfo) {
+        else if (line.charAt(0) !== '#' && currentInfo) {
             var group = currentInfo.group || 'Uncategorized';
+            if (!self.matchesLanguage(group)) {
+                currentInfo = null;
+                droppedCount++;
+                return;
+            }
             if (!categories[group]) {
                 categories[group] = {
                     category_id: Object.keys(categories).length + 1,
@@ -1683,18 +1710,161 @@ IPTVApp.prototype.parseM3U = function(content) {
             });
             currentInfo = null;
         }
-    }
-    var categoryList = [];
-    for (var g in categories) {
-        if (categories.hasOwnProperty(g)) {
-            categoryList.push(categories[g]);
-        }
-    }
-    this.data.live = {
-        categories: categoryList,
-        streams: streams
     };
-    this.availableLanguages = [];
+    return {
+        processLine: processLine,
+        getStreamCount: function() { return streams.length; },
+        getDroppedCount: function() { return droppedCount; },
+        finalize: function() {
+            var categoryList = [];
+            for (var g in categories) {
+                if (categories.hasOwnProperty(g)) categoryList.push(categories[g]);
+            }
+            self.data.live = { categories: categoryList, streams: streams };
+            self.availableLanguages = [];
+        }
+    };
+};
+
+IPTVApp.prototype._loadM3UStreaming = function(url, onProgress) {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+        var aborted = false;
+        var timeoutId = setTimeout(function() {
+            aborted = true;
+            window.log('ERROR', 'loadM3UPlaylist: timeout after ' + (M3U_TIMEOUT_MS / 1000) + 's');
+            reject(new Error('Timeout loading M3U'));
+        }, M3U_TIMEOUT_MS);
+        fetch(url).then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            if (!response.body || !response.body.getReader) {
+                throw new Error('NO_STREAMING');
+            }
+            var totalSize = parseInt(response.headers.get('Content-Length') || '0', 10);
+            var receivedSize = 0;
+            var lastProgressCb = 0;
+            var lastProgressLog = 0;
+            var reader = response.body.getReader();
+            var decoder = new TextDecoder('utf-8');
+            var buffer = '';
+            var parser = self._makeM3UParser();
+            var pump = function() {
+                if (aborted) {
+                    try { reader.cancel(); } catch (e) {}
+                    return;
+                }
+                return reader.read().then(function(result) {
+                    if (result.done) {
+                        if (buffer) parser.processLine(buffer);
+                        clearTimeout(timeoutId);
+                        parser.finalize();
+                        window.log('loadM3UPlaylist: parsed (streaming), categories=' + self.data.live.categories.length + ' streams=' + parser.getStreamCount() + ' dropped=' + parser.getDroppedCount());
+                        resolve();
+                        return;
+                    }
+                    receivedSize += result.value.length;
+                    buffer += decoder.decode(result.value, { stream: true });
+                    var nl;
+                    while ((nl = buffer.indexOf('\n')) >= 0) {
+                        parser.processLine(buffer.substring(0, nl));
+                        buffer = buffer.substring(nl + 1);
+                    }
+                    var now = Date.now();
+                    if (typeof onProgress === 'function' && now - lastProgressCb >= 500) {
+                        lastProgressCb = now;
+                        var loadedMB = (receivedSize / 1048576).toFixed(1);
+                        var totalMB = totalSize > 0 ? (totalSize / 1048576).toFixed(1) : '?';
+                        onProgress(loadedMB, totalMB);
+                    }
+                    if (now - lastProgressLog >= 5000) {
+                        lastProgressLog = now;
+                        window.log('loadM3UPlaylist: progress ' + (receivedSize / 1048576).toFixed(1) + ' MB streams=' + parser.getStreamCount());
+                    }
+                    return pump();
+                });
+            };
+            return pump();
+        }).catch(function(err) {
+            clearTimeout(timeoutId);
+            if (!aborted) {
+                reject(err);
+            }
+        });
+    });
+};
+
+IPTVApp.prototype._loadM3UXHR = function(url, onProgress) {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.timeout = M3U_TIMEOUT_MS;
+        var lastProgressLog = 0;
+        xhr.onprogress = function(ev) {
+            var loadedMB = (ev.loaded / 1048576).toFixed(1);
+            var totalMB = ev.lengthComputable ? (ev.total / 1048576).toFixed(1) : '?';
+            if (typeof onProgress === 'function') {
+                onProgress(loadedMB, totalMB);
+            }
+            var now = Date.now();
+            if (now - lastProgressLog >= 5000) {
+                lastProgressLog = now;
+                window.log('loadM3UPlaylist: progress ' + loadedMB + '/' + totalMB + ' MB');
+            }
+        };
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== 4) return;
+            window.log('loadM3UPlaylist: status=' + xhr.status + ' length=' + (xhr.responseText ? xhr.responseText.length : 0));
+            if (xhr.status !== 200) {
+                reject(new Error('Failed to load M3U: ' + xhr.status));
+                return;
+            }
+            try {
+                self.parseM3U(xhr.responseText);
+                window.log('loadM3UPlaylist: parsed (XHR), categories=' + self.data.live.categories.length + ' streams=' + self.data.live.streams.length);
+                resolve();
+            }
+            catch (e) {
+                window.log('ERROR loadM3UPlaylist: parse: ' + e.message);
+                reject(e);
+            }
+        };
+        xhr.ontimeout = function() {
+            window.log('ERROR', 'loadM3UPlaylist: timeout after ' + (M3U_TIMEOUT_MS / 1000) + 's');
+            reject(new Error('Timeout loading M3U'));
+        };
+        xhr.onerror = function() {
+            window.log('ERROR', 'loadM3UPlaylist: network error');
+            reject(new Error('Network error loading M3U'));
+        };
+        xhr.send();
+    });
+};
+
+IPTVApp.prototype.loadM3UPlaylist = function(url, onProgress) {
+    var self = this;
+    var lang = self.getEffectiveProviderLanguage();
+    var supportsStreaming = (typeof fetch === 'function') && (typeof TextDecoder === 'function');
+    window.log('loadM3UPlaylist: loading ' + url + ' lang=' + lang + ' streaming=' + supportsStreaming + ' (timeout=' + (M3U_TIMEOUT_MS / 1000) + 's)');
+    if (!supportsStreaming) {
+        return self._loadM3UXHR(url, onProgress);
+    }
+    return self._loadM3UStreaming(url, onProgress).catch(function(err) {
+        if (err && err.message === 'NO_STREAMING') {
+            window.log('loadM3UPlaylist: streaming not available, falling back to XHR');
+            return self._loadM3UXHR(url, onProgress);
+        }
+        throw err;
+    });
+};
+
+IPTVApp.prototype.parseM3U = function(content) {
+    var parser = this._makeM3UParser();
+    var lines = content.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+        parser.processLine(lines[i]);
+    }
+    parser.finalize();
 };
 
 IPTVApp.prototype.parseExtInf = function(line) {

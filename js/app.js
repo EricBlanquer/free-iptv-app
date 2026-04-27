@@ -449,8 +449,35 @@ class IPTVApp {
         this.startApp();
     }
 
+    _autoMigrateM3UToXtream() {
+        var playlists = this.settings.playlists || [];
+        var migrated = false;
+        for (var i = 0; i < playlists.length; i++) {
+            var p = playlists[i];
+            if (p.type !== 'm3u' || !p.url) continue;
+            var xt = this.detectXtreamFromM3UUrl(p.url);
+            if (!xt) continue;
+            window.log('INIT', 'autoMigrate M3U->Xtream: ' + (p.name || p.id));
+            this.clearM3UCache(p.id);
+            playlists[i] = {
+                id: p.id,
+                name: p.name,
+                type: 'provider',
+                serverUrl: xt.serverUrl,
+                username: xt.username,
+                password: xt.password
+            };
+            migrated = true;
+        }
+        if (migrated) {
+            this.saveSettings();
+        }
+        return migrated;
+    }
+
     autoConnect() {
         var self = this;
+        this._autoMigrateM3UToXtream();
         var playlists = this.settings.playlists || [];
         var isMergeMode = !this.settings.activePlaylistId && playlists.length >= 2;
         if (isMergeMode) {
@@ -468,11 +495,12 @@ class IPTVApp {
         window.log('INIT', 'autoConnect: ' + playlist.type + ' ' + (playlist.name || playlist.serverUrl || playlist.url));
         this.showLoadingBackdrop();
         this.showLoading(true, I18n.t('loading.connecting', 'Connecting...'));
+        var loadingTimeoutMs = playlist.type === 'm3u' ? 320000 : 10000;
         var loadingTimeout = setTimeout(function() {
-            window.log('HTTP', 'autoConnect: timeout');
+            window.log('HTTP', 'autoConnect: timeout after ' + (loadingTimeoutMs / 1000) + 's');
             document.getElementById('home-grid').style.visibility = '';
             self.showLoading(false);
-        }, 10000);
+        }, loadingTimeoutMs);
         var done = function() {
             clearTimeout(loadingTimeout);
             self.showLoading(false);
@@ -628,12 +656,20 @@ class IPTVApp {
             });
         }
         else if (playlist.type === 'm3u') {
-            this.loadM3UPlaylist(playlist.url).then(function() {
-                window.log('INIT', 'autoConnect: M3U loaded');
-                self.updateHomeMenuVisibility();
-                document.getElementById('home-grid').style.visibility = '';
-                done();
-            }).catch(function(err) {
+            var loadingText = document.getElementById('loading-text');
+            var onM3UProgress = function(loadedMB, totalMB) {
+                if (loadingText) {
+                    var sizeStr = totalMB === '?' ? loadedMB + ' MB' : loadedMB + '/' + totalMB + ' MB';
+                    loadingText.textContent = I18n.t('app.loading', 'Loading...') + ' ' + sizeStr;
+                }
+            };
+            var downloadAndCache = function() {
+                return self.loadM3UPlaylist(playlist.url, onM3UProgress).then(function() {
+                    window.log('INIT', 'autoConnect: M3U loaded');
+                    self.saveM3UCache(playlist.id, self.data.live);
+                });
+            };
+            var onM3UError = function(err) {
                 var errMsg = err ? (err.message || err.toString()) : 'Unknown error';
                 window.log('ERROR', 'autoConnect M3U: ' + errMsg);
                 self.updateHomeMenuVisibility();
@@ -644,7 +680,33 @@ class IPTVApp {
                     try { window.NetworkDiagnostic.runAndShow(self, playlist.url, 'm3u_failed'); }
                     catch (ex) { window.log('ERROR', 'diagnostic: ' + (ex.message || ex)); }
                 }
-            });
+            };
+            this.loadM3UCache(playlist.id).then(function(cached) {
+                var hasCache = cached && cached.categories && cached.categories.length > 0;
+                if (hasCache) {
+                    self.data.live = { categories: cached.categories, streams: cached.streams };
+                    self.availableLanguages = [];
+                    window.log('CACHE', 'autoConnect: M3U cache hit, ' + cached.streams.length + ' streams');
+                    self.updateHomeMenuVisibility();
+                    document.getElementById('home-grid').style.visibility = '';
+                    done();
+                    if (cached._needsRefresh) {
+                        window.log('CACHE', 'autoConnect: refreshing M3U in background');
+                        self.loadM3UPlaylist(playlist.url).then(function() {
+                            self.saveM3UCache(playlist.id, self.data.live);
+                            window.log('CACHE', 'autoConnect: M3U background refresh done');
+                        }).catch(function(err) {
+                            window.log('ERROR', 'M3U background refresh: ' + (err && err.message || err));
+                        });
+                    }
+                    return;
+                }
+                downloadAndCache().then(function() {
+                    self.updateHomeMenuVisibility();
+                    document.getElementById('home-grid').style.visibility = '';
+                    done();
+                }).catch(onM3UError);
+            }).catch(onM3UError);
         }
         else {
             done();

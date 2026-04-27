@@ -151,6 +151,7 @@
         "playlistName": "الاسم (اختياري)",
         "playlistType": "النوع",
         "m3uUrl": "رابط M3U",
+        "xtreamDetected": "تم اكتشاف حساب Xtream وتم التحويل تلقائيًا",
         "services": "الخدمات (اختياري)",
         "servicesEnabled": "تفعيل الخدمات",
         "streamProxy": "وكيل البث",

@@ -153,6 +153,7 @@
         "playlistName": "Ad (isteğe bağlı)",
         "playlistType": "Tür",
         "m3uUrl": "M3U URL",
+        "xtreamDetected": "Xtream hesabı algılandı, otomatik olarak dönüştürüldü",
         "services": "Hizmetler (isteğe bağlı)",
         "servicesEnabled": "Hizmetleri etkinleştir",
         "streamProxy": "Akış proxy",
