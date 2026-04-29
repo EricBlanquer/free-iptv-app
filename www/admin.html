@@ -415,6 +415,50 @@
             });
         }
 
+        function parseDeviceName(ua) {
+            if (!ua) return '';
+            var tizen = ua.match(/Tizen[\/\s]?(\d+(?:\.\d+)?)/i);
+            if (tizen) {
+                var isTV = /SMART-TV|SmartTV|SmartHub/i.test(ua);
+                var model = ua.match(/\b(UE|UN|QE|QN|GU|UA)\w+/);
+                if (isTV) return 'Samsung TV (Tizen ' + tizen[1] + (model ? ', ' + model[0] : '') + ')';
+                return 'Tizen Emulator (' + tizen[1] + ')';
+            }
+            var android = ua.match(/Android\s+(\d+(?:\.\d+)?)/i);
+            if (android) {
+                var dev = ua.match(/;\s*([^;)]+)\s+Build\//);
+                if (!dev) dev = ua.match(/Android\s+\d+(?:\.\d+)?;\s*([^;)]+?)\s*[);]/);
+                var name = dev ? dev[1].trim() : null;
+                return 'Android ' + android[1] + (name ? ' (' + name + ')' : '');
+            }
+            if (/iPhone|iPad|iPod/i.test(ua)) {
+                var ios = ua.match(/OS\s+(\d+[_\.]\d+)/);
+                var dev2 = /iPad/.test(ua) ? 'iPad' : (/iPod/.test(ua) ? 'iPod' : 'iPhone');
+                return dev2 + (ios ? ' (iOS ' + ios[1].replace('_', '.') + ')' : '');
+            }
+            var chrome = ua.match(/Chrom(?:e|ium)\/(\d+)/);
+            var os = 'Unknown';
+            if (/Windows NT 10/i.test(ua)) os = 'Windows 10/11';
+            else if (/Windows NT/i.test(ua)) os = 'Windows';
+            else if (/Mac OS X/i.test(ua)) os = 'macOS';
+            else if (/CrOS/i.test(ua)) os = 'ChromeOS';
+            else if (/X11.*Linux|Linux x86/i.test(ua)) os = 'Linux';
+            if (/Edg\//.test(ua)) {
+                var edge = ua.match(/Edg\/(\d+)/);
+                return 'Edge ' + (edge ? edge[1] : '') + ' (' + os + ')';
+            }
+            if (/Firefox\//.test(ua)) {
+                var ff = ua.match(/Firefox\/(\d+)/);
+                return 'Firefox ' + (ff ? ff[1] : '') + ' (' + os + ')';
+            }
+            if (/Safari/.test(ua) && !chrome) {
+                var sf = ua.match(/Version\/(\d+)/);
+                return 'Safari ' + (sf ? sf[1] : '') + ' (' + os + ')';
+            }
+            if (chrome) return 'Chrome ' + chrome[1] + ' (' + os + ')';
+            return ua.length > 60 ? ua.slice(0, 60) + '…' : ua;
+        }
+
         function getSortValue(dev, key) {
             var v = dev[key];
             if (key === 'installDate' || key === 'licensedAt' || key === 'lastSeen') return v || 0;
@@ -458,7 +502,7 @@
                 if (dev.lastUserAgent) {
                     var uaSpan = document.createElement('span');
                     uaSpan.className = 'device-ua';
-                    uaSpan.textContent = dev.lastUserAgent;
+                    uaSpan.textContent = parseDeviceName(dev.lastUserAgent);
                     uaSpan.title = dev.lastUserAgent;
                     tdDev.appendChild(uaSpan);
                 }
