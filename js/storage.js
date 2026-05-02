@@ -638,7 +638,7 @@ IPTVApp.prototype.loadProviderCacheLocal = function(playlistId) {
 };
 
 IPTVApp.prototype._stripStreamsForCache = function(streams) {
-    var stripFields = ['plot', 'cast', 'director', 'direct_source', 'custom_sid', 'backdrop_path', 'youtube_trailer', 'episode_run_time', 'tmdb'];
+    var stripFields = ['plot', 'cast', 'director', 'direct_source', 'custom_sid', 'backdrop_path', 'youtube_trailer', 'episode_run_time', 'tmdb', '_duplicateVersions', '_hiddenDuplicate'];
     return streams.map(function(s) {
         var stripped = {};
         for (var key in s) {

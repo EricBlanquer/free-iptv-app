@@ -2226,12 +2226,55 @@ IPTVApp.prototype._preprocessSection = function(section, categories, streams, on
             _categoryCounts: result._categoryCounts
         };
         self.logMemory('preprocessed ' + section + ' (' + result.streams.length + ' streams)');
+        if (result._wasSlowPath) {
+            self._schedulePersistPreprocessedCache();
+        }
     };
     var result = this._preprocessStreams(streams, categories, categoryMap, onProgress);
     if (result && result.then) {
         return result.then(storeResult);
     }
     storeResult(result);
+};
+
+IPTVApp.prototype._schedulePersistPreprocessedCache = function() {
+    var self = this;
+    if (this._persistPreprocessedTimer) clearTimeout(this._persistPreprocessedTimer);
+    this._persistPreprocessedTimer = setTimeout(function() {
+        self._persistPreprocessedTimer = null;
+        self._persistPreprocessedCache();
+    }, 3000);
+};
+
+IPTVApp.prototype._persistPreprocessedCache = function() {
+    if (!this.api || !this.api.cache) return;
+    var multiPlaylist = this.apis && this.apis.length > 1 && !this.settings.activePlaylistId;
+    if (multiPlaylist) {
+        window.log('CACHE', 'persistPreprocessedCache: skipping (multi-playlist mode not yet supported)');
+        return;
+    }
+    var playlistId = this.settings.activePlaylistId || this.api.playlistId;
+    if (!playlistId) {
+        window.log('CACHE', 'persistPreprocessedCache: no playlistId, skipping');
+        return;
+    }
+    var data = {
+        vod: {
+            categories: this.api.cache.vodCategories || [],
+            streams: (this.api.cache.vodStreams && this.api.cache.vodStreams['_all']) || []
+        },
+        series: {
+            categories: this.api.cache.seriesCategories || [],
+            streams: (this.api.cache.series && this.api.cache.series['_all']) || []
+        },
+        live: {
+            categories: this.api.cache.liveCategories || [],
+            streams: (this.api.cache.liveStreams && this.api.cache.liveStreams['_all']) || []
+        }
+    };
+    var totalStreams = data.vod.streams.length + data.series.streams.length + data.live.streams.length;
+    window.log('CACHE', 'persistPreprocessedCache: playlistId=' + playlistId + ' totalStreams=' + totalStreams);
+    this.saveProviderCache(playlistId, data);
 };
 
 IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap, onProgress) {
@@ -2263,16 +2306,32 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
     var beforeCount = streams.length;
     var BATCH_SIZE = 2000;
     var hasPreprocessedData = streams.length > 0 && streams[0]._dedupKey;
+    var computeFields = function(s) {
+        if (s._dedupKey !== undefined) return;
+        var title = self.getStreamTitle(s);
+        var clean = self.cleanTitle(title);
+        var cleanTitle = clean.toLowerCase();
+        var year = self.extractYear(title);
+        s._dedupCleanTitle = cleanTitle;
+        s._dedupYear = year;
+        s._dedupKey = cleanTitle + '|' + (year || '');
+        var stripped = self.stripCategoryPrefix(title);
+        var diff = stripped.replace(clean, '').replace(/\(\d{4}\)/g, '').replace(Regex.removeYearEnd, '').replace(/[\s\-|:()]+/g, ' ').trim();
+        var qualityMatch = title.match(Regex.qualityPrefix);
+        if (qualityMatch) {
+            diff = (qualityMatch[1] + (diff ? ' ' + diff : '')).trim();
+        }
+        s._dedupTag = diff || '';
+        s._dedupQualityScore = qualityScore(diff);
+        s._isSD = self.isSD(s);
+        s._is3D = self.is3D(s);
+        s._displayTitle = self.stripCategoryPrefix(self.formatDisplayTitle(title));
+        s._searchKey = s._displayTitle.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
+    };
     var processStream = hasPreprocessedData ? function(s) {
         if (!categoryIds[s.category_id]) return;
-        if (!s._displayTitle) {
-            var t = self.getStreamTitle(s);
-            s._displayTitle = self.stripCategoryPrefix(self.formatDisplayTitle(t));
-            var sn = s._displayTitle.toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
-            s._searchKey = sn;
-        }
         if (s._isSD === undefined) {
             s._isSD = self.isSD(s);
             s._is3D = self.is3D(s);
@@ -2297,32 +2356,12 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
         }
         filtered.push(s);
     } : function(s) {
+        computeFields(s);
         if (!categoryIds[s.category_id]) return;
         if (!s.genre && s.category_id) {
             s.genre = categoryMap[s.category_id] || '';
         }
-        var title = self.getStreamTitle(s);
-        var clean = self.cleanTitle(title);
-        var cleanTitle = clean.toLowerCase();
-        var year = self.extractYear(title);
-        s._dedupCleanTitle = cleanTitle;
-        s._dedupYear = year;
-        s._dedupKey = cleanTitle + '|' + (year || '');
-        var stripped = self.stripCategoryPrefix(title);
-        var diff = stripped.replace(clean, '').replace(/\(\d{4}\)/g, '').replace(Regex.removeYearEnd, '').replace(/[\s\-|:()]+/g, ' ').trim();
-        var qualityMatch = title.match(Regex.qualityPrefix);
-        if (qualityMatch) {
-            diff = (qualityMatch[1] + (diff ? ' ' + diff : '')).trim();
-        }
-        s._dedupTag = diff || '';
-        s._dedupQualityScore = qualityScore(diff);
-        s._isSD = self.isSD(s);
-        s._is3D = self.is3D(s);
-        s._displayTitle = self.stripCategoryPrefix(self.formatDisplayTitle(title));
-        var searchNorm = s._displayTitle.toLowerCase()
-            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
-        s._searchKey = searchNorm;
+        var cleanTitle = s._dedupCleanTitle;
         if (needsSDFilter) {
             if (!titleMap[cleanTitle]) titleMap[cleanTitle] = { sd: false, hd: false };
             if (s._isSD) titleMap[cleanTitle].sd = true;
@@ -2422,7 +2461,8 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
             _dedupGroups: dedupGroups,
             _dedupTitleCounts: dedupTitleCounts,
             _genreCategories: genreSet,
-            _categoryCounts: categoryCounts
+            _categoryCounts: categoryCounts,
+            _wasSlowPath: !hasPreprocessedData
         };
     };
     if (streams.length <= BATCH_SIZE) {
