@@ -1,0 +1,54 @@
+=== Submission ===
+Version: 1.0.7
+Date: 2026-05-02
+Type: Resubmission after v1.0.6 rejection
+
+=== Note for Tester ===
+WHAT'S NEW
+
+Fixes the v1.0.6 rejection ("Unable to play content"). v1.0.6 added a pre-flight internet probe to a single third-party endpoint (Cloudflare 1.1.1.1) before every playback. If that one endpoint was unreachable from the test network — even when the stream URLs themselves were reachable — the app refused to play and showed a "No internet connection" toast. v1.0.7 removes the third-party probe and uses the OS-level network state instead (Tizen webapis.network + navigator.onLine — instant, no HTTP call).
+
+HOW TO TEST
+
+No login or account required.
+
+Option A — Try the bundled demo (recommended):
+  1. On first launch, accept "Would you like to try a demo playlist?".
+  2. App auto-jumps to Live TV with 7 channels (DW family, France 24 FR/EN, Al Jazeera English).
+  3. Click any channel — should start playing within seconds.
+
+Option B — Configure manually:
+  Settings > Playlists > Add Playlist, enter an M3U URL, or Xtream credentials (server URL, username, password).
+
+=== English ===
+- Fixed playback being incorrectly blocked with a "No internet connection" message on networks where Cloudflare's connectivity-check endpoint was unreachable (the app now uses the OS network state instead of a third-party probe).
+
+=== German ===
+- Behoben: Wiedergabe wurde fälschlich mit der Meldung "Keine Internetverbindung" blockiert in Netzwerken, in denen der Cloudflare-Endpunkt zur Konnektivitätsprüfung nicht erreichbar war (die App verwendet jetzt den Netzwerkstatus des Betriebssystems anstelle einer Drittanbieter-Prüfung).
+
+=== Arabic ===
+- تم إصلاح حظر التشغيل بشكل خاطئ مع رسالة "لا يوجد اتصال بالإنترنت" على الشبكات التي يتعذر فيها الوصول إلى نقطة فحص الاتصال الخاصة بـ Cloudflare (يستخدم التطبيق الآن حالة الشبكة في نظام التشغيل بدلاً من فحص خارجي).
+
+=== Spanish ===
+- Corregido el bloqueo incorrecto de la reproducción con el mensaje "Sin conexión a internet" en redes donde el endpoint de verificación de conectividad de Cloudflare no era accesible (la app ahora usa el estado de red del sistema operativo en lugar de una sonda externa).
+
+=== French ===
+- Correction de la lecture bloquée à tort avec le message "Pas de connexion internet" sur les réseaux où le point de terminaison de vérification de connectivité de Cloudflare était inaccessible (l'app utilise désormais l'état réseau du système d'exploitation au lieu d'une sonde tierce).
+
+=== Italian ===
+- Risolto il blocco erroneo della riproduzione con il messaggio "Nessuna connessione internet" su reti in cui l'endpoint di verifica della connettività di Cloudflare non era raggiungibile (l'app ora usa lo stato di rete del sistema operativo invece di una sonda esterna).
+
+=== Dutch ===
+- Opgelost: afspelen werd ten onrechte geblokkeerd met de melding "Geen internetverbinding" op netwerken waar het Cloudflare-eindpunt voor connectiviteitscontrole onbereikbaar was (de app gebruikt nu de netwerkstatus van het besturingssysteem in plaats van een externe sonde).
+
+=== Polish ===
+- Naprawiono błędne blokowanie odtwarzania z komunikatem "Brak połączenia z internetem" w sieciach, w których punkt końcowy sprawdzania łączności Cloudflare był nieosiągalny (aplikacja używa teraz stanu sieci systemu operacyjnego zamiast zewnętrznej sondy).
+
+=== Portuguese ===
+- Corrigido o bloqueio incorreto da reprodução com a mensagem "Sem conexão à internet" em redes onde o endpoint de verificação de conectividade do Cloudflare estava inacessível (o app agora usa o estado de rede do sistema operacional em vez de uma sondagem externa).
+
+=== Russian ===
+- Исправлена ошибочная блокировка воспроизведения с сообщением "Нет подключения к интернету" в сетях, где конечная точка проверки подключения Cloudflare была недоступна (приложение теперь использует сетевое состояние операционной системы вместо внешнего зондирования).
+
+=== Turkish ===
+- Cloudflare'in bağlantı kontrol noktasının erişilemediği ağlarda "İnternet bağlantısı yok" mesajıyla oynatmanın hatalı şekilde engellenmesi düzeltildi (uygulama artık harici sonda yerine işletim sisteminin ağ durumunu kullanıyor).

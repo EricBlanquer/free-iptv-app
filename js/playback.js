@@ -256,21 +256,8 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     var self = this;
     var playlistId = stream ? stream._playlistId : null;
     window.log('playStream: id=' + streamId + ' type=' + type + ' playlistId=' + playlistId + ' section=' + this.currentSection);
-    // Pre-flight offline check BEFORE any screen transition or AVPlay call.
-    // AVPlay hangs silently on network errors ("Lancement de la lecture..."
-    // stuck forever), and even showing the player screen briefly is jarring.
-    var previewUrl = (stream && stream.url) ? stream.url : '';
-    if (!previewUrl && this.api && type === 'live' && stream && stream.stream_id) {
-        previewUrl = this.api.getLiveStreamUrl(stream.stream_id, (this.settings.liveFormat || 'ts'));
-    }
-    if (/^https?:\/\//i.test(previewUrl) && window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
-        window.NetworkDiagnostic.checkInternet().then(function(r) {
-            if (!r || !r.ok) {
-                self.showToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
-                return;
-            }
-            self._doPlayStream(streamId, type, stream, startPosition);
-        });
+    if (window.NetworkDiagnostic && window.NetworkDiagnostic.isLikelyOffline && window.NetworkDiagnostic.isLikelyOffline()) {
+        self.showToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
         return;
     }
     this._doPlayStream(streamId, type, stream, startPosition);
@@ -722,15 +709,8 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
                     finishWithModal(r.status || 0);
                 }).catch(function() {
                     clearTimeout(probeTimer);
-                    if (window.NetworkDiagnostic && window.NetworkDiagnostic.checkInternet) {
-                        window.NetworkDiagnostic.checkInternet().then(function(n) {
-                            if (!n || !n.ok) {
-                                finishWithToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
-                            }
-                            else {
-                                finishWithModal(0);
-                            }
-                        });
+                    if (window.NetworkDiagnostic && window.NetworkDiagnostic.isLikelyOffline && window.NetworkDiagnostic.isLikelyOffline()) {
+                        finishWithToast(I18n.t('player.noInternet', 'No internet connection — check your network'));
                     }
                     else {
                         finishWithModal(0);

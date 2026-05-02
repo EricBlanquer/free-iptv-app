@@ -83,6 +83,21 @@
             .catch(function(ex) { return { ok: false, error: ex.message || String(ex) }; });
     }
 
+    function isLikelyOffline() {
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+        try {
+            if (typeof webapis !== 'undefined' && webapis.network && webapis.network.getActiveConnectionType) {
+                var type = webapis.network.getActiveConnectionType();
+                var DC = webapis.network.NetworkActiveConnectionType
+                    ? webapis.network.NetworkActiveConnectionType.DISCONNECTED
+                    : 0;
+                if (type === DC) return true;
+            }
+        }
+        catch (ex) {}
+        return false;
+    }
+
     function checkDoh(hostname) {
         var url = DOH_URL + '?name=' + encodeURIComponent(hostname) + '&type=A';
         return fetchWithTimeout(url, {
@@ -459,6 +474,7 @@
     window.NetworkDiagnostic = {
         run: run,
         runAndShow: runAndShow,
-        checkInternet: checkInternet
+        checkInternet: checkInternet,
+        isLikelyOffline: isLikelyOffline
     };
 })();

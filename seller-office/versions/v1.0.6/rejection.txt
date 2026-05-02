@@ -1,0 +1,76 @@
+=== Rejected ===
+Date: 2026-04-28
+Reviewer: Samsung Apps TV
+App Version: V1.0.6
+App ID: 3202603044645
+
+=== Reason ===
+CRITICAL: Unable to play content.
+We were unable to use the playback of the app.
+Please make sure the content is playing correctly.
+Fix this issue and re-submit the app for these models in order to start certification process again.
+
+=== Rejected Model Groups ===
+26TV_STANDARD1 (Tizen 10.0), 26TV_PREMIUM2 (Tizen 10.0), 26TV_PREMIUM1 (Tizen 10.0), 26TV_BASIC1 (Tizen 10.0),
+25TV_STANDARD1 (Tizen 9.0), 25TV_PREMIUM4 (Tizen 9.0), 25TV_PREMIUM3 (Tizen 9.0), 25TV_PREMIUM2 (Tizen 9.0),
+25TV_PREMIUM1 (Tizen 9.0), 25TV_BASIC3 (Tizen 9.0), 25TV_BASIC2 (Tizen 9.0), 25TV_BASIC1 (Tizen 9.0),
+24TV_STANDARD3 (Tizen 9.0 (+1)), 24TV_STANDARD2 (Tizen 9.0 (+1)), 24TV_STANDARD1 (Tizen 9.0 (+1)),
+24TV_PREMIUM6 (Tizen 9.0 (+1)), 24TV_PREMIUM5 (Tizen 9.0 (+1)), 24TV_PREMIUM4 (Tizen 9.0 (+1)),
+24TV_PREMIUM2 (Tizen 9.0 (+1)), 24TV_PREMIUM1 (Tizen 9.0 (+1)),
+24TV_BASIC4 (Tizen 8.0), 24TV_BASIC3 (Tizen 9.0 (+1)),
+24TV_BASIC2_LIC2 (Tizen 8.0), 24TV_BASIC2_LIC (Tizen 8.0), 24TV_BASIC2 (Tizen 9.0 (+1)),
+23TV_BASIC1_LIC2 (Tizen 7.0), 23TV_BASIC1_LIC (Tizen 7.0)
+
+=== Root Cause Analysis ===
+v1.0.6 added a pre-flight offline check in `playStream()` that probed
+`https://1.1.1.1/cdn-cgi/trace` (Cloudflare) with a 3s timeout BEFORE every
+AVPlay call. The intent was to give the user a clear "No internet connection"
+toast instead of letting AVPlay hang silently on network errors. The flaw:
+sounding a single third-party endpoint introduces a single point of failure.
+If that one endpoint is unreachable for ANY reason (Korean ISP filtering,
+Samsung test-lab firewall, transient Cloudflare outage, corporate proxy),
+playback is rejected even when the actual stream URLs (Akamai DW, France 24,
+Al Jazeera) are perfectly reachable.
+
+Evidence: admin-devices API
+(iptv.blanquer.org/premium-api.php?action=admin-devices) shows ZERO Korean
+device registrations during the v1.0.6 review window (2026-04-27 to
+2026-04-28). All 11 registered devices over the full review period are French
+or Italian. The Samsung tester's TV appears to be unable to reach external
+endpoints we depend on (iptv.blanquer.org for v1.0.5, 1.1.1.1 for v1.0.6),
+which is consistent with a test-lab network configuration that allows AVPlay
+streaming traffic but restricts general fetch/XHR to non-allowlisted hosts.
+
+The result for the reviewer: clicking any channel produced an immediate
+"No internet connection — check your network" toast (because the 1.1.1.1
+probe failed) and no playback ever happened. Samsung interpreted this as
+"Unable to play content" and rejected.
+
+=== Resolution ===
+Resubmitted as v1.0.7 with the following fix:
+
+1. **Removed the third-party HTTP probe entirely** (js/playback.js
+   playStream pre-flight). The pre-flight check no longer makes any network
+   call to a third-party endpoint.
+
+2. **New native-only `isLikelyOffline()` helper** (js/core/diagnostic.js):
+   uses `navigator.onLine` + Tizen `webapis.network.getActiveConnectionType()`
+   (DISCONNECTED) — instant, OS-level, no HTTP dependency. If the OS reports
+   "no link" (cable unplugged, WiFi off), show the offline toast. Otherwise
+   proceed with playback and let the existing AVPlay error handler (3 retries
+   with backoff + post-failure URL probe + modal/toast) deal with real
+   stream-side failures.
+
+3. **Same replacement in the post-error catch path** (js/playback.js:725):
+   when AVPlay errors after retries and the URL probe also errors,
+   `isLikelyOffline()` is used (instead of `checkInternet()`) to distinguish
+   "device offline" from "stream-server-down".
+
+Trade-off: in the rare case where AVPlay hangs silently on a real network
+issue, the user now waits up to 14s (3 retries × 2/4/8s backoff) before the
+"Stream unavailable" modal appears. This is strictly better than the v1.0.6
+behaviour, which produced an immediate but WRONG offline toast on networks
+that block 1.1.1.1.
+
+Resubmit version: v1.0.7
+WGT: ~/Bureau/FreeIPTV-1.0.7.wgt
