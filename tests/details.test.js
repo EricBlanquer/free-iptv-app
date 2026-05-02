@@ -819,3 +819,125 @@ describe('Recommendations engine', () => {
         expect(kept).toEqual([{ id: 43 }]);
     });
 });
+
+describe('bug: stale TMDB callback after Back overwrites previous detail (I Origins → Split)', () => {
+    function makeApp() {
+        return {
+            _detailsSession: 0,
+            tmdbInfo: null,
+            selectedStream: null,
+            titleOverrides: {},
+            displayedTitle: '',
+            _bumpDetailsSession: function() {
+                this._detailsSession = (this._detailsSession || 0) + 1;
+                return this._detailsSession;
+            },
+            saveTitleOverride: function(streamId, title) {
+                this.titleOverrides[streamId] = title;
+            },
+            fetchTMDBDetailsByIdAsync: function(tmdbId, type, tmdbResponse) {
+                var self = this;
+                var session = self._detailsSession;
+                return function applyResponseLater() {
+                    if (self._detailsSession !== session) return false;
+                    self.tmdbInfo = tmdbResponse;
+                    if (self.selectedStream && self.selectedStream.data) {
+                        self.selectedStream.data.tmdb_id = tmdbResponse.id;
+                    }
+                    var providerTitle = self.selectedStream && self.selectedStream.data
+                        ? self.selectedStream.data.name : '';
+                    var titlesMatch = providerTitle.toLowerCase() === tmdbResponse.title.toLowerCase();
+                    if (!titlesMatch) {
+                        self.displayedTitle = tmdbResponse.title;
+                        var streamId = self.selectedStream && self.selectedStream.data
+                            && self.selectedStream.data.stream_id;
+                        if (streamId) self.saveTitleOverride(streamId, tmdbResponse.title);
+                    }
+                    return true;
+                };
+            }
+        };
+    }
+
+    it('aborts stale Split callback after user navigates back to I Origins details', () => {
+        var app = makeApp();
+        var iOriginsStream = { stream_id: 'IO', data: { stream_id: 'IO', name: 'I Origins' } };
+        var splitStream = { stream_id: 'SP', data: { stream_id: 'SP', name: 'Split' } };
+        app._bumpDetailsSession();
+        app.selectedStream = iOriginsStream;
+        app.displayedTitle = 'I Origins';
+        var iOriginsApply = app.fetchTMDBDetailsByIdAsync('IO_TMDB', 'movie', { id: 'IO_TMDB', title: 'I Origins' });
+        expect(iOriginsApply()).toBe(true);
+        expect(app.displayedTitle).toBe('I Origins');
+        app._bumpDetailsSession();
+        app.selectedStream = splitStream;
+        app.displayedTitle = 'Split';
+        var splitApply = app.fetchTMDBDetailsByIdAsync('SP_TMDB', 'movie', { id: 'SP_TMDB', title: 'Split' });
+        app._bumpDetailsSession();
+        app.selectedStream = iOriginsStream;
+        app.displayedTitle = 'I Origins';
+        var applied = splitApply();
+        expect(applied).toBe(false);
+        expect(app.displayedTitle).toBe('I Origins');
+        expect(iOriginsStream.data.tmdb_id).toBe('IO_TMDB');
+        expect(app.titleOverrides['IO']).toBeUndefined();
+    });
+
+    it('without session check: stale Split callback corrupts I Origins title and override (regression baseline)', () => {
+        var app = makeApp();
+        app._bumpDetailsSession = function() {};
+        var iOriginsStream = { stream_id: 'IO', data: { stream_id: 'IO', name: 'I Origins' } };
+        var splitStream = { stream_id: 'SP', data: { stream_id: 'SP', name: 'Split' } };
+        app.selectedStream = iOriginsStream;
+        app.displayedTitle = 'I Origins';
+        app.selectedStream = splitStream;
+        var splitApply = app.fetchTMDBDetailsByIdAsync('SP_TMDB', 'movie', { id: 'SP_TMDB', title: 'Split' });
+        app.selectedStream = iOriginsStream;
+        app.displayedTitle = 'I Origins';
+        splitApply();
+        expect(app.displayedTitle).toBe('Split');
+        expect(iOriginsStream.data.tmdb_id).toBe('SP_TMDB');
+        expect(app.titleOverrides['IO']).toBe('Split');
+    });
+});
+
+describe('bug: title editor recovery from corrupted tmdb_id (clear before re-fetch)', () => {
+    function commitNonEmpty(app, streamData, newTitle, rawTitle) {
+        if (newTitle === rawTitle) return;
+        app._manualTitleOverride = newTitle;
+        if (streamData) {
+            delete streamData.tmdb_id;
+            delete streamData._tmdbId;
+        }
+        app.titleOverrides[streamData.stream_id] = newTitle;
+    }
+
+    it('clears corrupted tmdb_id when user edits title to recover from a stale-callback corruption', () => {
+        var app = { titleOverrides: { IO: 'Split' }, _manualTitleOverride: null };
+        var streamData = { stream_id: 'IO', name: 'I Origins', tmdb_id: 'SP_TMDB', _tmdbId: 'SP_TMDB' };
+        commitNonEmpty(app, streamData, 'I Origins', 'i_origins_2014');
+        expect(streamData.tmdb_id).toBeUndefined();
+        expect(streamData._tmdbId).toBeUndefined();
+        expect(app.titleOverrides.IO).toBe('I Origins');
+        expect(app._manualTitleOverride).toBe('I Origins');
+    });
+});
+
+describe('bug: displayTMDBDetails respects _manualTitleOverride', () => {
+    function shouldOverwriteTitleFromTMDB(titlesMatch, manualTitleOverride) {
+        return !titlesMatch && !manualTitleOverride;
+    }
+
+    it('overwrites title when titles do not match and no manual override (default behaviour)', () => {
+        expect(shouldOverwriteTitleFromTMDB(false, null)).toBe(true);
+    });
+
+    it('skips overwrite when user has set a manual title override', () => {
+        expect(shouldOverwriteTitleFromTMDB(false, 'I Origins')).toBe(false);
+    });
+
+    it('skips overwrite when titles already match', () => {
+        expect(shouldOverwriteTitleFromTMDB(true, null)).toBe(false);
+        expect(shouldOverwriteTitleFromTMDB(true, 'I Origins')).toBe(false);
+    });
+});

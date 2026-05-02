@@ -86,6 +86,7 @@ class IPTVApp {
         this.previousScreen = null;
         this.currentActorId = null;
         this.detailsStack = [];
+        this._detailsSession = 0;
         this.detailsReturnActorId = null;
         this.availableLanguages = [];
         this.currentSeriesInfo = null;

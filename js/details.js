@@ -10,7 +10,14 @@ function setDescription(text, caller) {
     el.textContent = text;
 }
 
+IPTVApp.prototype._bumpDetailsSession = function() {
+    this._detailsSession = (this._detailsSession || 0) + 1;
+    window.log('SESSION', 'details session=' + this._detailsSession);
+    return this._detailsSession;
+};
+
 IPTVApp.prototype.showDetails = function(item) {
+    this._bumpDetailsSession();
     var streamId = item.dataset.streamId;
     var streamType = item.dataset.streamType;
     window.log('ACTION showDetails id=' + streamId + ' type=' + streamType);
@@ -262,7 +269,12 @@ IPTVApp.prototype._loadSingleStreamBitrate = function(streamData) {
     if (!streamId) return;
     var api = this._getApiForPlaylist(streamData._playlistId);
     if (!api || !api.getVodInfo) return;
+    var session = self._detailsSession;
     api.getVodInfo(streamId).then(function(data) {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', '_loadSingleStreamBitrate stale (was=' + session + ' now=' + self._detailsSession + ') id=' + streamId);
+            return;
+        }
         if (!data || !data.info || !data.info.bitrate) return;
         var playBtn = document.getElementById('play-btn');
         if (!playBtn || playBtn.classList.contains('hidden')) return;
@@ -1124,7 +1136,12 @@ IPTVApp.prototype.loadSeriesInfo = function(seriesId) {
         window.log('ERROR', 'loadSeriesInfo: no API, returning');
         return;
     }
+    var session = self._detailsSession;
     apiToUse.getSeriesInfo(seriesId).then(function(data) {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', 'loadSeriesInfo stale (was=' + session + ' now=' + self._detailsSession + ') seriesId=' + seriesId);
+            return;
+        }
         self.currentSeriesInfo = data;
         if (data && data.info && data.info.tmdb && self.selectedStream && self.selectedStream.data) {
             var hadTmdbId = !!self.selectedStream.data.tmdb_id;
@@ -1442,6 +1459,10 @@ IPTVApp.prototype.initTitleEditor = function() {
             self.tmdbInfo = null;
             self._titleReplacedByTmdb = false;
             self._manualTitleOverride = null;
+            if (streamData) {
+                delete streamData.tmdb_id;
+                delete streamData._tmdbId;
+            }
             var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
             self.fetchTMDBInfo(rawTitle, type);
             return;
@@ -1462,6 +1483,10 @@ IPTVApp.prototype.initTitleEditor = function() {
             self.tmdbInfo = null;
             self._titleReplacedByTmdb = false;
             self._manualTitleOverride = null;
+            if (streamData) {
+                delete streamData.tmdb_id;
+                delete streamData._tmdbId;
+            }
             var type2 = self.selectedStream.type === 'series' ? 'tv' : 'movie';
             self.fetchTMDBInfo(rawTitleForYear, type2);
             return;
@@ -1477,6 +1502,10 @@ IPTVApp.prototype.initTitleEditor = function() {
         titleNode.classList.remove('editing');
         self.tmdbInfo = null;
         self._titleReplacedByTmdb = false;
+        if (streamData) {
+            delete streamData.tmdb_id;
+            delete streamData._tmdbId;
+        }
         var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
         self._manualTitleOverride = newTitle;
         self.fetchTMDBInfo(newTitle, type);
@@ -1485,6 +1514,7 @@ IPTVApp.prototype.initTitleEditor = function() {
     titleEl.addEventListener('click', function(e) {
         if (!self.selectedStream) return;
         if (titleEl.querySelector('input')) return;
+        self._bumpDetailsSession();
         var currentText = titleEl.textContent;
         var savedChildren = [];
         for (var i = 0; i < titleEl.childNodes.length; i++) {
@@ -1507,18 +1537,21 @@ IPTVApp.prototype.initTitleEditor = function() {
             titleEl.classList.remove('editing');
         };
         input.addEventListener('keydown', function(ev) {
-            if (ev.key === 'Enter') {
+            var code = ev.keyCode;
+            if (ev.key === 'Enter' || code === 13 || code === 65376) {
                 ev.preventDefault();
+                ev.stopPropagation();
                 commitEdit(input, restore);
             }
-            else if (ev.key === 'Escape') {
+            else if (ev.key === 'Escape' || code === 27 || code === 65385 || code === 10009) {
                 ev.preventDefault();
+                ev.stopPropagation();
                 restore();
             }
         });
         input.addEventListener('blur', function() {
             setTimeout(function() {
-                if (titleEl.contains(input)) restore();
+                if (titleEl.contains(input)) commitEdit(input, restore);
             }, 100);
         });
         e.stopPropagation();
@@ -2175,6 +2208,7 @@ IPTVApp.prototype.getCleanTitleForTMDB = function() {
 
 IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
     var self = this;
+    var session = self._detailsSession;
     var cleanTitle = this.cleanTitle(title);
     var streamId = this.selectedStream && this.selectedStream.data ? (this.selectedStream.data.stream_id || this.selectedStream.data.vod_id || '') : '';
     var streamTmdbId = this.selectedStream && this.selectedStream.data ? (this.selectedStream.data.tmdb_id || this.selectedStream.data._tmdbId || '') : '';
@@ -2212,6 +2246,10 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
         return;
     }
     this.fetchTMDBCached(title, type, function(result) {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', 'fetchTMDBInfo stale (was=' + session + ' now=' + self._detailsSession + ') title="' + title + '"');
+            return;
+        }
         if (result) {
             self.tmdbInfo = result;
             self.tmdbInfo._type = type;
@@ -2327,11 +2365,16 @@ IPTVApp.prototype.renderSimilarGenres = function(streamData) {
     var tmdbId = streamData.tmdb_id || streamData._tmdbId;
     if (!tmdbId) return;
     var self = this;
+    var session = self._detailsSession;
     var tmdbType = section === 'series' ? 'tv' : 'movie';
     Promise.all([
         this._getRecommendationsCached(tmdbId, tmdbType),
         this._getSimilarCached(tmdbId, tmdbType)
     ]).then(function(results) {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', 'renderSimilarGenres stale (was=' + session + ' now=' + self._detailsSession + ') tmdbId=' + tmdbId);
+            return;
+        }
         var scoreById = {};
         var resultById = {};
         for (var li = 0; li < results.length; li++) {
@@ -2448,8 +2491,13 @@ IPTVApp.prototype._checkTmdbCardsAvailability = function(gridId) {
 };
 IPTVApp.prototype.fetchRandomBackdrop = function(tmdbId, type) {
     var self = this;
+    var session = self._detailsSession;
     window.log('fetchRandomBackdrop: tmdbId=' + tmdbId + ' type=' + type);
     TMDB.getImages(tmdbId, type, function(backdrops) {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', 'fetchRandomBackdrop stale (was=' + session + ' now=' + self._detailsSession + ') tmdbId=' + tmdbId);
+            return;
+        }
         window.log('fetchRandomBackdrop: got ' + (backdrops ? backdrops.length : 0) + ' backdrops');
         if (backdrops && backdrops.length > 0) {
             var randomIndex = Math.floor(Math.random() * backdrops.length);
@@ -2775,6 +2823,7 @@ IPTVApp.prototype.loadMoreFilmography = function(count) {
 
 // Details from TMDB
 IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
+    this._bumpDetailsSession();
     var cameFromDetails = this.currentScreen === 'details';
     this.detailsReturnActorId = cameFromDetails ? null : this.currentActorId;
     var tmdbId = filmItem.dataset.tmdbId;
@@ -2860,13 +2909,23 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
 
 IPTVApp.prototype.fetchTMDBDetailsById = function(tmdbId, type) {
     var self = this;
+    var session = self._detailsSession;
+    var stale = function() {
+        if (self._detailsSession !== session) {
+            window.log('SESSION', 'fetchTMDBDetailsById stale (was=' + session + ' now=' + self._detailsSession + ') tmdbId=' + tmdbId);
+            return true;
+        }
+        return false;
+    };
     if (type === 'movie') {
         TMDB.getMovieDetails(tmdbId, function(result) {
+            if (stale()) return;
             if (result) {
                 self.displayTMDBDetails(result, 'movie');
             }
             else {
                 TMDB.getTVDetails(tmdbId, function(tvResult) {
+                    if (stale()) return;
                     if (tvResult) {
                         self.displayTMDBDetails(tvResult, 'tv');
                     }
@@ -2879,11 +2938,13 @@ IPTVApp.prototype.fetchTMDBDetailsById = function(tmdbId, type) {
     }
     else {
         TMDB.getTVDetails(tmdbId, function(result) {
+            if (stale()) return;
             if (result) {
                 self.displayTMDBDetails(result, 'tv');
             }
             else {
                 TMDB.getMovieDetails(tmdbId, function(movieResult) {
+                    if (stale()) return;
                     if (movieResult) {
                         self.displayTMDBDetails(movieResult, 'movie');
                     }
@@ -2922,7 +2983,7 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
                 return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '').trim();
             };
             var titlesMatch = normalize(cleanProviderTitle) === normalize(tmdbTitle);
-            if (!titlesMatch) {
+            if (!titlesMatch && !this._manualTitleOverride) {
                 while (titleEl.firstChild) titleEl.removeChild(titleEl.firstChild);
                 titleEl.textContent = newTitle;
                 this._titleReplacedByTmdb = true;
@@ -2983,6 +3044,7 @@ IPTVApp.prototype.displayTMDBDetails = function(result, type) {
 };
 
 IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, filmItem) {
+    this._bumpDetailsSession();
     window.log('ACTION showDetailsFromFilmography id=' + streamId + ' type=' + streamType);
     var streams = this.getStreams(streamType === 'vod' ? 'vod' : 'series');
     window.log('showDetailsFromFilmography: searching in ' + streams.length + ' streams');
@@ -3067,6 +3129,7 @@ IPTVApp.prototype.pushDetailsState = function() {
 
 IPTVApp.prototype.popDetailsState = function() {
     if (!this.detailsStack.length) return false;
+    this._bumpDetailsSession();
     var state = this.detailsStack.pop();
     var wrapper = document.getElementById('details-wrapper');
     var backdrop = document.getElementById('details-backdrop');
