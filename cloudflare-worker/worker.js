@@ -25,6 +25,34 @@
  * URL: https://iptv-config.eric-blanquer.workers.dev
  */
 
+const LICENSE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function generateLicenseCode() {
+  const buf = new Uint8Array(6);
+  crypto.getRandomValues(buf);
+  let out = '';
+  for (let i = 0; i < buf.length; i++) {
+    out += LICENSE_CHARS.charAt(buf[i] % LICENSE_CHARS.length);
+  }
+  return out;
+}
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) {
+    return false;
+  }
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+function checkAdmin(provided, expected) {
+  if (!expected || expected === '') return false;
+  return timingSafeEqual(String(provided || ''), expected);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -64,8 +92,31 @@ async function handleRequest(request, env, url, path, headers) {
       }
 
       if (request.method === 'PUT') {
-        const data = await request.text();
-        await env.CONFIGS.put(kvKey, data);
+        let body;
+        try {
+          body = await request.json();
+        }
+        catch (ex) {
+          return new Response('{"error":"invalid body"}', { status: 400, headers });
+        }
+        if (!body || typeof body !== 'object' || Array.isArray(body)) {
+          return new Response('{"error":"invalid body"}', { status: 400, headers });
+        }
+        delete body.licenseCode;
+        delete body.licensedAt;
+        delete body.payerEmail;
+        const existingRaw = await env.CONFIGS.get(kvKey);
+        let merged = {};
+        if (existingRaw) {
+          try { merged = JSON.parse(existingRaw) || {}; }
+          catch (ex) { merged = {}; }
+        }
+        for (const k in body) {
+          if (Object.prototype.hasOwnProperty.call(body, k)) {
+            merged[k] = body[k];
+          }
+        }
+        await env.CONFIGS.put(kvKey, JSON.stringify(merged));
         return new Response('{"ok":true}', { headers });
       }
 
@@ -74,11 +125,17 @@ async function handleRequest(request, env, url, path, headers) {
 
     // License validation
     if (path === '/license/validate' && request.method === 'POST') {
-      const body = await request.json();
+      let body;
+      try {
+        body = await request.json();
+      }
+      catch (ex) {
+        return new Response('{"valid":false,"error":"invalid_body"}', { headers });
+      }
       const licCode = (body.code || '').toUpperCase().trim();
       const licDeviceId = body.deviceId || '';
 
-      if (!licCode || licCode.length < 4) {
+      if (!licCode || licCode.length < 4 || !/^[A-Z0-9]+$/.test(licCode)) {
         return new Response('{"valid":false,"error":"invalid_code"}', { headers });
       }
 
@@ -111,8 +168,7 @@ async function handleRequest(request, env, url, path, headers) {
 
     // Device deletion (admin only)
     if (path === '/admin/device/delete' && request.method === 'POST') {
-      const adminSecret = request.headers.get('X-Admin-Secret');
-      if (!adminSecret || adminSecret !== env.ADMIN_SECRET) {
+      if (!checkAdmin(request.headers.get('X-Admin-Secret'), env.ADMIN_SECRET)) {
         return new Response('{"error":"unauthorized"}', { status: 401, headers });
       }
 
@@ -128,8 +184,7 @@ async function handleRequest(request, env, url, path, headers) {
 
     // License revocation (admin only)
     if (path === '/license/revoke' && request.method === 'POST') {
-      const adminSecret = request.headers.get('X-Admin-Secret');
-      if (!adminSecret || adminSecret !== env.ADMIN_SECRET) {
+      if (!checkAdmin(request.headers.get('X-Admin-Secret'), env.ADMIN_SECRET)) {
         return new Response('{"error":"unauthorized"}', { status: 401, headers });
       }
 
@@ -159,16 +214,11 @@ async function handleRequest(request, env, url, path, headers) {
 
     // License generation (admin only)
     if (path === '/license/generate' && request.method === 'POST') {
-      const adminSecret = request.headers.get('X-Admin-Secret');
-      if (!adminSecret || adminSecret !== env.ADMIN_SECRET) {
+      if (!checkAdmin(request.headers.get('X-Admin-Secret'), env.ADMIN_SECRET)) {
         return new Response('{"error":"unauthorized"}', { status: 401, headers });
       }
 
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let genCode = '';
-      for (let i = 0; i < 6; i++) {
-        genCode += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+      const genCode = generateLicenseCode();
 
       await env.CONFIGS.put('license:' + genCode, JSON.stringify({
         code: genCode,
@@ -182,8 +232,7 @@ async function handleRequest(request, env, url, path, headers) {
 
     // Admin: list all licenses
     if (path === '/admin/licenses' && request.method === 'GET') {
-      const adminSecret = url.searchParams.get('secret');
-      if (!adminSecret || adminSecret !== env.ADMIN_SECRET) {
+      if (!checkAdmin(url.searchParams.get('secret'), env.ADMIN_SECRET)) {
         return new Response('{"error":"unauthorized"}', { status: 401, headers });
       }
 
@@ -202,8 +251,7 @@ async function handleRequest(request, env, url, path, headers) {
 
     // Admin: list all premium devices
     if (path === '/admin/devices' && request.method === 'GET') {
-      const adminSecret = url.searchParams.get('secret');
-      if (!adminSecret || adminSecret !== env.ADMIN_SECRET) {
+      if (!checkAdmin(url.searchParams.get('secret'), env.ADMIN_SECRET)) {
         return new Response('{"error":"unauthorized"}', { status: 401, headers });
       }
 
@@ -253,11 +301,7 @@ async function handleRequest(request, env, url, path, headers) {
       }
 
       // Generate license code
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let ipnCode = '';
-      for (let i = 0; i < 6; i++) {
-        ipnCode += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+      const ipnCode = generateLicenseCode();
 
       // Store license
       await env.CONFIGS.put('license:' + ipnCode, JSON.stringify({

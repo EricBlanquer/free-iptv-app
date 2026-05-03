@@ -638,6 +638,8 @@ IPTVApp.prototype.prepareDetailsFromHistory = function() {
                         self.renderEpisodes(data.episodes[self.currentSeason]);
                     }
                     self.updateSeriesContinueButton(data);
+                }).catch(function(err) {
+                    window.log('ERROR', 'prepareDetailsFromHistory.getSeriesInfo: ' + (err && err.message ? err.message : err));
                 });
             }
         }
@@ -1579,11 +1581,12 @@ IPTVApp.prototype.saveTitleOverride = function(streamId, title) {
     }
     catch (ex) { /* ignore */ }
     var newSortKey = this._computeSortKey(title, true);
+    var streamIdStr = String(streamId);
     var updateStream = function(arr) {
         if (!arr) return;
         for (var i = 0; i < arr.length; i++) {
             var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
-            if (sid == streamId) {
+            if (sid != null && String(sid) === streamIdStr) {
                 arr[i]._sortKey = newSortKey;
             }
         }
@@ -1606,11 +1609,12 @@ IPTVApp.prototype.removeTitleOverride = function(streamId) {
     catch (ex) { /* ignore */ }
     var rawSortKey = null;
     var self = this;
+    var streamIdStr = String(streamId);
     var updateStream = function(arr) {
         if (!arr) return;
         for (var i = 0; i < arr.length; i++) {
             var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
-            if (sid == streamId) {
+            if (sid != null && String(sid) === streamIdStr) {
                 if (!rawSortKey) {
                     var raw = self.getStreamTitle(arr[i]);
                     var clean = self.cleanTitle(raw);
@@ -3997,6 +4001,7 @@ IPTVApp.prototype.startFreeboxDownload = function(url, filename, streamId, playl
         this._startVmDownload(url, filename, streamId, playlistId, poster, seriesId);
         return;
     }
+    var self = this;
     var proxyUrl = this.getStreamProxyUrl();
     if (proxyUrl) {
         url = proxyUrl.replace(/\/+$/, '') + '/?url=' + encodeURIComponent(url) + '&duid=' + encodeURIComponent(localStorage.getItem('deviceId') || '');
@@ -4147,12 +4152,14 @@ IPTVApp.prototype.retryErroredDownloads = function(downloads) {
             this._freeboxResumeRetries[dl.id] = retries + 1;
             var action = dl.status === 'error' ? 'retry' : 'resume';
             window.log('Freebox: ' + action + ' attempt ' + (retries + 1) + '/12 for id=' + dl.id + ' status=' + dl.status);
-            var apiCall = dl.status === 'error' ? FreeboxAPI.retryDownload(dl.id) : FreeboxAPI.resumeDownload(dl.id);
-            apiCall.then(function() {
-                window.log('Freebox: ' + action + ' sent for id=' + dl.id);
-            }).catch(function(err) {
-                window.log('Freebox: ' + action + ' API error: ' + err.message);
-            });
+            (function(currentDl, currentAction) {
+                var apiCall = currentDl.status === 'error' ? FreeboxAPI.retryDownload(currentDl.id) : FreeboxAPI.resumeDownload(currentDl.id);
+                apiCall.then(function() {
+                    window.log('Freebox: ' + currentAction + ' sent for id=' + currentDl.id);
+                }).catch(function(err) {
+                    window.log('Freebox: ' + currentAction + ' API error: ' + err.message);
+                });
+            })(dl, action);
         }
         else if (dl.status === 'downloading' && dlMap[dl.id]) {
             delete this._freeboxResumeRetries[dl.id];

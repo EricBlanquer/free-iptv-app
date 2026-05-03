@@ -1109,3 +1109,160 @@ describe('bug: container_extension lost between series buttons and playStream', 
         expect(url).toBe('http://srv/series/u/p/948118.mp4');
     });
 });
+
+describe('bug: startFreeboxDownload missing var self = this leaks state to window', () => {
+    // The fix declares `var self = this;` at the top of startFreeboxDownload before the
+    // FreeboxAPI.addDownload(...).then(function(result) { ... self._freeboxDownloadMap[result.id] = ... }).
+    // Without it, `self` resolves to `window.self` (which is `window`) and the maps end up on
+    // `window` instead of the IPTVApp instance — silent state corruption.
+    function buildAddDownload(callbackResult) {
+        return function(url, filename) {
+            return Promise.resolve(callbackResult);
+        };
+    }
+    function emulateStartFreeboxDownloadFixed(app, addDownloadFn, opts) {
+        var self = app;
+        return addDownloadFn(opts.url, opts.filename).then(function(result) {
+            if (!self._freeboxDownloadMap) self._freeboxDownloadMap = {};
+            self._freeboxDownloadMap[result.id] = opts.streamId;
+            if (!self._freeboxDownloadProviderMap) self._freeboxDownloadProviderMap = {};
+            self._freeboxDownloadProviderMap[result.id] = opts.playlistId;
+            if (opts.poster) {
+                if (!self._freeboxDownloadPosterMap) self._freeboxDownloadPosterMap = {};
+                self._freeboxDownloadPosterMap[result.id] = opts.poster;
+            }
+        });
+    }
+    function emulateStartFreeboxDownloadBuggy(app, addDownloadFn, opts) {
+        // Note: no `var self = this` — `self` resolves to global `self` (window in jsdom).
+        return addDownloadFn(opts.url, opts.filename).then(function(result) {
+            if (!self._freeboxDownloadMap) self._freeboxDownloadMap = {};
+            self._freeboxDownloadMap[result.id] = opts.streamId;
+        });
+    }
+    afterEach(() => {
+        try { delete global._freeboxDownloadMap; } catch (e) {}
+        try { delete global.self._freeboxDownloadMap; } catch (e) {}
+    });
+    it('writes the maps on the app instance after addDownload resolves', async () => {
+        var app = {};
+        await emulateStartFreeboxDownloadFixed(app, buildAddDownload({ id: 'fb_42' }), {
+            url: 'http://x', filename: 'a.mp4', streamId: 'sid_1', playlistId: 'pl_A', poster: 'p.jpg'
+        });
+        expect(app._freeboxDownloadMap).toEqual({ fb_42: 'sid_1' });
+        expect(app._freeboxDownloadProviderMap).toEqual({ fb_42: 'pl_A' });
+        expect(app._freeboxDownloadPosterMap).toEqual({ fb_42: 'p.jpg' });
+    });
+    it('baseline repro: without var self = this, the map ends up on global self (window) instead of app', async () => {
+        var app = {};
+        await emulateStartFreeboxDownloadBuggy(app, buildAddDownload({ id: 'fb_99' }), {
+            url: 'http://x', filename: 'a.mp4', streamId: 'sid_2', playlistId: 'pl_B'
+        });
+        // BUG: app stays untouched
+        expect(app._freeboxDownloadMap).toBeUndefined();
+        // BUG: global self.window has the leaked state
+        expect(global.self._freeboxDownloadMap).toEqual({ fb_99: 'sid_2' });
+    });
+});
+
+describe('bug: streamId loose == matches when sid undefined', () => {
+    // Original code in saveTitleOverride / removeTitleOverride compared streamId with `==`,
+    // so streams missing all id fields (sid === undefined) matched when streamId was undefined,
+    // mass-assigning the sortKey to every untyped stream.
+    function updateStreamFixed(arr, streamId, newSortKey) {
+        var streamIdStr = String(streamId);
+        for (var i = 0; i < arr.length; i++) {
+            var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
+            if (sid != null && String(sid) === streamIdStr) {
+                arr[i]._sortKey = newSortKey;
+            }
+        }
+    }
+    function updateStreamBuggy(arr, streamId, newSortKey) {
+        for (var i = 0; i < arr.length; i++) {
+            var sid = arr[i].stream_id || arr[i].vod_id || arr[i].series_id;
+            // eslint-disable-next-line eqeqeq
+            if (sid == streamId) {
+                arr[i]._sortKey = newSortKey;
+            }
+        }
+    }
+    it('fixed: does NOT update streams with no id when streamId is undefined', () => {
+        var arr = [{ name: 'a' }, { stream_id: 5, name: 'b' }];
+        updateStreamFixed(arr, undefined, 'X');
+        expect(arr[0]._sortKey).toBeUndefined();
+        expect(arr[1]._sortKey).toBeUndefined();
+    });
+    it('baseline repro: buggy version updates ALL streams with no id when streamId is undefined', () => {
+        var arr = [{ name: 'a' }, { stream_id: 5, name: 'b' }];
+        updateStreamBuggy(arr, undefined, 'X');
+        // BUG: undefined == undefined → arr[0] gets matched
+        expect(arr[0]._sortKey).toBe('X');
+        // arr[1] has stream_id 5, so 5 == undefined is false, untouched
+        expect(arr[1]._sortKey).toBeUndefined();
+    });
+    it('fixed: matches both numeric and string streamId variants (5 vs "5")', () => {
+        var arr = [{ stream_id: 5 }, { stream_id: '5' }];
+        updateStreamFixed(arr, '5', 'Y');
+        expect(arr[0]._sortKey).toBe('Y');
+        expect(arr[1]._sortKey).toBe('Y');
+    });
+});
+
+describe('bug: closure-loop in retryErroredDownloads logs wrong dl/action', () => {
+    // The original `apiCall.then(function(){ window.log('Freebox: ' + action + ' sent for id=' + dl.id); })`
+    // captures `dl` and `action` by reference (var, not let). When the loop has finished iterating,
+    // all closures see the LAST values, so logs always report the last-iterated download — not the actual one.
+    function runLoopBuggy(downloads, log) {
+        var promises = [];
+        for (var i = 0; i < downloads.length; i++) {
+            var dl = downloads[i];
+            var action = dl.status === 'error' ? 'retry' : 'resume';
+            promises.push(Promise.resolve().then(function() {
+                log('Freebox: ' + action + ' sent for id=' + dl.id);
+            }));
+        }
+        return Promise.all(promises);
+    }
+    function runLoopFixed(downloads, log) {
+        var promises = [];
+        for (var i = 0; i < downloads.length; i++) {
+            var dl = downloads[i];
+            var action = dl.status === 'error' ? 'retry' : 'resume';
+            promises.push((function(currentDl, currentAction) {
+                return Promise.resolve().then(function() {
+                    log('Freebox: ' + currentAction + ' sent for id=' + currentDl.id);
+                });
+            })(dl, action));
+        }
+        return Promise.all(promises);
+    }
+    it('baseline repro: buggy version reports the same id for every iteration', async () => {
+        var downloads = [
+            { id: 1, status: 'error' },
+            { id: 2, status: 'stopped' },
+            { id: 3, status: 'error' }
+        ];
+        var lines = [];
+        await runLoopBuggy(downloads, function(s) { lines.push(s); });
+        expect(lines).toEqual([
+            'Freebox: error sent for id=3'.replace('error', 'retry'),
+            'Freebox: error sent for id=3'.replace('error', 'retry'),
+            'Freebox: error sent for id=3'.replace('error', 'retry')
+        ]);
+    });
+    it('fixed: each closure carries its own dl and action via IIFE binding', async () => {
+        var downloads = [
+            { id: 1, status: 'error' },
+            { id: 2, status: 'stopped' },
+            { id: 3, status: 'error' }
+        ];
+        var lines = [];
+        await runLoopFixed(downloads, function(s) { lines.push(s); });
+        expect(lines).toEqual([
+            'Freebox: retry sent for id=1',
+            'Freebox: resume sent for id=2',
+            'Freebox: retry sent for id=3'
+        ]);
+    });
+});

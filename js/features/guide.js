@@ -95,7 +95,7 @@ IPTVApp.prototype.renderGuideGrid = function() {
         var ch = this.guideChannels[i];
         var epg = this.guideEpgData[ch.stream_id] || [];
         var chLogo = this.getChannelLogo(ch) || ch.stream_icon || '';
-        logosHtml += '<div class="guide-channel-logo" data-row="' + i + '" style="background-image:url(\'' + chLogo + '\')"></div>';
+        logosHtml += '<div class="guide-channel-logo" data-row="' + i + '" data-bg="' + escapeHtml(chLogo) + '"></div>';
         gridHtml += '<div class="guide-programs-row" data-row="' + i + '">';
         var mergedProgs = [];
         for (var j = 0; j < epg.length; j++) {
@@ -156,6 +156,11 @@ IPTVApp.prototype.renderGuideGrid = function() {
     }
     logosContainer.innerHTML = logosHtml;
     gridContainer.innerHTML = gridHtml;
+    var logoDivs = logosContainer.querySelectorAll('.guide-channel-logo');
+    for (var k = 0; k < logoDivs.length; k++) {
+        var bg = logoDivs[k].getAttribute('data-bg');
+        if (bg) logoDivs[k].style.backgroundImage = cssUrl(bg);
+    }
     var indicator = document.createElement('div');
     indicator.id = 'guide-time-indicator';
     var indicatorLabel = document.createElement('div');

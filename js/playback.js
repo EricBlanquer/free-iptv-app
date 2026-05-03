@@ -566,6 +566,17 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
                     else {
                         self.showStreamErrorModal(errCtx);
                     }
+                }).catch(function(err) {
+                    window.log('ERROR', 'getAccountInfo (initial path): ' + (err && err.message ? err.message : err));
+                    if (httpErrIsLive) {
+                        var liveMsg3 = I18n.t('player.streamUnavailable', 'Stream unavailable');
+                        if (error.status) liveMsg3 += ' (HTTP ' + error.status + ')';
+                        self.showToast(liveMsg3);
+                        setTimeout(function() { self.stopPlayback(); }, 100);
+                    }
+                    else {
+                        self.showStreamErrorModal(errCtx);
+                    }
                 });
             }
             else if (httpErrIsLive) {
@@ -729,6 +740,9 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
                 else {
                     probeThenShow();
                 }
+            }).catch(function(err) {
+                window.log('ERROR', 'getAccountInfo (probe path): ' + (err && err.message ? err.message : err));
+                probeThenShow();
             });
         }
         else {
@@ -3043,9 +3057,25 @@ IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
             item.dataset.end = end;
             item.dataset.isPast = isPast ? '1' : '0';
             var durationStr = self.formatDuration(duration * 60000);
-            item.innerHTML = '<div class="catchup-program-time">' + timeStr + '</div>' +
-                '<div class="catchup-program-title">' + title + (isLive ? ' <span style="color:#e50914;">●</span>' : '') + '</div>' +
-                '<div class="catchup-program-duration">' + durationStr + '</div>';
+            var timeDiv = document.createElement('div');
+            timeDiv.className = 'catchup-program-time';
+            timeDiv.textContent = timeStr;
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'catchup-program-title';
+            titleDiv.textContent = title;
+            if (isLive) {
+                titleDiv.appendChild(document.createTextNode(' '));
+                var liveDot = document.createElement('span');
+                liveDot.style.color = '#e50914';
+                liveDot.textContent = '●';
+                titleDiv.appendChild(liveDot);
+            }
+            var durationDiv = document.createElement('div');
+            durationDiv.className = 'catchup-program-duration';
+            durationDiv.textContent = durationStr;
+            item.appendChild(timeDiv);
+            item.appendChild(titleDiv);
+            item.appendChild(durationDiv);
             if (canDownload) {
                 var actionDiv = document.createElement('div');
                 actionDiv.className = 'catchup-program-action';
@@ -3072,7 +3102,11 @@ IPTVApp.prototype.loadCatchupPrograms = function(streamId, daysAgo) {
         self.updateCatchupFocus();
     }).catch(function(e) {
         self.setHidden(loading, true);
-        programsList.innerHTML = '<div style="color:#ff6b6b;padding:20px;">Error: ' + e + '</div>';
+        self.clearElement(programsList);
+        var errDiv = document.createElement('div');
+        errDiv.style.cssText = 'color:#ff6b6b;padding:20px;';
+        errDiv.textContent = 'Error: ' + (e && e.message ? e.message : e);
+        programsList.appendChild(errDiv);
     });
 };
 

@@ -386,3 +386,241 @@ describe('showButtonTooltip auto-dismiss after N shows', () => {
         expect(store.b).toBe('shown:1');
     });
 });
+
+describe('XSS: catchup modal program rendering must escape EPG title from provider', () => {
+    function buildCatchupItemFixed(title, isLive, timeStr, durationStr) {
+        var item = document.createElement('div');
+        item.className = 'catchup-program' + (isLive ? ' live' : '');
+        var timeDiv = document.createElement('div');
+        timeDiv.className = 'catchup-program-time';
+        timeDiv.textContent = timeStr;
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'catchup-program-title';
+        titleDiv.textContent = title;
+        if (isLive) {
+            titleDiv.appendChild(document.createTextNode(' '));
+            var dot = document.createElement('span');
+            dot.style.color = '#e50914';
+            dot.textContent = '●';
+            titleDiv.appendChild(dot);
+        }
+        var durDiv = document.createElement('div');
+        durDiv.className = 'catchup-program-duration';
+        durDiv.textContent = durationStr;
+        item.appendChild(timeDiv);
+        item.appendChild(titleDiv);
+        item.appendChild(durDiv);
+        return item;
+    }
+    function buggyHtmlString(title, isLive, timeStr, durationStr) {
+        return '<div class="catchup-program-time">' + timeStr + '</div>' +
+            '<div class="catchup-program-title">' + title + (isLive ? ' <span style="color:#e50914;">●</span>' : '') + '</div>' +
+            '<div class="catchup-program-duration">' + durationStr + '</div>';
+    }
+    it('fixed: HTML payload in title becomes inert text', () => {
+        var payload = '<img src=x onerror="window.__pwned=1">';
+        delete window.__pwned;
+        var node = buildCatchupItemFixed(payload, false, '12:00', '1h');
+        document.body.appendChild(node);
+        expect(node.querySelector('img')).toBeNull();
+        expect(node.querySelector('.catchup-program-title').textContent).toBe(payload);
+        expect(window.__pwned).toBeUndefined();
+        node.remove();
+    });
+    it('baseline repro: buggy concatenated string contains unescaped payload', () => {
+        var payload = '<img src=x onerror="ignored">';
+        var html = buggyHtmlString(payload, false, '12:00', '1h');
+        // Documents that the original code would inject the payload verbatim into innerHTML
+        expect(html).toContain('<img src=x onerror=');
+    });
+    it('fixed: live indicator dot is appended without parsing title as HTML', () => {
+        var payload = '</div><div class="evil">x</div>';
+        var node = buildCatchupItemFixed(payload, true, '12:00', '1h');
+        var titleDiv = node.querySelector('.catchup-program-title');
+        expect(titleDiv.textContent).toBe(payload + ' ●');
+        expect(titleDiv.querySelectorAll('div').length).toBe(0);
+        expect(titleDiv.querySelectorAll('span').length).toBe(1);
+    });
+});
+
+describe('XSS: catchup error path renders error text safely', () => {
+    function buildCatchupErrorFixed(programsList, e) {
+        while (programsList.firstChild) {
+            programsList.removeChild(programsList.firstChild);
+        }
+        var div = document.createElement('div');
+        div.style.cssText = 'color:#ff6b6b;padding:20px;';
+        div.textContent = 'Error: ' + (e && e.message ? e.message : e);
+        programsList.appendChild(div);
+    }
+    it('payload in error message is escaped', () => {
+        var err = new Error('<script>window.__x=1</script>');
+        delete window.__x;
+        var list = document.createElement('div');
+        document.body.appendChild(list);
+        buildCatchupErrorFixed(list, err);
+        expect(list.querySelector('script')).toBeNull();
+        expect(list.firstChild.textContent).toContain('<script>window.__x=1</script>');
+        expect(window.__x).toBeUndefined();
+        list.remove();
+    });
+});
+
+describe('XSS: guide channel logo URL must not break out of CSS url()', () => {
+    function cssUrl(url) {
+        if (!url) return '';
+        return 'url("' + url.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '")';
+    }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function renderLogoFixed(channel) {
+        var div = document.createElement('div');
+        div.className = 'guide-channel-logo';
+        div.setAttribute('data-bg', channel.logo);
+        var bg = div.getAttribute('data-bg');
+        if (bg) div.style.backgroundImage = cssUrl(bg);
+        return div;
+    }
+    function buggyHtmlString(channel) {
+        return '<div class="guide-channel-logo" style="background-image:url(\'' + channel.logo + '\')"></div>';
+    }
+    it('fixed: malicious quote in logo URL cannot inject extra attributes', () => {
+        var div = renderLogoFixed({ logo: "x') onerror='alert(1)" });
+        // Critical security expectation: the malicious onerror attribute is NOT injected on the div
+        expect(div.getAttribute('onerror')).toBeNull();
+        // The data-bg attribute holds the literal value (URL parser will reject; that's the safe path)
+        expect(div.getAttribute('data-bg')).toBe("x') onerror='alert(1)");
+    });
+    it('fixed: escapeHtml escapes single-quote in data-bg attribute', () => {
+        var s = escapeHtml("x') onerror='alert(1)");
+        expect(s).not.toContain("'");
+        expect(s).toContain('&#39;');
+    });
+    it('baseline repro: buggy template string concatenates the unescaped quote', () => {
+        var html = buggyHtmlString({ logo: "x') onerror='document.body.dataset.pwn=1" });
+        expect(html).toContain("') onerror='");
+    });
+});
+
+describe('Server-side: premium PUT must merge and strip licenseCode/licensedAt', () => {
+    function premiumPutHandler(existing, body) {
+        if (!body || typeof body !== 'object' || Array.isArray(body)) {
+            return { error: 'invalid body' };
+        }
+        delete body.licenseCode;
+        delete body.licensedAt;
+        delete body.payerEmail;
+        var merged = Object.assign({}, existing || {});
+        for (var k in body) {
+            if (Object.prototype.hasOwnProperty.call(body, k)) {
+                merged[k] = body[k];
+            }
+        }
+        return merged;
+    }
+    it('strips client-supplied licenseCode (free premium attack)', () => {
+        var existing = { installDate: 1000 };
+        var attackerBody = { installDate: 2000, licenseCode: 'FAKEABC', licensedAt: 99999 };
+        var result = premiumPutHandler(existing, attackerBody);
+        expect(result.licenseCode).toBeUndefined();
+        expect(result.licensedAt).toBeUndefined();
+        expect(result.installDate).toBe(2000);
+    });
+    it('preserves existing server-set licenseCode when client sends empty', () => {
+        var existing = { licenseCode: 'REAL01', licensedAt: 1234, installDate: 1000 };
+        var clientBody = { installDate: 2000, licenseCode: '' };
+        var result = premiumPutHandler(existing, clientBody);
+        expect(result.licenseCode).toBe('REAL01');
+        expect(result.licensedAt).toBe(1234);
+        expect(result.installDate).toBe(2000);
+    });
+    it('rejects non-object body', () => {
+        expect(premiumPutHandler({}, null).error).toBe('invalid body');
+        expect(premiumPutHandler({}, []).error).toBe('invalid body');
+        expect(premiumPutHandler({}, 'string').error).toBe('invalid body');
+    });
+    it('strips payerEmail to prevent client poisoning admin filters', () => {
+        var existing = {};
+        var body = { payerEmail: 'attacker@example.com' };
+        var result = premiumPutHandler(existing, body);
+        expect(result.payerEmail).toBeUndefined();
+    });
+});
+
+describe('Server-side: license code generator uses CSPRNG (not Math.random)', () => {
+    function generateLicenseCode() {
+        var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        var buf = new Uint8Array(6);
+        if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+            crypto.getRandomValues(buf);
+        }
+        else {
+            for (var k = 0; k < 6; k++) buf[k] = Math.floor(Math.random() * 256);
+        }
+        var out = '';
+        for (var i = 0; i < buf.length; i++) {
+            out += chars.charAt(buf[i] % chars.length);
+        }
+        return out;
+    }
+    it('produces 6 chars from the safe alphabet', () => {
+        for (var i = 0; i < 50; i++) {
+            var code = generateLicenseCode();
+            expect(code.length).toBe(6);
+            expect(/^[A-HJ-NP-Z2-9]+$/.test(code)).toBe(true);
+        }
+    });
+    it('crypto.getRandomValues is available in test env (Node 18+ jsdom)', () => {
+        expect(typeof crypto).toBe('object');
+        expect(typeof crypto.getRandomValues).toBe('function');
+    });
+});
+
+describe('Server-side: license-validate must reject non-alphanumeric license codes', () => {
+    function validateInput(code) {
+        if (!code || code.length < 4 || !/^[A-Z0-9]+$/.test(code)) {
+            return { valid: false, error: 'invalid_code' };
+        }
+        return { valid: true };
+    }
+    it('rejects empty code', () => {
+        expect(validateInput('').error).toBe('invalid_code');
+    });
+    it('rejects too short code', () => {
+        expect(validateInput('ABC').error).toBe('invalid_code');
+    });
+    it('rejects code with special chars (path traversal attempt)', () => {
+        expect(validateInput('../etc').error).toBe('invalid_code');
+        expect(validateInput('AB CD').error).toBe('invalid_code');
+        expect(validateInput('AB:CD').error).toBe('invalid_code');
+    });
+    it('accepts valid 6-char uppercase alphanumeric', () => {
+        expect(validateInput('AB23DE').valid).toBe(true);
+    });
+    it('rejects lowercase (must be uppercased before)', () => {
+        expect(validateInput('abc123').error).toBe('invalid_code');
+    });
+});
+
+describe('Server-side: log.php newline injection prevention', () => {
+    function logSanitize(s, maxLen) {
+        if (typeof s !== 'string') s = String(s);
+        s = s.replace(/[\r\n\0]/g, ' ');
+        if (s.length > maxLen) s = s.slice(0, maxLen);
+        return s;
+    }
+    it('strips newlines from device id (log injection)', () => {
+        var dirty = 'Device1\n[FAKE TIMESTAMP] [evil_user] Forged log line';
+        var clean = logSanitize(dirty, 80);
+        expect(clean).not.toContain('\n');
+    });
+    it('strips carriage returns and null bytes', () => {
+        expect(logSanitize('a\rb\nc\0d', 80)).toBe('a b c d');
+    });
+    it('truncates over-long input', () => {
+        var s = 'x'.repeat(200);
+        expect(logSanitize(s, 50).length).toBe(50);
+    });
+});

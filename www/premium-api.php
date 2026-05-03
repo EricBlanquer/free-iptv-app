@@ -10,7 +10,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 define('DATA_DIR', __DIR__ . '/premium-data');
-define('ADMIN_SECRET', '***REMOVED-LEAKED-SECRET***');
+
+function loadAdminSecret() {
+    $env = getenv('ADMIN_SECRET');
+    if ($env !== false && $env !== '') {
+        return $env;
+    }
+    $candidates = [
+        __DIR__ . '/../.admin_secret',
+        __DIR__ . '/.admin_secret',
+    ];
+    foreach ($candidates as $path) {
+        if (is_file($path) && is_readable($path)) {
+            $value = trim(@file_get_contents($path));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+    }
+    return '';
+}
+define('ADMIN_SECRET', loadAdminSecret());
 
 if (!is_dir(DATA_DIR)) {
     mkdir(DATA_DIR, 0755, true);
@@ -100,34 +120,48 @@ switch ($action) {
         if (strlen($deviceId) < 2) {
             jsonResponse(['error' => 'invalid deviceId'], 400);
         }
+        if (!rateLimitCheck('put_' . getClientIp(), 30)) {
+            jsonResponse(['error' => 'rate_limit'], 429);
+        }
         $body = json_decode(file_get_contents('php://input'), true);
-        if (!$body) {
+        if (!is_array($body)) {
             jsonResponse(['error' => 'invalid body'], 400);
+        }
+        unset($body['licenseCode'], $body['licensedAt'], $body['payerEmail'], $body['comment']);
+        $existing = readJson('device_' . safeFilename($deviceId));
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+        foreach ($body as $k => $v) {
+            $existing[$k] = $v;
         }
         $ip = getClientIp();
         if ($ip) {
-            $body['lastIp'] = $ip;
+            $existing['lastIp'] = $ip;
             $geo = getGeoLocation($ip);
             if ($geo) {
-                $body['location'] = $geo['location'];
-                $body['isp'] = $geo['isp'];
+                $existing['location'] = $geo['location'];
+                $existing['isp'] = $geo['isp'];
             }
         }
-        $body['lastSeen'] = round(microtime(true) * 1000);
+        $existing['lastSeen'] = round(microtime(true) * 1000);
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-            $body['lastUserAgent'] = mb_substr($_SERVER['HTTP_USER_AGENT'], 0, 500);
+            $existing['lastUserAgent'] = mb_substr($_SERVER['HTTP_USER_AGENT'], 0, 500);
         }
-        writeJson('device_' . safeFilename($deviceId), $body);
+        writeJson('device_' . safeFilename($deviceId), $existing);
         jsonResponse(['ok' => true]);
         break;
 
     case 'license-validate':
         requirePost();
+        if (!rateLimitCheck('validate_' . getClientIp(), 10)) {
+            jsonResponse(['valid' => false, 'error' => 'rate_limit'], 429);
+        }
         $body = json_decode(file_get_contents('php://input'), true);
         $code = strtoupper(trim(isset($body['code']) ? $body['code'] : ''));
         $deviceId = isset($body['deviceId']) ? $body['deviceId'] : '';
 
-        if (strlen($code) < 4) {
+        if (strlen($code) < 4 || !preg_match('/^[A-Z0-9]+$/', $code)) {
             jsonResponse(['valid' => false, 'error' => 'invalid_code']);
         }
 
@@ -425,7 +459,7 @@ function requireAdmin() {
     if (isset($_SERVER['HTTP_X_ADMIN_SECRET'])) {
         $secret = $_SERVER['HTTP_X_ADMIN_SECRET'];
     }
-    if ($secret !== ADMIN_SECRET) {
+    if (ADMIN_SECRET === '' || !hash_equals(ADMIN_SECRET, $secret)) {
         jsonResponse(['error' => 'unauthorized'], 401);
     }
 }
