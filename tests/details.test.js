@@ -941,3 +941,171 @@ describe('bug: displayTMDBDetails respects _manualTitleOverride', () => {
         expect(shouldOverwriteTitleFromTMDB(true, 'I Origins')).toBe(false);
     });
 });
+
+describe('bug: container_extension lost between series buttons and playStream', () => {
+    // These mirror the implementations in js/details.js. Keep in sync.
+    function findFirstEpisode(seriesData) {
+        if (!seriesData.episodes) return null;
+        var seasons = Object.keys(seriesData.episodes).sort(function(a, b) {
+            return parseInt(a) - parseInt(b);
+        });
+        if (seasons.length === 0) return null;
+        var firstSeason = seasons[0];
+        var episodes = seriesData.episodes[firstSeason];
+        if (!episodes || episodes.length === 0) return null;
+        var firstEp = episodes.reduce(function(min, ep) {
+            return parseInt(ep.episode_num) < parseInt(min.episode_num) ? ep : min;
+        }, episodes[0]);
+        return {
+            id: firstEp.id,
+            season: parseInt(firstSeason),
+            episode: parseInt(firstEp.episode_num),
+            containerExtension: firstEp.container_extension || null
+        };
+    }
+
+    function analyzeSeriesProgress(seriesData, lastSeason, lastEpisode) {
+        var result = { newCount: 0, nextEpisode: null };
+        if (!seriesData.episodes) return result;
+        var candidates = [];
+        var seasonKeys = Object.keys(seriesData.episodes);
+        for (var si = 0; si < seasonKeys.length; si++) {
+            var seasonNum = seasonKeys[si];
+            var sNum = parseInt(seasonNum);
+            var episodes = seriesData.episodes[seasonNum];
+            for (var ei = 0; ei < episodes.length; ei++) {
+                var ep = episodes[ei];
+                var eNum = parseInt(ep.episode_num);
+                if (sNum > lastSeason || (sNum === lastSeason && eNum > lastEpisode)) {
+                    result.newCount++;
+                    candidates.push({
+                        id: ep.id,
+                        season: sNum,
+                        episode: eNum,
+                        containerExtension: ep.container_extension || null
+                    });
+                }
+            }
+        }
+        if (candidates.length > 0) {
+            candidates.sort(function(a, b) {
+                if (a.season !== b.season) return a.season - b.season;
+                return a.episode - b.episode;
+            });
+            result.nextEpisode = candidates[0];
+        }
+        return result;
+    }
+
+    function buildPlayStreamFromContinueEpisode(selectedStream, ep) {
+        return {
+            stream_id: ep.id,
+            series_id: selectedStream.seriesId,
+            name: selectedStream.data.name,
+            cover: selectedStream.data.cover || selectedStream.data.stream_icon,
+            season: ep.season,
+            episode: ep.episode,
+            container_extension: ep.containerExtension || null,
+            _playlistId: selectedStream._playlistId
+        };
+    }
+
+    function buildPlayStreamFromHistoryEpisode(selectedStream) {
+        var data = selectedStream.data;
+        return {
+            stream_id: data._episodeId,
+            series_id: selectedStream.seriesId,
+            name: data.name,
+            cover: data.cover || data.stream_icon,
+            season: data._season,
+            episode: data._episode,
+            container_extension: data.container_extension || null,
+            _playlistId: selectedStream._playlistId
+        };
+    }
+
+    var seriesData = {
+        episodes: {
+            '1': [
+                { id: 948118, episode_num: 1, container_extension: 'mp4' },
+                { id: 948119, episode_num: 2, container_extension: 'mkv' }
+            ],
+            '2': [
+                { id: 948200, episode_num: 1, container_extension: 'mp4' }
+            ]
+        }
+    };
+
+    it('findFirstEpisode propagates container_extension', () => {
+        var first = findFirstEpisode(seriesData);
+        expect(first.id).toBe(948118);
+        expect(first.containerExtension).toBe('mp4');
+    });
+
+    it('findFirstEpisode returns null containerExtension when episode lacks it', () => {
+        var bare = { episodes: { '1': [{ id: 1, episode_num: 1 }] } };
+        var first = findFirstEpisode(bare);
+        expect(first.containerExtension).toBeNull();
+    });
+
+    it('_analyzeSeriesProgress.nextEpisode propagates container_extension', () => {
+        var result = analyzeSeriesProgress(seriesData, 1, 1);
+        expect(result.nextEpisode.id).toBe(948119);
+        expect(result.nextEpisode.containerExtension).toBe('mkv');
+    });
+
+    it('playCurrentStream (seriesContinueEpisode path) preserves mp4 extension end-to-end', () => {
+        // Simulate the full chain: findFirstEpisode → seriesContinueEpisode → playStream
+        var firstEp = findFirstEpisode(seriesData);
+        var seriesContinueEpisode = {
+            id: firstEp.id,
+            season: firstEp.season,
+            episode: firstEp.episode,
+            position: 0,
+            containerExtension: firstEp.containerExtension || null
+        };
+        var selectedStream = {
+            seriesId: 17350,
+            _playlistId: 'Pure IPTV',
+            data: { name: 'A Town Like Alice', cover: 'cover.jpg' }
+        };
+        var stream = buildPlayStreamFromContinueEpisode(selectedStream, seriesContinueEpisode);
+        // Bug repro: before fix, container_extension was undefined and playStream
+        // fell back to '.mkv' producing a wrong URL for .mp4 episodes.
+        expect(stream.container_extension).toBe('mp4');
+    });
+
+    it('playCurrentStream (history Continue path) preserves container_extension', () => {
+        var selectedStream = {
+            type: 'series',
+            seriesId: 17350,
+            _playlistId: 'Pure IPTV',
+            data: {
+                _episodeId: 948118,
+                _season: 1,
+                _episode: 1,
+                name: 'A Town Like Alice',
+                cover: 'cover.jpg',
+                container_extension: 'mp4'
+            }
+        };
+        var stream = buildPlayStreamFromHistoryEpisode(selectedStream);
+        expect(stream.container_extension).toBe('mp4');
+        expect(stream.stream_id).toBe(948118);
+    });
+
+    it('emulates playStream URL building: mp4 episode no longer falls back to mkv', () => {
+        // Mirrors playback.js: url = getSeriesStreamUrl(streamId, ext || 'mkv')
+        function getSeriesUrl(streamId, ext) {
+            return 'http://srv/series/u/p/' + streamId + '.' + (ext || 'mkv');
+        }
+        var firstEp = findFirstEpisode(seriesData);
+        var seriesContinueEpisode = { id: firstEp.id, containerExtension: firstEp.containerExtension };
+        var stream = {
+            stream_id: seriesContinueEpisode.id,
+            container_extension: seriesContinueEpisode.containerExtension || null
+        };
+        var url = getSeriesUrl(stream.stream_id, stream.container_extension);
+        expect(url).toBe('http://srv/series/u/p/948118.mp4');
+    });
+});

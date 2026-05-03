@@ -1262,7 +1262,8 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
             id: inProgressEpisode.id,
             season: inProgressSeason,
             episode: inProgressNum,
-            position: inProgressProgress.position
+            position: inProgressProgress.position,
+            containerExtension: inProgressEpisode.container_extension || null
         };
         this.setHidden(statusEl, true);
         return;
@@ -1290,7 +1291,8 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
                     id: nextEpisode.id,
                     season: nextEpisode.season,
                     episode: nextEpisode.episode,
-                    position: 0
+                    position: 0,
+                    containerExtension: nextEpisode.containerExtension || null
                 };
             }
             // Status: X new episode(s)
@@ -1312,7 +1314,7 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
                 var fe = firstEp.episode < 10 ? '0' + firstEp.episode : firstEp.episode;
                 playBtn.textContent = I18n.t('player.play', 'Play') + ' S' + fs + 'E' + fe;
                 this.setHidden(playBtn, false);
-                this.seriesContinueEpisode = { id: firstEp.id, season: firstEp.season, episode: firstEp.episode, position: 0 };
+                this.seriesContinueEpisode = { id: firstEp.id, season: firstEp.season, episode: firstEp.episode, position: 0, containerExtension: firstEp.containerExtension || null };
             }
             statusEl.textContent = I18n.t('series.lastWatched', 'Last watched:') + ' ' + lastEpLabel + ', ' + I18n.t('series.noNewEpisode', 'no new episode');
             this.setHidden(statusEl, false);
@@ -1331,7 +1333,8 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
             id: firstEpisode.id,
             season: firstEpisode.season,
             episode: firstEpisode.episode,
-            position: 0
+            position: 0,
+            containerExtension: firstEpisode.containerExtension || null
         };
     }
     else {
@@ -1355,7 +1358,7 @@ IPTVApp.prototype._analyzeSeriesProgress = function(seriesData, lastSeason, last
             var eNum = parseInt(ep.episode_num);
             if (sNum > lastSeason || (sNum === lastSeason && eNum > lastEpisode)) {
                 result.newCount++;
-                candidates.push({ id: ep.id, season: sNum, episode: eNum });
+                candidates.push({ id: ep.id, season: sNum, episode: eNum, containerExtension: ep.container_extension || null });
             }
         }
     }
@@ -1392,7 +1395,8 @@ IPTVApp.prototype.findFirstEpisode = function(seriesData) {
     return {
         id: firstEp.id,
         season: parseInt(firstSeason),
-        episode: parseInt(firstEp.episode_num)
+        episode: parseInt(firstEp.episode_num),
+        containerExtension: firstEp.container_extension || null
     };
 };
 
@@ -2531,6 +2535,7 @@ IPTVApp.prototype.playCurrentStream = function(continueFromPosition) {
                 cover: data.cover || data.stream_icon,
                 season: data._season,
                 episode: data._episode,
+                container_extension: data.container_extension || null,
                 _playlistId: historyPlaylistId
             };
             // If from different playlist, build direct URL
@@ -2562,6 +2567,7 @@ IPTVApp.prototype.playCurrentStream = function(continueFromPosition) {
                 cover: this.selectedStream.data.cover || this.selectedStream.data.stream_icon,
                 season: ep.season,
                 episode: ep.episode,
+                container_extension: ep.containerExtension || null,
                 _playlistId: historyPlaylistId
             };
             // If from different playlist, build direct URL
