@@ -95,7 +95,9 @@ describe('addDemoPlaylist uses local bundled file', () => {
 
 describe('autoConnect M3U error path triggers diagnostic for remote URLs only', () => {
     const appCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8');
-    const m3uCatchBlock = appCode.match(/playlist\.type === 'm3u'[\s\S]*?\}\)\;\s*\}/);
+    // The M3U error path lives in the onM3UError closure; match on that anchor
+    // (the previous regex grabbed the loadingTimeoutMs ternary by accident).
+    const m3uCatchBlock = appCode.match(/onM3UError\s*=\s*function\s*\(err\)\s*\{[\s\S]*?\n\s{8,}\};/);
 
     test('catch block calls NetworkDiagnostic.runAndShow', () => {
         expect(m3uCatchBlock).not.toBeNull();
@@ -108,12 +110,15 @@ describe('autoConnect M3U error path triggers diagnostic for remote URLs only', 
 });
 
 describe('playback.js distinguishes offline vs stream error for M3U', () => {
+    // v1.0.7 replaced the active checkInternet() probe with NetworkDiagnostic.isLikelyOffline()
+    // (navigator.onLine + tizen connection-type), and the post-error decision now happens
+    // in the probeThenShow fetch().catch — see commit 6ad6ada.
     const playbackCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'playback.js'), 'utf8');
-    const retryBlock = playbackCode.match(/All retries exhausted[\s\S]*?stopPlayback\(\)[\s\S]*?\}\s*;\s*this\.player\.onBufferProgress/);
+    const retryBlock = playbackCode.match(/All retries exhausted[\s\S]*?probeThenShow[\s\S]*?this\.player\.onBufferProgress/);
 
-    test('retry-exhausted path probes internet via NetworkDiagnostic.checkInternet', () => {
+    test('retry-exhausted path probes connectivity via NetworkDiagnostic.isLikelyOffline', () => {
         expect(retryBlock).not.toBeNull();
-        expect(retryBlock[0]).toContain('NetworkDiagnostic.checkInternet');
+        expect(retryBlock[0]).toContain('NetworkDiagnostic.isLikelyOffline');
         expect(retryBlock[0]).toContain('player.noInternet');
     });
 
@@ -122,9 +127,12 @@ describe('playback.js distinguishes offline vs stream error for M3U', () => {
         expect(retryBlock[0]).toContain('connectionLimit');
     });
 
-    test('provider errors do NOT trigger internet probe (only fallback for M3U)', () => {
-        const providerBranch = retryBlock[0].match(/if\s*\(apiToUse[\s\S]*?else if[\s\S]*?else/);
-        expect(providerBranch).not.toBeNull();
+    test('isLikelyOffline check sits inside the probeThenShow fetch().catch (only fires on probe failure)', () => {
+        // The current structure: fetch(url).then(success).catch(check isLikelyOffline)
+        // — the offline detection only runs when even the probe HTTP fetch couldn't reach the URL.
+        const probeBlock = playbackCode.match(/var probeThenShow\s*=\s*function[\s\S]*?\};\s*\n\s+if \(apiToUse/);
+        expect(probeBlock).not.toBeNull();
+        expect(probeBlock[0]).toMatch(/fetch\([^)]*\)\.then[\s\S]*\.catch\([\s\S]*isLikelyOffline/);
     });
 });
 

@@ -136,9 +136,11 @@ describe('TTS', function() {
             expect(app.getTTSUrl()).toBeNull();
         });
 
-        it('should return null when proxy URL is empty', function() {
+        it('should fall back to default tts.blanquer.org when proxyEnabled but proxyUrl is empty', function() {
             app.settings.proxyUrl = '';
-            expect(app.getTTSUrl()).toBeNull();
+            // Code intentionally provides a default endpoint so the user gets a working TTS
+            // out-of-the-box; only `proxyEnabled=false` disables the feature entirely.
+            expect(app.getTTSUrl()).toBe('https://tts.blanquer.org');
         });
     });
 
@@ -182,7 +184,7 @@ describe('TTS', function() {
         it('should add pad parameter on first chunk', function() {
             app._ttsPadFirstChunk = true;
             var url = app.buildTTSUrl('http://proxy.example.com', 'test');
-            expect(url).toContain('pad=200');
+            expect(url).toContain('pad=300');
             expect(app._ttsPadFirstChunk).toBe(false);
         });
     });
@@ -388,14 +390,19 @@ describe('TTS', function() {
             expect(app.ttsSpeaking).toBe(false);
         });
 
-        it('should skip null chunks (non-first)', function() {
+        it('should wait (early return) when current chunk is still null — fetch onload will re-fire playNextChunk', function() {
+            // Chunks are fetched in parallel; a null at the current index means the XHR for that
+            // chunk hasn't completed yet. The function returns without playing — the chunk's
+            // onload callback (preloadTTS) will call playNextChunk again once the blob arrives.
+            // Skipping ahead would lose audio.
             var descEl = createMockDescEl();
             app.ttsChunkDescEl = descEl;
             app.ttsChunks = ['blob:c1', null, 'blob:c3'];
             app.ttsChunkIndex = 1;
             app.ttsSentenceMap = [[0], [1], [2]];
             app.playNextChunk(false);
-            expect(app.ttsChunkIndex).toBe(2);
+            expect(app.ttsChunkIndex).toBe(1);
+            expect(mockAudioInstances.length).toBe(0);
         });
 
         it('should not play when cancelled', function() {

@@ -115,9 +115,18 @@ describe('i18n hardcoded text detection', function() {
                     var line = lines[i];
                     if (line.indexOf('showToast(') === -1) continue;
                     if (line.indexOf('showToast(I18n.t(') !== -1) continue;
+                    // Showing a pre-built i18n message via I18n.t() referenced anywhere on the line
+                    // (e.g. self.showToast('+' + n + ' ' + I18n.t('home.vod', section)))
+                    if (line.indexOf('I18n.t(') !== -1) continue;
                     if (line.indexOf('showToast(msg') !== -1) continue;
                     if (line.indexOf('showToast(text') !== -1) continue;
                     if (line.indexOf('showToast(error') !== -1) continue;
+                    // Local variables holding a message previously built via I18n.t
+                    if (line.indexOf('showToast(live') !== -1) continue;
+                    // Provider-supplied track/stream names (language codes, audio/subtitle labels)
+                    // are intentionally NOT translated — they come from stream metadata.
+                    if (line.indexOf('showToast(nextName') !== -1) continue;
+                    if (line.indexOf('showToast(next.') !== -1) continue;
                     var relFile = path.relative(path.join(__dirname, '..'), file);
                     violations.push(relFile + ':' + (i + 1) + ': ' + line.trim());
                 }

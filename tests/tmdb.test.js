@@ -55,19 +55,35 @@ describe('TMDB', function() {
     });
 
     describe('setApiKey / isEnabled', function() {
+        // setApiKey falls back to defaultApiKey (the bundled v3 key) when the user
+        // passes empty/null. To test the "disabled" path we have to also clear the
+        // bundled fallback. In production this fallback ensures TMDB works
+        // out-of-the-box without any user setup.
+        var savedDefault;
+        beforeEach(function() { savedDefault = TMDB.defaultApiKey; });
+        afterEach(function()  { TMDB.defaultApiKey = savedDefault; });
+
         it('should be enabled when API key is set', function() {
             TMDB.setApiKey('abc123');
             expect(TMDB.isEnabled()).toBe(true);
         });
 
-        it('should be disabled when API key is empty', function() {
+        it('should be disabled when API key is empty AND no default fallback', function() {
+            TMDB.defaultApiKey = '';
             TMDB.setApiKey('');
             expect(TMDB.isEnabled()).toBe(false);
         });
 
-        it('should be disabled when API key is null', function() {
+        it('should be disabled when API key is null AND no default fallback', function() {
+            TMDB.defaultApiKey = '';
             TMDB.setApiKey(null);
             expect(TMDB.isEnabled()).toBe(false);
+        });
+
+        it('should still be enabled when key is empty if defaultApiKey is set (production safety net)', function() {
+            TMDB.defaultApiKey = 'b796d544bb4de0b1a89ffdfb01304b94';
+            TMDB.setApiKey('');
+            expect(TMDB.isEnabled()).toBe(true);
         });
     });
 
@@ -150,10 +166,15 @@ describe('TMDB', function() {
         });
 
         it('should return null when not enabled', function(done) {
+            // Both the explicit and default keys must be empty for isEnabled() to return false
+            // (production keeps a default fallback so TMDB works without user setup).
+            var savedDefault = TMDB.defaultApiKey;
+            TMDB.defaultApiKey = '';
             TMDB.setApiKey('');
             TMDB.searchMovie('Inception', 2010, function(result) {
                 expect(result).toBeNull();
                 expect(xhrInstances.length).toBe(0);
+                TMDB.defaultApiKey = savedDefault;
                 done();
             });
         });
@@ -184,75 +205,63 @@ describe('TMDB', function() {
             expect(xhrInstances[0].url).toContain('query=Inception');
         });
 
-        it('should route movie result to getMovieDetails', function(done) {
-            TMDB.searchMulti('Inception', function(result) {
-                expect(result).not.toBeNull();
-                expect(result.title).toBe('Inception');
+        // js/tmdb.js:527 reassigns TMDB.searchMulti to a simpler implementation that
+        // returns the filtered movie/tv results directly as an array (no automatic
+        // routing to getMovieDetails/getTVDetails). The original prototype-style
+        // searchMulti at line 135 is shadowed at runtime, so the tests reflect the
+        // active behavior.
+        it('should pass through movie result in the filtered array', function(done) {
+            TMDB.searchMulti('Inception', function(results) {
+                expect(Array.isArray(results)).toBe(true);
+                expect(results.length).toBe(1);
+                expect(results[0].title).toBe('Inception');
+                expect(results[0].media_type).toBe('movie');
                 done();
             });
 
             respondXHR(xhrInstances[0], {
                 results: [{ id: 27205, title: 'Inception', media_type: 'movie', release_date: '2010-07-16' }]
             });
-
-            tick().then(function() {
-                respondXHR(xhrInstances[1], {
-                    id: 27205, title: 'Inception', overview: 'desc',
-                    credits: { cast: [], crew: [] }, external_ids: {}
-                });
-            });
         });
 
-        it('should route tv result to getTVDetails', function(done) {
-            TMDB.searchMulti('Breaking Bad', function(result) {
-                expect(result).not.toBeNull();
-                expect(result.name).toBe('Breaking Bad');
+        it('should pass through tv result in the filtered array', function(done) {
+            TMDB.searchMulti('Breaking Bad', function(results) {
+                expect(Array.isArray(results)).toBe(true);
+                expect(results.length).toBe(1);
+                expect(results[0].name).toBe('Breaking Bad');
+                expect(results[0].media_type).toBe('tv');
                 done();
             });
 
             respondXHR(xhrInstances[0], {
                 results: [{ id: 1396, name: 'Breaking Bad', media_type: 'tv', first_air_date: '2008-01-20' }]
             });
-
-            tick().then(function() {
-                respondXHR(xhrInstances[1], {
-                    id: 1396, name: 'Breaking Bad', overview: 'A chemistry teacher...',
-                    credits: { cast: [], crew: [] }, external_ids: {}
-                });
-            });
         });
 
-        it('should return null for unknown media type', function(done) {
-            TMDB.searchMulti('Test', function(result) {
-                expect(result).toBeNull();
+        it('should filter out person and other non-movie/tv media types', function(done) {
+            TMDB.searchMulti('Test', function(results) {
+                expect(Array.isArray(results)).toBe(true);
+                expect(results.length).toBe(0);
                 done();
             });
 
             respondXHR(xhrInstances[0], {
-                results: [{ id: 1, name: 'Test', media_type: 'person' }]
+                results: [
+                    { id: 1, name: 'Test',  media_type: 'person' },
+                    { id: 2, name: 'Other', media_type: 'collection' }
+                ]
             });
         });
 
-        it('should try shorter title on no results', function(done) {
+        it('should return an empty array when the API returns no results', function(done) {
+            // The new searchMulti has no shorter-title retry — it simply forwards the
+            // (filtered) results array to the caller. Empty in → empty out.
             TMDB.searchMulti('Inception (2010) - Extended Cut', function(result) {
-                expect(result).not.toBeNull();
+                expect(Array.isArray(result)).toBe(true);
+                expect(result.length).toBe(0);
                 done();
             });
-
             respondXHR(xhrInstances[0], { results: [] });
-
-            tick().then(function() {
-                expect(xhrInstances[1].url).toContain('query=Inception');
-                respondXHR(xhrInstances[1], {
-                    results: [{ id: 27205, title: 'Inception', release_date: '2010-07-16' }]
-                });
-                return tick();
-            }).then(function() {
-                respondXHR(xhrInstances[2], {
-                    id: 27205, title: 'Inception', overview: 'desc',
-                    credits: { cast: [], crew: [] }, external_ids: {}
-                });
-            });
         });
     });
 
@@ -349,10 +358,13 @@ describe('TMDB', function() {
         });
 
         it('should return null when not enabled', function(done) {
+            var savedDefault = TMDB.defaultApiKey;
+            TMDB.defaultApiKey = '';
             TMDB.setApiKey('');
             TMDB.getSeasonDetails(1396, 1, function(result) {
                 expect(result).toBeNull();
                 expect(xhrInstances.length).toBe(0);
+                TMDB.defaultApiKey = savedDefault;
                 done();
             });
         });
@@ -481,7 +493,10 @@ describe('TMDB', function() {
     });
 
     describe('getCast', function() {
-        it('should return up to 8 cast members with photo URLs', function() {
+        // getCast intentionally returns the FULL cast list. Trimming (e.g. to 8 actors
+        // for the details page header strip) is the renderer's responsibility, not the
+        // API client's — actor browsing/search needs the full list.
+        it('should map all cast members with their photo URLs', function() {
             var data = {
                 credits: {
                     cast: [
@@ -496,13 +511,13 @@ describe('TMDB', function() {
             expect(result[1].photo).toBeNull();
         });
 
-        it('should limit to 8 cast members', function() {
+        it('should return ALL cast members (no slice — UI layer is responsible for trimming)', function() {
             var cast = [];
             for (var i = 0; i < 15; i++) {
                 cast.push({ id: i, name: 'Actor ' + i, character: 'Role ' + i, profile_path: null });
             }
             var result = TMDB.getCast({ credits: { cast: cast } });
-            expect(result.length).toBe(8);
+            expect(result.length).toBe(15);
         });
 
         it('should return empty array when no cast data', function() {
@@ -590,9 +605,12 @@ describe('TMDB', function() {
         });
 
         it('should return null when not enabled', function(done) {
+            var savedDefault = TMDB.defaultApiKey;
+            TMDB.defaultApiKey = '';
             TMDB.setApiKey('');
             TMDB.findByImdbId('tt1375666', function(result) {
                 expect(result).toBeNull();
+                TMDB.defaultApiKey = savedDefault;
                 done();
             });
         });

@@ -482,7 +482,8 @@ var TMDB = {
                 if (parsedData && parsedData.status_message && !(xhr.status >= 200 && xhr.status < 300)) {
                     window.log('TMDB', 'API error status=' + xhr.status + ' code=' + parsedData.status_code + ' msg="' + parsedData.status_message + '"');
                 }
-                callback(parsedData, xhr.status);
+                var resultForCallback = (xhr.status >= 200 && xhr.status < 300) ? parsedData : null;
+                callback(resultForCallback, xhr.status);
                 self._processQueue();
             }
         };
