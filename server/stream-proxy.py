@@ -230,11 +230,19 @@ def _cpu_watchdog():
             time.sleep(5)
 
 def _generate_silence_mp3(duration_ms: int) -> bytes:
-    """Generate silent MP3 frames matching Edge-TTS output format.
-    MPEG2 Layer3 48kbps 24000Hz mono: frame size = 288 bytes, duration = 24ms."""
-    SILENT_FRAME = b'\xff\xf3\x44\x00' + b'\x00' * 284
-    frames_needed = max(1, int(duration_ms / 24) + 1)
-    return SILENT_FRAME * frames_needed
+    """Generate REAL silent MP3 via ffmpeg+libmp3lame.
+    Synthetic frames with all-zero data after header are recognized as LAME
+    padding by MP3 decoders (Tizen AVPlay, ffmpeg, ...) and skipped, defeating
+    the purpose of the pad. ffmpeg-generated silence is decoded normally."""
+    duration_sec = max(0.024, duration_ms / 1000.0)
+    result = subprocess.run([
+        'ffmpeg', '-v', 'error',
+        '-f', 'lavfi', '-i', 'anullsrc=r=24000:cl=mono',
+        '-t', f'{duration_sec}',
+        '-c:a', 'libmp3lame', '-b:a', '48k',
+        '-f', 'mp3', '-'
+    ], capture_output=True, timeout=10)
+    return result.stdout
 
 TTS_CACHE_DIR = Path(tempfile.gettempdir()) / "tts_cache"
 TTS_CACHE_DIR.mkdir(exist_ok=True)

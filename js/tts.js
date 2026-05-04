@@ -17,7 +17,27 @@ IPTVApp.prototype.initTTS = function() {
     this.ttsSentenceMap = null;
     this.ttsOriginalText = null;
     this.ttsWarmedUp = false;
+    // Tizen 5 AVPlay cold-start: the first new Audio().play() of a session takes
+    // ~466ms to wake the decoder + speaker driver, eating the first word.
+    // The server's `pad=N` parameter prepends real ffmpeg-encoded silence to the
+    // first TTS chunk; AVPlay decodes it during cold-start and the actual voice
+    // arrives in a warm pipeline. (Note: the previous _generate_silence_mp3
+    // implementation prepended synthetic frames with all-zero data, which MP3
+    // decoders treat as LAME padding and skip — ineffective. Fixed server-side
+    // to use ffmpeg+libmp3lame on 2026-05-04.)
+    this._ttsAvPlayPadFirstChunk = true;
     window.log('TTS', 'Initialized (proxy=' + !!this.settings.proxyEnabled + ' url=' + (this.settings.proxyUrl || 'none') + ')');
+    var self = this;
+    setTimeout(function() { self._warmupAudioPipeline(); }, 0);
+};
+
+IPTVApp.prototype._warmupAudioPipeline = function() {
+    var self = this;
+    window.log('TTS', 'Audio pipeline warmup at app startup');
+    this._playAudioPrimer(function(ready) {
+        self.ttsWarmedUp = !!ready;
+        if (!ready) window.log('TTS', 'Startup warmup failed — first speak will fall back to on-demand primer');
+    });
 };
 
 IPTVApp.prototype.getTTSUrl = function() {
@@ -45,11 +65,115 @@ IPTVApp.prototype.buildTTSUrl = function(ttsUrl, text, lang, engine) {
     if (this.settings.ttsPitch) {
         url += '&pitch=' + encodeURIComponent((this.settings.ttsPitch >= 0 ? '+' : '') + this.settings.ttsPitch + 'Hz');
     }
-    if (this._ttsPadFirstChunk) {
-        url += '&pad=300';
-        this._ttsPadFirstChunk = false;
+    if (this._ttsAvPlayPadFirstChunk) {
+        url += '&pad=600';
+        this._ttsAvPlayPadFirstChunk = false;
+        window.log('TTS', 'pad=600 applied to first chunk URL');
     }
     return url;
+};
+
+IPTVApp.prototype._getOrCreateAudioContext = function() {
+    if (this._audioCtx) return this._audioCtx;
+    var Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    try {
+        this._audioCtx = new Ctor();
+    }
+    catch (ex) {
+        window.log('TTS', 'AudioContext create failed: ' + (ex && ex.message ? ex.message : ex));
+        return null;
+    }
+    return this._audioCtx;
+};
+
+IPTVApp.prototype._playAudioPrimer = function(onReady) {
+    var self = this;
+    if (this._audioPrimer) {
+        var existing = this._audioPrimer;
+        if (existing._primerSettled) {
+            if (onReady) onReady(existing._primerReady);
+        }
+        else if (onReady) {
+            var prev = existing._primerOnReady;
+            existing._primerOnReady = function(r) {
+                if (prev) prev(r);
+                onReady(r);
+            };
+        }
+        return;
+    }
+    // Web Audio API instead of HTMLAudioElement: Tizen Chromium 63 rejects
+    // synthetic WAV/MP3 blobs (MEDIA_ELEMENT_ERROR code=4 "no supported source"
+    // — Layer III side-info too lenient for its decoder). Web Audio takes raw
+    // PCM samples — no decode step — and is universally accepted.
+    var ctx = this._getOrCreateAudioContext();
+    var primer = { _primerSettled: false, _primerReady: false, _primerOnReady: onReady || null, _ctx: ctx };
+    var settle = function(reason, ready) {
+        if (primer._primerSettled) return;
+        primer._primerSettled = true;
+        primer._primerReady = !!ready;
+        window.log('TTS', 'Primer ' + (ready ? 'ready' : 'failed') + ' (' + reason + ')');
+        if (!ready && self._audioPrimer === primer) self._audioPrimer = null;
+        var cb = primer._primerOnReady;
+        primer._primerOnReady = null;
+        if (cb) cb(ready);
+    };
+    if (!ctx) {
+        setTimeout(function() { settle('no-audio-context', false); }, 0);
+        this._audioPrimer = primer;
+        return;
+    }
+    var startSource = function() {
+        try {
+            // 200ms silent buffer, looped = continuous silent samples until we stop.
+            // Samples are zero-filled (real PCM silence); a GainNode at 0 is added
+            // as defense-in-depth so any future non-zero buffer stays inaudible.
+            var sampleRate = ctx.sampleRate || 44100;
+            var buf = ctx.createBuffer(1, Math.floor(sampleRate * 0.2), sampleRate);
+            var src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.loop = true;
+            var gain = ctx.createGain();
+            gain.gain.value = 0;
+            src.connect(gain);
+            gain.connect(ctx.destination);
+            src.start();
+            primer._src = src;
+            primer._gain = gain;
+            settle('bufferSource started', true);
+        }
+        catch (ex) {
+            window.log('TTS', 'BufferSource start failed: ' + (ex && ex.message ? ex.message : ex));
+            settle('start exception', false);
+        }
+    };
+    if (ctx.state === 'suspended' && ctx.resume) {
+        ctx.resume().then(startSource).catch(function(err) {
+            window.log('TTS', 'AudioContext resume rejected: ' + (err && err.message ? err.message : err));
+            settle('resume rejected', false);
+        });
+    }
+    else {
+        startSource();
+    }
+    primer._safety = setTimeout(function() { settle('safety 600ms', false); }, 600);
+    this._audioPrimer = primer;
+};
+
+IPTVApp.prototype._stopAudioPrimer = function() {
+    if (!this._audioPrimer) return;
+    var primer = this._audioPrimer;
+    this._audioPrimer = null;
+    if (primer._safety) clearTimeout(primer._safety);
+    try {
+        if (primer._src) {
+            primer._src.stop();
+            primer._src.disconnect();
+        }
+        if (primer._gain) primer._gain.disconnect();
+    }
+    catch (ex) {}
 };
 
 IPTVApp.prototype.splitTTSSentences = function(text) {
@@ -246,10 +370,12 @@ IPTVApp.prototype.preloadTTS = function(text) {
 };
 
 IPTVApp.prototype._warmupAndSpeak = function(text, lang, engine) {
+    var self = this;
     this.ttsWarmedUp = true;
-    this._ttsPadFirstChunk = true;
-    window.log('TTS', 'First TTS: will pad first chunk with 1s silence');
-    this._doSpeakText(text, lang, engine);
+    window.log('TTS', 'First TTS: warming audio pipeline before fetch');
+    this._playAudioPrimer(function() {
+        self._doSpeakText(text, lang, engine);
+    });
 };
 
 IPTVApp.prototype.speakText = function(text, lang, engine) {
@@ -276,9 +402,8 @@ IPTVApp.prototype._doSpeakText = function(text, lang, engine) {
     var descEl = this.ttsTargetEl || document.getElementById('details-description');
     var ttsUrl = this.getTTSUrl();
     if (!ttsUrl) return false;
-    var needsPad = this._ttsPadFirstChunk;
-    window.log('TTS', 'Using ' + (engine || 'edge') + '-TTS: ' + ttsUrl + (needsPad ? ' (pad first chunk)' : ''));
-    if (!needsPad && this.ttsPreloadedUrl && this.ttsPreloadedText === text) {
+    window.log('TTS', 'Using ' + (engine || 'edge') + '-TTS: ' + ttsUrl);
+    if (this.ttsPreloadedUrl && this.ttsPreloadedText === text) {
         window.log('TTS', 'Using preloaded audio');
         var preloadedUrl = this.ttsPreloadedUrl;
         this.ttsPreloadedUrl = null;
@@ -287,7 +412,7 @@ IPTVApp.prototype._doSpeakText = function(text, lang, engine) {
         this.playTTSAudio(preloadedUrl, descEl, false);
         return true;
     }
-    if (!needsPad && this.ttsPreloadedChunks && this.ttsPreloadedChunksText === text) {
+    if (this.ttsPreloadedChunks && this.ttsPreloadedChunksText === text) {
         var allReady = this.ttsPreloadedChunks.length === this.ttsPreloadedChunksTotal;
         if (allReady) {
             for (var pi = 0; pi < this.ttsPreloadedChunks.length; pi++) {
@@ -409,6 +534,7 @@ IPTVApp.prototype.playNextChunk = function(isPreloaded) {
     this.ttsAudio = new Audio();
     this.ttsAudio.onplay = function() {
         self.ttsSpeaking = true;
+        self._stopAudioPrimer();
         if (descEl) descEl.classList.add('speaking');
     };
     this.ttsAudio.onended = function() {
@@ -462,6 +588,7 @@ IPTVApp.prototype.playTTSAudio = function(audioUrl, descEl, isPreloaded) {
     };
     this.ttsAudio.onplay = function() {
         self.ttsSpeaking = true;
+        self._stopAudioPrimer();
         if (descEl) descEl.classList.add('speaking');
     };
     this.ttsAudio.onended = function() {

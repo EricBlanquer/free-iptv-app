@@ -56,9 +56,43 @@ global.URL = {
     revokeObjectURL: jest.fn()
 };
 
-global.AudioContext = jest.fn(function() {
-    return { state: 'running', resume: jest.fn() };
-});
+var mockBufferSources = [];
+var mockGainNodes = [];
+var mockResumePromise = Promise.resolve();
+var mockAudioCtxState = 'running';
+function makeMockAudioContext(state) {
+    return {
+        state: state || mockAudioCtxState,
+        sampleRate: 44100,
+        destination: {},
+        resume: jest.fn(function() { return mockResumePromise; }),
+        createBuffer: jest.fn(function(channels, length, rate) {
+            return { numberOfChannels: channels, length: length, sampleRate: rate };
+        }),
+        createBufferSource: jest.fn(function() {
+            var src = {
+                buffer: null,
+                loop: false,
+                start: jest.fn(),
+                stop: jest.fn(),
+                connect: jest.fn(),
+                disconnect: jest.fn()
+            };
+            mockBufferSources.push(src);
+            return src;
+        }),
+        createGain: jest.fn(function() {
+            var gain = {
+                gain: { value: 1 },
+                connect: jest.fn(),
+                disconnect: jest.fn()
+            };
+            mockGainNodes.push(gain);
+            return gain;
+        })
+    };
+}
+global.AudioContext = jest.fn(function() { return makeMockAudioContext(); });
 
 var I18n = { getLocale: function() { return 'fr'; } };
 global.I18n = I18n;
@@ -103,7 +137,11 @@ describe('TTS', function() {
     beforeEach(function() {
         xhrInstances = [];
         mockAudioInstances = [];
+        mockBufferSources = [];
+        mockGainNodes = [];
         mockPlayPromise = Promise.resolve();
+        mockResumePromise = Promise.resolve();
+        mockAudioCtxState = 'running';
         URL.createObjectURL.mockClear();
         URL.revokeObjectURL.mockClear();
         app = new IPTVApp();
@@ -181,11 +219,19 @@ describe('TTS', function() {
             expect(url).toContain('rate=' + encodeURIComponent('-20%'));
         });
 
-        it('should add pad parameter on first chunk', function() {
-            app._ttsPadFirstChunk = true;
+        it('should add pad=600 on the first chunk and clear the flag', function() {
+            // Server now uses ffmpeg+libmp3lame to produce real silent MP3 frames
+            // (verified: pad=2000 increases ffprobe duration from 1.656s → 3.720s).
+            // 600ms covers the measured ~466ms AVPlay cold-start with margin.
+            app._ttsAvPlayPadFirstChunk = true;
             var url = app.buildTTSUrl('http://proxy.example.com', 'test');
-            expect(url).toContain('pad=300');
-            expect(app._ttsPadFirstChunk).toBe(false);
+            expect(url).toContain('pad=600');
+            expect(app._ttsAvPlayPadFirstChunk).toBe(false);
+        });
+        it('should NOT add pad on subsequent chunks (only the first per session)', function() {
+            app._ttsAvPlayPadFirstChunk = false;
+            var url = app.buildTTSUrl('http://proxy.example.com', 'test');
+            expect(url).not.toContain('pad=');
         });
     });
 
@@ -451,6 +497,203 @@ describe('TTS', function() {
             app.settings.proxyEnabled = false;
             var result = app._doSpeakText('Hello');
             expect(result).toBe(false);
+        });
+    });
+
+    describe('audio primer via Web Audio API', function() {
+        // The primer warms up the audio pipeline before the first TTS chunk plays
+        // so the AVPlay decoder + speaker driver wake-up doesn't eat the first word.
+        // We use Web Audio (AudioContext + BufferSource of silent PCM samples)
+        // because Tizen Chromium 63 rejects synthetic WAV/MP3 blobs with
+        // MEDIA_ELEMENT_ERROR code=4 "no supported source". Web Audio bypasses the
+        // media decoder entirely — raw samples are pushed straight to the destination.
+        describe('_getOrCreateAudioContext', function() {
+            it('creates an AudioContext lazily and caches it', function() {
+                AudioContext.mockClear();
+                app._audioCtx = null;
+                var ctx1 = app._getOrCreateAudioContext();
+                var ctx2 = app._getOrCreateAudioContext();
+                expect(ctx1).toBe(ctx2);
+                expect(AudioContext).toHaveBeenCalledTimes(1);
+            });
+            it('returns null when neither AudioContext nor webkitAudioContext is available', function() {
+                var savedCtor = global.AudioContext;
+                global.AudioContext = undefined;
+                window.AudioContext = undefined;
+                window.webkitAudioContext = undefined;
+                app._audioCtx = null;
+                expect(app._getOrCreateAudioContext()).toBeNull();
+                global.AudioContext = savedCtor;
+                window.AudioContext = savedCtor;
+            });
+        });
+
+        describe('_playAudioPrimer / _stopAudioPrimer', function() {
+            it('starts a looping silent BufferSource through a 0-gain GainNode', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                expect(mockBufferSources.length).toBe(1);
+                expect(mockGainNodes.length).toBe(1);
+                var src = mockBufferSources[0];
+                var gain = mockGainNodes[0];
+                expect(src.loop).toBe(true);
+                expect(src.buffer).not.toBeNull();
+                expect(src.start).toHaveBeenCalled();
+                expect(gain.gain.value).toBe(0);
+                // src → gain → destination
+                expect(src.connect).toHaveBeenCalledWith(gain);
+                expect(gain.connect).toHaveBeenCalled();
+                expect(app._audioPrimer).not.toBeNull();
+            });
+            it('settles ready=true synchronously after BufferSource.start()', function() {
+                app._audioCtx = null;
+                var firedReady = null;
+                app._playAudioPrimer(function(ready) { firedReady = ready; });
+                expect(firedReady).toBe(true);
+            });
+            it('does not start a second primer if one is already running', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                app._playAudioPrimer();
+                expect(mockBufferSources.length).toBe(1);
+            });
+            it('stops the BufferSource and disconnects nodes on stop', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                var src = mockBufferSources[0];
+                var gain = mockGainNodes[0];
+                app._stopAudioPrimer();
+                expect(src.stop).toHaveBeenCalled();
+                expect(src.disconnect).toHaveBeenCalled();
+                expect(gain.disconnect).toHaveBeenCalled();
+                expect(app._audioPrimer).toBeNull();
+            });
+            it('is idempotent when no primer is running', function() {
+                expect(function() { app._stopAudioPrimer(); }).not.toThrow();
+            });
+            it('settles ready=false when AudioContext is not available', function(done) {
+                var savedCtor = global.AudioContext;
+                global.AudioContext = undefined;
+                window.AudioContext = undefined;
+                window.webkitAudioContext = undefined;
+                app._audioCtx = null;
+                var firedReady = null;
+                app._playAudioPrimer(function(ready) { firedReady = ready; });
+                setTimeout(function() {
+                    expect(firedReady).toBe(false);
+                    global.AudioContext = savedCtor;
+                    window.AudioContext = savedCtor;
+                    done();
+                }, 5);
+            });
+        });
+
+        describe('_warmupAndSpeak (on-demand fallback before TTS chunk plays)', function() {
+            it('starts the primer and fires _doSpeakText synchronously when context is running', function() {
+                app.ttsTargetEl = createMockDescEl();
+                document.body.appendChild(app.ttsTargetEl);
+                app._warmupAndSpeak('Hello world.', 'en');
+                // Primer started, ready, and TTS XHR fired in the same tick
+                expect(app._audioPrimer).not.toBeNull();
+                expect(app.ttsWarmedUp).toBe(true);
+                expect(mockBufferSources.length).toBe(1);
+                expect(xhrInstances.length).toBe(1);
+                expect(xhrInstances[0].url).toContain('/tts?');
+                expect(xhrInstances[0].url).toContain('pad=600');
+            });
+            it('chains a second onReady callback while primer is still settling (suspended ctx)', function(done) {
+                mockAudioCtxState = 'suspended';
+                var resumeResolve;
+                mockResumePromise = new Promise(function(r) { resumeResolve = r; });
+                app._audioCtx = null;
+                var firstFired = false;
+                var secondFired = false;
+                app._playAudioPrimer(function() { firstFired = true; });
+                app._playAudioPrimer(function() { secondFired = true; });
+                expect(firstFired).toBe(false);
+                expect(secondFired).toBe(false);
+                resumeResolve();
+                setTimeout(function() {
+                    expect(firstFired).toBe(true);
+                    expect(secondFired).toBe(true);
+                    mockAudioCtxState = 'running';
+                    done();
+                }, 5);
+            });
+            it('fires onReady immediately if primer is already settled', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                var firedReady = null;
+                app._playAudioPrimer(function(r) { firedReady = r; });
+                expect(firedReady).toBe(true);
+                expect(mockBufferSources.length).toBe(1);
+            });
+        });
+
+        describe('_warmupAudioPipeline (proactive warmup at app startup)', function() {
+            it('sets ttsWarmedUp=true when BufferSource starts successfully', function() {
+                app.ttsWarmedUp = false;
+                app._audioCtx = null;
+                app._warmupAudioPipeline();
+                expect(app.ttsWarmedUp).toBe(true);
+                expect(mockBufferSources.length).toBe(1);
+                expect(mockBufferSources[0].start).toHaveBeenCalled();
+            });
+            it('keeps ttsWarmedUp=false when AudioContext is unavailable', function(done) {
+                var savedCtor = global.AudioContext;
+                global.AudioContext = undefined;
+                window.AudioContext = undefined;
+                window.webkitAudioContext = undefined;
+                app._audioCtx = null;
+                app.ttsWarmedUp = false;
+                app._warmupAudioPipeline();
+                setTimeout(function() {
+                    expect(app.ttsWarmedUp).toBe(false);
+                    global.AudioContext = savedCtor;
+                    window.AudioContext = savedCtor;
+                    done();
+                }, 5);
+            });
+        });
+
+        describe('primer is stopped when real TTS audio actually starts playing', function() {
+            it('playTTSAudio.onplay calls _stopAudioPrimer', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                expect(app._audioPrimer).not.toBeNull();
+                var descEl = createMockDescEl();
+                app.playTTSAudio('blob:tts-test', descEl, false);
+                var ttsAudio = mockAudioInstances[mockAudioInstances.length - 1];
+                ttsAudio.onplay();
+                expect(app._audioPrimer).toBeNull();
+            });
+            it('playNextChunk.onplay calls _stopAudioPrimer', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                expect(app._audioPrimer).not.toBeNull();
+                var descEl = createMockDescEl();
+                app.ttsChunkDescEl = descEl;
+                app.ttsChunks = ['blob:c1', 'blob:c2'];
+                app.ttsChunkIndex = 0;
+                app.ttsSentenceMap = [[0], [1]];
+                app.playNextChunk(false);
+                var chunkAudio = mockAudioInstances[mockAudioInstances.length - 1];
+                chunkAudio.onplay();
+                expect(app._audioPrimer).toBeNull();
+            });
+        });
+
+        describe('stopTTS does NOT kill the primer', function() {
+            // speakText calls stopTTS at its start; if stopTTS killed the primer
+            // we'd lose the startup warmup precisely when we need it.
+            it('keeps the primer alive across stopTTS calls', function() {
+                app._audioCtx = null;
+                app._playAudioPrimer();
+                var primer = app._audioPrimer;
+                expect(primer).not.toBeNull();
+                app.stopTTS();
+                expect(app._audioPrimer).toBe(primer);
+            });
         });
     });
 });
