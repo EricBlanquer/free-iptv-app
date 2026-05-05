@@ -180,7 +180,8 @@
     "sortName": "Name",
     "sortYear": "Jahr",
     "title": "Titel...",
-    "year": "Jahr..."
+    "year": "Jahr...",
+    "genre": "Genre"
   },
   "freebox": {
     "allAlreadyQueued": "Alle Episoden bereits in der Warteschlange oder werden heruntergeladen",
@@ -608,5 +609,11 @@
     "demoNo": "Nein, manuell einrichten",
     "demoTitle": "Willkommen bei Free IPTV",
     "demoYes": "Ja, Demo testen"
+  },
+  "genrePicker": {
+    "clear": "Löschen",
+    "sortPopularity": "Beliebtheit",
+    "sortRating": "Bewertung",
+    "sortDate": "Datum"
   }
 }

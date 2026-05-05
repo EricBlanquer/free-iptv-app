@@ -186,7 +186,8 @@
     "sortName": "الاسم",
     "sortYear": "السنة",
     "title": "...العنوان",
-    "year": "...السنة"
+    "year": "...السنة",
+    "genre": "النوع"
   },
   "freebox": {
     "allAlreadyQueued": "جميع الحلقات موجودة بالفعل في قائمة الانتظار أو قيد التحميل",
@@ -612,5 +613,11 @@
     "demoNo": "لا، إعداد يدوي",
     "demoTitle": "مرحباً بك في Free IPTV",
     "demoYes": "نعم، جرب العرض التوضيحي"
+  },
+  "genrePicker": {
+    "clear": "مسح",
+    "sortPopularity": "الشعبية",
+    "sortRating": "التقييم",
+    "sortDate": "التاريخ"
   }
 }

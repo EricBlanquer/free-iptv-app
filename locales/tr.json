@@ -182,7 +182,8 @@
     "sortName": "Ad",
     "sortYear": "Yıl",
     "title": "Başlık...",
-    "year": "Yıl..."
+    "year": "Yıl...",
+    "genre": "Tür"
   },
   "freebox": {
     "allAlreadyQueued": "Tüm bölümler zaten sırada veya indiriliyor",
@@ -610,5 +611,11 @@
     "demoNo": "Hayır, manuel yapılandır",
     "demoTitle": "Free IPTV'ye hoş geldiniz",
     "demoYes": "Evet, demoyu dene"
+  },
+  "genrePicker": {
+    "clear": "Temizle",
+    "sortPopularity": "Popülerlik",
+    "sortRating": "Puan",
+    "sortDate": "Tarih"
   }
 }

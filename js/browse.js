@@ -1658,11 +1658,14 @@ IPTVApp.prototype._isSortAsc = function(sort) {
 
 IPTVApp.prototype._updateSortButtons = function() {
     var self = this;
-    var group = this._sortToGroup(this.currentSort);
+    var genreActive = !!this.genreFilter;
+    var group = genreActive ? null : this._sortToGroup(this.currentSort);
     var asc = this._isSortAsc(this.currentSort);
     document.querySelectorAll('.sort-btn').forEach(function(btn) {
+        if (btn.id === 'genre-filter-btn') return;
         var btnGroup = btn.dataset.sortGroup;
         btn.classList.toggle('selected', btnGroup === group);
+        btn.classList.toggle('genre-disabled', genreActive);
         var arrow = btn.querySelector('.sort-arrow');
         if (arrow) {
             if (btnGroup === group) {
@@ -1688,14 +1691,27 @@ IPTVApp.prototype.resetFilters = function() {
     this.searchActor = '';
     this.ratingFilter = 0;
     this.actorSearchResults = null;
+    this.genreFilter = null;
+    this._genreFilteredStreams = null;
+    this._genreNextPage = 1;
+    this._genreTotalPages = null;
+    this._genreReachedEnd = false;
+    this._genreFetchInProgress = false;
+    this._genreSeenStreamIds = null;
+    this._genreMatchIndex = null;
     document.getElementById('search-title').value = '';
     document.getElementById('search-year').value = '';
     document.getElementById('search-actor').value = '';
     this._updateSortButtons();
     this.updateRatingStars(0);
+    this._updateGenreButton();
+    this._updateGenreButtonVisibility();
 };
 
 IPTVApp.prototype.applySortGroup = function(group) {
+    if (this.genreFilter) {
+        this.clearGenreFilter(true);
+    }
     var newSort;
     var currentGroup = this._sortToGroup(this.currentSort);
     if (currentGroup === group) {
@@ -1751,6 +1767,417 @@ IPTVApp.prototype.updateRatingStars = function(rating) {
     });
 };
 
+// Genre filter (TMDB discover)
+IPTVApp.prototype._getTMDBTypeForSection = function(section) {
+    if (section === 'vod') return 'movie';
+    if (section === 'series') return 'tv';
+    return null;
+};
+
+IPTVApp.prototype._normalizeTitleForGenre = function(s) {
+    if (!s) return '';
+    return s.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\([^)]*\)/g, ' ')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+IPTVApp.prototype._extractStreamYear = function(s) {
+    if (!s) return null;
+    if (s.year) {
+        var ny = parseInt(s.year, 10);
+        if (ny) return ny;
+    }
+    var rd = s.releaseDate || s.release_date;
+    if (rd) {
+        var ry = parseInt(String(rd).substring(0, 4), 10);
+        if (ry) return ry;
+    }
+    var name = s.name || '';
+    var m = name.match(/\((\d{4})\)/);
+    if (m) return parseInt(m[1], 10);
+    return null;
+};
+
+IPTVApp.prototype._buildTitleYearIndex = function(streams) {
+    var byTitleYear = {};
+    var byTitleOnly = {};
+    for (var i = 0; i < streams.length; i++) {
+        var s = streams[i];
+        // Use cleanTitle to strip category prefixes ("CA| ", "FR| ", "VF | ") and
+        // quality tags. Without this the provider title "CA| Hypnotic (2023)"
+        // never matches TMDB's "Hypnotic".
+        var rawTitle = (typeof this.getStreamTitle === 'function') ? this.getStreamTitle(s) : (s.name || '');
+        var cleaned = (typeof this.cleanTitle === 'function') ? this.cleanTitle(rawTitle) : rawTitle;
+        var t = this._normalizeTitleForGenre(cleaned || rawTitle);
+        if (!t) continue;
+        // Year must come from the RAW title — cleanTitle already stripped "(YYYY)".
+        var y = this._extractStreamYear(s);
+        if (!y) {
+            var ym = String(rawTitle).match(/\((\d{4})\)/);
+            if (ym) y = parseInt(ym[1], 10);
+        }
+        if (y) {
+            var keyTY = t + '|' + y;
+            if (!byTitleYear[keyTY]) byTitleYear[keyTY] = [];
+            byTitleYear[keyTY].push(s);
+        }
+        if (!byTitleOnly[t]) byTitleOnly[t] = [];
+        byTitleOnly[t].push(s);
+    }
+    return { byTitleYear: byTitleYear, byTitleOnly: byTitleOnly };
+};
+
+IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index) {
+    if (!tmdbResult || !index) return null;
+    var titles = [];
+    if (isMovie) {
+        if (tmdbResult.title) titles.push(tmdbResult.title);
+        if (tmdbResult.original_title && tmdbResult.original_title !== tmdbResult.title) {
+            titles.push(tmdbResult.original_title);
+        }
+    } else {
+        if (tmdbResult.name) titles.push(tmdbResult.name);
+        if (tmdbResult.original_name && tmdbResult.original_name !== tmdbResult.name) {
+            titles.push(tmdbResult.original_name);
+        }
+    }
+    var dateField = isMovie ? tmdbResult.release_date : tmdbResult.first_air_date;
+    var year = dateField ? parseInt(String(dateField).substring(0, 4), 10) : null;
+    for (var i = 0; i < titles.length; i++) {
+        var t = this._normalizeTitleForGenre(titles[i]);
+        if (!t) continue;
+        if (year) {
+            var hit = index.byTitleYear[t + '|' + year];
+            if (hit && hit.length) return hit[0];
+            hit = index.byTitleYear[t + '|' + (year - 1)] || index.byTitleYear[t + '|' + (year + 1)];
+            if (hit && hit.length) return hit[0];
+        }
+        var titleHit = index.byTitleOnly[t];
+        if (titleHit && titleHit.length) return titleHit[0];
+    }
+    return null;
+};
+
+IPTVApp.prototype._updateGenreButton = function() {
+    var btn = document.getElementById('genre-filter-btn');
+    if (!btn) return;
+    var label = document.getElementById('genre-filter-label');
+    var active = !!this.genreFilter;
+    btn.classList.toggle('selected', active);
+    if (label) {
+        label.textContent = active ? (' · ' + this.genreFilter.name) : '';
+    }
+};
+
+IPTVApp.prototype._updateGenreButtonVisibility = function() {
+    var btn = document.getElementById('genre-filter-btn');
+    if (!btn) return;
+    var supported = !!this._getTMDBTypeForSection(this.currentSection);
+    this.setHidden(btn, !supported);
+};
+
+IPTVApp.prototype._clearChildren = function(el) {
+    while (el && el.firstChild) el.removeChild(el.firstChild);
+};
+
+IPTVApp.prototype.openGenrePicker = function() {
+    var type = this._getTMDBTypeForSection(this.currentSection);
+    if (!type) return;
+    var modal = document.getElementById('genre-picker-modal');
+    var listEl = document.getElementById('genre-picker-list');
+    var loadingEl = document.getElementById('genre-picker-loading');
+    var clearBtn = document.getElementById('genre-picker-clear-btn');
+    if (!modal || !listEl) return;
+    this._clearChildren(listEl);
+    this.setHidden(loadingEl, false);
+    this.setHidden(clearBtn, !this.genreFilter);
+    this.setHidden(modal, false);
+    this._updateGenrePickerSortButtons();
+    this._previousFocusArea = this.focusArea;
+    this._previousFocusIndex = this.focusIndex;
+    this.focusArea = 'genre-picker';
+    this.focusIndex = 0;
+    var self = this;
+    TMDB.getGenresList(type, function(genres) {
+        self.setHidden(loadingEl, true);
+        self._clearChildren(listEl);
+        if (!genres || !genres.length) {
+            self.invalidateFocusables();
+            self.updateFocus();
+            return;
+        }
+        var activeId = self.genreFilter ? self.genreFilter.id : null;
+        for (var i = 0; i < genres.length; i++) {
+            var g = genres[i];
+            var item = document.createElement('button');
+            item.className = 'genre-picker-item focusable';
+            item.dataset.genreId = String(g.id);
+            item.dataset.genreName = g.name;
+            item.textContent = g.name;
+            if (activeId && String(activeId) === String(g.id)) {
+                item.classList.add('selected');
+            }
+            listEl.appendChild(item);
+        }
+        self.invalidateFocusables();
+        self.updateFocus();
+    });
+};
+
+IPTVApp.prototype.closeGenrePicker = function() {
+    var modal = document.getElementById('genre-picker-modal');
+    if (!modal) return;
+    this.setHidden(modal, true);
+    if (this._previousFocusArea) {
+        this.focusArea = this._previousFocusArea;
+        this.focusIndex = this._previousFocusIndex || 0;
+        this._previousFocusArea = null;
+        this._previousFocusIndex = null;
+    }
+    this.invalidateFocusables();
+    this.updateFocus();
+};
+
+IPTVApp.prototype._GENRE_PAGES_PER_BATCH = 3;
+IPTVApp.prototype._GENRE_MAX_PAGES = 50; // 1000 titles per genre — big genres (sci-fi, drama) need more depth when matching against a provider catalog
+IPTVApp.prototype._GENRE_PREFETCH_THRESHOLD = 10; // start fetch when ≤ N items left
+IPTVApp.prototype._GENRE_RATING_VOTE_MIN = 200;  // floor on TMDB vote_count when sorting by rating (filters out obscure 10/10)
+IPTVApp.prototype._GENRE_DATE_VOTE_MIN = 10;  // light floor when sorting by date (filters truly unknown films but stays permissive)
+
+IPTVApp.prototype._getGenrePickerSort = function() {
+    var s = this.settings && this.settings.genrePickerSort;
+    if (s && s.group) return { group: s.group, asc: !!s.asc };
+    return { group: 'popularity', asc: false };
+};
+
+IPTVApp.prototype._buildDiscoverOptions = function(type, sort) {
+    var dir = sort.asc ? 'asc' : 'desc';
+    var opts = {};
+    if (sort.group === 'rating') {
+        opts.sortBy = 'vote_average.' + dir;
+        opts.voteCountMin = this._GENRE_RATING_VOTE_MIN;
+    } else if (sort.group === 'date') {
+        var isTv = (type === 'tv' || type === 'series');
+        var dateField = isTv ? 'first_air_date' : 'primary_release_date';
+        opts.sortBy = dateField + '.' + dir;
+        // Filter out future releases — they pollute date.desc with announced-but-not-released titles.
+        opts.dateLte = { field: dateField, value: this._todayIso() };
+        // Light vote_count floor: keeps recent indie/festival films out without being as
+        // strict as the rating sort (which uses 200).
+        opts.voteCountMin = this._GENRE_DATE_VOTE_MIN;
+    } else {
+        opts.sortBy = 'popularity.' + dir;
+    }
+    return opts;
+};
+
+IPTVApp.prototype._todayIso = function() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+};
+
+IPTVApp.prototype._updateGenrePickerSortButtons = function() {
+    var sort = this._getGenrePickerSort();
+    document.querySelectorAll('.genre-sort-btn').forEach(function(btn) {
+        var btnGroup = btn.dataset.genreSortGroup;
+        var arrow = btn.querySelector('.sort-arrow');
+        var selected = (btnGroup === sort.group);
+        btn.classList.toggle('selected', selected);
+        if (arrow) {
+            if (selected) {
+                arrow.textContent = sort.asc ? '↑' : '↓';
+                arrow.style.display = '';
+            }
+            else {
+                arrow.textContent = '';
+                arrow.style.display = 'none';
+            }
+        }
+    });
+};
+
+IPTVApp.prototype.applyGenrePickerSort = function(group) {
+    var current = this._getGenrePickerSort();
+    var newSort;
+    if (current.group === group) {
+        newSort = { group: group, asc: !current.asc };
+    } else {
+        newSort = { group: group, asc: false };
+    }
+    if (typeof this.settings !== 'object') this.settings = {};
+    this.settings.genrePickerSort = newSort;
+    this.saveSettings();
+    this._updateGenrePickerSortButtons();
+    window.log('ACTION', 'applyGenrePickerSort group=' + newSort.group + ' asc=' + newSort.asc);
+    // Re-fetch from page 1 if a genre is currently active.
+    if (this.genreFilter) {
+        this.applyGenreFilter(this.genreFilter.id, this.genreFilter.name);
+    }
+};
+
+IPTVApp.prototype.applyGenreFilter = function(genreId, genreName) {
+    var type = this._getTMDBTypeForSection(this.currentSection);
+    if (!type || !genreId) return;
+    window.log('ACTION', 'applyGenreFilter id=' + genreId + ' name=' + genreName + ' type=' + type);
+    this.genreFilter = { id: genreId, name: genreName, type: type };
+    this._genreFilteredStreams = null;
+    this._genreNextPage = 1;
+    this._genreTotalPages = null;
+    this._genreReachedEnd = false;
+    this._genreFetchInProgress = false;
+    this._genreSeenStreamIds = {};
+    var streamsAtRequest = this.originalStreams || [];
+    this._genreMatchIndex = this._buildTitleYearIndex(streamsAtRequest);
+    window.log('GENRE', 'index built: ' + streamsAtRequest.length + ' streams, ' +
+        Object.keys(this._genreMatchIndex.byTitleYear).length + ' (title|year) keys, ' +
+        Object.keys(this._genreMatchIndex.byTitleOnly).length + ' title-only keys');
+    this.closeGenrePicker();
+    this._updateGenreButton();
+    this._updateSortButtons();
+    var requestId = (this._genreRequestId || 0) + 1;
+    this._genreRequestId = requestId;
+    var gridEl = document.getElementById('content-grid');
+    this._clearChildren(gridEl);
+    if (typeof this.showEmptyMessage === 'function') {
+        this.showEmptyMessage('content-grid', 'common.loading', 'Loading...');
+    }
+    var self = this;
+    this._fetchGenrePagesBatch(requestId, function(newStreams, isInitial) {
+        if (self._genreRequestId !== requestId) return;
+        if (!self.genreFilter || String(self.genreFilter.id) !== String(genreId)) return;
+        self._genreFilteredStreams = newStreams.slice();
+        window.log('GENRE', 'initial batch: ' + newStreams.length + ' matched streams for genre=' + genreName +
+            ' (totalPages=' + self._genreTotalPages + ')');
+        self.applyFilters();
+    }, true);
+};
+
+// Fetch the next batch of TMDB discover pages (3 at a time) and append matches to
+// the caller-provided callback. The first batch (isInitial=true) clears state and
+// resets the grid via applyFilters(); subsequent batches append to the existing
+// rendered grid via _appendGenreMatches().
+IPTVApp.prototype._fetchGenrePagesBatch = function(requestId, onComplete, isInitial) {
+    if (!this.genreFilter) return;
+    var startPage = this._genreNextPage || 1;
+    if (this._genreTotalPages && startPage > this._genreTotalPages) {
+        this._genreReachedEnd = true;
+        return;
+    }
+    if (startPage > this._GENRE_MAX_PAGES) {
+        this._genreReachedEnd = true;
+        return;
+    }
+    if (this._genreFetchInProgress) return;
+    this._genreFetchInProgress = true;
+    var self = this;
+    var type = this.genreFilter.type;
+    var genreId = this.genreFilter.id;
+    var pagesPerBatch = this._GENRE_PAGES_PER_BATCH;
+    var endPage = Math.min(startPage + pagesPerBatch - 1, this._GENRE_MAX_PAGES);
+    if (this._genreTotalPages) endPage = Math.min(endPage, this._genreTotalPages);
+    var fetched = 0;
+    var pagesRequested = endPage - startPage + 1;
+    var allMatches = [];
+    var seenIds = this._genreSeenStreamIds || {};
+    var sawEmptyPage = false;
+    var discoverOptions = this._buildDiscoverOptions(type, this._getGenrePickerSort());
+    var onPage = function(pageNum) {
+        return function(data) {
+            fetched++;
+            if (data) {
+                if (data.total_pages && !self._genreTotalPages) {
+                    self._genreTotalPages = data.total_pages;
+                }
+                if (data.results) {
+                    if (data.results.length === 0) sawEmptyPage = true;
+                    for (var i = 0; i < data.results.length; i++) {
+                        var match = self._matchTMDBToStream(data.results[i], type === 'movie', self._genreMatchIndex);
+                        if (!match) continue;
+                        var sid = match.stream_id || match.vod_id || match.series_id;
+                        var key = sid != null ? String(sid) : (match.name || '') + '|p' + pageNum + 'i' + i;
+                        if (seenIds[key]) continue;
+                        seenIds[key] = true;
+                        allMatches.push({ stream: match, order: pageNum * 1000 + i });
+                    }
+                }
+            }
+            if (fetched === pagesRequested) {
+                self._genreFetchInProgress = false;
+                if (self._genreRequestId !== requestId) return;
+                self._genreSeenStreamIds = seenIds;
+                self._genreNextPage = endPage + 1;
+                if (sawEmptyPage || (self._genreTotalPages && self._genreNextPage > self._genreTotalPages) || self._genreNextPage > self._GENRE_MAX_PAGES) {
+                    self._genreReachedEnd = true;
+                }
+                allMatches.sort(function(a, b) { return a.order - b.order; });
+                var streams = allMatches.map(function(m) { return m.stream; });
+                onComplete(streams, !!isInitial);
+            }
+        };
+    };
+    for (var p = startPage; p <= endPage; p++) {
+        TMDB.discover(type, genreId, p, onPage(p), discoverOptions);
+    }
+};
+
+// Hook called from loadMoreItems when the user is near the end of currentStreams.
+// Triggers a background fetch of the next pages and appends matches to the grid.
+IPTVApp.prototype._maybePrefetchGenrePages = function() {
+    if (!this.genreFilter) return;
+    if (this._genreReachedEnd || this._genreFetchInProgress) return;
+    var remaining = (this.currentStreams || []).length - (this.displayedCount || 0);
+    if (remaining > this._GENRE_PREFETCH_THRESHOLD) return;
+    var requestId = this._genreRequestId;
+    var self = this;
+    this._fetchGenrePagesBatch(requestId, function(newStreams) {
+        if (self._genreRequestId !== requestId) return;
+        if (!newStreams.length) {
+            window.log('GENRE', 'pagination: no new matches in batch (reachedEnd=' + self._genreReachedEnd + ')');
+            return;
+        }
+        self._appendGenreMatches(newStreams);
+    }, false);
+};
+
+// Append newly-fetched genre matches to _genreFilteredStreams + currentStreams
+// without re-rendering the existing grid (preserves scroll position and focus).
+IPTVApp.prototype._appendGenreMatches = function(newStreams) {
+    if (!newStreams || !newStreams.length) return;
+    this._genreFilteredStreams = (this._genreFilteredStreams || []).concat(newStreams);
+    this.currentStreams = (this.currentStreams || []).concat(newStreams);
+    this._streamLookup = null;
+    window.log('GENRE', 'pagination: +' + newStreams.length + ' streams (total=' +
+        this._genreFilteredStreams.length + ', nextPage=' + this._genreNextPage + ')');
+    this.updateGridSpacer();
+    this.invalidateFocusables();
+    this.loadMoreItems();
+};
+
+IPTVApp.prototype.clearGenreFilter = function(skipRender) {
+    if (!this.genreFilter) return;
+    window.log('ACTION', 'clearGenreFilter');
+    this.genreFilter = null;
+    this._genreFilteredStreams = null;
+    this._genreNextPage = 1;
+    this._genreTotalPages = null;
+    this._genreReachedEnd = false;
+    this._genreFetchInProgress = false;
+    this._genreSeenStreamIds = null;
+    this._genreMatchIndex = null;
+    this._genreRequestId = (this._genreRequestId || 0) + 1;
+    this._updateGenreButton();
+    this._updateSortButtons();
+    if (!skipRender) {
+        this.applyFilters();
+    }
+};
+
 IPTVApp.prototype.setViewMode = function(mode) {
     window.log('ACTION', 'setViewMode: ' + mode);
     // Use 'favorites_<section>' key when viewing favorites, otherwise use current section
@@ -1801,8 +2228,11 @@ IPTVApp.prototype.applyFilters = function() {
     var self = this;
     this._filterGeneration = (this._filterGeneration || 0) + 1;
     var generation = this._filterGeneration;
-    // Data is already filtered (SD/3D/SM) in IndexedDB cache, just apply search filters
-    var streams = this.originalStreams.slice();
+    // When genre filter is active, start from the TMDB-matched subset (popularity order preserved).
+    // Search/rating filters still apply on top; sort is bypassed (TMDB popularity wins).
+    var streams = (this.genreFilter && this._genreFilteredStreams)
+        ? this._genreFilteredStreams.slice()
+        : this.originalStreams.slice();
     var titleFilter = document.getElementById('search-title').value.toLowerCase().trim();
     this.searchTitle = titleFilter;
     if (titleFilter) {
@@ -1847,8 +2277,8 @@ IPTVApp.prototype.applyFilters = function() {
             return rating >= minRating;
         });
     }
-    window.log('SORT', 'currentSort=' + this.currentSort + ', streams.length=' + streams.length);
-    if (this.currentSort === 'default' || this.currentSort === 'default-asc') {
+    window.log('SORT', 'currentSort=' + this.currentSort + ', streams.length=' + streams.length + (this.genreFilter ? ' [GENRE-FILTER ACTIVE: skipping sort]' : ''));
+    if (!this.genreFilter && (this.currentSort === 'default' || this.currentSort === 'default-asc')) {
         var firstSample = streams.slice(0, 5).map(function(s) {
             var id = s.stream_id || s.vod_id || s.series_id || '?';
             var name = (self.getStreamTitle(s) || '').substring(0, 30);
@@ -1856,7 +2286,7 @@ IPTVApp.prototype.applyFilters = function() {
         }).join(' | ');
         window.log('SORT', 'default top5: ' + firstSample);
     }
-    if (this.currentSort === 'year' || this.currentSort === 'year-asc') {
+    if (!this.genreFilter && (this.currentSort === 'year' || this.currentSort === 'year-asc')) {
         var yearRegex = /\((\d{4})\)/;
         streams.forEach(function(s) {
             if (s._sortYear === undefined) {
@@ -1865,7 +2295,10 @@ IPTVApp.prototype.applyFilters = function() {
             }
         });
     }
-    if (this.currentSort === 'default-asc') {
+    if (this.genreFilter) {
+        // Sort phase skipped: TMDB popularity order from _genreFilteredStreams is preserved.
+    }
+    else if (this.currentSort === 'default-asc') {
         streams.reverse();
     }
     else if (this.currentSort !== 'default') {
@@ -3147,7 +3580,17 @@ IPTVApp.prototype.loadMoreItems = function() {
     }
     var endIndex = Math.min(startIndex + batchSize, this.currentStreams.length);
     if (startIndex >= this.currentStreams.length) {
+        // Genre filter pagination: when the user reaches the end and there are
+        // more TMDB pages available, fetch the next batch in the background.
+        if (this.genreFilter && !this._genreReachedEnd) {
+            this._maybePrefetchGenrePages();
+        }
         return false;
+    }
+    // Pre-emptive prefetch when only a few items remain ahead of the cursor —
+    // hides the network latency by overlapping fetch with rendering.
+    if (this.genreFilter && !this._genreReachedEnd) {
+        this._maybePrefetchGenrePages();
     }
     var fragment = document.createDocumentFragment();
     for (var i = startIndex; i < endIndex; i++) {

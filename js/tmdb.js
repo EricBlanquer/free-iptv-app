@@ -550,6 +550,55 @@ TMDB.searchMovieAsync = function(title, year) {
     });
 };
 
+TMDB._genresCache = {};
+
+TMDB.getGenresList = function(type, callback) {
+    var path = (type === 'tv' || type === 'series') ? 'tv' : 'movie';
+    var cacheKey = path + ':' + this.language;
+    if (this._genresCache[cacheKey]) {
+        callback(this._genresCache[cacheKey]);
+        return;
+    }
+    if (!this.isEnabled()) {
+        callback([]);
+        return;
+    }
+    var self = this;
+    var url = this.baseUrl + '/genre/' + path + '/list?api_key=' + this.apiKey + '&language=' + this.language;
+    this._fetch(url, function(data) {
+        var genres = (data && data.genres) ? data.genres : [];
+        self._genresCache[cacheKey] = genres;
+        callback(genres);
+    });
+};
+
+TMDB.discover = function(type, genreId, page, callback, options) {
+    if (!this.isEnabled() || !genreId) {
+        callback(null);
+        return;
+    }
+    var path = (type === 'tv' || type === 'series') ? 'tv' : 'movie';
+    var p = page || 1;
+    var opts = options || {};
+    var sortBy = opts.sortBy || 'popularity.desc';
+    var url = this.baseUrl + '/discover/' + path +
+        '?api_key=' + this.apiKey +
+        '&language=' + this.language +
+        '&sort_by=' + encodeURIComponent(sortBy) +
+        '&include_adult=false' +
+        '&with_genres=' + encodeURIComponent(genreId) +
+        '&page=' + p;
+    if (opts.voteCountMin) {
+        url += '&vote_count.gte=' + opts.voteCountMin;
+    }
+    if (opts.dateLte && opts.dateLte.field && opts.dateLte.value) {
+        url += '&' + encodeURIComponent(opts.dateLte.field + '.lte') + '=' + encodeURIComponent(opts.dateLte.value);
+    }
+    this._fetch(url, function(data) {
+        callback(data || null);
+    });
+};
+
 TMDB.getRecommendations = function(id, type) {
     var self = this;
     return new Promise(function(resolve) {

@@ -1123,7 +1123,8 @@ var I18nData = {
                             "sortName": "الاسم",
                             "sortYear": "السنة",
                             "title": "...العنوان",
-                            "year": "...السنة"
+                            "year": "...السنة",
+                            "genre": "النوع"
                     },
                     "freebox": {
                             "allAlreadyQueued": "جميع الحلقات موجودة بالفعل في قائمة الانتظار أو قيد التحميل",
@@ -1542,6 +1543,12 @@ var I18nData = {
                             "demoNo": "لا، إعداد يدوي",
                             "demoTitle": "مرحباً بك في Free IPTV",
                             "demoYes": "نعم، جرب العرض التوضيحي"
+                    },
+                    "genrePicker": {
+                            "clear": "مسح",
+                            "sortPopularity": "الشعبية",
+                            "sortRating": "التقييم",
+                            "sortDate": "التاريخ"
                     }
             },
             "de": {
@@ -1654,7 +1661,8 @@ var I18nData = {
                             "sortName": "Name",
                             "sortYear": "Jahr",
                             "title": "Titel...",
-                            "year": "Jahr..."
+                            "year": "Jahr...",
+                            "genre": "Genre"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Alle Episoden bereits in der Warteschlange oder werden heruntergeladen",
@@ -2073,6 +2081,12 @@ var I18nData = {
                             "demoNo": "Nein, manuell einrichten",
                             "demoTitle": "Willkommen bei Free IPTV",
                             "demoYes": "Ja, Demo testen"
+                    },
+                    "genrePicker": {
+                            "clear": "Löschen",
+                            "sortPopularity": "Beliebtheit",
+                            "sortRating": "Bewertung",
+                            "sortDate": "Datum"
                     }
             },
             "en": {
@@ -2185,7 +2199,8 @@ var I18nData = {
                             "sortName": "Name",
                             "sortYear": "Year",
                             "title": "Title...",
-                            "year": "Year..."
+                            "year": "Year...",
+                            "genre": "Genre"
                     },
                     "freebox": {
                             "allAlreadyQueued": "All episodes already queued or downloading",
@@ -2604,6 +2619,12 @@ var I18nData = {
                             "demoNo": "No, configure manually",
                             "demoTitle": "Welcome to Free IPTV",
                             "demoYes": "Yes, try demo"
+                    },
+                    "genrePicker": {
+                            "clear": "Clear",
+                            "sortPopularity": "Popularity",
+                            "sortRating": "Rating",
+                            "sortDate": "Date"
                     }
             },
             "es": {
@@ -2716,7 +2737,8 @@ var I18nData = {
                             "sortName": "Nombre",
                             "sortYear": "Año",
                             "title": "Título...",
-                            "year": "Año..."
+                            "year": "Año...",
+                            "genre": "Género"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Todos los episodios ya están en cola o descargándose",
@@ -3135,6 +3157,12 @@ var I18nData = {
                             "demoNo": "No, configurar manualmente",
                             "demoTitle": "Bienvenido a Free IPTV",
                             "demoYes": "Sí, probar demo"
+                    },
+                    "genrePicker": {
+                            "clear": "Borrar",
+                            "sortPopularity": "Popularidad",
+                            "sortRating": "Valoración",
+                            "sortDate": "Fecha"
                     }
             },
             "fr": {
@@ -3247,7 +3275,8 @@ var I18nData = {
                             "sortName": "Nom",
                             "sortYear": "Année",
                             "title": "Titre...",
-                            "year": "Année..."
+                            "year": "Année...",
+                            "genre": "Genre"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Tous les épisodes sont déjà en file d'attente ou en cours",
@@ -3666,6 +3695,12 @@ var I18nData = {
                             "demoNo": "Non, configurer manuellement",
                             "demoTitle": "Bienvenue dans Free IPTV",
                             "demoYes": "Oui, essayer la démo"
+                    },
+                    "genrePicker": {
+                            "clear": "Effacer",
+                            "sortPopularity": "Popularité",
+                            "sortRating": "Note",
+                            "sortDate": "Date"
                     }
             },
             "it": {
@@ -3778,7 +3813,8 @@ var I18nData = {
                             "sortName": "Nome",
                             "sortYear": "Anno",
                             "title": "Titolo...",
-                            "year": "Anno..."
+                            "year": "Anno...",
+                            "genre": "Genere"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Tutti gli episodi sono già in coda o in download",
@@ -4197,6 +4233,12 @@ var I18nData = {
                             "demoNo": "No, configura manualmente",
                             "demoTitle": "Benvenuto in Free IPTV",
                             "demoYes": "Sì, prova la demo"
+                    },
+                    "genrePicker": {
+                            "clear": "Cancella",
+                            "sortPopularity": "Popolarità",
+                            "sortRating": "Voto",
+                            "sortDate": "Data"
                     }
             },
             "nl": {
@@ -4309,7 +4351,8 @@ var I18nData = {
                             "sortName": "Naam",
                             "sortYear": "Jaar",
                             "title": "Titel...",
-                            "year": "Jaar..."
+                            "year": "Jaar...",
+                            "genre": "Genre"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Alle afleveringen staan al in de wachtrij of worden gedownload",
@@ -4728,6 +4771,12 @@ var I18nData = {
                             "demoNo": "Nee, handmatig configureren",
                             "demoTitle": "Welkom bij Free IPTV",
                             "demoYes": "Ja, demo proberen"
+                    },
+                    "genrePicker": {
+                            "clear": "Wissen",
+                            "sortPopularity": "Populariteit",
+                            "sortRating": "Beoordeling",
+                            "sortDate": "Datum"
                     }
             },
             "pl": {
@@ -4840,7 +4889,8 @@ var I18nData = {
                             "sortName": "Nazwa",
                             "sortYear": "Rok",
                             "title": "Tytuł...",
-                            "year": "Rok..."
+                            "year": "Rok...",
+                            "genre": "Gatunek"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Wszystkie odcinki są już w kolejce lub pobierane",
@@ -5259,6 +5309,12 @@ var I18nData = {
                             "demoNo": "Nie, skonfiguruj ręcznie",
                             "demoTitle": "Witaj w Free IPTV",
                             "demoYes": "Tak, wypróbuj demo"
+                    },
+                    "genrePicker": {
+                            "clear": "Wyczyść",
+                            "sortPopularity": "Popularność",
+                            "sortRating": "Ocena",
+                            "sortDate": "Data"
                     }
             },
             "pt": {
@@ -5371,7 +5427,8 @@ var I18nData = {
                             "sortName": "Nome",
                             "sortYear": "Ano",
                             "title": "Título...",
-                            "year": "Ano..."
+                            "year": "Ano...",
+                            "genre": "Género"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Todos os episódios já estão na fila ou em download",
@@ -5790,6 +5847,12 @@ var I18nData = {
                             "demoNo": "Não, configurar manualmente",
                             "demoTitle": "Bem-vindo ao Free IPTV",
                             "demoYes": "Sim, experimentar demo"
+                    },
+                    "genrePicker": {
+                            "clear": "Limpar",
+                            "sortPopularity": "Popularidade",
+                            "sortRating": "Avaliação",
+                            "sortDate": "Data"
                     }
             },
             "ru": {
@@ -5902,7 +5965,8 @@ var I18nData = {
                             "sortName": "Имя",
                             "sortYear": "Год",
                             "title": "Название...",
-                            "year": "Год..."
+                            "year": "Год...",
+                            "genre": "Жанр"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Все эпизоды уже в очереди или загружаются",
@@ -6321,6 +6385,12 @@ var I18nData = {
                             "demoNo": "Нет, настроить вручную",
                             "demoTitle": "Добро пожаловать в Free IPTV",
                             "demoYes": "Да, попробовать демо"
+                    },
+                    "genrePicker": {
+                            "clear": "Очистить",
+                            "sortPopularity": "Популярность",
+                            "sortRating": "Рейтинг",
+                            "sortDate": "Дата"
                     }
             },
             "tr": {
@@ -6433,7 +6503,8 @@ var I18nData = {
                             "sortName": "Ad",
                             "sortYear": "Yıl",
                             "title": "Başlık...",
-                            "year": "Yıl..."
+                            "year": "Yıl...",
+                            "genre": "Tür"
                     },
                     "freebox": {
                             "allAlreadyQueued": "Tüm bölümler zaten sırada veya indiriliyor",
@@ -6852,6 +6923,12 @@ var I18nData = {
                             "demoNo": "Hayır, manuel yapılandır",
                             "demoTitle": "Free IPTV'ye hoş geldiniz",
                             "demoYes": "Evet, demoyu dene"
+                    },
+                    "genrePicker": {
+                            "clear": "Temizle",
+                            "sortPopularity": "Popülerlik",
+                            "sortRating": "Puan",
+                            "sortDate": "Tarih"
                     }
             }
     }

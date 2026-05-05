@@ -179,7 +179,8 @@
     "sortName": "Naam",
     "sortYear": "Jaar",
     "title": "Titel...",
-    "year": "Jaar..."
+    "year": "Jaar...",
+    "genre": "Genre"
   },
   "freebox": {
     "allAlreadyQueued": "Alle afleveringen staan al in de wachtrij of worden gedownload",
@@ -607,5 +608,11 @@
     "demoNo": "Nee, handmatig configureren",
     "demoTitle": "Welkom bij Free IPTV",
     "demoYes": "Ja, demo proberen"
+  },
+  "genrePicker": {
+    "clear": "Wissen",
+    "sortPopularity": "Populariteit",
+    "sortRating": "Beoordeling",
+    "sortDate": "Datum"
   }
 }

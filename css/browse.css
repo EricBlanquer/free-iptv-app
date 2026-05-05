@@ -1066,3 +1066,109 @@ body.touch #content-grid.list-view .grid-item-info {
     white-space: nowrap;
     overflow: hidden;
 }
+
+/* Genre filter button label (selected genre name) */
+#genre-filter-label {
+    margin-left: 6px;
+    color: #ffd54f;
+}
+
+#genre-filter-label:empty {
+    margin-left: 0;
+}
+
+/* Genre Picker Modal */
+.genre-picker-content {
+    min-width: 720px;
+    max-width: 1100px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#genre-picker-sort {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.genre-sort-btn {
+    padding: 8px 18px;
+    margin: 4px 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.genre-sort-btn.selected {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+.genre-sort-btn:focus,
+.genre-sort-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff;
+    transform: scale(1.05);
+}
+
+.genre-sort-btn.selected.focused {
+    box-shadow: 0 0 0 3px #fff;
+}
+
+.genre-sort-btn .sort-arrow {
+    margin-left: 4px;
+    color: #ffd54f;
+}
+
+#genre-picker-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+    max-height: 50vh;
+}
+
+.genre-picker-item {
+    padding: 12px 22px;
+    margin: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.genre-picker-item.selected {
+    background: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 2px #00d4ff;
+}
+
+.genre-picker-item:focus,
+.genre-picker-item.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff;
+    transform: scale(1.05);
+}
+
+#genre-picker-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+#genre-picker-loading {
+    color: #aaa;
+    margin: 30px 0;
+}
+
+/* Disabled sort buttons when a genre filter is active */
+.sort-btn.genre-disabled {
+    opacity: 0.4;
+}

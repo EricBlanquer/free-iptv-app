@@ -550,6 +550,7 @@
                 <button class="sort-btn focusable selected" data-sort-group="default"><span data-i18n="filters.default">Default</span> <span class="sort-arrow">↓</span></button>
                 <button class="sort-btn focusable" data-sort-group="name"><span data-i18n="filters.sortName">Name</span> <span class="sort-arrow">↓</span></button>
                 <button class="sort-btn focusable" data-sort-group="year"><span data-i18n="filters.sortYear">Year</span> <span class="sort-arrow">↓</span></button>
+                <button id="genre-filter-btn" class="sort-btn focusable hidden"><span data-i18n="filters.genre">Genre</span><span id="genre-filter-label"></span></button>
             </div>
             <div id="rating-filters">
                 <button class="rating-star focusable" data-rating="1" title="1+ stars">☆</button>
@@ -882,6 +883,23 @@
         </div>
     </div>
 
+
+    <!-- Genre Picker Modal -->
+    <div id="genre-picker-modal" class="modal hidden">
+        <div class="modal-content genre-picker-content">
+            <div id="genre-picker-sort">
+                <button class="genre-sort-btn focusable selected" data-genre-sort-group="popularity"><span data-i18n="genrePicker.sortPopularity">Popularity</span> <span class="sort-arrow">↓</span></button>
+                <button class="genre-sort-btn focusable" data-genre-sort-group="rating"><span data-i18n="genrePicker.sortRating">Rating</span> <span class="sort-arrow">↓</span></button>
+                <button class="genre-sort-btn focusable" data-genre-sort-group="date"><span data-i18n="genrePicker.sortDate">Date</span> <span class="sort-arrow">↓</span></button>
+            </div>
+            <div id="genre-picker-list"></div>
+            <div id="genre-picker-loading" class="hidden" data-i18n="common.loading">Loading...</div>
+            <div id="genre-picker-buttons">
+                <button id="genre-picker-clear-btn" class="focusable modal-btn hidden" data-i18n="genrePicker.clear">Clear</button>
+                <button id="genre-picker-cancel-btn" class="focusable modal-btn" data-i18n="common.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Catchup/Replay Modal -->
     <div id="catchup-modal" class="modal hidden">

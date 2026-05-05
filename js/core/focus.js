@@ -284,6 +284,7 @@ IPTVApp.prototype.bindKeys = function() {
             { id: 'tracks-modal', area: 'tracks' },
             { id: 'tts-voice-modal', area: 'tts-voice-modal' },
             { id: 'tmdb-connect-modal', area: 'tmdb-connect-modal' },
+            { id: 'genre-picker-modal', area: 'genre-picker' },
             { id: 'playlist-selector', area: 'home' },
             { id: 'home-grid', area: 'home' },
             { id: 'continue-grid', area: 'continue' },
@@ -494,7 +495,7 @@ IPTVApp.prototype.navigate = function(direction, isRepeat) {
     } else if (this.focusArea === 'actor') {
         result = this._navigateActor(navContext);
         if (result.handled) return;
-    } else if (this.focusArea === 'settings' || this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal') {
+    } else if (this.focusArea === 'settings' || this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal' || this.focusArea === 'genre-picker') {
         result = { index: this.navigate2D(focusables, newIndex, direction) };
     } else {
         result = { index: newIndex };
@@ -1141,6 +1142,9 @@ IPTVApp.prototype.getFocusables = function() {
             break;
         case 'tmdb-connect-modal':
             selector = '#tmdb-connect-modal .focusable';
+            break;
+        case 'genre-picker':
+            selector = '#genre-picker-modal .focusable';
             break;
     }
     var elements = document.querySelectorAll(selector);

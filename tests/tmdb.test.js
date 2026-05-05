@@ -664,4 +664,178 @@ describe('TMDB', function() {
             expect(redacted).not.toContain('secret123');
         });
     });
+
+    describe('discover', function() {
+        it('should construct movie discover URL with genre, sort and page', function() {
+            TMDB.discover('movie', 28, 1, function() {});
+            var url = xhrInstances[0].url;
+            expect(url).toContain('/discover/movie');
+            expect(url).toContain('api_key=test-api-key');
+            expect(url).toContain('language=fr-FR');
+            expect(url).toContain('sort_by=popularity.desc');
+            expect(url).toContain('with_genres=28');
+            expect(url).toContain('page=1');
+            expect(url).toContain('include_adult=false');
+        });
+
+        it('should construct tv discover URL when type is tv', function() {
+            TMDB.discover('tv', 10759, 2, function() {});
+            var url = xhrInstances[0].url;
+            expect(url).toContain('/discover/tv');
+            expect(url).toContain('with_genres=10759');
+            expect(url).toContain('page=2');
+        });
+
+        it('should treat type=series as tv', function() {
+            TMDB.discover('series', 18, 1, function() {});
+            expect(xhrInstances[0].url).toContain('/discover/tv');
+        });
+
+        it('should default to page=1 when page is omitted', function() {
+            TMDB.discover('movie', 28, undefined, function() {});
+            expect(xhrInstances[0].url).toContain('page=1');
+        });
+
+        it('should pass through results to callback', function(done) {
+            TMDB.discover('movie', 28, 1, function(data) {
+                expect(data).not.toBeNull();
+                expect(data.results.length).toBe(2);
+                expect(data.results[0].id).toBe(27205);
+                done();
+            });
+            respondXHR(xhrInstances[0], {
+                page: 1,
+                total_pages: 5,
+                results: [
+                    { id: 27205, title: 'Inception', release_date: '2010-07-16' },
+                    { id: 24428, title: 'The Avengers', release_date: '2012-04-25' }
+                ]
+            });
+        });
+
+        it('should call back with null when API key is missing', function(done) {
+            TMDB.defaultApiKey = '';
+            TMDB.setApiKey('');
+            TMDB.discover('movie', 28, 1, function(data) {
+                expect(data).toBeNull();
+                done();
+            });
+            expect(xhrInstances.length).toBe(0);
+        });
+
+        it('should call back with null when genreId is falsy (no XHR fired)', function(done) {
+            TMDB.discover('movie', null, 1, function(data) {
+                expect(data).toBeNull();
+                done();
+            });
+            expect(xhrInstances.length).toBe(0);
+        });
+
+        it('should accept custom sortBy via options', function() {
+            TMDB.discover('movie', 28, 1, function() {}, { sortBy: 'vote_average.desc' });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('sort_by=vote_average.desc');
+        });
+
+        it('should append vote_count.gte when voteCountMin is set', function() {
+            TMDB.discover('movie', 28, 1, function() {}, { sortBy: 'vote_average.desc', voteCountMin: 200 });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('vote_count.gte=200');
+        });
+
+        it('should NOT append vote_count.gte when voteCountMin is omitted', function() {
+            TMDB.discover('movie', 28, 1, function() {}, { sortBy: 'primary_release_date.desc' });
+            var url = xhrInstances[0].url;
+            expect(url).not.toContain('vote_count.gte');
+        });
+
+        it('should default to popularity.desc when options are not provided', function() {
+            TMDB.discover('movie', 28, 1, function() {});
+            expect(xhrInstances[0].url).toContain('sort_by=popularity.desc');
+        });
+
+        it('should append a date upper bound when dateLte option is provided', function() {
+            TMDB.discover('movie', 28, 1, function() {}, {
+                sortBy: 'primary_release_date.desc',
+                dateLte: { field: 'primary_release_date', value: '2026-05-05' }
+            });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('primary_release_date.lte=2026-05-05');
+        });
+
+        it('should NOT append the date filter when dateLte is missing fields', function() {
+            TMDB.discover('movie', 28, 1, function() {}, { dateLte: {} });
+            expect(xhrInstances[0].url).not.toContain('.lte=');
+        });
+    });
+
+    describe('getGenresList', function() {
+        beforeEach(function() {
+            TMDB._genresCache = {};
+        });
+
+        it('should fetch movie genres list', function(done) {
+            TMDB.getGenresList('movie', function(genres) {
+                expect(genres.length).toBe(2);
+                expect(genres[0].name).toBe('Action');
+                done();
+            });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('/genre/movie/list');
+            expect(url).toContain('language=fr-FR');
+            respondXHR(xhrInstances[0], {
+                genres: [
+                    { id: 28, name: 'Action' },
+                    { id: 35, name: 'Comédie' }
+                ]
+            });
+        });
+
+        it('should fetch tv genres list when type is tv or series', function() {
+            TMDB.getGenresList('tv', function() {});
+            expect(xhrInstances[0].url).toContain('/genre/tv/list');
+            xhrInstances.length = 0;
+            TMDB._genresCache = {};
+            TMDB.getGenresList('series', function() {});
+            expect(xhrInstances[0].url).toContain('/genre/tv/list');
+        });
+
+        it('should serve from cache on second call (no XHR)', function(done) {
+            TMDB.getGenresList('movie', function(genres1) {
+                expect(genres1.length).toBe(1);
+                var xhrCountAfterFirst = xhrInstances.length;
+                TMDB.getGenresList('movie', function(genres2) {
+                    expect(genres2.length).toBe(1);
+                    expect(xhrInstances.length).toBe(xhrCountAfterFirst);
+                    done();
+                });
+            });
+            respondXHR(xhrInstances[0], { genres: [{ id: 28, name: 'Action' }] });
+        });
+
+        it('should keep separate cache entries per locale', function(done) {
+            TMDB.language = 'fr-FR';
+            TMDB.getGenresList('movie', function() {
+                TMDB.language = 'en-US';
+                TMDB.getGenresList('movie', function() {
+                    expect(xhrInstances.length).toBe(2);
+                    expect(xhrInstances[0].url).toContain('language=fr-FR');
+                    expect(xhrInstances[1].url).toContain('language=en-US');
+                    done();
+                });
+                respondXHR(xhrInstances[1], { genres: [{ id: 28, name: 'Action' }] });
+            });
+            respondXHR(xhrInstances[0], { genres: [{ id: 28, name: 'Action' }] });
+        });
+
+        it('should return [] when API is disabled and not fire XHR', function(done) {
+            TMDB.defaultApiKey = '';
+            TMDB.setApiKey('');
+            TMDB.getGenresList('movie', function(genres) {
+                expect(genres).toEqual([]);
+                expect(xhrInstances.length).toBe(0);
+                done();
+            });
+        });
+    });
 });

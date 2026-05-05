@@ -184,7 +184,8 @@
     "sortName": "Имя",
     "sortYear": "Год",
     "title": "Название...",
-    "year": "Год..."
+    "year": "Год...",
+    "genre": "Жанр"
   },
   "freebox": {
     "allAlreadyQueued": "Все эпизоды уже в очереди или загружаются",
@@ -610,5 +611,11 @@
     "demoNo": "Нет, настроить вручную",
     "demoTitle": "Добро пожаловать в Free IPTV",
     "demoYes": "Да, попробовать демо"
+  },
+  "genrePicker": {
+    "clear": "Очистить",
+    "sortPopularity": "Популярность",
+    "sortRating": "Рейтинг",
+    "sortDate": "Дата"
   }
 }

@@ -102,6 +102,10 @@ IPTVApp.prototype.selectHandlers = {
             if (mode) this.toggleCategorySort(mode);
             return;
         }
+        if (current.id === 'genre-filter-btn') {
+            this.openGenrePicker();
+            return;
+        }
         if (current.classList.contains('sort-btn')) {
             var group = current.dataset.sortGroup;
             this.applySortGroup(group);
@@ -250,6 +254,28 @@ IPTVApp.prototype.selectHandlers = {
             this.hideTMDBConnectModal();
         }
     },
+    'genre-picker': function(current) {
+        if (!current) return;
+        if (current.id === 'genre-picker-cancel-btn') {
+            this.closeGenrePicker();
+            return;
+        }
+        if (current.id === 'genre-picker-clear-btn') {
+            this.closeGenrePicker();
+            this.clearGenreFilter();
+            return;
+        }
+        if (current.classList.contains('genre-sort-btn')) {
+            var group = current.dataset.genreSortGroup;
+            this.applyGenrePickerSort(group);
+            return;
+        }
+        if (current.classList.contains('genre-picker-item')) {
+            var id = current.dataset.genreId;
+            var name = current.dataset.genreName;
+            this.applyGenreFilter(id, name);
+        }
+    },
     playlists: function() {
         this.handlePlaylistsSelect();
     },
@@ -285,6 +311,9 @@ IPTVApp.prototype.backHandlers = {
     },
     'focusArea:tmdb-connect-modal': function() {
         this.hideTMDBConnectModal();
+    },
+    'focusArea:genre-picker': function() {
+        this.closeGenrePicker();
     },
     'screen:catchup-modal': function() {
         this.hideCatchupModal();
@@ -386,37 +415,72 @@ IPTVApp.prototype.backHandlers = {
             this.showScreen('browse');
             this.currentScreen = 'browse';
             this.focusArea = 'grid';
-            this.focusIndex = this.lastGridIndex;
-            var jumped = false;
             if (needsResort && this.applyFilters) {
                 window.log('OVERRIDE', 'Re-applying filters after title override');
                 this.applyFilters();
-                if (focusedStreamId && this.currentStreams) {
-                    var targetIndex = -1;
-                    for (var i = 0; i < this.currentStreams.length; i++) {
-                        var s = this.currentStreams[i];
-                        var sid = s.stream_id || s.vod_id || s.series_id;
-                        if (sid == focusedStreamId) {
-                            targetIndex = i;
+            }
+            // Restore focus by streamId. lastGridIndex is a position in the
+            // virtual DOM window — used only as a hint. If it points to the
+            // wrong stream (window shifted by pagination/trim or title-override
+            // resort), look up by streamId in DOM, then in currentStreams as a
+            // last resort (which falls back to _jumpToIndex — the only path
+            // that rebuilds the DOM).
+            this.focusIndex = this.lastGridIndex || 0;
+            var rebuiltDom = false;
+            if (focusedStreamId) {
+                var focusables = this.getFocusables();
+                var hint = focusables[this.focusIndex];
+                if (!(hint && hint.dataset && hint.dataset.streamId == focusedStreamId)) {
+                    var foundInDom = -1;
+                    for (var fi = 0; fi < focusables.length; fi++) {
+                        var f = focusables[fi];
+                        if (f && f.dataset && f.dataset.streamId == focusedStreamId) {
+                            foundInDom = fi;
                             break;
                         }
                     }
-                    if (targetIndex >= 0) {
-                        this.lastGridIndex = targetIndex;
-                        this._jumpToIndex(targetIndex);
-                        var container = document.getElementById('content-grid');
-                        if (container) {
-                            var topSpacer = document.getElementById('grid-top-spacer');
-                            var spacerHeight = topSpacer ? topSpacer.offsetHeight : 0;
-                            container.scrollTop = spacerHeight;
+                    if (foundInDom >= 0) {
+                        this.focusIndex = foundInDom;
+                        this.lastGridIndex = foundInDom;
+                    } else if (this.currentStreams) {
+                        var targetIndex = -1;
+                        for (var ci = 0; ci < this.currentStreams.length; ci++) {
+                            var s = this.currentStreams[ci];
+                            var sid = s.stream_id || s.vod_id || s.series_id;
+                            if (sid == focusedStreamId) {
+                                targetIndex = ci;
+                                break;
+                            }
                         }
-                        jumped = true;
+                        if (targetIndex >= 0) {
+                            this._jumpToIndex(targetIndex);
+                            this.lastGridIndex = this.focusIndex;
+                            var container = document.getElementById('content-grid');
+                            if (container) {
+                                var topSpacer = document.getElementById('grid-top-spacer');
+                                var spacerHeight = topSpacer ? topSpacer.offsetHeight : 0;
+                                container.scrollTop = spacerHeight;
+                            }
+                            rebuiltDom = true;
+                        }
                     }
                 }
             }
+            // The grid scroll listener (initGridScrollLoader in browse.js)
+            // recomputes focusIndex from the first-visible row whenever a scroll
+            // event fires — that's how PageUp/Down and the live-TV channel
+            // change keep focus tracking the viewport. Showing the browse
+            // screen after details can fire a scroll event on Tizen; without a
+            // guard, the listener overwrites our stream-id-based focus
+            // restoration with `firstVisibleRow * cols` and the user lands on
+            // a different movie. The same `_programmaticScroll` flag is used
+            // by changeChannel (see comment at js/browse.js:3113).
+            this._programmaticScroll = true;
             this.updateGridProgress();
             this.updateFocus();
-            if (jumped) {
+            var selfPS = this;
+            setTimeout(function() { selfPS._programmaticScroll = false; }, 200);
+            if (rebuiltDom) {
                 var self = this;
                 requestAnimationFrame(function() {
                     self.updateFocus();
