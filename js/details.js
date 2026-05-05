@@ -3629,6 +3629,9 @@ IPTVApp.prototype.showDownloadsScreen = function() {
     this.setHidden('view-mode-filters', true);
     var self = this;
     var queueSnapshot = (this._freeboxDownloadQueue || []).slice();
+    this.currentStreams = [];
+    this.originalStreams = [];
+    this.showEmptyMessage('content-grid', 'common.loading', 'Loading...');
     window.log('Downloads screen: queue=' + queueSnapshot.length + ' dlMap=' + Object.keys(this._freeboxDownloadMap || {}).length);
     if (this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl) {
         var baseProxy = this.settings.proxyUrl.replace(/\/+$/, '');
@@ -3648,10 +3651,16 @@ IPTVApp.prototype.showDownloadsScreen = function() {
                 self.renderDownloadsList(fakeDownloads, queueSnapshot);
             }
             catch (ex) {
+                window.log('Downloads screen: VM /downloads parse error: ' + (ex.message || ex));
                 self.renderDownloadsList([], queueSnapshot);
             }
         };
         xhr.onerror = function() {
+            window.log('Downloads screen: VM /downloads network error');
+            self.renderDownloadsList([], queueSnapshot);
+        };
+        xhr.ontimeout = function() {
+            window.log('Downloads screen: VM /downloads timeout after ' + xhr.timeout + 'ms');
             self.renderDownloadsList([], queueSnapshot);
         };
         xhr.send();

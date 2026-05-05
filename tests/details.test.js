@@ -1266,3 +1266,112 @@ describe('bug: closure-loop in retryErroredDownloads logs wrong dl/action', () =
         ]);
     });
 });
+
+describe('bug: showDownloadsScreen leaves stale grid content while VM /downloads pending', () => {
+    // When opening Downloads, showDownloadsScreen sends an XHR to the VM proxy and waits
+    // up to 10s before rendering the list. During that wait, the previous screen's content
+    // (e.g. 18 VOD movies from the last browse) stays visible because initBrowseScreen does
+    // NOT clear the content-grid. Result: user sees what looks like the History page until
+    // the XHR resolves. Worse, the original code had no `ontimeout` handler — if the VM
+    // didn't respond within 10s, nothing was ever rendered and the stale grid stayed forever.
+    function setEmpty(grid, label) {
+        while (grid.firstChild) grid.removeChild(grid.firstChild);
+        var div = document.createElement('div');
+        div.className = 'empty-message';
+        div.textContent = label;
+        grid.appendChild(div);
+    }
+    function setItems(grid, count) {
+        while (grid.firstChild) grid.removeChild(grid.firstChild);
+        for (var i = 0; i < count; i++) {
+            var it = document.createElement('div');
+            it.className = 'grid-item dl';
+            it.textContent = 'item' + i;
+            grid.appendChild(it);
+        }
+    }
+    function buildXhr(spec) {
+        var xhr = {
+            timeout: 10000,
+            onload: null,
+            onerror: null,
+            ontimeout: null,
+            send: function() {
+                if (spec.action === 'load') {
+                    xhr.responseText = JSON.stringify({ success: true, result: spec.list || [] });
+                    xhr.onload();
+                }
+                else if (spec.action === 'timeout' && xhr.ontimeout) {
+                    xhr.ontimeout();
+                }
+                else if (spec.action === 'error' && xhr.onerror) {
+                    xhr.onerror();
+                }
+            }
+        };
+        return xhr;
+    }
+    function emulateBuggy(grid, spec) {
+        var xhr = buildXhr(spec);
+        xhr.onload = function() {
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                var list = (resp.success && resp.result) ? resp.result : [];
+                if (list.length === 0) setEmpty(grid, 'No downloads');
+                else setItems(grid, list.length);
+            }
+            catch (ex) { setEmpty(grid, 'No downloads'); }
+        };
+        xhr.onerror = function() { setEmpty(grid, 'No downloads'); };
+        xhr.send();
+    }
+    function emulateFixed(grid, spec) {
+        setEmpty(grid, 'Loading...');
+        var xhr = buildXhr(spec);
+        xhr.onload = function() {
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                var list = (resp.success && resp.result) ? resp.result : [];
+                if (list.length === 0) setEmpty(grid, 'No downloads');
+                else setItems(grid, list.length);
+            }
+            catch (ex) { setEmpty(grid, 'No downloads'); }
+        };
+        xhr.onerror = function() { setEmpty(grid, 'No downloads'); };
+        xhr.ontimeout = function() { setEmpty(grid, 'No downloads'); };
+        xhr.send();
+    }
+    var grid;
+    beforeEach(() => {
+        grid = document.createElement('div');
+        setItems(grid, 3);
+    });
+    it('baseline repro: buggy version leaves 3 stale items visible when VM never responds', () => {
+        emulateBuggy(grid, { action: 'timeout' });
+        expect(grid.querySelectorAll('.grid-item').length).toBe(3);
+    });
+    it('fixed: synchronously clears stale content before the XHR fires', () => {
+        emulateFixed(grid, { action: 'timeout' });
+        expect(grid.querySelectorAll('.grid-item').length).toBe(0);
+        expect(grid.querySelector('.empty-message')).not.toBeNull();
+    });
+    it('fixed: ontimeout resolves to "No downloads" even when VM does not respond', () => {
+        emulateFixed(grid, { action: 'timeout' });
+        expect(grid.querySelector('.empty-message').textContent).toBe('No downloads');
+    });
+    it('fixed: onload with empty list shows "No downloads"', () => {
+        emulateFixed(grid, { action: 'load', list: [] });
+        expect(grid.querySelectorAll('.grid-item').length).toBe(0);
+        expect(grid.querySelector('.empty-message').textContent).toBe('No downloads');
+    });
+    it('fixed: onload with items renders them', () => {
+        emulateFixed(grid, { action: 'load', list: [{ id: 1 }, { id: 2 }] });
+        expect(grid.querySelectorAll('.grid-item').length).toBe(2);
+        expect(grid.querySelector('.empty-message')).toBeNull();
+    });
+    it('fixed: onerror falls back to "No downloads"', () => {
+        emulateFixed(grid, { action: 'error' });
+        expect(grid.querySelector('.empty-message').textContent).toBe('No downloads');
+        expect(grid.querySelectorAll('.grid-item').length).toBe(0);
+    });
+});
