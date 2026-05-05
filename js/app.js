@@ -207,6 +207,9 @@ class IPTVApp {
             if (document.hidden) {
                 self.forceSaveProgress();
             }
+            else {
+                self.onAppResumed();
+            }
             if (self.currentScreen !== 'player') return;
             if (document.hidden) {
                 self.player.stop();

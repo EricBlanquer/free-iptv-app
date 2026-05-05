@@ -121,6 +121,38 @@ describe('formatTimeAgo', () => {
     });
 });
 
+describe('IPTVApp.prototype.onAppResumed', () => {
+    it('should re-render the playlist selector so stale time-ago text is refreshed', () => {
+        var app = new IPTVApp();
+        app.renderPlaylistSelector = jest.fn();
+        app.onAppResumed();
+        expect(app.renderPlaylistSelector).toHaveBeenCalledTimes(1);
+    });
+
+    it('should restart the age timer when one was previously running', () => {
+        var app = new IPTVApp();
+        app.renderPlaylistSelector = jest.fn();
+        app.startPlaylistAgeTimer = jest.fn();
+        app._playlistAgeTimer = 42;
+        app.onAppResumed();
+        expect(app.startPlaylistAgeTimer).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not start an age timer when none was running', () => {
+        var app = new IPTVApp();
+        app.renderPlaylistSelector = jest.fn();
+        app.startPlaylistAgeTimer = jest.fn();
+        app._playlistAgeTimer = null;
+        app.onAppResumed();
+        expect(app.startPlaylistAgeTimer).not.toHaveBeenCalled();
+    });
+
+    it('should be a no-op when renderPlaylistSelector is not bound yet', () => {
+        var app = new IPTVApp();
+        expect(function() { app.onAppResumed(); }).not.toThrow();
+    });
+});
+
 describe('IPTVApp.prototype.showEmptyMessage', () => {
     it('should set innerHTML with empty-message div using string container', () => {
         var container = document.createElement('div');

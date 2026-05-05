@@ -38,6 +38,15 @@ function formatTimeAgo(timestamp) {
     return I18n.t('time.monthsAgo', '{n} months ago').replace('{n}', months);
 }
 
+IPTVApp.prototype.onAppResumed = function() {
+    if (typeof this.renderPlaylistSelector === 'function') {
+        this.renderPlaylistSelector();
+    }
+    if (typeof this.startPlaylistAgeTimer === 'function' && this._playlistAgeTimer) {
+        this.startPlaylistAgeTimer();
+    }
+};
+
 IPTVApp.prototype.setFocus = function(area, index) {
     this.focusArea = area;
     this.focusIndex = index !== undefined ? index : 0;
