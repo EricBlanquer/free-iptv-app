@@ -39,11 +39,29 @@ function formatTimeAgo(timestamp) {
 }
 
 IPTVApp.prototype.onAppResumed = function() {
+    if (typeof this.setupRemoteDebug === 'function') {
+        this.setupRemoteDebug();
+    }
     if (typeof this.renderPlaylistSelector === 'function') {
         this.renderPlaylistSelector();
     }
     if (typeof this.startPlaylistAgeTimer === 'function' && this._playlistAgeTimer) {
         this.startPlaylistAgeTimer();
+    }
+    if (typeof this.refreshProviderCacheBackground === 'function' && this.playlistCacheTimestamps) {
+        var ttl = (typeof PROVIDER_CACHE_TTL !== 'undefined') ? PROVIDER_CACHE_TTL : 12 * 60 * 60 * 1000;
+        var now = Date.now();
+        var playlists = (this.settings && this.settings.playlists) || [];
+        var self = this;
+        playlists.forEach(function(p) {
+            var ts = self.playlistCacheTimestamps[p.id];
+            if (ts && (now - ts) > ttl) {
+                if (!self._backgroundRefreshInProgress || !self._backgroundRefreshInProgress[p.id]) {
+                    window.log('CACHE', 'App resumed: cache expired for ' + p.id + ' (age: ' + Math.round((now - ts) / 60000) + 'min), refreshing...');
+                    self.refreshProviderCacheBackground(p.id);
+                }
+            }
+        });
     }
 };
 

@@ -4,6 +4,7 @@
  */
 
 IPTVApp.prototype.setupRemoteDebug = function() {
+    var self = this;
     if (this.settings.remoteDebug && this.settings.remoteDebugExpiry && Date.now() > this.settings.remoteDebugExpiry) {
         this.settings.remoteDebug = false;
         delete this.settings.remoteDebugExpiry;
@@ -32,6 +33,7 @@ IPTVApp.prototype.setupRemoteDebug = function() {
         window.log = function() {
             originalLog.apply(window, arguments);
             if (!window.deviceId) return;
+            if (!self.settings.remoteDebug) return;
             var args = Array.prototype.slice.call(arguments);
             var msg = args.map(function(a) {
                 if (a === null) return 'null';

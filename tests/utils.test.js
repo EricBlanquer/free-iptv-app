@@ -151,6 +151,58 @@ describe('IPTVApp.prototype.onAppResumed', () => {
         var app = new IPTVApp();
         expect(function() { app.onAppResumed(); }).not.toThrow();
     });
+
+    it('should re-check remote debug expiry by calling setupRemoteDebug', () => {
+        var app = new IPTVApp();
+        app.renderPlaylistSelector = jest.fn();
+        app.setupRemoteDebug = jest.fn();
+        app.onAppResumed();
+        expect(app.setupRemoteDebug).toHaveBeenCalledTimes(1);
+    });
+
+    it('should trigger refreshProviderCacheBackground for playlists whose cache is expired', () => {
+        var app = new IPTVApp();
+        var now = Date.now();
+        app.settings.playlists = [
+            { id: 'p1', name: 'A' },
+            { id: 'p2', name: 'B' },
+            { id: 'p3', name: 'C' }
+        ];
+        app.playlistCacheTimestamps = {
+            p1: now - (13 * 60 * 60 * 1000),
+            p2: now - (60 * 1000),
+            p3: now - (24 * 60 * 60 * 1000)
+        };
+        app.renderPlaylistSelector = jest.fn();
+        app.refreshProviderCacheBackground = jest.fn();
+        app.onAppResumed();
+        expect(app.refreshProviderCacheBackground).toHaveBeenCalledTimes(2);
+        expect(app.refreshProviderCacheBackground).toHaveBeenCalledWith('p1');
+        expect(app.refreshProviderCacheBackground).toHaveBeenCalledWith('p3');
+        expect(app.refreshProviderCacheBackground).not.toHaveBeenCalledWith('p2');
+    });
+
+    it('should NOT trigger refresh if a background refresh is already in progress', () => {
+        var app = new IPTVApp();
+        var now = Date.now();
+        app.settings.playlists = [{ id: 'p1', name: 'A' }];
+        app.playlistCacheTimestamps = { p1: now - (13 * 60 * 60 * 1000) };
+        app._backgroundRefreshInProgress = { p1: true };
+        app.renderPlaylistSelector = jest.fn();
+        app.refreshProviderCacheBackground = jest.fn();
+        app.onAppResumed();
+        expect(app.refreshProviderCacheBackground).not.toHaveBeenCalled();
+    });
+
+    it('should NOT trigger refresh when no timestamp is recorded yet for a playlist', () => {
+        var app = new IPTVApp();
+        app.settings.playlists = [{ id: 'p1', name: 'A' }];
+        app.playlistCacheTimestamps = {};
+        app.renderPlaylistSelector = jest.fn();
+        app.refreshProviderCacheBackground = jest.fn();
+        app.onAppResumed();
+        expect(app.refreshProviderCacheBackground).not.toHaveBeenCalled();
+    });
 });
 
 describe('IPTVApp.prototype.showEmptyMessage', () => {
