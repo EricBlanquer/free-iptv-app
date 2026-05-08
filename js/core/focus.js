@@ -873,6 +873,11 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
                 newIndex = zones.download.start;
             } else if ((currentZone === 'favorite' || currentZone === 'download') && zones.title) {
                 newIndex = zones.title.start;
+            } else if (currentZone === 'actions' && zones.versions && newIndex === zones.actions.start) {
+                newIndex = zones.versions.end;
+            } else if (currentZone === 'rating' && newIndex === zones.rating.start) {
+                var prevZoneL = this.getPrevDetailsZone('rating', zones);
+                if (prevZoneL) newIndex = zones[prevZoneL].start;
             } else if (newIndex > 0) {
                 var prev = ctx.focusables[newIndex - 1];
                 if (this.getDetailsZone(prev) === currentZone) {
@@ -892,6 +897,11 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             } else if (currentZone === 'title') {
                 if (zones.download) newIndex = zones.download.start;
                 else if (zones.favorite) newIndex = zones.favorite.start;
+            } else if (currentZone === 'versions' && zones.actions && newIndex === zones.versions.end) {
+                newIndex = zones.actions.start;
+            } else if (currentZone === 'rating' && newIndex === zones.rating.end) {
+                var nextZoneR = this.getNextDetailsZone('rating', zones);
+                if (nextZoneR) newIndex = zones[nextZoneR].start;
             } else if (newIndex < ctx.focusables.length - 1) {
                 var next = ctx.focusables[newIndex + 1];
                 if (this.getDetailsZone(next) === currentZone) {
