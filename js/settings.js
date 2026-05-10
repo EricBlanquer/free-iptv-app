@@ -1598,11 +1598,6 @@ IPTVApp.prototype.handlePlaylistEditSelect = function() {
     var focusables = this.getFocusables();
     var current = focusables[this.focusIndex];
     if (!current) return;
-    if (current.dataset && current.dataset.action === 'playlist-edit-back') {
-        window.log('ACTION playlist-edit: back');
-        this.goBack();
-        return;
-    }
     if (current.classList.contains('settings-input') || current.tagName === 'INPUT') {
         window.log('ACTION playlist-edit: open-keyboard ' + current.id);
         this.openKeyboard(current.id);

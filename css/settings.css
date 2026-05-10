@@ -1322,25 +1322,6 @@
     color: #8bc34a;
 }
 
-.playlist-edit-back-btn {
-    display: inline-flex;
-    align-items: center;
-    margin: 10px 20px;
-    padding: 10px 18px;
-    background: rgba(255,255,255,0.08);
-    border: 2px solid transparent;
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.playlist-edit-back-btn .material-symbols-outlined {
-    margin-right: 6px;
-}
-.playlist-edit-back-btn.focused {
-    background: rgba(255,255,255,0.18);
-    border-color: #00b4d8;
-}
-
 .stream-error-content {
     text-align: center;
 }
