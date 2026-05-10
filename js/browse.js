@@ -1151,13 +1151,13 @@ IPTVApp.prototype.loadStreams = function(categoryId, options) {
             for (var ti = 0; ti < allStreams.length; ti++) {
                 var as = allStreams[ti];
                 var asIsSD = as._isSD !== undefined ? as._isSD : self.isSD(as);
-                var asClean = as._dedupCleanTitle || self.cleanTitle(self.getStreamTitle(as)).toLowerCase();
+                var asClean = as._dedupCleanTitle || self._normalizeDedupTitle(self.getStreamTitle(as));
                 if (!asIsSD) titleHasHD[asClean] = true;
             }
             streams = streams.filter(function(s) {
                 var sIsSD = s._isSD !== undefined ? s._isSD : self.isSD(s);
                 if (!sIsSD) return true;
-                var sClean = s._dedupCleanTitle || self.cleanTitle(self.getStreamTitle(s)).toLowerCase();
+                var sClean = s._dedupCleanTitle || self._normalizeDedupTitle(self.getStreamTitle(s));
                 return !titleHasHD[sClean];
             });
         }
@@ -2224,6 +2224,95 @@ IPTVApp.prototype.isSM = function(stream) {
     return name.indexOf('SOURD') !== -1 || name.indexOf('MALENTENDANT') !== -1 || name.indexOf('SME|') !== -1;
 };
 
+IPTVApp.prototype._normalizeDedupTitle = function(title) {
+    if (!title) return '';
+    var s = title;
+    var lastPipe = s.lastIndexOf('|');
+    if (lastPipe !== -1) s = s.substring(lastPipe + 1);
+    return this.cleanTitle(s).toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+IPTVApp.prototype._consolidateDedupGroupsByCleanTitle = function(dedupGroups) {
+    var YEAR_DELTA_MAX = 2;
+    var byCleanTitle = {};
+    var keys = Object.keys(dedupGroups);
+    for (var ki = 0; ki < keys.length; ki++) {
+        var key = keys[ki];
+        var sepIdx = key.lastIndexOf('|');
+        if (sepIdx < 0) continue;
+        var ct = key.substring(0, sepIdx);
+        var yearStr = key.substring(sepIdx + 1);
+        var year = yearStr ? parseInt(yearStr, 10) || null : null;
+        if (!byCleanTitle[ct]) byCleanTitle[ct] = [];
+        byCleanTitle[ct].push({ key: key, year: year, group: dedupGroups[key] });
+    }
+    var ctKeys = Object.keys(byCleanTitle);
+    for (var ci = 0; ci < ctKeys.length; ci++) {
+        var entries = byCleanTitle[ctKeys[ci]];
+        if (entries.length < 2) continue;
+        var withYear = [];
+        var noYear = [];
+        for (var ei = 0; ei < entries.length; ei++) {
+            if (entries[ei].year === null) noYear.push(entries[ei]);
+            else withYear.push(entries[ei]);
+        }
+        if (withYear.length >= 2) {
+            var minY = withYear[0].year;
+            var maxY = withYear[0].year;
+            for (var wi = 1; wi < withYear.length; wi++) {
+                if (withYear[wi].year < minY) minY = withYear[wi].year;
+                if (withYear[wi].year > maxY) maxY = withYear[wi].year;
+            }
+            if (maxY - minY > YEAR_DELTA_MAX) continue;
+        }
+        var anchor = null;
+        if (withYear.length > 0) {
+            anchor = withYear[0];
+            for (var wi2 = 1; wi2 < withYear.length; wi2++) {
+                if (withYear[wi2].group.length > anchor.group.length) anchor = withYear[wi2];
+            }
+        }
+        else {
+            anchor = entries[0];
+            for (var ni = 1; ni < entries.length; ni++) {
+                if (entries[ni].group.length > anchor.group.length) anchor = entries[ni];
+            }
+        }
+        for (var mi = 0; mi < entries.length; mi++) {
+            var e = entries[mi];
+            if (e.key === anchor.key) continue;
+            for (var gi = 0; gi < e.group.length; gi++) {
+                e.group[gi]._dedupKey = anchor.key;
+                anchor.group.push(e.group[gi]);
+            }
+            delete dedupGroups[e.key];
+        }
+        anchor.group.sort(function(a, b) {
+            return parseInt(a.stream_id || a.series_id || 0) - parseInt(b.stream_id || b.series_id || 0);
+        });
+    }
+};
+
+IPTVApp.prototype._sortByDateAdded = function(streams, asc) {
+    var n = streams.length;
+    if (n < 2) return;
+    var withIdx = new Array(n);
+    for (var i = 0; i < n; i++) {
+        var raw = streams[i].added;
+        var added = (raw === undefined || raw === null || raw === '') ? 0 : (parseInt(raw, 10) || 0);
+        withIdx[i] = { s: streams[i], i: i, added: added };
+    }
+    withIdx.sort(function(a, b) {
+        if (a.added !== b.added) return asc ? (a.added - b.added) : (b.added - a.added);
+        return a.i - b.i;
+    });
+    for (var k = 0; k < n; k++) streams[k] = withIdx[k].s;
+};
+
 IPTVApp.prototype.applyFilters = function() {
     var self = this;
     this._filterGeneration = (this._filterGeneration || 0) + 1;
@@ -2298,7 +2387,10 @@ IPTVApp.prototype.applyFilters = function() {
     if (this.genreFilter) {
         // Sort phase skipped: TMDB popularity order from _genreFilteredStreams is preserved.
     }
-    else if (this.currentSort === 'default-asc') {
+    else if ((this.currentSort === 'default' || this.currentSort === 'default-asc') && this.currentSection !== 'entertainment') {
+        this._sortByDateAdded(streams, this.currentSort === 'default-asc');
+    }
+    else if (this.currentSort === 'default-asc' && this.currentSection === 'entertainment') {
         streams.reverse();
     }
     else if (this.currentSort !== 'default') {
@@ -2384,7 +2476,7 @@ IPTVApp.prototype.applyFilters = function() {
     }
     window.log('FILTER', 'applyFilters: ' + streams.length + ' streams after filter/sort');
     self.logMemory('applyFilters');
-    if (this.currentSection !== 'downloads' && this.currentSection !== 'history' && !this.searchTitle) {
+    if (this.currentSection !== 'downloads' && this.currentSection !== 'history') {
         streams = this._applyDedup(streams);
     }
     self.logMemory('applyFilters done');
@@ -2711,6 +2803,7 @@ IPTVApp.prototype._persistPreprocessedCache = function() {
 };
 
 IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap, onProgress) {
+    var DEDUP_FORMAT_VERSION = 3;
     var self = this;
     var t0 = Date.now();
     var filtered = [];
@@ -2738,16 +2831,22 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
     var needsGenre = true;
     var beforeCount = streams.length;
     var BATCH_SIZE = 2000;
-    var hasPreprocessedData = streams.length > 0 && streams[0]._dedupKey;
+    var hasPreprocessedData = streams.length > 0 && streams[0]._dedupKey && streams[0]._dedupFormatVersion === DEDUP_FORMAT_VERSION;
     var computeFields = function(s) {
-        if (s._dedupKey !== undefined) return;
+        if (s._dedupKey !== undefined && s._dedupFormatVersion === DEDUP_FORMAT_VERSION) return;
         var title = self.getStreamTitle(s);
         var clean = self.cleanTitle(title);
-        var cleanTitle = clean.toLowerCase();
+        var cleanTitle = self._normalizeDedupTitle(title);
         var year = self.extractYear(title);
         s._dedupCleanTitle = cleanTitle;
         s._dedupYear = year;
-        s._dedupKey = cleanTitle + '|' + (year || '');
+        var tmdbId = s.tmdb && String(s.tmdb).trim();
+        if (tmdbId && tmdbId !== '0') {
+            s._dedupKey = 'tmdb:' + tmdbId;
+        }
+        else {
+            s._dedupKey = 'title:' + cleanTitle + '|' + (year || '');
+        }
         var stripped = self.stripCategoryPrefix(title);
         var diff = stripped.replace(clean, '').replace(/\(\d{4}\)/g, '').replace(Regex.removeYearEnd, '').replace(/[\s\-|:()]+/g, ' ').trim();
         var qualityMatch = title.match(Regex.qualityPrefix);
@@ -2762,6 +2861,7 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
         s._searchKey = s._displayTitle.toLowerCase()
             .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
+        s._dedupFormatVersion = DEDUP_FORMAT_VERSION;
     };
     var processStream = hasPreprocessedData ? function(s) {
         if (!categoryIds[s.category_id]) return;
@@ -2879,6 +2979,7 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
                 return true;
             });
         }
+        self._consolidateDedupGroupsByCleanTitle(dedupGroups);
         var keys = Object.keys(dedupGroups);
         for (var k = 0; k < keys.length; k++) {
             dedupGroups[keys[k]].sort(function(a, b) {
@@ -2964,8 +3065,6 @@ IPTVApp.prototype._applyDedup = function(streams) {
             tags.push(gs._dedupTag);
             duplicateInfos.push({ id: gs.stream_id || gs.series_id, name: gs.name || gs.title || '', num: gi + 1 });
         }
-        var uniqueTags = tags.filter(function(t, idx) { return tags.indexOf(t) === idx; });
-        if (uniqueTags.length <= 1 && (uniqueTags.length === 0 || uniqueTags[0] === '')) continue;
         for (var gi = 0; gi < group.length; gi++) {
             group[gi]._duplicateInfos = duplicateInfos;
         }
