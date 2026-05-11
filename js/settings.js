@@ -5,6 +5,7 @@
 
 IPTVApp.prototype.setupRemoteDebug = function() {
     var self = this;
+    var freshlyInstalled = false;
     if (this.settings.remoteDebug && this.settings.remoteDebugExpiry && Date.now() > this.settings.remoteDebugExpiry) {
         this.settings.remoteDebug = false;
         delete this.settings.remoteDebugExpiry;
@@ -12,6 +13,7 @@ IPTVApp.prototype.setupRemoteDebug = function() {
     }
     if (this.settings.remoteDebug && !window._remoteDebugEnabled) {
         window._remoteDebugEnabled = true;
+        freshlyInstalled = true;
         var originalLog = window.log;
         var lastMsg = null;
         var dupCount = 0;
@@ -53,6 +55,9 @@ IPTVApp.prototype.setupRemoteDebug = function() {
             buffer.push({ msg: msg, time: new Date().toISOString() });
         };
     }
+    var expiryStr = this.settings.remoteDebugExpiry ? new Date(this.settings.remoteDebugExpiry).toISOString() : 'none';
+    var state = freshlyInstalled ? 'ENABLED (wrapper just installed)' : (this.settings.remoteDebug && window._remoteDebugEnabled ? 'still active' : 'OFF');
+    window.log('REMOTE_DEBUG', 'setup state=' + state + ' deviceId=' + (window.deviceId || 'missing') + ' expires=' + expiryStr);
 };
 
 // Settings screen

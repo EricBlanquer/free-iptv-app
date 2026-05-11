@@ -91,8 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($lines !== '') {
         $logFile = __DIR__ . '/debug.log';
-        if (is_file($logFile) && filesize($logFile) > LOG_MAX_FILE_BYTES) {
-            @rename($logFile, $logFile . '.1');
+        if (is_file($logFile)) {
+            $fileDay = date('Y-m-d', filemtime($logFile));
+            $today = date('Y-m-d');
+            if ($fileDay !== $today) {
+                @rename($logFile, $logFile . '.' . $fileDay);
+            }
+            else if (filesize($logFile) > LOG_MAX_FILE_BYTES) {
+                @rename($logFile, $logFile . '.' . $today . '.' . time());
+            }
         }
         file_put_contents($logFile, $lines, FILE_APPEND | LOCK_EX);
     }

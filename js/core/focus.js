@@ -500,6 +500,7 @@ IPTVApp.prototype.navigate = function(direction, isRepeat) {
     } else {
         result = { index: newIndex };
     }
+    this._lastNavDirection = direction;
     this.focusIndex = result.index;
     this.updateFocus();
     var navDuration = performance.now() - navStart;
@@ -1430,11 +1431,35 @@ IPTVApp.prototype.updateFocus = function() {
             if (container) {
                 var elRect = el.getBoundingClientRect();
                 var containerRect = container.getBoundingClientRect();
-                if (elRect.top < containerRect.top + 10) {
-                    container.scrollTop -= (containerRect.top + 10 - elRect.top);
+                var elTopInContainer = elRect.top - containerRect.top;
+                var elBottomInContainer = elRect.bottom - containerRect.top;
+                var containerH = containerRect.height;
+                var rowHeight = this._gridRowHeight || 300;
+                var dir = this._lastNavDirection;
+                var scrollDelta = 0;
+                if (dir === 'down') {
+                    var desired = rowHeight + 10;
+                    if (Math.abs(elTopInContainer - desired) > 5) {
+                        scrollDelta = elTopInContainer - desired;
+                    }
                 }
-                else if (elRect.bottom > containerRect.bottom - 20) {
-                    container.scrollTop += (elRect.bottom - containerRect.bottom + 20);
+                else if (dir === 'up') {
+                    if (Math.abs(elTopInContainer - 10) > 5) {
+                        scrollDelta = elTopInContainer - 10;
+                    }
+                }
+                else {
+                    if (elTopInContainer < 10) {
+                        scrollDelta = elTopInContainer - 10;
+                    }
+                    else if (elBottomInContainer > containerH - 20) {
+                        scrollDelta = elBottomInContainer - (containerH - 20);
+                    }
+                }
+                if (scrollDelta !== 0) {
+                    self._programmaticScroll = true;
+                    container.scrollTop += scrollDelta;
+                    setTimeout(function() { self._programmaticScroll = false; }, 300);
                 }
             }
         }

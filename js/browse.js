@@ -3155,6 +3155,18 @@ IPTVApp.prototype.initGridScrollLoader = function() {
     var lastEnsureRun = 0;
     var ensurePending = false;
     var imageTimer = null;
+    var userScrollClearTimer = null;
+    var markUserScroll = function() {
+        self._userScrolling = true;
+        if (userScrollClearTimer) clearTimeout(userScrollClearTimer);
+        userScrollClearTimer = setTimeout(function() {
+            self._userScrolling = false;
+            userScrollClearTimer = null;
+        }, 400);
+    };
+    grid.addEventListener('touchstart', markUserScroll, { passive: true });
+    grid.addEventListener('touchmove', markUserScroll, { passive: true });
+    grid.addEventListener('wheel', markUserScroll, { passive: true });
     var ensureItems = function() {
         if (!self.currentStreams) return;
         var rowHeight = self._gridRowHeight || 300;
@@ -3212,7 +3224,7 @@ IPTVApp.prototype.initGridScrollLoader = function() {
         // Skip when scroll was programmatic (stopPlayback / changeChannel set
         // scrollTop after computing focusIndex; without this guard the handler
         // would overwrite the computed focus with the first-visible row).
-        if (!self._arrowHeld && !self._programmaticScroll && self.focusArea === 'grid') {
+        if (self._userScrolling && !self._arrowHeld && !self._programmaticScroll && self.focusArea === 'grid') {
             var isListView = grid.classList.contains('list-view');
             var cols = isListView ? 1 : (self.gridColumns || 5);
             var rowHeight = self._gridRowHeight || (isListView ? 88 : 300);
@@ -3595,6 +3607,7 @@ IPTVApp.prototype._prependGridItems = function() {
     this.focusIndex += count;
     this.invalidateFocusables();
     window.log('MEM', 'Prepended ' + count + ' DOM items (offset now ' + this._domOffset + ')');
+    this._trimExcessDomItems();
     return count;
 };
 
@@ -3714,6 +3727,7 @@ IPTVApp.prototype.loadMoreItems = function() {
         this.loadVisibleImages(true);
         this.loadVisibleEPG();
     }
+    if (!isFirstBatch) this._trimExcessDomItems();
     return true;
 };
 
@@ -3722,7 +3736,7 @@ IPTVApp.prototype._trimExcessDomItems = function() {
     if (!container) return;
     var items = container.querySelectorAll('.grid-item');
     var itemsLen = items.length;
-    var maxItems = 100;
+    var maxItems = 50;
     if (itemsLen <= maxItems) return;
     var firstGridItem = items[0];
     if (firstGridItem && firstGridItem.offsetHeight > 0) {
@@ -3746,6 +3760,10 @@ IPTVApp.prototype._trimExcessDomItems = function() {
     var bottomRemoveCount = itemsLen - keepEnd;
     if (topRemoveCount <= 0 && bottomRemoveCount <= 0) return;
     var savedScrollTop = container.scrollTop;
+    var focusedStreamId = null;
+    if (this.focusArea === 'grid' && items[this.focusIndex] && items[this.focusIndex].dataset) {
+        focusedStreamId = items[this.focusIndex].dataset.streamId || null;
+    }
     if (bottomRemoveCount > 0) {
         for (var b = itemsLen - 1; b >= keepEnd; b--) {
             if (items[b]) items[b].remove();
@@ -3761,9 +3779,26 @@ IPTVApp.prototype._trimExcessDomItems = function() {
         }
         this.focusIndex = Math.max(0, this.focusIndex - topRemoveCount);
     }
+    this._programmaticScroll = true;
     container.scrollTop = savedScrollTop;
     this.invalidateFocusables();
-    window.log('MEM', 'Trimmed top=' + topRemoveCount + ' bottom=' + bottomRemoveCount + ' (DOM now ' + (itemsLen - topRemoveCount - bottomRemoveCount) + ', offset ' + this._domOffset + ' scroll ' + savedScrollTop + ')');
+    var anchoredByStreamId = false;
+    if (focusedStreamId) {
+        var survivors = this.getFocusables();
+        for (var fi = 0; fi < survivors.length; fi++) {
+            if (survivors[fi].dataset && survivors[fi].dataset.streamId === focusedStreamId) {
+                this.focusIndex = fi;
+                anchoredByStreamId = true;
+                break;
+            }
+        }
+    }
+    window.log('MEM', 'Trimmed top=' + topRemoveCount + ' bottom=' + bottomRemoveCount + ' (DOM now ' + (itemsLen - topRemoveCount - bottomRemoveCount) + ', offset ' + this._domOffset + ' scroll ' + savedScrollTop + ' focusIndex=' + this.focusIndex + ' anchored=' + anchoredByStreamId + ')');
+    if (this.focusArea === 'grid') {
+        this.updateFocus();
+    }
+    var selfTrim = this;
+    setTimeout(function() { selfTrim._programmaticScroll = false; }, 300);
 };
 
 IPTVApp.prototype.getFilteredContinueHistory = function(section) {
