@@ -19,6 +19,8 @@ IPTVApp.prototype.updateFavoriteButton = function() {
 IPTVApp.prototype.showFavoritesInGrid = function() {
     var container = document.getElementById('content-grid');
     container.innerHTML = '';
+    this._domOffset = 0;
+    this._gridRowHeight = 0;
     var self = this;
     var section = this.currentSection;
     this.filteredFavoriteIndices = [];
@@ -106,6 +108,8 @@ IPTVApp.prototype._getRatedStreamsForSection = function(section) {
 IPTVApp.prototype.showRatedInGrid = function() {
     var container = document.getElementById('content-grid');
     this.clearElement(container);
+    this._domOffset = 0;
+    this._gridRowHeight = 0;
     var section = this.currentSection;
     var entries = this._getRatedEntriesForSection(section);
     if (entries.length === 0) {

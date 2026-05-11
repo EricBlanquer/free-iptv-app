@@ -55,9 +55,14 @@ IPTVApp.prototype.setupRemoteDebug = function() {
             buffer.push({ msg: msg, time: new Date().toISOString() });
         };
     }
-    var expiryStr = this.settings.remoteDebugExpiry ? new Date(this.settings.remoteDebugExpiry).toISOString() : 'none';
+    var expiryStr = 'none';
+    if (this.settings.remoteDebugExpiry) {
+        var d = new Date(this.settings.remoteDebugExpiry);
+        var pad = function(n, len) { var s = String(n); while (s.length < (len || 2)) s = '0' + s; return s; };
+        expiryStr = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + '.' + pad(d.getMilliseconds(), 3);
+    }
     var state = freshlyInstalled ? 'ENABLED (wrapper just installed)' : (this.settings.remoteDebug && window._remoteDebugEnabled ? 'still active' : 'OFF');
-    window.log('REMOTE_DEBUG', 'setup state=' + state + ' deviceId=' + (window.deviceId || 'missing') + ' expires=' + expiryStr);
+    window.log('REMOTE_DEBUG', 'setup state=' + state + ' expires=' + expiryStr);
 };
 
 // Settings screen

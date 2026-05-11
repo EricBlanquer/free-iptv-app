@@ -800,6 +800,8 @@ class IPTVApp {
     showTntInGrid() {
         var container = document.getElementById('content-grid');
         container.innerHTML = '';
+        this._domOffset = 0;
+        this._gridRowHeight = 0;
         var section = this.currentSection;
         if (section !== 'live') return;
         var allStreams = this.getStreams('live');

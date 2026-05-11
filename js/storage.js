@@ -1106,9 +1106,9 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
                         }
                         if (newCount > 0) {
                             window.log('CACHE', 'Background refresh: ' + newCount + ' new streams in ' + section);
-                            var vodSubs = ['sport', 'manga', 'entertainment'];
-                            var gridType = vodSubs.indexOf(section) !== -1 || section.indexOf('custom_') === 0 ? 'vod' : section;
-                            self.renderGrid(sectionData.streams, gridType, true);
+                            var selectedCategory = document.querySelector('.category-item.selected');
+                            var currentCategoryId = selectedCategory ? selectedCategory.dataset.categoryId : '';
+                            self.loadStreams(currentCategoryId, { preserveFilters: true });
                             self.showToast('+' + newCount + ' ' + I18n.t('home.' + (section === 'series' ? 'series' : 'vod'), section));
                         }
                     }

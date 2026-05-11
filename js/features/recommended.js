@@ -362,6 +362,8 @@ IPTVApp.prototype.showRecommendedInGrid = function() {
     var section = this.currentSection;
     var container = document.getElementById('content-grid');
     container.textContent = '';
+    this._domOffset = 0;
+    this._gridRowHeight = 0;
     this._gridLoading = true;
     this._ensureRecommendationsState();
     var cached = this._recommendationsCache[section];
