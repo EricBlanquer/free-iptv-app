@@ -187,7 +187,7 @@ IPTVApp.prototype.bindKeys = function() {
                 break;
             case 33:
                 if (self.currentScreen === 'player' && self.currentPlayingType === 'live') {
-                    self.changeChannel(-1);
+                    self.changeChannel(1);
                 }
                 else {
                     self.navigatePage('up');
@@ -195,7 +195,7 @@ IPTVApp.prototype.bindKeys = function() {
                 break;
             case 34:
                 if (self.currentScreen === 'player' && self.currentPlayingType === 'live') {
-                    self.changeChannel(1);
+                    self.changeChannel(-1);
                 }
                 else {
                     self.navigatePage('down');

@@ -102,6 +102,10 @@ IPTVApp.prototype.stripCategoryPrefix = function(title) {
     // First try quality prefix (4K|, 3D|, SD|, etc.)
     var result = clean.replace(Regex.qualityPrefix, '');
     if (result !== clean) return result;
+    // Try compound region+lang prefix (e.g., "EU- FR ", "24/7| FR ", "VIP CA- ").
+    // Both halves are allow-listed to avoid false positives on real titles.
+    result = clean.replace(/^(?:EU|AF|AS|NA|SA|OC|24\/7|VIP|EST|INT|EX-YU|EXYU|HK|LA|MA|AR|SE|DK|NO|FI|LU)[-\s|]+(?:FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|UK|US|CA|BE|CH|GR|JP|KR|CN|HU|RO|CZ|SK|HR|SR|BG|FI|SE|DK|NO|IE|AUS|NZ|IN|HK|TW|SG|IL|IR|MX|BR|AT)[-\s|]+/i, '');
+    if (result !== clean) return result;
     // Then try category prefix (FR|, EN|, etc.)
     result = clean.replace(Regex.categoryPrefix, '');
     if (result !== clean) return result;
@@ -222,21 +226,160 @@ IPTVApp.prototype.getEffectiveProviderLanguage = function() {
     return setting;
 };
 
+IPTVApp.prototype._buildLangTokenMap = function() {
+    // Primary: unambiguous language codes / native names. Win over secondary.
+    var primary = {
+        FR: 'FR', FRA: 'FR', FRENCH: 'FR', FRANCAIS: 'FR',
+        EN: 'EN', ENG: 'EN', ENGLISH: 'EN',
+        DE: 'DE', DEU: 'DE', GER: 'DE', GERMAN: 'DE', DEUTSCH: 'DE',
+        ES: 'ES', ESP: 'ES', SPANISH: 'ES', ESPANOL: 'ES',
+        IT: 'IT', ITA: 'IT', ITALIAN: 'IT',
+        PT: 'PT', POR: 'PT', PORTUGUESE: 'PT',
+        NL: 'NL', NLD: 'NL', DUTCH: 'NL', VLAAMS: 'NL', FLEMISH: 'NL',
+        PL: 'PL', POL: 'PL', POLISH: 'PL', POLSKA: 'PL',
+        RU: 'RU', RUS: 'RU', RUSSIAN: 'RU', RUSSE: 'RU',
+        TR: 'TR', TUR: 'TR', TURKISH: 'TR', TURKCE: 'TR',
+        AR: 'AR', ARA: 'AR', ARABIC: 'AR', ARAB: 'AR', ARABE: 'AR',
+        GR: 'EL', GREEK: 'EL', ELLINIKA: 'EL',
+        SV: 'SV', SWE: 'SV', SWEDISH: 'SV',
+        DA: 'DA', DAN: 'DA', DANISH: 'DA',
+        NO: 'NB', NOR: 'NB', NORWEGIAN: 'NB',
+        FI: 'FI', FIN: 'FI', FINNISH: 'FI',
+        CS: 'CS', CZE: 'CS', CZECH: 'CS',
+        SK: 'SK', SLK: 'SK', SLOVAK: 'SK',
+        HU: 'HU', HUN: 'HU', HUNGARIAN: 'HU', MAGYAR: 'HU',
+        RO: 'RO', RUM: 'RO', ROMANIAN: 'RO',
+        BG: 'BG', BUL: 'BG', BULGARIAN: 'BG',
+        HR: 'HR', CRO: 'HR', CROATIAN: 'HR',
+        SR: 'SR', SRP: 'SR', SERBIAN: 'SR',
+        UK: 'EN', GB: 'EN', BRITISH: 'EN', AMERICAN: 'EN',
+        US: 'EN', USA: 'EN',
+        NHL: 'EN', NBA: 'EN', NFL: 'EN', MLB: 'EN', MLS: 'EN',
+        AHL: 'EN', OHL: 'EN', CHL: 'EN', NCAA: 'EN', WNBA: 'EN',
+        UFC: 'EN', WWE: 'EN', MMA: 'EN', NASCAR: 'EN',
+        TSN: 'EN', SPORTSNET: 'EN', FUBO: 'EN', ESPN: 'EN',
+        QMJHL: 'FR', LIGUE: 'FR',
+        JA: 'JA', JAP: 'JA', JAPANESE: 'JA',
+        KO: 'KO', KOR: 'KO', KOREAN: 'KO',
+        ZH: 'ZH', CHI: 'ZH', CHINESE: 'ZH',
+        HI: 'HI', HIN: 'HI', HINDI: 'HI', URDU: 'UR',
+        HE: 'HE', HEB: 'HE', HEBREW: 'HE',
+        FA: 'FA', PERSIAN: 'FA', FARSI: 'FA',
+        SQ: 'SQ', ALBANIAN: 'SQ',
+        MK: 'MK', MACEDONIAN: 'MK',
+        SLOVENIAN: 'SL', SLOVENE: 'SL',
+        ESTONIAN: 'ET', LATVIAN: 'LV', LITHUANIAN: 'LT',
+        KURD: 'KU', KURDISH: 'KU',
+        VLAAMS: 'NL', NEDERLANDS: 'NL',
+        VFF: 'FR', VOSTFR: 'FR'
+    };
+    // Secondary: country / region names. Used only if no primary token matched.
+    var secondary = {
+        FRANCE: 'FR', BELGIQUE: 'FR', LUXEMBOURG: 'FR', QUEBEC: 'FR',
+        MA: 'FR', MAROC: 'FR', MOROCCO: 'FR',
+        IVOIRE: 'FR', SENEGAL: 'FR', CAMEROUN: 'FR', CAMEROON: 'FR',
+        GABON: 'FR', TOGO: 'FR', BENIN: 'FR',
+        BURKINA: 'FR', MALI: 'FR', TCHAD: 'FR', CHAD: 'FR',
+        DJIBOUTI: 'FR', MADAGASCAR: 'FR',
+        GUINEE: 'FR', GUINEA: 'FR', RWANDA: 'FR', BURUNDI: 'FR',
+        HAITI: 'FR', POLYNESIE: 'FR', POLYNESIA: 'FR',
+        REUNION: 'FR', ROWANDA: 'FR', CAMERON: 'FR', LU: 'FR',
+        IRELAND: 'EN', BRITAIN: 'EN', GERMANY: 'DE', AUSTRIA: 'DE',
+        SPAIN: 'ES', ESPANA: 'ES', MEXICO: 'ES', CHILE: 'ES', PERU: 'ES',
+        COLOMBIA: 'ES', ARGENTINA: 'ES', LATINO: 'ES', LATAM: 'ES',
+        ECUADOR: 'ES', URUGUAY: 'ES', PARAGUAY: 'ES', BOLIVIA: 'ES', VENEZUELA: 'ES',
+        PANAMA: 'ES', SALVADOR: 'ES', GUATEMALA: 'ES', HONDURAS: 'ES',
+        NICARAGUA: 'ES', DOMINICAN: 'ES', CUBA: 'ES',
+        CARIBBEAN: 'ES', CAR: 'ES',
+        ITALY: 'IT', ITALIA: 'IT',
+        PORTUGAL: 'PT', BRASIL: 'PT', BRAZIL: 'PT',
+        ANGOLA: 'PT', MOZAMBIQUE: 'PT', CABOVERDE: 'PT',
+        NETHERLANDS: 'NL', NEDERLAND: 'NL', HOLLAND: 'NL', BELGIE: 'NL',
+        POLAND: 'PL',
+        RUSSIA: 'RU', RUSSIE: 'RU',
+        TURKEY: 'TR', TURKIYE: 'TR',
+        ALGERIE: 'AR', ALGERIA: 'AR', TUNISIA: 'AR', TUNISIE: 'AR',
+        EGYPT: 'AR', EGY: 'AR', ALG: 'AR', TUN: 'AR',
+        GREECE: 'EL', CYPRUS: 'EL', CYPRIOT: 'EL',
+        SWEDEN: 'SV', SVERIGE: 'SV',
+        DENMARK: 'DA', DANMARK: 'DA',
+        NORWAY: 'NB', NORGE: 'NB',
+        FINLAND: 'FI', SUOMI: 'FI',
+        HUNGARY: 'HU', HUNGARIA: 'HU',
+        ROMANIA: 'RO', BULGARIA: 'BG',
+        CROATIA: 'HR', SERBIA: 'SR', BOSNIA: 'BS', BIH: 'BS', SRB: 'SR',
+        MACEDONIA: 'MK', SLOVENIA: 'SL', SLOVAKIA: 'SK',
+        UKRAINE: 'UK', UA: 'UK',
+        JAPAN: 'JA', KOREA: 'KO', CHINA: 'ZH', INDIA: 'HI',
+        VIETNAM: 'VI', THAILAND: 'TH', INDONESIA: 'ID',
+        MALAYSIA: 'MS', SINGAPORE: 'EN',
+        NIGERIA: 'EN', GHANA: 'EN', KENYA: 'EN', UGANDA: 'EN',
+        ZIMBABWE: 'EN', TANZANIA: 'SW', AZAM: 'SW', AZAMTV: 'SW', SWAHILI: 'SW',
+        ETHIOPIA: 'AM', AMHARIC: 'AM',
+        SOMALIA: 'SO', SOMALI: 'SO',
+        ISRAEL: 'HE', IRAN: 'FA',
+        AFGHANISTAN: 'FA', PAKISTAN: 'UR',
+        SRILANKA: 'SI', BANGLADESH: 'BN',
+        PHILIPPINE: 'TL', PHILIPPINES: 'TL',
+        MALTA: 'MT', MT: 'MT',
+        ERITREA: 'TI', GAMBIA: 'EN',
+        ARMENIA: 'HY', AZERBAIJAN: 'AZ', AZERABAIJAN: 'AZ',
+        ALBANIA: 'SQ', ALB: 'SQ',
+        BALTIC: 'ET', LATVIA: 'LV', LITHUANIA: 'LT', ESTONIA: 'ET',
+        HK: 'ZH', TW: 'ZH', SG: 'ZH',
+        IE: 'EN', AUS: 'EN', NZ: 'EN',
+        IS: 'HE',
+        LA: 'ES', LAT: 'ES',
+        IN: 'HI', PR: 'ES',
+        VLAAMS: 'NL', KINDEREN: 'NL', NATUUR: 'NL',
+        YU: 'SR', EX: 'SR', EXYU: 'SR',
+        AL: 'SQ',
+        CL: 'ES', MX: 'ES', PE: 'ES', CO: 'ES', VE: 'ES', BO: 'ES', PY: 'ES', UY: 'ES',
+        DO: 'ES', GT: 'ES', HN: 'ES', NI: 'ES', SV: 'ES', PA: 'ES', CR: 'ES', CU: 'ES',
+        PK: 'UR', BD: 'BN', LK: 'SI', AF: 'FA', MY: 'MS', VN: 'VI',
+        TH: 'TH', ID: 'ID', IL: 'HE', IR: 'FA',
+        ZA: 'EN',
+        EG: 'AR', SA: 'AR', AE: 'AR', QA: 'AR', KW: 'AR', BH: 'AR', OM: 'AR', JO: 'AR',
+        LB: 'AR', SY: 'AR', IQ: 'AR', YE: 'AR', LY: 'AR', SD: 'AR',
+        HU: 'HU', RO: 'RO', BG: 'BG', HR: 'HR', SK: 'SK', CZ: 'CS',
+        // BE / CH / SW / CA are intentionally NOT in either map: multilingual
+        // countries — we rely on an explicit primary token (FR/NL/DE/EN) to
+        // disambiguate. If none, the category stays language-agnostic (shown
+        // to all).
+    };
+    return { primary: primary, secondary: secondary };
+};
+
 IPTVApp.prototype.matchesLanguage = function(categoryName) {
     var effectiveLang = this.getEffectiveProviderLanguage();
     if (effectiveLang === 'ALL') return true;
-    var name = categoryName.toUpperCase();
-    var match = name.match(Regex.categoryPrefix);
-    // No prefix at all - show category (not language-specific)
-    if (!match) return true;
-    var prefix = match[1];
-    // Check if prefix is a recognized language code
-    var isRecognizedLang = this.langAliases[prefix] || Regex.langCode.test(prefix);
-    // If prefix is NOT a language code (e.g., "Foradulte"), show category
-    if (!isRecognizedLang) return true;
-    // It's a language prefix - check if it matches the effective language
-    var lang = this.langAliases[prefix] || prefix;
-    return lang === effectiveLang;
+    if (!categoryName) return true;
+    var name = categoryName.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (!this._langTokenMap) this._langTokenMap = this._buildLangTokenMap();
+    var tokens = name.match(/[A-Z]{2,}/g) || [];
+    var primary = this._langTokenMap.primary;
+    var secondary = this._langTokenMap.secondary;
+    var primaryMatched = {};
+    var hasPrimary = false;
+    for (var i = 0; i < tokens.length; i++) {
+        var lang = primary[tokens[i]];
+        if (lang) {
+            primaryMatched[lang] = true;
+            hasPrimary = true;
+        }
+    }
+    if (hasPrimary) return primaryMatched[effectiveLang] === true;
+    var secondaryMatched = {};
+    var hasSecondary = false;
+    for (var j = 0; j < tokens.length; j++) {
+        var slang = secondary[tokens[j]];
+        if (slang) {
+            secondaryMatched[slang] = true;
+            hasSecondary = true;
+        }
+    }
+    if (hasSecondary) return secondaryMatched[effectiveLang] === true;
+    return true;
 };
 
 // Get regex patterns for custom category
@@ -1117,14 +1260,30 @@ IPTVApp.prototype.loadStreams = function(categoryId, options) {
     var isMergeMode = this.apis && this.apis.length >= 1 && !this.settings.activePlaylistId;
     var realCategoryId = categoryId;
     var categoryPlaylistId = null;
+    var mergedIds = null;
     if (categoryId) {
-        var catEl = document.querySelector('.category-item[data-category-id="' + categoryId + '"]');
+        var catEl = document.querySelector('.category-item[data-category-id="' + CSS.escape(categoryId) + '"]');
         if (catEl) {
-            realCategoryId = catEl.dataset.realCategoryId || categoryId;
-            categoryPlaylistId = catEl.dataset.playlistId || null;
+            if (catEl.dataset.merged === '1' && catEl.dataset.mergedIds) {
+                mergedIds = {};
+                catEl.dataset.mergedIds.split(',').forEach(function(id) { mergedIds[id] = true; });
+            }
+            else {
+                realCategoryId = catEl.dataset.realCategoryId || categoryId;
+                categoryPlaylistId = catEl.dataset.playlistId || null;
+            }
         }
     }
-    if (!this.api || isMergeMode) {
+    if (mergedIds) {
+        var dataSectionM = isMixed ? section : apiSection;
+        var allStreamsM = this.data[dataSectionM] ? this.data[dataSectionM].streams : [];
+        var filteredM = allStreamsM.filter(function(s) {
+            var key = s._playlistId ? s.category_id + '_' + s._playlistId : s.category_id;
+            return mergedIds[key] === true || mergedIds[String(s.category_id)] === true;
+        });
+        promise = Promise.resolve(filteredM);
+    }
+    else if (!this.api || isMergeMode) {
         var dataSection = isMixed ? section : apiSection;
         var allStreams = this.data[dataSection] ? this.data[dataSection].streams : [];
         var filtered = categoryId ? allStreams.filter(function(s) {
@@ -1513,6 +1672,38 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
             return (countByCategory[cat.id] || 0) > 0;
         });
     }
+    // Merge categories sharing the same display name (e.g. several "Music"
+    // entries left over after prefix stripping). Sort order is preserved by
+    // keeping the first occurrence and absorbing the others into it.
+    if (!useGenre) {
+        var nameToFirst = {};
+        var mergedList = [];
+        preparedCategories.forEach(function(cat) {
+            var key = (cat.name || '').toLowerCase().trim();
+            if (!key) { mergedList.push(cat); return; }
+            if (!nameToFirst[key]) {
+                cat._mergedIds = [cat.id];
+                cat._mergedCount = countByCategory[cat.id] || 0;
+                nameToFirst[key] = cat;
+                mergedList.push(cat);
+            }
+            else {
+                var first = nameToFirst[key];
+                first._mergedIds.push(cat.id);
+                first._mergedCount += countByCategory[cat.id] || 0;
+                first._isMerged = true;
+            }
+        });
+        // Re-stamp the merged anchor's id so the sidebar selection works on the
+        // synthetic merged identifier (not the first underlying category_id).
+        mergedList.forEach(function(cat) {
+            if (cat._isMerged) {
+                cat._originalId = cat.id;
+                cat.id = 'merged:' + cat.name.toLowerCase().trim();
+            }
+        });
+        preparedCategories = mergedList;
+    }
     var isFirst = (categories.length === 1 && continueCount === 0 && !useGenre);
     preparedCategories.forEach(function(cat) {
         var item = document.createElement('div');
@@ -1534,9 +1725,16 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
                 displayName = typePrefix + ' - ' + displayName;
             }
             var iconPrefix = cat.icon ? cat.icon + ' ' : '';
-            self.setCategoryText(item, iconPrefix + displayName + ' (' + (countByCategory[cat.id] || 0) + ')');
+            var displayCount = cat._isMerged ? cat._mergedCount : (countByCategory[cat.id] || 0);
+            self.setCategoryText(item, iconPrefix + displayName + ' (' + displayCount + ')');
             item.dataset.categoryId = cat.id;
-            item.dataset.realCategoryId = cat.categoryId;
+            if (cat._isMerged) {
+                item.dataset.merged = '1';
+                item.dataset.mergedIds = cat._mergedIds.join(',');
+            }
+            else {
+                item.dataset.realCategoryId = cat.categoryId;
+            }
             if (cat.playlistId) item.dataset.playlistId = cat.playlistId;
             if (cat.sourceType) item.dataset.sourceType = cat.sourceType;
         }
@@ -2714,7 +2912,7 @@ IPTVApp.prototype._preprocessSection = function(section, categories, streams, on
     }
     var categoryMap = {};
     categories.forEach(function(c) {
-        var name = (c.category_name || '').replace(Regex.categoryPrefix, '');
+        var name = self.stripCategoryPrefix(c.category_name || '');
         categoryMap[c.category_id] = name;
     });
     var self = this;

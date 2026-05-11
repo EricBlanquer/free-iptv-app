@@ -91,14 +91,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($lines !== '') {
         $logFile = __DIR__ . '/debug.log';
+        $archiveDir = __DIR__ . '/logs';
+        foreach (glob($logFile . '.*') as $oldFile) {
+            if (!is_file($oldFile)) continue;
+            $oldDay = null;
+            $fpOld = @fopen($oldFile, 'r');
+            if ($fpOld) {
+                $firstLine = fgets($fpOld);
+                fclose($fpOld);
+                if ($firstLine && preg_match('/^\[(\d{4}-\d{2}-\d{2})/', $firstLine, $mm)) {
+                    $oldDay = $mm[1];
+                }
+            }
+            if (!$oldDay && preg_match('/debug\.log\.(\d{4}-\d{2}-\d{2})/', basename($oldFile), $mm)) {
+                $oldDay = $mm[1];
+            }
+            if (!$oldDay) continue;
+            if (!is_dir($archiveDir)) @mkdir($archiveDir, 0755, true);
+            $targetGz = $archiveDir . '/' . $oldDay . '.log.gz';
+            $idx = 1;
+            while (is_file($targetGz)) {
+                $targetGz = $archiveDir . '/' . $oldDay . '.' . $idx . '.log.gz';
+                $idx++;
+            }
+            $in = @fopen($oldFile, 'rb');
+            $out = @gzopen($targetGz, 'wb9');
+            if ($in && $out) {
+                while (!feof($in)) gzwrite($out, fread($in, 65536));
+                fclose($in);
+                gzclose($out);
+                @unlink($oldFile);
+            }
+            else {
+                if ($in) fclose($in);
+                if ($out) gzclose($out);
+            }
+        }
         if (is_file($logFile)) {
-            $fileDay = date('Y-m-d', filemtime($logFile));
             $today = date('Y-m-d');
-            if ($fileDay !== $today) {
-                @rename($logFile, $logFile . '.' . $fileDay);
+            $startDay = null;
+            $fp = @fopen($logFile, 'r');
+            if ($fp) {
+                $firstLine = fgets($fp);
+                fclose($fp);
+                if ($firstLine && preg_match('/^\[(\d{4}-\d{2}-\d{2})/', $firstLine, $m)) {
+                    $startDay = $m[1];
+                }
+            }
+            if ($startDay && $startDay !== $today) {
+                if (!is_dir($archiveDir)) @mkdir($archiveDir, 0755, true);
+                $archivePath = $archiveDir . '/' . $startDay . '.log';
+                $i = 1;
+                while (is_file($archivePath) || is_file($archivePath . '.gz')) {
+                    $archivePath = $archiveDir . '/' . $startDay . '.' . $i . '.log';
+                    $i++;
+                }
+                if (@rename($logFile, $archivePath)) {
+                    $in = @fopen($archivePath, 'rb');
+                    $out = @gzopen($archivePath . '.gz', 'wb9');
+                    if ($in && $out) {
+                        while (!feof($in)) gzwrite($out, fread($in, 65536));
+                        fclose($in);
+                        gzclose($out);
+                        @unlink($archivePath);
+                    }
+                    else {
+                        if ($in) fclose($in);
+                        if ($out) gzclose($out);
+                    }
+                }
             }
             else if (filesize($logFile) > LOG_MAX_FILE_BYTES) {
-                @rename($logFile, $logFile . '.' . $today . '.' . time());
+                if (!is_dir($archiveDir)) @mkdir($archiveDir, 0755, true);
+                $archivePath = $archiveDir . '/' . $today . '.' . time() . '.log';
+                @rename($logFile, $archivePath);
             }
         }
         file_put_contents($logFile, $lines, FILE_APPEND | LOCK_EX);
