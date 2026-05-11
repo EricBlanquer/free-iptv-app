@@ -188,6 +188,7 @@
   "filters": {
     "default": "تاريخ الإضافة",
     "person": "شخص...",
+    "name": "الاسم...",
     "sortName": "الاسم",
     "sortYear": "السنة",
     "title": "...العنوان",

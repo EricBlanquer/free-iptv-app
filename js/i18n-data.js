@@ -1167,6 +1167,7 @@ var I18nData = {
                     "filters": {
                             "default": "تاريخ الإضافة",
                             "person": "شخص...",
+                            "name": "الاسم...",
                             "sortName": "الاسم",
                             "sortYear": "السنة",
                             "title": "...العنوان",
@@ -1705,6 +1706,7 @@ var I18nData = {
                     "filters": {
                             "default": "Hinzugefügt",
                             "person": "Person...",
+                            "name": "Name...",
                             "sortName": "Name",
                             "sortYear": "Jahr",
                             "title": "Titel...",
@@ -2243,6 +2245,7 @@ var I18nData = {
                     "filters": {
                             "default": "Added date",
                             "person": "Person...",
+                            "name": "Name...",
                             "sortName": "Name",
                             "sortYear": "Year",
                             "title": "Title...",
@@ -2781,6 +2784,7 @@ var I18nData = {
                     "filters": {
                             "default": "Fecha de adición",
                             "person": "Persona...",
+                            "name": "Nombre...",
                             "sortName": "Nombre",
                             "sortYear": "Año",
                             "title": "Título...",
@@ -3319,6 +3323,7 @@ var I18nData = {
                     "filters": {
                             "default": "Date d'ajout",
                             "person": "Personne...",
+                            "name": "Nom...",
                             "sortName": "Nom",
                             "sortYear": "Année",
                             "title": "Titre...",
@@ -3857,6 +3862,7 @@ var I18nData = {
                     "filters": {
                             "default": "Data di aggiunta",
                             "person": "Persona...",
+                            "name": "Nome...",
                             "sortName": "Nome",
                             "sortYear": "Anno",
                             "title": "Titolo...",
@@ -4395,6 +4401,7 @@ var I18nData = {
                     "filters": {
                             "default": "Toegevoegd",
                             "person": "Persoon...",
+                            "name": "Naam...",
                             "sortName": "Naam",
                             "sortYear": "Jaar",
                             "title": "Titel...",
@@ -4933,6 +4940,7 @@ var I18nData = {
                     "filters": {
                             "default": "Data dodania",
                             "person": "Osoba...",
+                            "name": "Nazwa...",
                             "sortName": "Nazwa",
                             "sortYear": "Rok",
                             "title": "Tytuł...",
@@ -5471,6 +5479,7 @@ var I18nData = {
                     "filters": {
                             "default": "Data de adição",
                             "person": "Pessoa...",
+                            "name": "Nome...",
                             "sortName": "Nome",
                             "sortYear": "Ano",
                             "title": "Título...",
@@ -6009,6 +6018,7 @@ var I18nData = {
                     "filters": {
                             "default": "Дата добавления",
                             "person": "Человек...",
+                            "name": "Имя...",
                             "sortName": "Имя",
                             "sortYear": "Год",
                             "title": "Название...",
@@ -6547,6 +6557,7 @@ var I18nData = {
                     "filters": {
                             "default": "Eklenme tarihi",
                             "person": "Kişi...",
+                            "name": "Ad...",
                             "sortName": "Ad",
                             "sortYear": "Yıl",
                             "title": "Başlık...",

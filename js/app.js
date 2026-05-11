@@ -1003,8 +1003,11 @@ class IPTVApp {
         }
         var currentId = this.getStreamId(currentStream);
         window.log('PLAYER', 'changeChannel: currentId=' + currentId + ' type=' + typeof currentId);
-        // Use saved live channel list, or current streams as fallback
-        var streams = this.liveChannelList || this.currentStreams || [];
+        // currentStreams reflects the current sort+filter (what the user sees in
+        // the grid), so prog+/- follows the same visual order. liveChannelList
+        // is a stale snapshot from the initial section load and only used as a
+        // fallback if currentStreams was wiped (rare).
+        var streams = (this.currentStreams && this.currentStreams.length) ? this.currentStreams : (this.liveChannelList || []);
         window.log('PLAYER', 'changeChannel: liveChannelList=' + (this.liveChannelList ? this.liveChannelList.length : 'null') + ' currentStreams=' + (this.currentStreams ? this.currentStreams.length : 'null'));
         if (streams.length === 0) {
             window.log('PLAYER', 'changeChannel: no streams in list');

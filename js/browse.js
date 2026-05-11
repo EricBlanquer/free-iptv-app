@@ -1334,6 +1334,12 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
     document.getElementById('sort-filters').style.display = '';
     var yearSortBtn = document.querySelector('.sort-btn[data-sort-group="year"]');
     if (yearSortBtn) yearSortBtn.style.display = isLive ? 'none' : '';
+    var defaultSortBtn = document.querySelector('.sort-btn[data-sort-group="default"]');
+    if (defaultSortBtn) defaultSortBtn.style.display = isLive ? 'none' : '';
+    var titleInput = document.getElementById('search-title');
+    if (titleInput) {
+        titleInput.placeholder = I18n.t(isLive ? 'filters.name' : 'filters.title', isLive ? 'Name...' : 'Title...');
+    }
     // Check TNT availability for live section
     var hasTnt = false;
     var tntCount = 0;

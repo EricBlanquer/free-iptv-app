@@ -184,6 +184,7 @@
   "filters": {
     "default": "Added date",
     "person": "Person...",
+    "name": "Name...",
     "sortName": "Name",
     "sortYear": "Year",
     "title": "Title...",

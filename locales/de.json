@@ -182,6 +182,7 @@
   "filters": {
     "default": "Hinzugefügt",
     "person": "Person...",
+    "name": "Name...",
     "sortName": "Name",
     "sortYear": "Jahr",
     "title": "Titel...",

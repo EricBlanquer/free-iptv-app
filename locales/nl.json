@@ -181,6 +181,7 @@
   "filters": {
     "default": "Toegevoegd",
     "person": "Persoon...",
+    "name": "Naam...",
     "sortName": "Naam",
     "sortYear": "Jaar",
     "title": "Titel...",

@@ -188,6 +188,7 @@
   "filters": {
     "default": "Fecha de adición",
     "person": "Persona...",
+    "name": "Nombre...",
     "sortName": "Nombre",
     "sortYear": "Año",
     "title": "Título...",

@@ -184,6 +184,7 @@
   "filters": {
     "default": "Data dodania",
     "person": "Osoba...",
+    "name": "Nazwa...",
     "sortName": "Nazwa",
     "sortYear": "Rok",
     "title": "Tytuł...",

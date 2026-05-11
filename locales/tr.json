@@ -183,6 +183,7 @@
   "filters": {
     "default": "Eklenme tarihi",
     "person": "Kişi...",
+    "name": "Ad...",
     "sortName": "Ad",
     "sortYear": "Yıl",
     "title": "Başlık...",

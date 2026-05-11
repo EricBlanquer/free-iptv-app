@@ -870,6 +870,7 @@ IPTVApp.prototype.stopPlayback = function() {
     }
     var wasHistory = (this.currentStreamType === 'history');
     var isSeries = this.selectedStream && this.selectedStream.type === 'series';
+    var lastPlayedStreamId = this.currentPlayingStream ? this.getStreamId(this.currentPlayingStream) : null;
     if (this.currentPlayingStream && this.currentPlayingType !== 'live') {
         var currentPos = this.player.currentTime || 0;
         var duration = this.player.duration || 0;
@@ -962,18 +963,46 @@ IPTVApp.prototype.stopPlayback = function() {
         }
         this.updateContinueCounter();
         this.focusArea = 'grid';
-        this.focusIndex = this.lastGridIndex || 0;
-        // Scroll the grid so the focused row is visible. Doing it here (not in
-        // changeChannel) because the grid is display:none while on the player
-        // screen, and scrollTop changes on hidden elements are silently ignored.
-        var gridEl = document.getElementById('content-grid');
-        if (gridEl && this.focusIndex > 0) {
-            var isListView = gridEl.classList.contains('list-view');
-            var cols = isListView ? 1 : (this.gridColumns || 5);
-            var rowHeight = this._gridRowHeight || (isListView ? 88 : 300);
-            var rowOfTarget = Math.floor(this.focusIndex / cols);
+        var focusablesBack = this.getFocusables();
+        var targetIdx = -1;
+        if (lastPlayedStreamId != null) {
+            for (var bi = 0; bi < focusablesBack.length; bi++) {
+                var bf = focusablesBack[bi];
+                if (bf && bf.dataset && bf.dataset.streamId == lastPlayedStreamId) {
+                    targetIdx = bi;
+                    break;
+                }
+            }
+        }
+        if (targetIdx >= 0) {
+            this.focusIndex = targetIdx;
+            this.lastGridIndex = targetIdx;
+        }
+        else if (lastPlayedStreamId != null && this.currentStreams) {
+            var logicalIdx = -1;
+            for (var ci = 0; ci < this.currentStreams.length; ci++) {
+                var cs = this.currentStreams[ci];
+                var csid = cs.stream_id || cs.vod_id || cs.series_id;
+                if (csid == lastPlayedStreamId) {
+                    logicalIdx = ci;
+                    break;
+                }
+            }
+            if (logicalIdx >= 0) {
+                this._jumpToIndex(logicalIdx);
+                this.lastGridIndex = this.focusIndex;
+            }
+            else {
+                this.focusIndex = this.lastGridIndex || 0;
+            }
+        }
+        else {
+            this.focusIndex = this.lastGridIndex || 0;
+        }
+        var elBack = this.getFocusables()[this.focusIndex];
+        if (elBack && elBack.scrollIntoView) {
             this._programmaticScroll = true;
-            gridEl.scrollTop = Math.max(0, (rowOfTarget - 1) * rowHeight);
+            elBack.scrollIntoView({ block: 'center', behavior: 'auto' });
             var selfScroll = this;
             setTimeout(function() { selfScroll._programmaticScroll = false; }, 300);
         }
