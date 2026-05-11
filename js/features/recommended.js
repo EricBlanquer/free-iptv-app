@@ -247,16 +247,15 @@ IPTVApp.prototype._buildProviderIndex = function(streams) {
     var byCleanKey = {};
     for (var i = 0; i < streams.length; i++) {
         var s = streams[i];
-        if (s.tmdb_id != null) {
-            byTmdb[String(s.tmdb_id)] = s;
+        var tmdbRaw = s.tmdb_id != null ? s.tmdb_id : s.tmdb;
+        var tmdbId = tmdbRaw != null ? String(tmdbRaw).trim() : '';
+        if (tmdbId && tmdbId !== '0') {
+            if (!byTmdb[tmdbId]) byTmdb[tmdbId] = s;
         }
-        var key = s._dedupKey;
-        if (!key) {
-            var rawTitle = this.getStreamTitle ? this.getStreamTitle(s) : s.name;
-            var clean = this.cleanTitle(rawTitle).toLowerCase();
-            var year = this.extractYear(rawTitle);
-            key = clean + '|' + (year || '');
-        }
+        var rawTitle = this.getStreamTitle ? this.getStreamTitle(s) : s.name;
+        var clean = s._dedupCleanTitle != null ? s._dedupCleanTitle : this._normalizeDedupTitle(rawTitle);
+        var year = s._dedupYear != null ? s._dedupYear : this.extractYear(rawTitle);
+        var key = clean + '|' + (year || '');
         if (!byCleanKey[key]) byCleanKey[key] = s;
     }
     return { byTmdb: byTmdb, byCleanKey: byCleanKey };
@@ -267,7 +266,8 @@ IPTVApp.prototype._matchTmdbToStream = function(tmdbResult, type, providerIndex)
     if (hit) return hit;
     var rawTitle = type === 'tv' ? (tmdbResult.name || tmdbResult.original_name) : (tmdbResult.title || tmdbResult.original_title);
     if (!rawTitle) return null;
-    var clean = this.cleanTitle(rawTitle).toLowerCase();
+    var clean = this._normalizeDedupTitle(rawTitle);
+    if (!clean) return null;
     var year = '';
     if (type === 'tv' && tmdbResult.first_air_date) year = tmdbResult.first_air_date.substring(0, 4);
     if (type !== 'tv' && tmdbResult.release_date) year = tmdbResult.release_date.substring(0, 4);
