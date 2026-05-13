@@ -136,6 +136,7 @@ IPTVApp.prototype.addToWatchHistory = function(stream, type, position) {
         name: this.getStreamTitle(stream),
         cover: this.getStreamImage(stream),
         type: type,
+        section: stream._section || this.currentSection || type,
         position: position || 0,
         date: Date.now(),
         playlistId: stream._playlistId || this.settings.activePlaylistId || null,

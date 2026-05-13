@@ -4012,18 +4012,24 @@ IPTVApp.prototype.getFilteredContinueHistory = function(section) {
     var self = this;
     var minMs = (this.settings.minProgressMinutes || 2) * 60000;
     section = section || this.currentSection;
+    var vodSubsections = ['sport', 'entertainment', 'manga'];
+    var isVodSubsection = vodSubsections.indexOf(section) !== -1;
+    var isCustom = section.indexOf('custom_') === 0;
     var seenSeries = {};
     return this.watchHistory.filter(function(item) {
         if (item.watched) return false;
-        // Filter out items below minimum progress threshold (except series)
         if (item.type !== 'series' && (!item.position || item.position < minMs)) return false;
-        // Deduplicate series by name (seriesId is unreliable)
         if (item.type === 'series') {
             var seriesKey = (item.playlistId || '') + '_' + item.name;
             if (seenSeries[seriesKey]) return false;
             seenSeries[seriesKey] = true;
         }
-        if (section === 'vod') return item.type === 'vod' || item.type === 'movie';
+        var itemSection = item.section || item.type;
+        if (isVodSubsection || isCustom) return itemSection === section;
+        if (section === 'vod') {
+            if (item.type !== 'vod' && item.type !== 'movie') return false;
+            return vodSubsections.indexOf(itemSection) === -1 && itemSection.indexOf('custom_') !== 0;
+        }
         if (section === 'series') return item.type === 'series';
         if (section === 'live') return item.type === 'live';
         return item.type === 'vod' || item.type === 'movie';

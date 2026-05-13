@@ -575,6 +575,9 @@ class IPTVApp {
                         }, 2000);
                     }
                     self.startCacheRefreshTimer(playlist.id);
+                    setTimeout(function() {
+                        if (self._connectingPlaylistId === playlist.id) self.preloadSections();
+                    }, 100);
                 }
                 else {
                     self.api.authenticate().then(function() {
@@ -648,6 +651,9 @@ class IPTVApp {
                                 document.getElementById('home-grid').style.visibility = '';
                                 self.showLoading(false);
                                 self.startCacheRefreshTimer(playlist.id);
+                                setTimeout(function() {
+                                    if (self._connectingPlaylistId === playlist.id) self.preloadSections();
+                                }, 100);
                             }
                         });
                     }).catch(function(err) {
