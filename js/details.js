@@ -1984,6 +1984,7 @@ IPTVApp.prototype.getNextEpisode = function() {
 
 // Title utilities
 IPTVApp.prototype.extractYear = function(title) {
+    if (!title) return null;
     var match = title.match(Regex.yearInParens) || title.match(Regex.yearAtEnd);
     return match ? match[1] : null;
 };
@@ -3353,7 +3354,7 @@ IPTVApp.prototype.updateDownloadButton = function() {
 
 IPTVApp.prototype.getDownloadFilename = function(stream) {
     var title = this.getStreamTitle(stream) || 'download';
-    var cleanName = this.cleanTitle(title).replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var cleanName = this.cleanTitle(title).replace(/[\\\/:*?"<>|\x00-\x1f]/g, '_');
     var ext = stream.container_extension || 'mkv';
     return cleanName + '.' + ext;
 };
@@ -3475,7 +3476,7 @@ IPTVApp.prototype.downloadSeasonEpisodes = function(episodes) {
     var playlist = this.getPlaylistById(playlistId) || this.getActivePlaylist();
     if (!playlist || playlist.type !== 'provider') return;
     var seriesName = this.getStreamTitle(stream) || 'series';
-    var cleanSeriesName = this.cleanTitle(seriesName).replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var cleanSeriesName = this.cleanTitle(seriesName).replace(/[\\\/:*?"<>|\x00-\x1f]/g, '_');
     var sorted = episodes.slice().sort(function(a, b) {
         return parseInt(a.episode_num) - parseInt(b.episode_num);
     });
@@ -3809,13 +3810,15 @@ IPTVApp.prototype.renderDownloadsList = function(freeboxDownloads, queueSnapshot
 IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
     var self = this;
     var browserActive = this._isBrowserModeActive();
+    var restoreSort = this._fbRestoreSortGroup;
+    this._fbRestoreSortGroup = null;
     if (!browserActive) {
+        document.body.classList.remove('downloads-browser');
         if (downloadItems.length === 0) {
             this.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
         } else {
             var grid0 = document.getElementById('content-grid');
             grid0.classList.add('list-view');
-            this.currentSort = 'default';
             this.renderGrid(downloadItems, 'downloads');
             this.scheduleDownloadDeleteTooltip();
         }
@@ -3833,7 +3836,25 @@ IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
         FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
     }
     this._applyFreeboxSortLabels(true);
-    this.setHidden('sort-filters', false);
+    this.showElement('sort-filters');
+    document.body.classList.add('downloads-browser');
+    var restoreFocus = function() {
+        if (restoreSort) {
+            self.focusArea = 'filters';
+            var focusables = self.getFocusables();
+            for (var i = 0; i < focusables.length; i++) {
+                if (focusables[i].dataset && focusables[i].dataset.sortGroup === restoreSort) {
+                    self.focusIndex = i;
+                    break;
+                }
+            }
+        } else {
+            self.focusArea = 'grid';
+            self.focusIndex = self._fbRestoreIndex || 0;
+            self._fbRestoreIndex = 0;
+        }
+        self.deferUpdateFocus();
+    };
     FreeboxAPI.fsLs(path).then(function(entries) {
         var browserItems = self._buildFreeboxBrowserItems(path, entries);
         var combined = downloadItems.concat(browserItems);
@@ -3842,14 +3863,10 @@ IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
         } else {
             var grid = document.getElementById('content-grid');
             grid.classList.add('list-view');
-            self.currentSort = 'default';
             self.renderGrid(combined, 'downloads');
             if (downloadItems.length > 0) self.scheduleDownloadDeleteTooltip();
         }
-        self.focusArea = 'grid';
-        self.focusIndex = self._fbRestoreIndex || 0;
-        self._fbRestoreIndex = 0;
-        self.deferUpdateFocus();
+        restoreFocus();
     }).catch(function(err) {
         window.log('Freebox fs/ls error: ' + err.message);
         if (downloadItems.length === 0) {
@@ -3857,12 +3874,9 @@ IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
         } else {
             var gridE = document.getElementById('content-grid');
             gridE.classList.add('list-view');
-            self.currentSort = 'default';
             self.renderGrid(downloadItems, 'downloads');
         }
-        self.focusArea = 'grid';
-        self.focusIndex = 0;
-        self.deferUpdateFocus();
+        restoreFocus();
     });
 };
 
@@ -3946,8 +3960,10 @@ IPTVApp.prototype._sortFreeboxEntries = function(entries, sortMode) {
     else if (sortMode === 'year-asc') cmp = sizeAsc;
     else if (sortMode === 'default-asc') cmp = dateAsc;
     else cmp = dateDesc;
+    var isSizeMode = sortMode === 'year' || sortMode === 'year-asc';
     entries.sort(function(a, b) {
         if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+        if (a.type === 'dir' && isSizeMode) return nameAsc(a, b);
         return cmp(a, b);
     });
     return entries;
@@ -4013,6 +4029,28 @@ IPTVApp.prototype.openFreeboxFolder = function(path) {
     this._fbBrowsePath = path || '';
     this._fbRestoreIndex = this._fbPathFocus[this._fbBrowsePath] || 0;
     this.showDownloadsScreen();
+};
+
+IPTVApp.prototype.deleteFreeboxAtIndex = function(index) {
+    var self = this;
+    var streams = this.currentStreams || [];
+    if (index < 0 || index >= streams.length) return;
+    var stream = streams[index];
+    if (!stream || !stream._freeboxFile || stream._fbIsUp) return;
+    var name = stream.name || stream._fbPath;
+    var msg = stream._fbIsDir
+        ? I18n.t('freebox.deleteConfirmFolder', 'Delete folder "{name}" and all its contents?', { name: name })
+        : I18n.t('freebox.deleteConfirmFile', 'Delete file "{name}"?', { name: name });
+    this.showConfirmModal(msg, function() {
+        FreeboxAPI.fsRm([stream._fbPath]).then(function() {
+            self.showToast(I18n.t('freebox.deleteSuccess', 'Deleted'), 2000);
+            self._fbRestoreIndex = Math.max(0, index - 1);
+            self.showDownloadsScreen();
+        }).catch(function(err) {
+            window.log('Freebox rm error: ' + err.message);
+            self.showToast(I18n.t('freebox.deleteFailed', 'Delete failed') + ': ' + err.message, 3000, true);
+        });
+    });
 };
 
 IPTVApp.prototype.handleFreeboxFileClick = function(itemEl) {

@@ -3293,13 +3293,13 @@ IPTVApp.prototype.downloadCatchup = function(stream, program, start, duration) {
         this.showToast(I18n.t('freebox.downloadError', 'Download error'), 3000, true);
         return;
     }
-    var channelName = this.cleanTitle(this.getStreamTitle(stream) || 'Channel').replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var channelName = this.cleanTitle(this.getStreamTitle(stream) || 'Channel').replace(/[\\\/:*?"<>|\x00-\x1f]/g, '_');
     var progTitle = program.title;
     try {
         progTitle = decodeURIComponent(escape(atob(program.title)));
     }
     catch (e) { /* keep original title */ }
-    var cleanProgTitle = this.cleanTitle(progTitle || 'Program').replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+    var cleanProgTitle = this.cleanTitle(progTitle || 'Program').replace(/[\\\/:*?"<>|\x00-\x1f]/g, '_');
     var startDate = new Date(start * 1000);
     var pad = function(n) { return n < 10 ? '0' + n : String(n); };
     var dateStr = startDate.getFullYear() + '-' + pad(startDate.getMonth() + 1) + '-' + pad(startDate.getDate()) + '_' + pad(startDate.getHours()) + '-' + pad(startDate.getMinutes());

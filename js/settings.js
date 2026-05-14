@@ -3037,6 +3037,8 @@ IPTVApp.prototype.startFreeboxPairing = function() {
                 self.saveSettings();
                 self.initFreebox();
                 self.updateFreeboxStatus();
+                self.updateFreeboxVisibility();
+                self.updateHomeDownloadButton();
                 self.showToast(I18n.t('freebox.pairingGranted', 'Pairing successful!'), 3000);
             }
             else if (status === 'denied') {
@@ -3058,6 +3060,8 @@ IPTVApp.prototype.unpairFreebox = function() {
     FreeboxAPI.setConfig(this.settings.freeboxHost, '');
     FreeboxAPI.stopPolling();
     this.updateFreeboxStatus();
+    this.updateFreeboxVisibility();
+    this.updateHomeDownloadButton();
 };
 
 IPTVApp.prototype.updateSettingsUpdateButton = function() {

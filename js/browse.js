@@ -555,6 +555,11 @@ IPTVApp.prototype._getStreamById = function(streamId) {
 
 IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, done) {
     var self = this;
+    if (gridItem && gridItem.classList && gridItem.classList.contains('freebox-file')) {
+        div.dataset.loaded = 'skip';
+        done();
+        return;
+    }
     div.dataset.loaded = 'loading';
     var optimizedUrl = this.optimizeTmdbImageUrl(url, 'w300');
     var loadProviderImage = function(onDone) {
@@ -2004,7 +2009,7 @@ IPTVApp.prototype.applySort = function(sortType) {
     this.saveSettings();
     this._updateSortButtons();
     if (section === 'downloads' && this.settings.freeboxEnabled && this.settings.freeboxAppToken) {
-        this._fbRestoreIndex = this.focusIndex;
+        this._fbRestoreSortGroup = this._sortToGroup(sortType);
         this.showDownloadsScreen();
         return;
     }
@@ -2650,6 +2655,9 @@ IPTVApp.prototype.applyFilters = function() {
     }
     if (this.genreFilter) {
         // Sort phase skipped: TMDB popularity order from _genreFilteredStreams is preserved.
+    }
+    else if (this.currentSection === 'downloads') {
+        // Sort phase skipped: Freebox file browser pre-sorts items via _sortFreeboxEntries.
     }
     else if ((this.currentSort === 'default' || this.currentSort === 'default-asc') && this.currentSection !== 'entertainment') {
         this._sortByDateAdded(streams, this.currentSort === 'default-asc');
@@ -3901,7 +3909,7 @@ IPTVApp.prototype._createFreeboxItem = function(stream) {
     listTitle.className = 'list-title';
     listTitle.textContent = stream.name || '';
     info.appendChild(listTitle);
-    if (!stream._fbIsDir && !stream._fbIsUp && stream._fbSize > 0) {
+    if (!stream._fbIsDir && !stream._fbIsUp) {
         var meta = document.createElement('div');
         meta.className = 'list-meta';
         var sizeSpan = document.createElement('span');
@@ -3915,8 +3923,13 @@ IPTVApp.prototype._createFreeboxItem = function(stream) {
 };
 
 IPTVApp.prototype._fbFormatSize = function(bytes) {
-    if (!bytes) return '';
-    var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var unitsByLocale = {
+        fr: ['o', 'Ko', 'Mo', 'Go', 'To'],
+        ru: ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ']
+    };
+    var locale = (typeof I18n !== 'undefined' && I18n.getLocale) ? I18n.getLocale() : 'en';
+    var units = unitsByLocale[locale] || ['B', 'KB', 'MB', 'GB', 'TB'];
+    if (!bytes || bytes < 0) return '0 ' + units[0];
     var i = 0;
     var n = bytes;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }

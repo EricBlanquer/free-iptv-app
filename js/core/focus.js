@@ -28,7 +28,11 @@ IPTVApp.prototype.bindKeys = function() {
     }
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
-        window.log('KEY', 'keydown key=' + key + ' focusArea=' + self.focusArea);
+        var logAfter = function() {
+            window.log('KEY', 'keydown key=' + key + ' focusArea=' + self.focusArea + ' focused=' + self._describeFocused());
+        };
+        if (typeof queueMicrotask === 'function') queueMicrotask(logAfter);
+        else setTimeout(logAfter, 0);
         if (key === 37 || key === 38 || key === 39 || key === 40) {
             self._arrowHeld = true;
         }
@@ -773,6 +777,10 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
                     this.removeDownloadAtIndex(this.focusIndex);
                     return { index: newIndex, handled: true };
                 }
+                if (dlEl && dlEl.classList && dlEl.classList.contains('freebox-file') && dlEl.dataset.fbIsUp !== '1') {
+                    this.deleteFreeboxAtIndex(this.focusIndex);
+                    return { index: newIndex, handled: true };
+                }
             }
             if ((newIndex + 1) % cols !== 0 && newIndex < ctx.focusables.length - 1) {
                 newIndex++;
@@ -1127,6 +1135,26 @@ IPTVApp.prototype.invalidateFocusables = function() {
     this._focusablesDirty = true;
 };
 
+IPTVApp.prototype._describeFocused = function() {
+    var focusables = this.getFocusables();
+    if (!focusables || focusables.length === 0) return '<no-focusables>';
+    var el = focusables[this.focusIndex];
+    if (!el) return '<idx=' + this.focusIndex + '/' + focusables.length + ':null>';
+    var parts = [];
+    if (el.id) parts.push('#' + el.id);
+    else if (el.dataset && el.dataset.section) parts.push('section=' + el.dataset.section);
+    else if (el.dataset && el.dataset.streamId) parts.push('stream=' + el.dataset.streamId + (el.dataset.streamType ? ':' + el.dataset.streamType : ''));
+    else if (el.dataset && el.dataset.fbPath) parts.push('fb=' + el.dataset.fbPath);
+    else if (el.dataset && el.dataset.sortGroup) parts.push('sort=' + el.dataset.sortGroup);
+    else if (el.dataset && el.dataset.action) parts.push('action=' + el.dataset.action);
+    else if (el.classList && el.classList.length > 0) parts.push('.' + el.classList[0]);
+    else parts.push('<' + el.tagName.toLowerCase() + '>');
+    var txt = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    if (txt && txt.length <= 40) parts.push('"' + txt + '"');
+    else if (txt) parts.push('"' + txt.substring(0, 37) + '..."');
+    return '[' + this.focusIndex + '/' + focusables.length + '] ' + parts.join(' ');
+};
+
 IPTVApp.prototype.getFocusables = function() {
     if (!this._focusablesDirty && this._cachedFocusables && this._cachedFocusArea === this.focusArea) {
         return this._cachedFocusables;
@@ -1189,11 +1217,17 @@ IPTVApp.prototype.getFocusables = function() {
             selector = '#genre-picker-modal .focusable';
             break;
     }
+    if (!selector) {
+        this._cachedFocusables = [];
+        this._cachedFocusArea = this.focusArea;
+        this._focusablesDirty = false;
+        return [];
+    }
     var elements = document.querySelectorAll(selector);
     var visible = [];
     for (var i = 0; i < elements.length; i++) {
         var el = elements[i];
-        if (!el.classList.contains('hidden') && !el.classList.contains('collapsed-hidden') && el.style.display !== 'none' && !el.closest('.collapsible-content.collapsed') && !el.closest('.hidden')) {
+        if (!el.classList.contains('hidden') && !el.classList.contains('collapsed-hidden') && el.style.display !== 'none' && !el.closest('.collapsible-content.collapsed') && !el.closest('.hidden') && el.offsetParent !== null) {
             visible.push(el);
         }
     }

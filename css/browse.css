@@ -179,6 +179,21 @@
     flex-shrink: 0;
 }
 
+#search-filters.hidden + #sort-filters {
+    margin-left: auto;
+}
+
+body.downloads-browser #filters-bar #sidebar-header {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+}
+
+body.downloads-browser #filters-bar #sidebar-title {
+    direction: rtl;
+    text-align: left;
+}
+
 .filter-input {
     padding: 0 15px;
     background: rgba(255, 255, 255, 0.1);
@@ -833,6 +848,10 @@ body.touch #content-grid.list-view .grid-item-info {
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.05);
+}
+
+.grid-item-image.fb-icon::before {
+    content: none;
 }
 
 .fb-icon-glyph {

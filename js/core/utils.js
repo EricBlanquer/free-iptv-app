@@ -113,6 +113,9 @@ IPTVApp.prototype.initBrowseScreen = function(section, streamType, titleKey, tit
     if (section !== 'downloads' && this._applyFreeboxSortLabels) {
         this._applyFreeboxSortLabels(false);
     }
+    if (section !== 'downloads') {
+        document.body.classList.remove('downloads-browser');
+    }
 };
 
 IPTVApp.prototype.goToScreen = function(screen, area, index) {

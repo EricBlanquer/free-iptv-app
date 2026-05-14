@@ -454,6 +454,18 @@ var FreeboxAPI = (function() {
         });
     }
 
+    function fsRm(paths) {
+        return ensureSession().then(function() {
+            var encoded = (paths || []).map(encodePath);
+            return xhr('POST', apiUrl('/api/v4/fs/rm/'), { files: encoded });
+        }).then(function(resp) {
+            if (!resp.success) {
+                throw new Error(resp.msg || 'fs/rm failed');
+            }
+            return resp.result;
+        });
+    }
+
     function fetchFileBlob(path) {
         return ensureSession().then(function() {
             return new Promise(function(resolve, reject) {
@@ -497,6 +509,7 @@ var FreeboxAPI = (function() {
         isConfigured: isConfigured,
         hmacSha1: hmacSha1,
         fsLs: fsLs,
+        fsRm: fsRm,
         getStreamUrl: getStreamUrl,
         fetchFileBlob: fetchFileBlob
     };

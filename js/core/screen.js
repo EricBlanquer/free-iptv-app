@@ -82,13 +82,16 @@ IPTVApp.prototype.bindTouchEvents = function() {
         }
     };
     document.addEventListener('touchstart', function(e) {
-        var item = e.target.closest('#content-grid .grid-item[data-is-download="1"], #content-grid .grid-item[data-is-history="1"]');
+        var item = e.target.closest('#content-grid .grid-item[data-is-download="1"], #content-grid .grid-item[data-is-history="1"], #content-grid .grid-item.freebox-file:not([data-fb-is-up="1"])');
         if (!item) return;
         var isHistoryItem = item.dataset.isHistory === '1';
-        var validSection = isHistoryItem ? self.currentSection === 'history' : self.currentSection === 'downloads';
+        var isFreeboxItem = item.classList.contains('freebox-file');
+        var validSection;
+        if (isHistoryItem) validSection = self.currentSection === 'history';
+        else validSection = self.currentSection === 'downloads';
         if (!validSection) return;
         var touch = e.touches[0];
-        swipeState = { item: item, isHistory: isHistoryItem, startX: touch.clientX, startY: touch.clientY, dx: 0, cancelled: false, trashEl: null };
+        swipeState = { item: item, isHistory: isHistoryItem, isFreebox: isFreeboxItem, startX: touch.clientX, startY: touch.clientY, dx: 0, cancelled: false, trashEl: null };
     }, { passive: true });
     document.addEventListener('touchmove', function(e) {
         if (!swipeState || swipeState.cancelled) return;
@@ -132,6 +135,8 @@ IPTVApp.prototype.bindTouchEvents = function() {
                 if (state.isHistory) {
                     self.hideButtonTooltip('history-delete-tooltip-anchor', true);
                     self.removeHistoryAtIndex(idx);
+                } else if (state.isFreebox) {
+                    self.deleteFreeboxAtIndex(idx);
                 } else {
                     self.hideButtonTooltip('download-delete-tooltip-anchor', true);
                     self.removeDownloadAtIndex(idx);
