@@ -3889,6 +3889,7 @@ IPTVApp.prototype._createFreeboxItem = function(stream) {
     item.dataset.fbIsDir = stream._fbIsDir ? '1' : '0';
     item.dataset.fbMime = stream._fbMime || '';
     if (stream._fbIsUp) item.dataset.fbIsUp = '1';
+    if (stream._fbContinue) item.dataset.fbContinue = '1';
     var image = document.createElement('div');
     image.className = 'grid-item-image fb-icon';
     var iconName;
@@ -3914,11 +3915,28 @@ IPTVApp.prototype._createFreeboxItem = function(stream) {
         meta.className = 'list-meta';
         var sizeSpan = document.createElement('span');
         sizeSpan.className = 'list-year';
-        sizeSpan.textContent = this._fbFormatSize(stream._fbSize);
+        if (stream._fbContinue) {
+            sizeSpan.textContent = '▶ ' + this.formatPosition(stream._fbContinuePosition || 0);
+        } else {
+            sizeSpan.textContent = this._fbFormatSize(stream._fbSize);
+        }
         meta.appendChild(sizeSpan);
         info.appendChild(meta);
     }
     item.appendChild(info);
+    if (!stream._fbIsDir && !stream._fbIsUp && (stream._fbMime === 'video' || stream._fbMime === 'audio')) {
+        var fbProgress = this.getWatchHistoryItem(stream.stream_id, '_fb_');
+        var minMs = (this.settings.minProgressMinutes || 2) * 60000;
+        if (fbProgress && fbProgress.position >= minMs && fbProgress.percent > 0 && !fbProgress.watched) {
+            var pb = document.createElement('div');
+            pb.className = 'grid-progress-bar';
+            var pf = document.createElement('div');
+            pf.className = 'grid-progress-fill';
+            pf.style.width = fbProgress.percent + '%';
+            pb.appendChild(pf);
+            item.appendChild(pb);
+        }
+    }
     return item;
 };
 
@@ -4164,6 +4182,7 @@ IPTVApp.prototype.getFilteredContinueHistory = function(section) {
     var isCustom = section.indexOf('custom_') === 0;
     var seenSeries = {};
     return this.watchHistory.filter(function(item) {
+        if (item.playlistId === '_fb_') return false;
         if (item.watched) return false;
         if (item.type !== 'series' && (!item.position || item.position < minMs)) return false;
         if (item.type === 'series') {

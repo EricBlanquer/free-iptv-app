@@ -67,7 +67,19 @@ IPTVApp.prototype.startMemoryMonitor = function() {
 IPTVApp.prototype.loadWatchHistory = function() {
     try {
         var data = localStorage.getItem('watchHistory');
-        return data ? JSON.parse(data) : [];
+        var list = data ? JSON.parse(data) : [];
+        var changed = false;
+        for (var i = 0; i < list.length; i++) {
+            var it = list[i];
+            if (typeof it.id === 'string' && it.id.indexOf('_fb_/') === 0 && it.playlistId !== '_fb_') {
+                it.playlistId = '_fb_';
+                changed = true;
+            }
+        }
+        if (changed) {
+            try { localStorage.setItem('watchHistory', JSON.stringify(list)); } catch (ex) {}
+        }
+        return list;
     }
     catch (e) {
         return [];
@@ -1387,6 +1399,7 @@ IPTVApp.prototype.loadSettings = function() {
         freeboxBatchDownload: true,
         freeboxDownloadViaProxy: false,
         freeboxBrowserEnabled: true,
+        freeboxSlideshowInterval: 5,
         useGenreCategories: true,
         bufferPreset: 'standard',
         bufferPlay: 2,

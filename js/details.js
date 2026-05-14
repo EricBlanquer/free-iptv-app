@@ -3855,6 +3855,19 @@ IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
         }
         self.deferUpdateFocus();
     };
+    if (path === '_fb_continue') {
+        var browserItemsC = self._buildFreeboxBrowserItems(path, []);
+        var combinedC = downloadItems.concat(browserItemsC);
+        if (combinedC.length === 0) {
+            self.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
+        } else {
+            var gridC = document.getElementById('content-grid');
+            gridC.classList.add('list-view');
+            self.renderGrid(combinedC, 'downloads');
+        }
+        restoreFocus();
+        return;
+    }
     FreeboxAPI.fsLs(path).then(function(entries) {
         var browserItems = self._buildFreeboxBrowserItems(path, entries);
         var combined = downloadItems.concat(browserItems);
@@ -3888,12 +3901,42 @@ IPTVApp.prototype._buildFreeboxBrowserItems = function(path, entries) {
         var base = I18n.t('home.files', 'Files');
         if (isRoot) {
             titleEl.textContent = base;
+        } else if (path === '_fb_continue') {
+            titleEl.textContent = base + ' / ' + I18n.t('home.continue', 'Continue');
         } else {
             var crumbs = this._fbDisplayPath(path).split('/').filter(Boolean).join(' / ');
             titleEl.textContent = base + ' / ' + crumbs;
         }
     }
-    if (!isRoot) {
+    var isContinueFolder = path === '_fb_continue';
+    if (isRoot) {
+        var continueItems = this._buildFreeboxContinueItems();
+        if (continueItems.length > 0) {
+            items.push({
+                stream_id: '_fb_continue',
+                name: I18n.t('home.continue', 'Continue'),
+                _freeboxFile: true,
+                _fbPath: '_fb_continue',
+                _fbIsDir: true,
+                _fbVirtual: true
+            });
+        }
+    }
+    if (isContinueFolder) {
+        items.push({
+            stream_id: '_fb_up_continue',
+            name: '↑ ' + I18n.t('freebox.parentFolder', 'Parent folder'),
+            _freeboxFile: true,
+            _fbIsUp: true,
+            _fbPath: '',
+            _fbIsDir: true
+        });
+        var contItems = this._buildFreeboxContinueItems();
+        for (var k = 0; k < contItems.length; k++) {
+            items.push(contItems[k]);
+        }
+    }
+    if (!isRoot && !isContinueFolder) {
         var parent = this._fbParentPath(path);
         items.push({
             stream_id: '_fb_up_' + path,
@@ -3967,6 +4010,37 @@ IPTVApp.prototype._sortFreeboxEntries = function(entries, sortMode) {
         return cmp(a, b);
     });
     return entries;
+};
+
+IPTVApp.prototype._buildFreeboxContinueItems = function() {
+    var minMs = (this.settings.minProgressMinutes || 2) * 60000;
+    var out = [];
+    var hist = this.watchHistory || [];
+    for (var i = 0; i < hist.length; i++) {
+        var h = hist[i];
+        if (h.playlistId !== '_fb_') continue;
+        if (h.watched) continue;
+        if (!h.position || h.position < minMs) continue;
+        if (typeof h.id !== 'string' || h.id.indexOf('_fb_/') !== 0) continue;
+        var path = h.id.substring('_fb_'.length);
+        var name = h.name || path.split('/').pop() || path;
+        var mime = this._fbMimeFromName(name);
+        out.push({
+            stream_id: h.id,
+            name: name,
+            _freeboxFile: true,
+            _fbPath: path,
+            _fbIsDir: false,
+            _fbMime: mime,
+            _fbSize: 0,
+            _fbContinue: true,
+            _fbContinuePosition: h.position || 0,
+            _fbContinueDuration: h.duration || 0,
+            _fbModification: h.date || 0
+        });
+    }
+    out.sort(function(a, b) { return (b._fbModification || 0) - (a._fbModification || 0); });
+    return out;
 };
 
 IPTVApp.prototype._fbDisplayPath = function(path) {
@@ -4074,21 +4148,33 @@ IPTVApp.prototype.handleFreeboxFileClick = function(itemEl) {
 
 IPTVApp.prototype.playFreeboxFile = function(path, mime) {
     var self = this;
+    if (!FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken || '');
+    }
+    if (!this.settings.freeboxAppToken) {
+        this.showToast(I18n.t('freebox.notConfigured', 'Freebox not configured'), 3000, true);
+        return;
+    }
     this.showLoading(true);
     FreeboxAPI.getStreamUrl(path).then(function(url) {
         self.showLoading(false);
         var name = path.split('/').pop() || path;
+        var streamId = '_fb_' + path;
         var fakeStream = {
             url: url,
-            stream_id: '_fb_' + path,
+            stream_id: streamId,
             name: name,
             _type: 'vod',
             _isFreeboxFile: true,
             _fbPath: path,
-            _fbMime: mime
+            _fbMime: mime,
+            _playlistId: '_fb_'
         };
+        var progress = self.getWatchHistoryItem(streamId, '_fb_');
+        var startPosition = (progress && progress.position > 0 && !progress.watched) ? progress.position : 0;
         self.selectedStream = null;
-        self.playStream(fakeStream.stream_id, 'vod', fakeStream);
+        self.playStream(streamId, 'vod', fakeStream, startPosition);
     }).catch(function(err) {
         self.showLoading(false);
         window.log('Freebox play error: ' + err.message);
@@ -4116,57 +4202,277 @@ IPTVApp.prototype.openFreeboxPhoto = function(path) {
     this._showFreeboxPhotoAt(index);
 };
 
+IPTVApp.prototype._parseExifOrientation = function(url) {
+    return new Promise(function(resolve) {
+        var req = new XMLHttpRequest();
+        req.open('GET', url, true);
+        req.responseType = 'arraybuffer';
+        try { req.setRequestHeader('Range', 'bytes=0-131071'); } catch (ex) {}
+        req.timeout = 8000;
+        req.onload = function() {
+            if (req.status !== 200 && req.status !== 206) {
+                window.log('EXIF http status ' + req.status);
+                resolve(1);
+                return;
+            }
+            try {
+                var view = new DataView(req.response);
+                window.log('EXIF parse bytes=' + view.byteLength);
+                if (view.byteLength < 4 || view.getUint16(0) !== 0xFFD8) {
+                    window.log('EXIF not JPEG magic=' + (view.byteLength >= 2 ? view.getUint16(0).toString(16) : 'short'));
+                    resolve(1);
+                    return;
+                }
+                var offset = 2;
+                while (offset < view.byteLength - 4) {
+                    var marker = view.getUint16(offset);
+                    if ((marker & 0xFF00) !== 0xFF00) {
+                        window.log('EXIF invalid marker at ' + offset + ': ' + marker.toString(16));
+                        resolve(1);
+                        return;
+                    }
+                    var segLen = view.getUint16(offset + 2);
+                    if (marker === 0xFFE1 && offset + 10 < view.byteLength && view.getUint32(offset + 4) === 0x45786966) {
+                        var tiffStart = offset + 10;
+                        var byteOrder = view.getUint16(tiffStart);
+                        var le;
+                        if (byteOrder === 0x4949) le = true;
+                        else if (byteOrder === 0x4D4D) le = false;
+                        else { window.log('EXIF bad TIFF byte order'); resolve(1); return; }
+                        if (view.getUint16(tiffStart + 2, le) !== 42) { window.log('EXIF bad TIFF magic'); resolve(1); return; }
+                        var ifdOffset = tiffStart + view.getUint32(tiffStart + 4, le);
+                        if (ifdOffset >= view.byteLength - 2) { window.log('EXIF IFD out of range'); resolve(1); return; }
+                        var numTags = view.getUint16(ifdOffset, le);
+                        window.log('EXIF tags=' + numTags);
+                        for (var i = 0; i < numTags; i++) {
+                            var tagOffset = ifdOffset + 2 + i * 12;
+                            if (tagOffset >= view.byteLength - 10) break;
+                            var tagId = view.getUint16(tagOffset, le);
+                            if (tagId === 0x0112) {
+                                var orient = view.getUint16(tagOffset + 8, le) || 1;
+                                window.log('EXIF found orientation=' + orient);
+                                resolve(orient);
+                                return;
+                            }
+                        }
+                        window.log('EXIF no orientation tag (scanned ' + numTags + ')');
+                        resolve(1);
+                        return;
+                    }
+                    offset += 2 + segLen;
+                }
+                window.log('EXIF no APP1/Exif found, last offset=' + offset);
+                resolve(1);
+            } catch (ex) {
+                window.log('EXIF exception: ' + (ex.message || ex));
+                resolve(1);
+            }
+        };
+        req.onerror = function() { window.log('EXIF network error'); resolve(1); };
+        req.ontimeout = function() { window.log('EXIF timeout'); resolve(1); };
+        req.send();
+    });
+};
+
+IPTVApp.prototype._orientationToTransform = function(o) {
+    switch (o) {
+        case 2: return 'scaleX(-1)';
+        case 3: return 'rotate(180deg)';
+        case 4: return 'rotate(180deg) scaleX(-1)';
+        case 5: return 'rotate(90deg) scaleX(-1)';
+        case 6: return 'rotate(90deg)';
+        case 7: return 'rotate(-90deg) scaleX(-1)';
+        case 8: return 'rotate(-90deg)';
+        default: return '';
+    }
+};
+
 IPTVApp.prototype._showFreeboxPhotoAt = function(index) {
     if (!this._fbPhotoList || index < 0 || index >= this._fbPhotoList.length) return;
     this._fbPhotoIndex = index;
     var entry = this._fbPhotoList[index];
     var self = this;
-    this.showLoading(true);
     var modal = document.getElementById('fb-photo-modal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'fb-photo-modal';
         modal.className = 'fb-photo-modal hidden';
-        var img = document.createElement('img');
-        img.id = 'fb-photo-img';
-        img.className = 'fb-photo-img';
-        modal.appendChild(img);
+        var imgA = document.createElement('img');
+        imgA.id = 'fb-photo-img-a';
+        imgA.className = 'fb-photo-img';
+        modal.appendChild(imgA);
+        var imgB = document.createElement('img');
+        imgB.id = 'fb-photo-img-b';
+        imgB.className = 'fb-photo-img';
+        modal.appendChild(imgB);
         var caption = document.createElement('div');
         caption.id = 'fb-photo-caption';
         caption.className = 'fb-photo-caption';
         modal.appendChild(caption);
         document.body.appendChild(modal);
+        this._fbActiveImg = 'a';
     }
-    var imgEl = document.getElementById('fb-photo-img');
+    var activeImg = document.getElementById('fb-photo-img-' + this._fbActiveImg);
+    var inactiveKey = this._fbActiveImg === 'a' ? 'b' : 'a';
+    var inactiveImg = document.getElementById('fb-photo-img-' + inactiveKey);
     var captionEl = document.getElementById('fb-photo-caption');
     captionEl.textContent = entry.name + ' (' + (index + 1) + '/' + this._fbPhotoList.length + ')';
-    FreeboxAPI.getStreamUrl(entry._fbPath).then(function(url) {
-        imgEl.onload = function() { self.showLoading(false); };
-        imgEl.onerror = function() {
+    this._photoLoadId = (this._photoLoadId || 0) + 1;
+    var loadId = this._photoLoadId;
+    inactiveImg.onload = null;
+    inactiveImg.onerror = null;
+    inactiveImg.classList.remove('fb-photo-img-rotated');
+    inactiveImg.style.transform = 'translate(-50%, -50%)';
+    modal.classList.remove('hidden');
+    self.focusArea = 'fb-photo';
+    var setSrcWithTransform = function(url, orient) {
+        if (loadId !== self._photoLoadId) return;
+        var transform = self._orientationToTransform(orient);
+        window.log('PHOTO orient=' + orient + ' transform="' + transform + '"');
+        inactiveImg.style.transform = 'translate(-50%, -50%) ' + (transform || '');
+        if (orient === 5 || orient === 6 || orient === 7 || orient === 8) {
+            inactiveImg.classList.add('fb-photo-img-rotated');
+        }
+        inactiveImg.onload = function() {
             self.showLoading(false);
+            if (loadId !== self._photoLoadId) return;
+            inactiveImg.classList.add('fb-photo-visible');
+            if (activeImg !== inactiveImg) activeImg.classList.remove('fb-photo-visible');
+            self._fbActiveImg = inactiveKey;
+            window.log('PHOTO loaded transform="' + inactiveImg.style.transform + '" natural=' + inactiveImg.naturalWidth + 'x' + inactiveImg.naturalHeight);
+            if (self._fbPhotoList.length > 1) {
+                var nextIdx = (index + 1) % self._fbPhotoList.length;
+                self._preloadFreeboxPhotoAt(nextIdx);
+            }
+        };
+        inactiveImg.onerror = function() {
+            self.showLoading(false);
+            if (loadId !== self._photoLoadId) return;
             self.showToast(I18n.t('freebox.playError', 'Cannot open photo'), 2500, true);
         };
-        imgEl.src = url;
-        modal.classList.remove('hidden');
-        self.focusArea = 'fb-photo';
+        inactiveImg.src = url;
+    };
+    var cached = this._fbPhotoPreload && this._fbPhotoPreload[entry._fbPath];
+    if (cached && cached.status === 'ready' && cached.url) {
+        window.log('PHOTO using preloaded ' + entry._fbPath);
+        setSrcWithTransform(cached.url, cached.orient);
+        return;
+    }
+    this.showLoading(true);
+    FreeboxAPI.getStreamUrl(entry._fbPath).then(function(url) {
+        if (loadId !== self._photoLoadId) return;
+        var ext = (entry.name || '').toLowerCase().split('.').pop();
+        var isJpeg = ext === 'jpg' || ext === 'jpeg';
+        if (isJpeg) {
+            self._parseExifOrientation(url).then(function(orient) {
+                if (loadId !== self._photoLoadId) return;
+                setSrcWithTransform(url, orient);
+            });
+        } else {
+            setSrcWithTransform(url, 1);
+        }
     }).catch(function(err) {
+        if (loadId !== self._photoLoadId) return;
         self.showLoading(false);
         window.log('Freebox photo url error: ' + err.message);
         self.showToast(I18n.t('freebox.playError', 'Cannot open photo') + ': ' + err.message, 3000, true);
     });
 };
 
-IPTVApp.prototype.closeFreeboxPhoto = function() {
+IPTVApp.prototype._preloadFreeboxPhotoAt = function(index) {
+    if (!this._fbPhotoList || index < 0 || index >= this._fbPhotoList.length) return;
+    var entry = this._fbPhotoList[index];
+    if (!entry || !entry._fbPath) return;
+    if (!this._fbPhotoPreload) this._fbPhotoPreload = {};
+    var key = entry._fbPath;
+    if (this._fbPhotoPreload[key]) return;
+    this._fbPhotoPreload[key] = { url: null, orient: 1, status: 'loading' };
+    var self = this;
+    var ext = (entry.name || '').toLowerCase().split('.').pop();
+    var isJpeg = ext === 'jpg' || ext === 'jpeg';
+    FreeboxAPI.getStreamUrl(entry._fbPath).then(function(url) {
+        if (!self._fbPhotoPreload[key]) return;
+        self._fbPhotoPreload[key].url = url;
+        var preImg = new Image();
+        preImg.src = url;
+        if (isJpeg) {
+            self._parseExifOrientation(url).then(function(orient) {
+                if (!self._fbPhotoPreload[key]) return;
+                self._fbPhotoPreload[key].orient = orient;
+                self._fbPhotoPreload[key].status = 'ready';
+                window.log('PHOTO preloaded ' + key + ' orient=' + orient);
+            });
+        } else {
+            self._fbPhotoPreload[key].status = 'ready';
+            window.log('PHOTO preloaded ' + key + ' (non-jpeg)');
+        }
+    }).catch(function() {
+        delete self._fbPhotoPreload[key];
+    });
+};
+
+IPTVApp.prototype.toggleFreeboxSlideshow = function() {
+    if (this._fbSlideshowTimer) {
+        this.stopFreeboxSlideshow();
+    } else {
+        this.startFreeboxSlideshow();
+    }
+};
+
+IPTVApp.prototype.startFreeboxSlideshow = function() {
+    var self = this;
+    var interval = parseInt(this.settings.freeboxSlideshowInterval, 10);
+    if (!interval || interval < 1) interval = 5;
+    this.stopFreeboxSlideshow();
     var modal = document.getElementById('fb-photo-modal');
-    if (modal) modal.classList.add('hidden');
-    var imgEl = document.getElementById('fb-photo-img');
-    if (imgEl) imgEl.src = '';
+    if (modal) modal.classList.add('fb-slideshow-mode');
+    this._fbSlideshowTimer = setInterval(function() {
+        self._fbSlideshowAdvancing = true;
+        self.nextFreeboxPhoto(1);
+        self._fbSlideshowAdvancing = false;
+    }, interval * 1000);
+    if (self._fbPhotoList && self._fbPhotoList.length > 1) {
+        var nextIdx = (self._fbPhotoIndex + 1) % self._fbPhotoList.length;
+        self._preloadFreeboxPhotoAt(nextIdx);
+    }
+};
+
+IPTVApp.prototype.stopFreeboxSlideshow = function() {
+    if (this._fbSlideshowTimer) {
+        clearInterval(this._fbSlideshowTimer);
+        this._fbSlideshowTimer = null;
+    }
+    var modal = document.getElementById('fb-photo-modal');
+    if (modal) modal.classList.remove('fb-slideshow-mode');
+};
+
+IPTVApp.prototype.closeFreeboxPhoto = function() {
+    this.stopFreeboxSlideshow();
+    this._photoLoadId = (this._photoLoadId || 0) + 1;
+    var modal = document.getElementById('fb-photo-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('fb-slideshow-mode');
+    }
+    ['fb-photo-img-a', 'fb-photo-img-b'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.onload = null;
+            el.onerror = null;
+            el.removeAttribute('src');
+            el.style.transform = '';
+            el.classList.remove('fb-photo-img-rotated');
+            el.classList.remove('fb-photo-visible');
+        }
+    });
+    this._fbPhotoPreload = {};
     this.focusArea = 'grid';
     this.updateFocus();
 };
 
 IPTVApp.prototype.nextFreeboxPhoto = function(delta) {
     if (!this._fbPhotoList) return;
+    if (!this._fbSlideshowAdvancing) this.stopFreeboxSlideshow();
     var n = this._fbPhotoList.length;
     var next = (this._fbPhotoIndex + delta + n) % n;
     this._showFreeboxPhotoAt(next);

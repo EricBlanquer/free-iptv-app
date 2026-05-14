@@ -389,6 +389,7 @@ var FreeboxAPI = (function() {
     }
 
     var streamUrlMethod = null;
+    var shareLinkCache = {};
 
     function getStreamUrlWithSessionParam(path) {
         return 'http://' + config.host + '/api/v4/dl/' + encodePath(path) + '?session=' + encodeURIComponent(config.sessionToken);
@@ -429,15 +430,33 @@ var FreeboxAPI = (function() {
         });
     }
 
+    function getCachedShareLink(path) {
+        var cached = shareLinkCache[path];
+        if (cached && cached.expiresAt > Date.now() + 60000) {
+            return cached.url;
+        }
+        return null;
+    }
+
+    function createOrReuseShareLink(path) {
+        var cachedUrl = getCachedShareLink(path);
+        if (cachedUrl) {
+            return Promise.resolve(cachedUrl);
+        }
+        return createShareLink(path).then(function(res) {
+            var url = res.fullurl || res.url;
+            shareLinkCache[path] = { url: url, expiresAt: Date.now() + 3600000 };
+            return url;
+        });
+    }
+
     function getStreamUrl(path) {
         return ensureSession().then(function() {
             if (streamUrlMethod === 'session') {
                 return getStreamUrlWithSessionParam(path);
             }
             if (streamUrlMethod === 'share_link') {
-                return createShareLink(path).then(function(res) {
-                    return res.fullurl || res.url;
-                });
+                return createOrReuseShareLink(path);
             }
             return probeSessionParamUrl(path).then(function(ok) {
                 if (ok) {
@@ -447,9 +466,7 @@ var FreeboxAPI = (function() {
                 }
                 streamUrlMethod = 'share_link';
                 window.log('Freebox: stream auth via share_link');
-                return createShareLink(path).then(function(res) {
-                    return res.fullurl || res.url;
-                });
+                return createOrReuseShareLink(path);
             });
         });
     }

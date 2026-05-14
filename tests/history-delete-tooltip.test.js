@@ -107,7 +107,8 @@ describe('History delete-entry tooltip — source pins', () => {
         });
 
         it('section guard rejects history items when not in history section (and vice versa)', () => {
-            expect(screenCode).toMatch(/isHistoryItem\s*\?\s*self\.currentSection\s*===\s*['"]history['"]\s*:\s*self\.currentSection\s*===\s*['"]downloads['"]/);
+            expect(screenCode).toMatch(/if\s*\(\s*isHistoryItem\s*\)\s*validSection\s*=\s*self\.currentSection\s*===\s*['"]history['"]/);
+            expect(screenCode).toMatch(/else\s*validSection\s*=\s*self\.currentSection\s*===\s*['"]downloads['"]/);
         });
     });
 

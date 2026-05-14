@@ -678,6 +678,9 @@ IPTVApp.prototype.initSettingsUI = function() {
                 toggle.textContent = value ? I18n.t('settings.freeboxBatchAll', 'All at once') : I18n.t('settings.freeboxBatchSeq', 'One by one');
             } else if (setting === 'freeboxDownloadViaProxy') {
                 toggle.textContent = value ? I18n.t('settings.freeboxViaProxy', 'VM Proxy') : I18n.t('settings.freeboxViaFreebox', 'Freebox');
+            } else if (setting === 'freeboxSlideshowInterval') {
+                toggle.textContent = (parseInt(value, 10) || 5) + ' s';
+                toggle.dataset.value = String(parseInt(value, 10) || 5);
             } else {
                 toggle.textContent = value ? I18n.t('settings.yes', 'Yes') : I18n.t('settings.no', 'No');
             }
@@ -983,6 +986,16 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
                     toggleOpts[ti].classList.remove('active');
                 }
             }
+        }
+        else if (setting === 'freeboxSlideshowInterval') {
+            var fbSsValues = [3, 5, 10, 30];
+            var fbSsIdx = fbSsValues.indexOf(parseInt(this.settings[setting], 10));
+            fbSsIdx = (fbSsIdx + 1) % fbSsValues.length;
+            this.settings[setting] = fbSsValues[fbSsIdx];
+            current.dataset.value = String(fbSsValues[fbSsIdx]);
+            current.textContent = fbSsValues[fbSsIdx] + ' s';
+            this.saveSettings();
+            return;
         }
         else if (setting) {
             this.settings[setting] = !this.settings[setting];
@@ -2997,6 +3010,11 @@ IPTVApp.prototype.updateFreeboxVisibility = function() {
     if (browserRow) {
         var showBrowser = show && !!this.settings.freeboxAppToken;
         browserRow.style.display = showBrowser ? '' : 'none';
+    }
+    var slideshowRow = document.getElementById('freebox-slideshow-row');
+    if (slideshowRow) {
+        var showSlideshow = show && !!this.settings.freeboxAppToken;
+        slideshowRow.style.display = showSlideshow ? '' : 'none';
     }
     this.invalidateFocusables();
 };

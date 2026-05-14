@@ -236,6 +236,10 @@ IPTVApp.prototype.bindKeys = function() {
             case 32:
             case 415:
             case 10252:
+                if (self.focusArea === 'fb-photo') {
+                    self.toggleFreeboxSlideshow();
+                    break;
+                }
                 if (self.currentScreen === 'player') {
                     self.stopSeek();
                     self.player.togglePlayPause();

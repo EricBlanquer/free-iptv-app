@@ -863,6 +863,7 @@ body.touch #content-grid.list-view .grid-item-info {
     color: #fff;
 }
 
+
 .fb-photo-modal {
     position: fixed;
     top: 0;
@@ -871,10 +872,7 @@ body.touch #content-grid.list-view .grid-item-info {
     bottom: 0;
     background: #000;
     z-index: 9000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    overflow: hidden;
 }
 
 .fb-photo-modal.hidden {
@@ -882,9 +880,25 @@ body.touch #content-grid.list-view .grid-item-info {
 }
 
 .fb-photo-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     max-width: 95vw;
     max-height: 90vh;
     object-fit: contain;
+    image-orientation: none;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.8s ease;
+}
+
+.fb-photo-img.fb-photo-visible {
+    opacity: 1;
+}
+
+.fb-photo-img.fb-photo-img-rotated {
+    max-width: 90vh;
+    max-height: 95vw;
 }
 
 .fb-photo-caption {
@@ -896,6 +910,21 @@ body.touch #content-grid.list-view .grid-item-info {
     color: #fff;
     background: rgba(0, 0, 0, 0.6);
     padding: 10px;
+    z-index: 10;
+}
+
+.fb-photo-modal.fb-slideshow-mode .fb-photo-img {
+    max-width: 100vw;
+    max-height: 100vh;
+}
+
+.fb-photo-modal.fb-slideshow-mode .fb-photo-img.fb-photo-img-rotated {
+    max-width: 100vh;
+    max-height: 100vw;
+}
+
+.fb-photo-modal.fb-slideshow-mode .fb-photo-caption {
+    display: none;
 }
 
 .details-stars {

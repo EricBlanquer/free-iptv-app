@@ -252,6 +252,7 @@ IPTVApp.prototype.showContinueScreen = function() {
     var continueItems = [];
     for (var i = 0; i < this.watchHistory.length; i++) {
         var item = this.watchHistory[i];
+        if (item.playlistId === '_fb_') continue;
         if ((item.type === 'vod' || item.type === 'movie') && !item.watched && item.position >= minMs) {
             continueItems.push({
                 id: item.id,

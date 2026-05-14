@@ -168,6 +168,13 @@ IPTVApp.prototype.selectHandlers = {
                 this.showDetails(current);
             }
         } else if (this.currentSection === 'history' && streamType === 'vod') {
+            if (typeof streamId === 'string' && streamId.indexOf('_fb_/') === 0) {
+                var fbPath = streamId.substring('_fb_'.length);
+                var fbName = fbPath.split('/').pop() || fbPath;
+                var fbMime = this._fbMimeFromName(fbName);
+                this.playFreeboxFile(fbPath, fbMime);
+                return;
+            }
             var streamData = this.currentStreams.find(function(s) {
                 return (s.stream_id || s.series_id) == streamId;
             });
