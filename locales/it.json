@@ -180,7 +180,9 @@
     "default": "Data di aggiunta",
     "person": "Persona...",
     "name": "Nome...",
+    "sortDate": "Modificato",
     "sortName": "Nome",
+    "sortSize": "Dimensione",
     "sortYear": "Anno",
     "title": "Titolo...",
     "year": "Anno...",
@@ -204,7 +206,11 @@
     "paused": "In pausa",
     "seasonQueued": "{n} episodi in coda",
     "selectEpisodes": "Seleziona gli episodi, poi premi scarica",
-    "sessionExpired": "Sessione scaduta, riconnessione..."
+    "myFiles": "File Freebox",
+    "parentFolder": "Cartella superiore",
+    "playError": "Impossibile riprodurre il file",
+    "sessionExpired": "Sessione scaduta, riconnessione...",
+    "unsupportedFile": "Tipo di file non supportato"
   },
   "guide": {
     "days": [
@@ -229,6 +235,7 @@
     "continue": "Continua",
     "continueWatching": "Continua a guardare",
     "downloads": "Download",
+    "files": "File",
     "entertainment": "Intrattenimento",
     "favorites": "La mia lista",
     "history": "Cronologia",
@@ -428,6 +435,7 @@
     "favoritesCleared": "Lista cancellata",
     "focusOnCategories": "Focus su categorie",
     "freeboxBatch": "Modalità download",
+    "freeboxBrowser": "Esplora file",
     "freeboxBatchAll": "Tutti insieme",
     "freeboxBatchSeq": "Uno alla volta",
     "freeboxDesc": "Scarica contenuti VOD sulla tua Freebox",
@@ -439,7 +447,7 @@
     "freeboxPaired": "Associato",
     "freeboxPairedNoApi": "Accoppiato (API non connessa)",
     "freeboxStatus": "Stato",
-    "freeboxTitle": "Download Freebox",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Disassocia",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -595,6 +603,8 @@
   "tips": {
     "clickToListen": "🔊 Clicca per ascoltare",
     "deleteHistoryHintAndroid": "👉 Scorri a destra per eliminare una voce",
+    "deleteDownloadHintAndroid": "👉 Scorri a destra per annullare un download",
+    "deleteDownloadHintTizen": "▶ Premi a destra per annullare un download",
     "deleteHistoryHintTizen": "▶ Premi a destra per eliminare una voce",
     "downloadHint": "Scarica su Freebox",
     "downloadSeasonHint": "Scarica stagione su Freebox",

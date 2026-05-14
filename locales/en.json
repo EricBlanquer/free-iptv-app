@@ -185,7 +185,9 @@
     "default": "Added date",
     "person": "Person...",
     "name": "Name...",
+    "sortDate": "Modified",
     "sortName": "Name",
+    "sortSize": "Size",
     "sortYear": "Year",
     "title": "Title...",
     "year": "Year...",
@@ -209,7 +211,11 @@
     "paused": "Paused",
     "seasonQueued": "{n} episodes queued",
     "selectEpisodes": "Select episodes, then press download",
-    "sessionExpired": "Session expired, reconnecting..."
+    "myFiles": "Freebox files",
+    "parentFolder": "Parent folder",
+    "playError": "Cannot play file",
+    "sessionExpired": "Session expired, reconnecting...",
+    "unsupportedFile": "Unsupported file type"
   },
   "guide": {
     "days": [
@@ -234,6 +240,7 @@
     "continue": "Continue",
     "continueWatching": "Continue watching",
     "downloads": "Downloads",
+    "files": "Files",
     "entertainment": "Entertainment",
     "favorites": "My List",
     "history": "History",
@@ -432,6 +439,7 @@
     "favoritesCleared": "List cleared",
     "focusOnCategories": "Focus on categories",
     "freeboxBatch": "Download mode",
+    "freeboxBrowser": "Files browser",
     "freeboxBatchAll": "All at once",
     "freeboxBatchSeq": "One by one",
     "freeboxDesc": "Download VOD content to your Freebox",
@@ -443,7 +451,7 @@
     "freeboxPaired": "Paired",
     "freeboxPairedNoApi": "Paired (API not connected)",
     "freeboxStatus": "Status",
-    "freeboxTitle": "Freebox Download",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Unpair",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -599,6 +607,8 @@
   "tips": {
     "clickToListen": "🔊 Click to listen",
     "deleteHistoryHintAndroid": "👉 Swipe right to delete an entry",
+    "deleteDownloadHintAndroid": "👉 Swipe right to cancel a download",
+    "deleteDownloadHintTizen": "▶ Press right to cancel a download",
     "deleteHistoryHintTizen": "▶ Press right to delete an entry",
     "downloadHint": "Download to Freebox",
     "downloadSeasonHint": "Download season to Freebox",

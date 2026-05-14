@@ -185,7 +185,9 @@
     "default": "Data dodania",
     "person": "Osoba...",
     "name": "Nazwa...",
+    "sortDate": "Zmodyfikowano",
     "sortName": "Nazwa",
+    "sortSize": "Rozmiar",
     "sortYear": "Rok",
     "title": "Tytuł...",
     "year": "Rok...",
@@ -209,7 +211,11 @@
     "paused": "Wstrzymano",
     "seasonQueued": "{n} odcinków w kolejce",
     "selectEpisodes": "Wybierz odcinki, następnie naciśnij pobierz",
-    "sessionExpired": "Sesja wygasła, ponowne łączenie..."
+    "myFiles": "Pliki Freebox",
+    "parentFolder": "Folder nadrzędny",
+    "playError": "Nie można odtworzyć pliku",
+    "sessionExpired": "Sesja wygasła, ponowne łączenie...",
+    "unsupportedFile": "Nieobsługiwany typ pliku"
   },
   "guide": {
     "days": [
@@ -234,6 +240,7 @@
     "continue": "Kontynuuj",
     "continueWatching": "Kontynuuj oglądanie",
     "downloads": "Pobieranie",
+    "files": "Pliki",
     "entertainment": "Rozrywka",
     "favorites": "Moja lista",
     "history": "Historia",
@@ -433,6 +440,7 @@
     "favoritesCleared": "Lista wyczyszczona",
     "focusOnCategories": "Skupienie na kategoriach",
     "freeboxBatch": "Tryb pobierania",
+    "freeboxBrowser": "Eksplorator plików",
     "freeboxBatchAll": "Wszystko naraz",
     "freeboxBatchSeq": "Po jednym",
     "freeboxDesc": "Pobierz treści VOD na Freebox",
@@ -444,7 +452,7 @@
     "freeboxPaired": "Sparowany",
     "freeboxPairedNoApi": "Sparowany (API niepołączone)",
     "freeboxStatus": "Status",
-    "freeboxTitle": "Pobieranie Freebox",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Rozparuj",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -600,6 +608,8 @@
   "tips": {
     "clickToListen": "🔊 Kliknij, aby posłuchać",
     "deleteHistoryHintAndroid": "👉 Przesuń w prawo, aby usunąć wpis",
+    "deleteDownloadHintAndroid": "👉 Przesuń w prawo, aby anulować pobieranie",
+    "deleteDownloadHintTizen": "▶ Naciśnij w prawo, aby anulować pobieranie",
     "deleteHistoryHintTizen": "▶ Naciśnij w prawo, aby usunąć wpis",
     "downloadHint": "Pobierz do Freebox",
     "downloadSeasonHint": "Pobierz sezon na Freebox",

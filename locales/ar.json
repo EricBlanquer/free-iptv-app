@@ -189,7 +189,9 @@
     "default": "تاريخ الإضافة",
     "person": "شخص...",
     "name": "الاسم...",
+    "sortDate": "تم التعديل",
     "sortName": "الاسم",
+    "sortSize": "الحجم",
     "sortYear": "السنة",
     "title": "...العنوان",
     "year": "...السنة",
@@ -213,7 +215,11 @@
     "paused": "متوقف مؤقتًا",
     "seasonQueued": "{n} حلقات في قائمة الانتظار",
     "selectEpisodes": "حدد الحلقات، ثم اضغط تنزيل",
-    "sessionExpired": "انتهت الجلسة، إعادة الاتصال..."
+    "myFiles": "ملفات Freebox",
+    "parentFolder": "المجلد الأصلي",
+    "playError": "تعذر تشغيل الملف",
+    "sessionExpired": "انتهت الجلسة، إعادة الاتصال...",
+    "unsupportedFile": "نوع ملف غير مدعوم"
   },
   "guide": {
     "days": [
@@ -238,6 +244,7 @@
     "continue": "متابعة",
     "continueWatching": "متابعة المشاهدة",
     "downloads": "التنزيلات",
+    "files": "ملفات",
     "entertainment": "ترفيه",
     "favorites": "قائمتي",
     "history": "السجل",
@@ -436,6 +443,7 @@
     "favoritesCleared": "تم مسح القائمة",
     "focusOnCategories": "التركيز على الفئات",
     "freeboxBatch": "وضع التنزيل",
+    "freeboxBrowser": "متصفح الملفات",
     "freeboxBatchAll": "الكل دفعة واحدة",
     "freeboxBatchSeq": "واحد تلو الآخر",
     "freeboxDesc": "تحميل محتوى VOD على Freebox",
@@ -447,7 +455,7 @@
     "freeboxPaired": "مقترن",
     "freeboxPairedNoApi": "مقترن (API غير متصل)",
     "freeboxStatus": "الحالة",
-    "freeboxTitle": "تحميل Freebox",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "إلغاء الإقران",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -603,6 +611,8 @@
   "tips": {
     "clickToListen": "🔊 انقر للاستماع",
     "deleteHistoryHintAndroid": "👈 اسحب لليمين لحذف إدخال",
+    "deleteDownloadHintAndroid": "👈 اسحب لليمين لإلغاء التنزيل",
+    "deleteDownloadHintTizen": "◀ اضغط لليمين لإلغاء التنزيل",
     "deleteHistoryHintTizen": "◀ اضغط لليمين لحذف إدخال",
     "downloadHint": "تنزيل إلى Freebox",
     "downloadSeasonHint": "تحميل الموسم إلى Freebox",

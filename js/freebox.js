@@ -356,6 +356,126 @@ var FreeboxAPI = (function() {
         return !!(config.host && config.appToken);
     }
 
+    function encodePath(path) {
+        var bytes = unescape(encodeURIComponent(path));
+        return btoa(bytes);
+    }
+
+    function decodePath(b64) {
+        if (!b64) return '';
+        try {
+            var raw = atob(b64);
+            return decodeURIComponent(escape(raw));
+        } catch (ex) {
+            return b64;
+        }
+    }
+
+    function fsLs(path) {
+        return ensureSession().then(function() {
+            return xhr('GET', apiUrl('/api/v4/fs/ls/' + encodePath(path) + '?count=1000&relative=true&onlyFolder=false'));
+        }).then(function(resp) {
+            if (!resp.success) {
+                throw new Error(resp.msg || 'fs/ls failed');
+            }
+            var entries = resp.result || [];
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].path) {
+                    entries[i].path = decodePath(entries[i].path);
+                }
+            }
+            return entries;
+        });
+    }
+
+    var streamUrlMethod = null;
+
+    function getStreamUrlWithSessionParam(path) {
+        return 'http://' + config.host + '/api/v4/dl/' + encodePath(path) + '?session=' + encodeURIComponent(config.sessionToken);
+    }
+
+    function probeSessionParamUrl(path) {
+        return new Promise(function(resolve, reject) {
+            var url = getStreamUrlWithSessionParam(path);
+            var req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.setRequestHeader('Range', 'bytes=0-0');
+            req.timeout = 8000;
+            req.onload = function() {
+                if (req.status === 200 || req.status === 206) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            };
+            req.onerror = function() { resolve(false); };
+            req.ontimeout = function() { resolve(false); };
+            req.send();
+        });
+    }
+
+    function createShareLink(path) {
+        return ensureSession().then(function() {
+            return xhr('POST', apiUrl('/api/v4/share_link/'), {
+                path: encodePath(path),
+                expire: Math.floor(Date.now() / 1000) + 3600,
+                fullurl: true
+            });
+        }).then(function(resp) {
+            if (!resp.success) {
+                throw new Error(resp.msg || 'share_link failed');
+            }
+            return resp.result;
+        });
+    }
+
+    function getStreamUrl(path) {
+        return ensureSession().then(function() {
+            if (streamUrlMethod === 'session') {
+                return getStreamUrlWithSessionParam(path);
+            }
+            if (streamUrlMethod === 'share_link') {
+                return createShareLink(path).then(function(res) {
+                    return res.fullurl || res.url;
+                });
+            }
+            return probeSessionParamUrl(path).then(function(ok) {
+                if (ok) {
+                    streamUrlMethod = 'session';
+                    window.log('Freebox: stream auth via session param');
+                    return getStreamUrlWithSessionParam(path);
+                }
+                streamUrlMethod = 'share_link';
+                window.log('Freebox: stream auth via share_link');
+                return createShareLink(path).then(function(res) {
+                    return res.fullurl || res.url;
+                });
+            });
+        });
+    }
+
+    function fetchFileBlob(path) {
+        return ensureSession().then(function() {
+            return new Promise(function(resolve, reject) {
+                var req = new XMLHttpRequest();
+                req.open('GET', apiUrl('/api/v4/dl/' + encodePath(path)), true);
+                req.setRequestHeader('X-Fbx-App-Auth', config.sessionToken);
+                req.responseType = 'blob';
+                req.timeout = 30000;
+                req.onload = function() {
+                    if (req.status === 200) {
+                        resolve(req.response);
+                    } else {
+                        reject(new Error('Download failed: ' + req.status));
+                    }
+                };
+                req.onerror = function() { reject(new Error('Network error')); };
+                req.ontimeout = function() { reject(new Error('Timeout')); };
+                req.send();
+            });
+        });
+    }
+
     return {
         setConfig: setConfig,
         requestAuthorization: requestAuthorization,
@@ -375,6 +495,9 @@ var FreeboxAPI = (function() {
         stopPolling: stopPolling,
         getActiveDownloads: getActiveDownloads,
         isConfigured: isConfigured,
-        hmacSha1: hmacSha1
+        hmacSha1: hmacSha1,
+        fsLs: fsLs,
+        getStreamUrl: getStreamUrl,
+        fetchFileBlob: fetchFileBlob
     };
 })();

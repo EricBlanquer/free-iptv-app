@@ -140,7 +140,7 @@ describe('History delete-entry tooltip — source pins', () => {
     describe('js/browse.js — Android touch / wheel dismisses tooltip', () => {
         it('markUserScroll hides the history tooltip in addition to flagging userScrolling', () => {
             const browse = fs.readFileSync('./js/browse.js', 'utf8');
-            const m = browse.match(/var markUserScroll\s*=\s*function[\s\S]{0,600}?\n\s*\};/);
+            const m = browse.match(/var markUserScroll\s*=\s*function[\s\S]{0,1200}?\n\s*\};/);
             expect(m).toBeTruthy();
             const body = m[0];
             expect(body).toMatch(/currentSection\s*===\s*['"]history['"]/);

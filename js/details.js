@@ -3258,6 +3258,31 @@ IPTVApp.prototype.updateHomeDownloadButton = function() {
         dlBtn.style.display = 'none';
         this.updateHomeGridLayout();
     }
+    this._updateDownloadsButtonAppearance(dlBtn);
+};
+
+IPTVApp.prototype._updateDownloadsButtonAppearance = function(dlBtn) {
+    if (!dlBtn) dlBtn = document.getElementById('home-downloads-btn');
+    if (!dlBtn) return;
+    var browserMode = this._isBrowserModeActive();
+    var label = dlBtn.querySelector('[data-i18n]');
+    var iconPath = dlBtn.querySelector('.home-icon svg path');
+    var foldKey = 'home.files';
+    var dlKey = 'home.downloads';
+    var folderPath = 'M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z';
+    var dlArrowPath = 'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z';
+    if (label) {
+        var newKey = browserMode ? foldKey : dlKey;
+        label.setAttribute('data-i18n', newKey);
+        label.textContent = I18n.t(newKey, browserMode ? 'Files' : 'Downloads');
+    }
+    if (iconPath) {
+        iconPath.setAttribute('d', browserMode ? folderPath : dlArrowPath);
+    }
+};
+
+IPTVApp.prototype._isBrowserModeActive = function() {
+    return !!(this.settings.freeboxEnabled && this.settings.freeboxAppToken && this.settings.freeboxBrowserEnabled !== false);
 };
 
 IPTVApp.prototype.hasAppDownloads = function() {
@@ -3266,6 +3291,7 @@ IPTVApp.prototype.hasAppDownloads = function() {
     if (!this.settings.freeboxEnabled) return false;
     var viaVm = this.settings.freeboxDownloadViaProxy && this.settings.proxyEnabled && this.settings.proxyUrl;
     if (!viaVm && !this.settings.freeboxAppToken) return false;
+    if (this._isBrowserModeActive()) return true;
     if (this._freeboxDownloadQueue && this._freeboxDownloadQueue.length > 0) return true;
     if (viaVm && this._vmPollTimer) return true;
     var dlMap = this._freeboxDownloadMap || {};
@@ -3777,18 +3803,335 @@ IPTVApp.prototype.renderDownloadsList = function(freeboxDownloads, queueSnapshot
         if (idA !== idB) return idA - idB;
         return (a.name || '').localeCompare(b.name || '');
     });
-    if (items.length === 0) {
-        this.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
+    this._renderDownloadsWithBrowser(items);
+};
+
+IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
+    var self = this;
+    var browserActive = this._isBrowserModeActive();
+    if (!browserActive) {
+        if (downloadItems.length === 0) {
+            this.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
+        } else {
+            var grid0 = document.getElementById('content-grid');
+            grid0.classList.add('list-view');
+            this.currentSort = 'default';
+            this.renderGrid(downloadItems, 'downloads');
+            this.scheduleDownloadDeleteTooltip();
+        }
+        this.focusArea = 'grid';
+        this.focusIndex = 0;
+        this.deferUpdateFocus();
+        return;
     }
-    else {
+    if (this._fbBrowsePath === undefined || this._fbBrowsePath === null) {
+        this._fbBrowsePath = '';
+    }
+    var path = this._fbBrowsePath;
+    if (FreeboxAPI.isConfigured && !FreeboxAPI.isConfigured()) {
+        var host = this.settings.freeboxHost || 'mafreebox.freebox.fr';
+        FreeboxAPI.setConfig(host, this.settings.freeboxAppToken);
+    }
+    this._applyFreeboxSortLabels(true);
+    this.setHidden('sort-filters', false);
+    FreeboxAPI.fsLs(path).then(function(entries) {
+        var browserItems = self._buildFreeboxBrowserItems(path, entries);
+        var combined = downloadItems.concat(browserItems);
+        if (combined.length === 0) {
+            self.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
+        } else {
+            var grid = document.getElementById('content-grid');
+            grid.classList.add('list-view');
+            self.currentSort = 'default';
+            self.renderGrid(combined, 'downloads');
+            if (downloadItems.length > 0) self.scheduleDownloadDeleteTooltip();
+        }
+        self.focusArea = 'grid';
+        self.focusIndex = self._fbRestoreIndex || 0;
+        self._fbRestoreIndex = 0;
+        self.deferUpdateFocus();
+    }).catch(function(err) {
+        window.log('Freebox fs/ls error: ' + err.message);
+        if (downloadItems.length === 0) {
+            self.showEmptyMessage('content-grid', 'home.noDownloads', 'No downloads');
+        } else {
+            var gridE = document.getElementById('content-grid');
+            gridE.classList.add('list-view');
+            self.currentSort = 'default';
+            self.renderGrid(downloadItems, 'downloads');
+        }
+        self.focusArea = 'grid';
+        self.focusIndex = 0;
+        self.deferUpdateFocus();
+    });
+};
+
+IPTVApp.prototype._buildFreeboxBrowserItems = function(path, entries) {
+    var items = [];
+    var isRoot = !path || path === '' || path === '/';
+    var titleEl = document.getElementById('sidebar-title');
+    if (titleEl) {
+        var base = I18n.t('home.files', 'Files');
+        if (isRoot) {
+            titleEl.textContent = base;
+        } else {
+            var crumbs = this._fbDisplayPath(path).split('/').filter(Boolean).join(' / ');
+            titleEl.textContent = base + ' / ' + crumbs;
+        }
+    }
+    if (!isRoot) {
+        var parent = this._fbParentPath(path);
+        items.push({
+            stream_id: '_fb_up_' + path,
+            name: '↑ ' + I18n.t('freebox.parentFolder', 'Parent folder'),
+            _freeboxFile: true,
+            _fbIsUp: true,
+            _fbPath: parent,
+            _fbIsDir: true
+        });
+    }
+    var sorted = this._sortFreeboxEntries((entries || []).slice(), this.currentSort);
+    for (var i = 0; i < sorted.length; i++) {
+        var e = sorted[i];
+        if (e.hidden) continue;
+        var entryPath = e.path || (path ? path + '/' + e.name : '/' + e.name);
+        var mime = this._fbMimeFromName(e.name, e.mimetype);
+        items.push({
+            stream_id: '_fb_' + entryPath,
+            name: e.name,
+            _freeboxFile: true,
+            _fbPath: entryPath,
+            _fbIsDir: e.type === 'dir',
+            _fbMime: mime,
+            _fbSize: e.size || 0,
+            _fbModification: e.modification || 0
+        });
+    }
+    return items;
+};
+
+IPTVApp.prototype._applyFreeboxSortLabels = function(freeboxMode) {
+    var groups = {
+        'default': freeboxMode ? 'filters.sortDate' : 'filters.default',
+        'name': 'filters.sortName',
+        'year': freeboxMode ? 'filters.sortSize' : 'filters.sortYear'
+    };
+    var defaults = {
+        'default': freeboxMode ? 'Modified' : 'Default',
+        'name': 'Name',
+        'year': freeboxMode ? 'Size' : 'Year'
+    };
+    Object.keys(groups).forEach(function(group) {
+        var btn = document.querySelector('.sort-btn[data-sort-group="' + group + '"]');
+        if (!btn) return;
+        var span = btn.querySelector('[data-i18n]');
+        if (span) {
+            span.dataset.i18n = groups[group];
+            span.textContent = I18n.t(groups[group], defaults[group]);
+        }
+    });
+};
+
+IPTVApp.prototype._sortFreeboxEntries = function(entries, sortMode) {
+    var nameAsc = function(a, b) { return (a.name || '').localeCompare(b.name || ''); };
+    var nameDesc = function(a, b) { return (b.name || '').localeCompare(a.name || ''); };
+    var dateDesc = function(a, b) { return (b.modification || 0) - (a.modification || 0); };
+    var dateAsc = function(a, b) { return (a.modification || 0) - (b.modification || 0); };
+    var sizeDesc = function(a, b) { return (b.size || 0) - (a.size || 0); };
+    var sizeAsc = function(a, b) { return (a.size || 0) - (b.size || 0); };
+    var cmp;
+    if (sortMode === 'name') cmp = nameAsc;
+    else if (sortMode === 'name-desc') cmp = nameDesc;
+    else if (sortMode === 'year') cmp = sizeDesc;
+    else if (sortMode === 'year-asc') cmp = sizeAsc;
+    else if (sortMode === 'default-asc') cmp = dateAsc;
+    else cmp = dateDesc;
+    entries.sort(function(a, b) {
+        if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+        return cmp(a, b);
+    });
+    return entries;
+};
+
+IPTVApp.prototype._fbDisplayPath = function(path) {
+    if (!path || path === '/') return '/';
+    return path.replace(/^\/+/, '');
+};
+
+IPTVApp.prototype._fbParentPath = function(path) {
+    if (!path || path === '/') return '';
+    var trimmed = path.replace(/\/+$/, '');
+    var idx = trimmed.lastIndexOf('/');
+    if (idx <= 0) return '';
+    return trimmed.substring(0, idx);
+};
+
+IPTVApp.prototype._fbMimeFromName = function(name, mimetype) {
+    var ext = (name || '').toLowerCase().split('.').pop();
+    var videoExt = { mp4:1, mkv:1, avi:1, mov:1, m4v:1, webm:1, ts:1, mpg:1, mpeg:1, wmv:1, flv:1, '3gp':1, divx:1, vob:1, m2ts:1, mts:1, ogv:1, asf:1 };
+    var audioExt = { mp3:1, m4a:1, aac:1, flac:1, ogg:1, oga:1, opus:1, wav:1, wma:1, ape:1, alac:1 };
+    var imageExt = { jpg:1, jpeg:1, png:1, gif:1, bmp:1, webp:1, heic:1, tiff:1 };
+    if (videoExt[ext]) return 'video';
+    if (audioExt[ext]) return 'audio';
+    if (imageExt[ext]) return 'image';
+    if (mimetype) {
+        if (mimetype.indexOf('video/') === 0) return 'video';
+        if (mimetype.indexOf('audio/') === 0) return 'audio';
+        if (mimetype.indexOf('image/') === 0) return 'image';
+    }
+    return 'other';
+};
+
+IPTVApp.prototype.scheduleDownloadDeleteTooltip = function() {
+    var self = this;
+    this.scheduleTooltipShow('downloadDelete', function() {
+        if (self.currentSection !== 'downloads') return;
         var grid = document.getElementById('content-grid');
-        grid.classList.add('list-view');
-        this.currentSort = 'default';
-        this.renderGrid(items, 'downloads');
+        if (!grid) return;
+        var items = grid.querySelectorAll('.grid-item');
+        var firstDownload = null;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].dataset.isDownload === '1') {
+                firstDownload = items[i];
+                break;
+            }
+        }
+        if (!firstDownload) return;
+        var anchorId = 'download-delete-tooltip-anchor';
+        firstDownload.id = anchorId;
+        var isAndroid = typeof Android !== 'undefined' && Android;
+        var key = isAndroid ? 'tips.deleteDownloadHintAndroid' : 'tips.deleteDownloadHintTizen';
+        var fallback = isAndroid ? 'Swipe right to cancel a download' : 'Press → to cancel a download';
+        self.showButtonTooltip(anchorId, 'downloadDeleteTooltipShown', I18n.t(key, fallback), 'bottom');
+    }, 800);
+};
+
+IPTVApp.prototype.openFreeboxFolder = function(path) {
+    if (!this._fbPathFocus) this._fbPathFocus = {};
+    var currentPath = this._fbBrowsePath || '';
+    this._fbPathFocus[currentPath] = this.focusIndex;
+    this._fbBrowsePath = path || '';
+    this._fbRestoreIndex = this._fbPathFocus[this._fbBrowsePath] || 0;
+    this.showDownloadsScreen();
+};
+
+IPTVApp.prototype.handleFreeboxFileClick = function(itemEl) {
+    var path = itemEl.dataset.fbPath || '';
+    var isDir = itemEl.dataset.fbIsDir === '1';
+    var mime = itemEl.dataset.fbMime || '';
+    if (isDir) {
+        this.openFreeboxFolder(path);
+        return;
     }
+    if (mime === 'image') {
+        this.openFreeboxPhoto(path);
+        return;
+    }
+    if (mime === 'video' || mime === 'audio') {
+        this.playFreeboxFile(path, mime);
+        return;
+    }
+    this.showToast(I18n.t('freebox.unsupportedFile', 'Unsupported file type'), 2500);
+};
+
+IPTVApp.prototype.playFreeboxFile = function(path, mime) {
+    var self = this;
+    this.showLoading(true);
+    FreeboxAPI.getStreamUrl(path).then(function(url) {
+        self.showLoading(false);
+        var name = path.split('/').pop() || path;
+        var fakeStream = {
+            url: url,
+            stream_id: '_fb_' + path,
+            name: name,
+            _type: 'vod',
+            _isFreeboxFile: true,
+            _fbPath: path,
+            _fbMime: mime
+        };
+        self.selectedStream = null;
+        self.playStream(fakeStream.stream_id, 'vod', fakeStream);
+    }).catch(function(err) {
+        self.showLoading(false);
+        window.log('Freebox play error: ' + err.message);
+        self.showToast(I18n.t('freebox.playError', 'Cannot play file') + ': ' + err.message, 3000, true);
+    });
+};
+
+IPTVApp.prototype.openFreeboxPhoto = function(path) {
+    var self = this;
+    var folder = this._fbBrowsePath || '';
+    var siblings = (this.currentStreams || []).filter(function(s) {
+        return s._freeboxFile && !s._fbIsDir && !s._fbIsUp && s._fbMime === 'image';
+    });
+    var index = -1;
+    for (var i = 0; i < siblings.length; i++) {
+        if (siblings[i]._fbPath === path) { index = i; break; }
+    }
+    if (index < 0) {
+        this.showToast(I18n.t('freebox.playError', 'Cannot open photo'), 2500, true);
+        return;
+    }
+    this._fbPhotoList = siblings;
+    this._fbPhotoIndex = index;
+    this._fbPhotoFolder = folder;
+    this._showFreeboxPhotoAt(index);
+};
+
+IPTVApp.prototype._showFreeboxPhotoAt = function(index) {
+    if (!this._fbPhotoList || index < 0 || index >= this._fbPhotoList.length) return;
+    this._fbPhotoIndex = index;
+    var entry = this._fbPhotoList[index];
+    var self = this;
+    this.showLoading(true);
+    var modal = document.getElementById('fb-photo-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'fb-photo-modal';
+        modal.className = 'fb-photo-modal hidden';
+        var img = document.createElement('img');
+        img.id = 'fb-photo-img';
+        img.className = 'fb-photo-img';
+        modal.appendChild(img);
+        var caption = document.createElement('div');
+        caption.id = 'fb-photo-caption';
+        caption.className = 'fb-photo-caption';
+        modal.appendChild(caption);
+        document.body.appendChild(modal);
+    }
+    var imgEl = document.getElementById('fb-photo-img');
+    var captionEl = document.getElementById('fb-photo-caption');
+    captionEl.textContent = entry.name + ' (' + (index + 1) + '/' + this._fbPhotoList.length + ')';
+    FreeboxAPI.getStreamUrl(entry._fbPath).then(function(url) {
+        imgEl.onload = function() { self.showLoading(false); };
+        imgEl.onerror = function() {
+            self.showLoading(false);
+            self.showToast(I18n.t('freebox.playError', 'Cannot open photo'), 2500, true);
+        };
+        imgEl.src = url;
+        modal.classList.remove('hidden');
+        self.focusArea = 'fb-photo';
+    }).catch(function(err) {
+        self.showLoading(false);
+        window.log('Freebox photo url error: ' + err.message);
+        self.showToast(I18n.t('freebox.playError', 'Cannot open photo') + ': ' + err.message, 3000, true);
+    });
+};
+
+IPTVApp.prototype.closeFreeboxPhoto = function() {
+    var modal = document.getElementById('fb-photo-modal');
+    if (modal) modal.classList.add('hidden');
+    var imgEl = document.getElementById('fb-photo-img');
+    if (imgEl) imgEl.src = '';
     this.focusArea = 'grid';
-    this.focusIndex = 0;
-    this.deferUpdateFocus();
+    this.updateFocus();
+};
+
+IPTVApp.prototype.nextFreeboxPhoto = function(delta) {
+    if (!this._fbPhotoList) return;
+    var n = this._fbPhotoList.length;
+    var next = (this._fbPhotoIndex + delta + n) % n;
+    this._showFreeboxPhotoAt(next);
 };
 
 IPTVApp.prototype.removeDownloadAtIndex = function(index) {

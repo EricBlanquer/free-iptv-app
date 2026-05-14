@@ -68,6 +68,10 @@ IPTVApp.prototype.bindKeys = function() {
         }
         switch (key) {
             case 37:
+                if (self.focusArea === 'fb-photo') {
+                    self.nextFreeboxPhoto(-1);
+                    break;
+                }
                 if (self.currentScreen === 'guide') {
                     self.navigateGuide('left');
                 } else if (self.currentScreen === 'catchup-modal') {
@@ -90,6 +94,9 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 break;
             case 38:
+                if (self.focusArea === 'fb-photo') {
+                    break;
+                }
                 if (self.ttsVoiceModalOpen) {
                     self.ttsVoiceFocusIndex = Math.max(0, self.ttsVoiceFocusIndex - 1);
                     self.updateTTSVoiceFocus();
@@ -115,6 +122,10 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 break;
             case 39:
+                if (self.focusArea === 'fb-photo') {
+                    self.nextFreeboxPhoto(1);
+                    break;
+                }
                 if (self.currentScreen === 'guide') {
                     self.navigateGuide('right');
                 } else if (self.currentScreen === 'catchup-modal') {
@@ -137,6 +148,9 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 break;
             case 40:
+                if (self.focusArea === 'fb-photo') {
+                    break;
+                }
                 if (self.ttsVoiceModalOpen) {
                     var maxIdx = self.ttsVoiceItems ? self.ttsVoiceItems.length - 1 : 0;
                     self.ttsVoiceFocusIndex = Math.min(maxIdx, self.ttsVoiceFocusIndex + 1);
@@ -156,6 +170,10 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 break;
             case 13:
+                if (self.focusArea === 'fb-photo') {
+                    self.nextFreeboxPhoto(1);
+                    break;
+                }
                 if (self.ttsVoiceModalOpen) {
                     self.selectTTSVoice();
                 } else if (self.currentScreen === 'guide') {
@@ -710,6 +728,10 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
         this.hideButtonTooltip('history-delete-tooltip-anchor');
         this.cancelTooltipShow('historyDelete');
     }
+    if (this.currentSection === 'downloads') {
+        this.hideButtonTooltip('download-delete-tooltip-anchor');
+        this.cancelTooltipShow('downloadDelete');
+    }
     switch (ctx.direction) {
         case 'left':
             if (this.favoritesEditMode && this.movingFavoriteIndex >= 0) {
@@ -745,8 +767,12 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
                 return { index: newIndex, handled: true };
             }
             if (isListView && this.currentSection === 'downloads') {
-                this.removeDownloadAtIndex(this.focusIndex);
-                return { index: newIndex, handled: true };
+                var dlEl = ctx.focusables[ctx.index];
+                if (dlEl && dlEl.dataset && dlEl.dataset.isDownload === '1') {
+                    this.hideButtonTooltip('download-delete-tooltip-anchor', true);
+                    this.removeDownloadAtIndex(this.focusIndex);
+                    return { index: newIndex, handled: true };
+                }
             }
             if ((newIndex + 1) % cols !== 0 && newIndex < ctx.focusables.length - 1) {
                 newIndex++;

@@ -1028,6 +1028,10 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             if (setting === 'freeboxEnabled') {
                 this.updateFreeboxVisibility();
                 this.initFreebox();
+                this.updateHomeDownloadButton();
+            }
+            if (setting === 'freeboxBrowserEnabled') {
+                this.updateHomeDownloadButton();
             }
             if (setting === 'freeboxBatchDownload') {
                 current.textContent = this.settings[setting] ? I18n.t('settings.freeboxBatchAll', 'All at once') : I18n.t('settings.freeboxBatchSeq', 'One by one');
@@ -2988,6 +2992,11 @@ IPTVApp.prototype.updateFreeboxVisibility = function() {
     if (viaRow) {
         var showVia = show && this.settings.proxyEnabled && this.settings.proxyUrl;
         viaRow.style.display = showVia ? '' : 'none';
+    }
+    var browserRow = document.getElementById('freebox-browser-row');
+    if (browserRow) {
+        var showBrowser = show && !!this.settings.freeboxAppToken;
+        browserRow.style.display = showBrowser ? '' : 'none';
     }
     this.invalidateFocusables();
 };

@@ -189,7 +189,9 @@
     "default": "Fecha de adición",
     "person": "Persona...",
     "name": "Nombre...",
+    "sortDate": "Modificado",
     "sortName": "Nombre",
+    "sortSize": "Tamaño",
     "sortYear": "Año",
     "title": "Título...",
     "year": "Año...",
@@ -213,7 +215,11 @@
     "paused": "En pausa",
     "seasonQueued": "{n} episodios en cola",
     "selectEpisodes": "Selecciona episodios, luego pulsa descargar",
-    "sessionExpired": "Sesión expirada, reconectando..."
+    "myFiles": "Archivos de Freebox",
+    "parentFolder": "Carpeta superior",
+    "playError": "No se puede reproducir el archivo",
+    "sessionExpired": "Sesión expirada, reconectando...",
+    "unsupportedFile": "Tipo de archivo no admitido"
   },
   "guide": {
     "days": [
@@ -238,6 +244,7 @@
     "continue": "Continuar",
     "continueWatching": "Continuar viendo",
     "downloads": "Descargas",
+    "files": "Archivos",
     "entertainment": "Entretenimiento",
     "favorites": "Mi lista",
     "history": "Historial",
@@ -438,6 +445,7 @@
     "favoritesCleared": "Lista borrada",
     "focusOnCategories": "Foco en categorías",
     "freeboxBatch": "Modo de descarga",
+    "freeboxBrowser": "Explorador de archivos",
     "freeboxBatchAll": "Todo de una vez",
     "freeboxBatchSeq": "Uno por uno",
     "freeboxDesc": "Descargar contenido VOD en tu Freebox",
@@ -449,7 +457,7 @@
     "freeboxPaired": "Emparejado",
     "freeboxPairedNoApi": "Emparejado (API no conectada)",
     "freeboxStatus": "Estado",
-    "freeboxTitle": "Descarga Freebox",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Desemparejar",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -605,6 +613,8 @@
   "tips": {
     "clickToListen": "🔊 Haz clic para escuchar",
     "deleteHistoryHintAndroid": "👉 Desliza a la derecha para eliminar una entrada",
+    "deleteDownloadHintAndroid": "👉 Desliza a la derecha para cancelar una descarga",
+    "deleteDownloadHintTizen": "▶ Pulsa a la derecha para cancelar una descarga",
     "deleteHistoryHintTizen": "▶ Pulsa a la derecha para eliminar una entrada",
     "downloadHint": "Descargar a Freebox",
     "downloadSeasonHint": "Descargar temporada en Freebox",

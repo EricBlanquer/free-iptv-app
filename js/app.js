@@ -913,6 +913,7 @@ class IPTVApp {
                 xhr.send();
             }
             else {
+                self.updateHomeDownloadButton();
                 FreeboxAPI.getDownloads().then(function(downloads) {
                     var downloadsById = {};
                     for (var k = 0; k < downloads.length; k++) {

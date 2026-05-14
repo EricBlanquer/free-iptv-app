@@ -133,6 +133,7 @@ IPTVApp.prototype.bindTouchEvents = function() {
                     self.hideButtonTooltip('history-delete-tooltip-anchor', true);
                     self.removeHistoryAtIndex(idx);
                 } else {
+                    self.hideButtonTooltip('download-delete-tooltip-anchor', true);
                     self.removeDownloadAtIndex(idx);
                 }
                 return;

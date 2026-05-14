@@ -182,7 +182,9 @@
     "default": "Toegevoegd",
     "person": "Persoon...",
     "name": "Naam...",
+    "sortDate": "Gewijzigd",
     "sortName": "Naam",
+    "sortSize": "Grootte",
     "sortYear": "Jaar",
     "title": "Titel...",
     "year": "Jaar...",
@@ -206,7 +208,11 @@
     "paused": "Gepauzeerd",
     "seasonQueued": "{n} afleveringen in wachtrij",
     "selectEpisodes": "Selecteer afleveringen, druk dan op downloaden",
-    "sessionExpired": "Sessie verlopen, opnieuw verbinden..."
+    "myFiles": "Freebox-bestanden",
+    "parentFolder": "Bovenliggende map",
+    "playError": "Kan bestand niet afspelen",
+    "sessionExpired": "Sessie verlopen, opnieuw verbinden...",
+    "unsupportedFile": "Niet-ondersteund bestandstype"
   },
   "guide": {
     "days": [
@@ -231,6 +237,7 @@
     "continue": "Doorgaan",
     "continueWatching": "Verder kijken",
     "downloads": "Downloads",
+    "files": "Bestanden",
     "entertainment": "Entertainment",
     "favorites": "Mijn lijst",
     "history": "Geschiedenis",
@@ -431,6 +438,7 @@
     "favoritesCleared": "Lijst gewist",
     "focusOnCategories": "Focus op categorieën",
     "freeboxBatch": "Downloadmodus",
+    "freeboxBrowser": "Bestandsverkenner",
     "freeboxBatchAll": "Alles tegelijk",
     "freeboxBatchSeq": "Eén voor één",
     "freeboxDesc": "VOD-inhoud naar uw Freebox downloaden",
@@ -442,7 +450,7 @@
     "freeboxPaired": "Gekoppeld",
     "freeboxPairedNoApi": "Gekoppeld (API niet verbonden)",
     "freeboxStatus": "Status",
-    "freeboxTitle": "Freebox Download",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Ontkoppelen",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -598,6 +606,8 @@
   "tips": {
     "clickToListen": "🔊 Klik om te luisteren",
     "deleteHistoryHintAndroid": "👉 Veeg naar rechts om een item te verwijderen",
+    "deleteDownloadHintAndroid": "👉 Veeg naar rechts om een download te annuleren",
+    "deleteDownloadHintTizen": "▶ Druk op rechts om een download te annuleren",
     "deleteHistoryHintTizen": "▶ Druk op rechts om een item te verwijderen",
     "downloadHint": "Downloaden naar Freebox",
     "downloadSeasonHint": "Seizoen downloaden naar Freebox",

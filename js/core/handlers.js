@@ -127,6 +127,11 @@ IPTVApp.prototype.selectHandlers = {
             return;
         }
         if (this.currentSection === 'downloads') {
+            if (current.classList.contains('freebox-file')) {
+                this.lastGridIndex = this.focusIndex;
+                this.handleFreeboxFileClick(current);
+                return;
+            }
             this.lastGridIndex = this.focusIndex;
             this.showDetails(current);
             return;
@@ -315,6 +320,9 @@ IPTVApp.prototype.backHandlers = {
     'focusArea:genre-picker': function() {
         this.closeGenrePicker();
     },
+    'focusArea:fb-photo': function() {
+        this.closeFreeboxPhoto();
+    },
     'screen:catchup-modal': function() {
         this.hideCatchupModal();
     },
@@ -497,6 +505,10 @@ IPTVApp.prototype.backHandlers = {
                 el.classList.remove('moving');
             });
             this.saveFavorites();
+        }
+        if (this.currentSection === 'downloads' && this._fbBrowsePath) {
+            this.openFreeboxFolder(this._fbParentPath(this._fbBrowsePath));
+            return;
         }
         this.showScreen('home');
         this.currentScreen = 'home';

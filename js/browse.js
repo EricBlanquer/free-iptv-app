@@ -2003,6 +2003,11 @@ IPTVApp.prototype.applySort = function(sortType) {
     this.settings.sortMode[section] = sortType;
     this.saveSettings();
     this._updateSortButtons();
+    if (section === 'downloads' && this.settings.freeboxEnabled && this.settings.freeboxAppToken) {
+        this._fbRestoreIndex = this.focusIndex;
+        this.showDownloadsScreen();
+        return;
+    }
     this.applyFilters();
 };
 
@@ -3438,6 +3443,10 @@ IPTVApp.prototype.initGridScrollLoader = function() {
             self.hideButtonTooltip('history-delete-tooltip-anchor');
             if (typeof self.cancelTooltipShow === 'function') self.cancelTooltipShow('historyDelete');
         }
+        if (self.currentSection === 'downloads' && typeof self.hideButtonTooltip === 'function') {
+            self.hideButtonTooltip('download-delete-tooltip-anchor');
+            if (typeof self.cancelTooltipShow === 'function') self.cancelTooltipShow('downloadDelete');
+        }
     };
     grid.addEventListener('touchstart', markUserScroll, { passive: true });
     grid.addEventListener('touchmove', markUserScroll, { passive: true });
@@ -3682,6 +3691,9 @@ IPTVApp.prototype.renderActorResults = function(actors) {
 
 // Grid item creation
 IPTVApp.prototype._createGridItem = function(stream) {
+    if (stream._freeboxFile) {
+        return this._createFreeboxItem(stream);
+    }
     var item = document.createElement('div');
     item.className = 'grid-item';
     item.dataset.streamId = this.getStreamId(stream);
@@ -3859,6 +3871,56 @@ IPTVApp.prototype._createGridItem = function(stream) {
         item.appendChild(progressBar);
     }
     return item;
+};
+
+IPTVApp.prototype._createFreeboxItem = function(stream) {
+    var item = document.createElement('div');
+    item.className = 'grid-item freebox-file';
+    item.dataset.streamId = stream.stream_id || stream._fbPath;
+    item.dataset.fbPath = stream._fbPath || '';
+    item.dataset.fbIsDir = stream._fbIsDir ? '1' : '0';
+    item.dataset.fbMime = stream._fbMime || '';
+    if (stream._fbIsUp) item.dataset.fbIsUp = '1';
+    var image = document.createElement('div');
+    image.className = 'grid-item-image fb-icon';
+    var iconName;
+    if (stream._fbIsUp) iconName = 'arrow_upward';
+    else if (stream._fbIsDir) iconName = 'folder';
+    else if (stream._fbMime === 'video') iconName = 'movie';
+    else if (stream._fbMime === 'audio') iconName = 'music_note';
+    else if (stream._fbMime === 'image') iconName = 'image';
+    else iconName = 'insert_drive_file';
+    var icon = document.createElement('span');
+    icon.className = 'material-symbols-outlined fb-icon-glyph';
+    icon.textContent = iconName;
+    image.appendChild(icon);
+    item.appendChild(image);
+    var info = document.createElement('div');
+    info.className = 'grid-item-info';
+    var listTitle = document.createElement('div');
+    listTitle.className = 'list-title';
+    listTitle.textContent = stream.name || '';
+    info.appendChild(listTitle);
+    if (!stream._fbIsDir && !stream._fbIsUp && stream._fbSize > 0) {
+        var meta = document.createElement('div');
+        meta.className = 'list-meta';
+        var sizeSpan = document.createElement('span');
+        sizeSpan.className = 'list-year';
+        sizeSpan.textContent = this._fbFormatSize(stream._fbSize);
+        meta.appendChild(sizeSpan);
+        info.appendChild(meta);
+    }
+    item.appendChild(info);
+    return item;
+};
+
+IPTVApp.prototype._fbFormatSize = function(bytes) {
+    if (!bytes) return '';
+    var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = 0;
+    var n = bytes;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return (n < 10 ? n.toFixed(1) : Math.round(n)) + ' ' + units[i];
 };
 
 IPTVApp.prototype._prependGridItems = function() {

@@ -1386,6 +1386,7 @@ IPTVApp.prototype.loadSettings = function() {
         freeboxAppToken: '',
         freeboxBatchDownload: true,
         freeboxDownloadViaProxy: false,
+        freeboxBrowserEnabled: true,
         useGenreCategories: true,
         bufferPreset: 'standard',
         bufferPlay: 2,

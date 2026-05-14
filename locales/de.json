@@ -183,7 +183,9 @@
     "default": "Hinzugefügt",
     "person": "Person...",
     "name": "Name...",
+    "sortDate": "Geändert",
     "sortName": "Name",
+    "sortSize": "Größe",
     "sortYear": "Jahr",
     "title": "Titel...",
     "year": "Jahr...",
@@ -207,7 +209,11 @@
     "paused": "Pausiert",
     "seasonQueued": "{n} Episoden in Warteschlange",
     "selectEpisodes": "Episoden auswählen, dann Download drücken",
-    "sessionExpired": "Sitzung abgelaufen, Wiederverbindung..."
+    "myFiles": "Freebox-Dateien",
+    "parentFolder": "Übergeordneter Ordner",
+    "playError": "Datei kann nicht abgespielt werden",
+    "sessionExpired": "Sitzung abgelaufen, Wiederverbindung...",
+    "unsupportedFile": "Nicht unterstützter Dateityp"
   },
   "guide": {
     "days": [
@@ -232,6 +238,7 @@
     "continue": "Fortsetzen",
     "continueWatching": "Weiterschauen",
     "downloads": "Downloads",
+    "files": "Dateien",
     "entertainment": "Unterhaltung",
     "favorites": "Meine Liste",
     "history": "Verlauf",
@@ -432,6 +439,7 @@
     "favoritesCleared": "Liste gelöscht",
     "focusOnCategories": "Fokus auf Kategorien",
     "freeboxBatch": "Download-Modus",
+    "freeboxBrowser": "Datei-Explorer",
     "freeboxBatchAll": "Alle auf einmal",
     "freeboxBatchSeq": "Einzeln",
     "freeboxDesc": "VOD-Inhalte auf Ihre Freebox herunterladen",
@@ -443,7 +451,7 @@
     "freeboxPaired": "Gekoppelt",
     "freeboxPairedNoApi": "Gekoppelt (API nicht verbunden)",
     "freeboxStatus": "Status",
-    "freeboxTitle": "Freebox Download",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Entkoppeln",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -599,6 +607,8 @@
   "tips": {
     "clickToListen": "🔊 Zum Anhören klicken",
     "deleteHistoryHintAndroid": "👉 Nach rechts wischen, um einen Eintrag zu löschen",
+    "deleteDownloadHintAndroid": "👉 Nach rechts wischen, um einen Download abzubrechen",
+    "deleteDownloadHintTizen": "▶ Rechts drücken, um einen Download abzubrechen",
     "deleteHistoryHintTizen": "▶ Rechts drücken, um einen Eintrag zu löschen",
     "downloadHint": "Auf Freebox herunterladen",
     "downloadSeasonHint": "Staffel auf Freebox herunterladen",

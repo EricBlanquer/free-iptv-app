@@ -187,7 +187,9 @@
     "default": "Дата добавления",
     "person": "Человек...",
     "name": "Имя...",
+    "sortDate": "Изменено",
     "sortName": "Имя",
+    "sortSize": "Размер",
     "sortYear": "Год",
     "title": "Название...",
     "year": "Год...",
@@ -211,7 +213,11 @@
     "paused": "Приостановлено",
     "seasonQueued": "{n} эпизодов в очереди",
     "selectEpisodes": "Выберите эпизоды, затем нажмите загрузить",
-    "sessionExpired": "Сессия истекла, переподключение..."
+    "myFiles": "Файлы Freebox",
+    "parentFolder": "Родительская папка",
+    "playError": "Не удается воспроизвести файл",
+    "sessionExpired": "Сессия истекла, переподключение...",
+    "unsupportedFile": "Неподдерживаемый тип файла"
   },
   "guide": {
     "days": [
@@ -236,6 +242,7 @@
     "continue": "Продолжить",
     "continueWatching": "Продолжить просмотр",
     "downloads": "Загрузки",
+    "files": "Файлы",
     "entertainment": "Развлечения",
     "favorites": "Мой список",
     "history": "История",
@@ -434,6 +441,7 @@
     "favoritesCleared": "Список очищен",
     "focusOnCategories": "Фокус на категориях",
     "freeboxBatch": "Режим загрузки",
+    "freeboxBrowser": "Файловый менеджер",
     "freeboxBatchAll": "Все сразу",
     "freeboxBatchSeq": "По одному",
     "freeboxDesc": "Загрузка VOD-контента на Freebox",
@@ -445,7 +453,7 @@
     "freeboxPaired": "Сопряжено",
     "freeboxPairedNoApi": "Сопряжено (API не подключен)",
     "freeboxStatus": "Статус",
-    "freeboxTitle": "Загрузка Freebox",
+    "freeboxTitle": "Freebox",
     "freeboxUnpair": "Отвязать",
     "freeboxViaFreebox": "Freebox",
     "freeboxViaProxy": "VM Proxy",
@@ -601,6 +609,8 @@
   "tips": {
     "clickToListen": "🔊 Нажмите, чтобы прослушать",
     "deleteHistoryHintAndroid": "👉 Смахните вправо, чтобы удалить запись",
+    "deleteDownloadHintAndroid": "👉 Смахните вправо, чтобы отменить загрузку",
+    "deleteDownloadHintTizen": "▶ Нажмите вправо, чтобы отменить загрузку",
     "deleteHistoryHintTizen": "▶ Нажмите вправо, чтобы удалить запись",
     "downloadHint": "Скачать на Freebox",
     "downloadSeasonHint": "Скачать сезон на Freebox",

@@ -828,6 +828,57 @@ body.touch #content-grid.list-view .grid-item-info {
     padding: 0 30px;
 }
 
+.grid-item-image.fb-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fb-icon-glyph {
+    font-size: 48px;
+    color: #aaa;
+}
+
+.grid-item.freebox-file.focused .fb-icon-glyph {
+    color: #fff;
+}
+
+.fb-photo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.fb-photo-modal.hidden {
+    display: none;
+}
+
+.fb-photo-img {
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.fb-photo-caption {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+}
+
 .details-stars {
     color: #ffc107;
     letter-spacing: 2px;
