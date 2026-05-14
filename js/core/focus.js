@@ -39,7 +39,7 @@ IPTVApp.prototype.bindKeys = function() {
         var activeEl = document.activeElement;
         var isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
         if (isInput) {
-            if (key === 38 || key === 40 || key === 10009) {
+            if (key === 38 || key === 40 || key === 10009 || key === 8 || key === 27) {
                 activeEl.blur();
                 if (key === 38) {
                     var gridItems = document.querySelectorAll('#content-grid .grid-item');
@@ -48,6 +48,11 @@ IPTVApp.prototype.bindKeys = function() {
                         self.focusIndex = 0;
                         self.updateFocus();
                     }
+                    return;
+                }
+                if (key === 10009 || key === 8 || key === 27) {
+                    e.preventDefault();
+                    self.goBack();
                     return;
                 }
             } else if (key === 37) {
