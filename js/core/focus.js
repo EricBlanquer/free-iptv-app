@@ -706,6 +706,10 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
     var isListView = document.getElementById('content-grid').classList.contains('list-view');
     var cols = isListView ? 1 : this.gridColumns;
     var sidebarVisible = document.getElementById('sidebar').style.display !== 'none';
+    if (this.currentSection === 'history') {
+        this.hideButtonTooltip('history-delete-tooltip-anchor');
+        this.cancelTooltipShow('historyDelete');
+    }
     switch (ctx.direction) {
         case 'left':
             if (this.favoritesEditMode && this.movingFavoriteIndex >= 0) {
@@ -736,6 +740,7 @@ IPTVApp.prototype._navigateGrid = function(ctx) {
                 return { index: newIndex, handled: true };
             }
             if (isListView && !this.favoritesEditMode && this.currentSection === 'history') {
+                this.hideButtonTooltip('history-delete-tooltip-anchor', true);
                 this.removeHistoryAtIndex(this.focusIndex);
                 return { index: newIndex, handled: true };
             }

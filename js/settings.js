@@ -686,7 +686,7 @@ IPTVApp.prototype.initSettingsUI = function() {
     this.updateProxyUrlVisibility();
     this.updateDialogueBoostVisibility();
     this.initTTSVoiceOptions();
-    var numericSettings = ['minProgressMinutes', 'watchedThreshold', 'retentionWeeks', 'historyMaxItems', 'bufferPlay', 'bufferRebuffer', 'bufferMin', 'bufferMax'];
+    var numericSettings = ['minProgressMinutes', 'watchedThreshold', 'retentionWeeks', 'historyMaxItems', 'bufferPlay', 'bufferRebuffer', 'bufferMin', 'bufferMax', 'cacheRefreshHours'];
     for (var j = 0; j < numericSettings.length; j++) {
         var key = numericSettings[j];
         var el = document.getElementById('setting-' + key);
@@ -1056,7 +1056,8 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             bufferPlay: { min: 1, max: 60 },
             bufferRebuffer: { min: 1, max: 60 },
             bufferMin: { min: 1, max: 600 },
-            bufferMax: { min: 1, max: 600 }
+            bufferMax: { min: 1, max: 600 },
+            cacheRefreshHours: { min: 1, max: 168 }
         };
         var lim = limits[btnSetting] || { min: 1, max: 100 };
         if (action === 'increase' && currentVal < lim.max) {
@@ -3069,6 +3070,7 @@ IPTVApp.prototype.formatSettingValue = function(key, value) {
     if (key === 'minProgressMinutes') return I18n.plural('settings.unitMinutes', value, '{n} minutes');
     if (key === 'watchedThreshold') return value + '%';
     if (key === 'retentionWeeks') return I18n.plural('settings.unitWeeks', value, '{n} weeks');
+    if (key === 'cacheRefreshHours') return I18n.plural('settings.unitHours', value, '{n} hours');
     if (key === 'bufferPlay' || key === 'bufferRebuffer' || key === 'bufferMin' || key === 'bufferMax') {
         return I18n.plural('settings.unitSeconds', value, '{n} s');
     }

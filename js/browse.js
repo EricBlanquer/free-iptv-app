@@ -3434,6 +3434,10 @@ IPTVApp.prototype.initGridScrollLoader = function() {
             self._userScrolling = false;
             userScrollClearTimer = null;
         }, 400);
+        if (self.currentSection === 'history' && typeof self.hideButtonTooltip === 'function') {
+            self.hideButtonTooltip('history-delete-tooltip-anchor');
+            if (typeof self.cancelTooltipShow === 'function') self.cancelTooltipShow('historyDelete');
+        }
     };
     grid.addEventListener('touchstart', markUserScroll, { passive: true });
     grid.addEventListener('touchmove', markUserScroll, { passive: true });
@@ -3684,6 +3688,7 @@ IPTVApp.prototype._createGridItem = function(stream) {
     item.dataset.playlistId = stream._playlistId || '';
     item.dataset.streamType = stream._type || stream._sourceType || this.currentStreamType;
     if (stream._isDownload) item.dataset.isDownload = '1';
+    if (stream._isHistory && this.currentSection === 'history') item.dataset.isHistory = '1';
     if (stream._tmdbOnly) {
         item.dataset.tmdbOnly = '1';
         item.dataset.tmdbId = stream.tmdb_id || '';

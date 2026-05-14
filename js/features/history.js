@@ -425,10 +425,28 @@ IPTVApp.prototype.showHistoryScreen = function() {
             btn.classList.toggle('selected', btn.dataset.view === 'list');
         });
         this.renderGrid(historyItems, 'history');
+        this.scheduleHistoryDeleteTooltip();
     }
     this.focusArea = 'grid';
     this.focusIndex = 0;
     this.deferUpdateFocus();
+};
+
+IPTVApp.prototype.scheduleHistoryDeleteTooltip = function() {
+    var self = this;
+    this.scheduleTooltipShow('historyDelete', function() {
+        if (self.currentSection !== 'history') return;
+        var grid = document.getElementById('content-grid');
+        if (!grid) return;
+        var firstItem = grid.querySelector('.grid-item');
+        if (!firstItem) return;
+        var anchorId = 'history-delete-tooltip-anchor';
+        firstItem.id = anchorId;
+        var isAndroid = typeof Android !== 'undefined' && Android;
+        var key = isAndroid ? 'tips.deleteHistoryHintAndroid' : 'tips.deleteHistoryHintTizen';
+        var fallback = isAndroid ? 'Swipe right to delete an entry' : 'Press → to delete an entry';
+        self.showButtonTooltip(anchorId, 'historyDeleteTooltipShown', I18n.t(key, fallback), 'bottom');
+    }, 800);
 };
 
 IPTVApp.prototype.playFromHistory = function(itemId, itemType, itemName, playlistId) {

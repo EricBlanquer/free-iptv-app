@@ -490,6 +490,15 @@
             <div class="settings-section" id="data-section">
                 <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="data"><span data-i18n="settings.data">Data</span><span class="collapse-arrow collapsed">▼</span></div>
                 <div class="collapsible-content collapsed" id="data-content">
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.cacheRefresh">Provider refresh</span>
+                        <div class="settings-value">
+                            <div class="settings-btn focusable" data-setting="cacheRefreshHours" data-action="decrease">-</div>
+                            <span id="setting-cacheRefreshHours">12</span>
+                            <div class="settings-btn focusable" data-setting="cacheRefreshHours" data-action="increase">+</div>
+                        </div>
+                    </div>
+                    <div class="settings-desc" data-i18n="settings.cacheRefreshDesc">How often the provider data (channels, VOD, series) is refreshed in the background.</div>
                     <div class="settings-row" style="flex-wrap: wrap;">
                         <div class="settings-action focusable" data-action="clearAllCaches" data-i18n="settings.clearAllCaches">Clear all caches</div>
                         <div class="settings-action focusable" data-action="clearTMDBCache" data-i18n="settings.clearCache">Clear TMDB cache</div>

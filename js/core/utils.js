@@ -49,7 +49,7 @@ IPTVApp.prototype.onAppResumed = function() {
         this.startPlaylistAgeTimer();
     }
     if (typeof this.refreshProviderCacheBackground === 'function' && this.playlistCacheTimestamps) {
-        var ttl = (typeof PROVIDER_CACHE_TTL !== 'undefined') ? PROVIDER_CACHE_TTL : 12 * 60 * 60 * 1000;
+        var ttl = typeof this.getProviderCacheTTL === 'function' ? this.getProviderCacheTTL() : 12 * 60 * 60 * 1000;
         var now = Date.now();
         var playlists = (this.settings && this.settings.playlists) || [];
         var self = this;

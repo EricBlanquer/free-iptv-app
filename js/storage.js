@@ -457,8 +457,16 @@ IPTVApp.prototype.getTMDBCacheKey = function(title, year) {
     return (title + '_' + (year || '')).toLowerCase();
 };
 
-// Provider Data Cache (12h expiration) - Using IndexedDB for larger capacity
-var PROVIDER_CACHE_TTL = 12 * 60 * 60 * 1000;
+// Provider Data Cache - Using IndexedDB for larger capacity
+// TTL is configurable via settings.cacheRefreshHours (default 12h)
+var PROVIDER_CACHE_TTL_DEFAULT_HOURS = 12;
+IPTVApp.prototype.getProviderCacheTTL = function() {
+    var h = this.settings && this.settings.cacheRefreshHours;
+    if (typeof h !== 'number' || !isFinite(h) || h <= 0) {
+        h = PROVIDER_CACHE_TTL_DEFAULT_HOURS;
+    }
+    return h * 60 * 60 * 1000;
+};
 var PROVIDER_CACHE_DB_NAME = 'IPTVProviderCache';
 var PROVIDER_CACHE_STORE_NAME = 'cache';
 var PROVIDER_CACHE_DB_VERSION = 1;
@@ -612,7 +620,7 @@ IPTVApp.prototype.loadProviderCacheLocal = function(playlistId) {
                         return;
                     }
                     var ageMinutes = cache.timestamp ? Math.round((Date.now() - cache.timestamp) / 60000) : 0;
-                    var needsRefresh = !cache.timestamp || Date.now() - cache.timestamp > PROVIDER_CACHE_TTL;
+                    var needsRefresh = !cache.timestamp || Date.now() - cache.timestamp > self.getProviderCacheTTL();
                     if (needsRefresh) {
                         window.log('Provider cache stale for ' + playlistId + ' (age: ' + ageMinutes + 'min), will refresh in background');
                         cache.data._needsRefresh = true;
@@ -761,7 +769,7 @@ IPTVApp.prototype.loadM3UCache = function(playlistId) {
                         return;
                     }
                     var ageMinutes = cache.timestamp ? Math.round((Date.now() - cache.timestamp) / 60000) : 0;
-                    var needsRefresh = !cache.timestamp || Date.now() - cache.timestamp > PROVIDER_CACHE_TTL;
+                    var needsRefresh = !cache.timestamp || Date.now() - cache.timestamp > self.getProviderCacheTTL();
                     if (needsRefresh) {
                         window.log('CACHE', 'M3U cache stale for ' + playlistId + ' (age: ' + ageMinutes + 'min), will refresh in background');
                         cache.data._needsRefresh = true;
@@ -1163,7 +1171,7 @@ IPTVApp.prototype.startCacheRefreshTimer = function(playlistsOrId) {
         var cacheAge = self.providerCacheInfo && self.providerCacheInfo.timestamp
             ? Date.now() - self.providerCacheInfo.timestamp
             : Infinity;
-        if (cacheAge > PROVIDER_CACHE_TTL) {
+        if (cacheAge > self.getProviderCacheTTL()) {
             window.log('CACHE', 'Timer: cache expired (age: ' + Math.round(cacheAge / 60000) + 'min), refreshing...');
             playlistIds.forEach(function(playlistId) {
                 if (!self._backgroundRefreshInProgress || !self._backgroundRefreshInProgress[playlistId]) {
@@ -1384,7 +1392,8 @@ IPTVApp.prototype.loadSettings = function() {
         bufferRebuffer: 5,
         bufferMin: 30,
         bufferMax: 60,
-        exitConfirmation: true
+        exitConfirmation: true,
+        cacheRefreshHours: 12
     };
     try {
         var data = localStorage.getItem('settings');
