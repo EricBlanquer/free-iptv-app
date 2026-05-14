@@ -165,18 +165,31 @@ IPTVApp.prototype.clampHomeFocusIndex = function() {
     }
 };
 
-IPTVApp.prototype.getHomeLiveButtonIndex = function() {
+IPTVApp.prototype.getHomeButtonIndexBySection = function(section) {
+    if (!section) return -1;
     var focusables = this.getFocusables();
     for (var i = 0; i < focusables.length; i++) {
-        if (focusables[i].dataset && focusables[i].dataset.section === 'live') {
+        if (focusables[i].dataset && focusables[i].dataset.section === section) {
             return i;
         }
     }
-    return 0;
+    return -1;
+};
+
+IPTVApp.prototype.getHomeLiveButtonIndex = function() {
+    var idx = this.getHomeButtonIndexBySection('live');
+    return idx >= 0 ? idx : 0;
 };
 
 IPTVApp.prototype.setDefaultHomeFocus = function() {
-    if (this.focusArea === 'home') {
-        this.focusIndex = this.getHomeLiveButtonIndex();
+    if (this.focusArea !== 'home') return;
+    var lastSection = this.settings && this.settings.lastViewedSection;
+    if (lastSection) {
+        var idx = this.getHomeButtonIndexBySection(lastSection);
+        if (idx >= 0) {
+            this.focusIndex = idx;
+            return;
+        }
     }
+    this.focusIndex = this.getHomeLiveButtonIndex();
 };

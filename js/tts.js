@@ -18,14 +18,15 @@ IPTVApp.prototype.initTTS = function() {
     this.ttsOriginalText = null;
     this.ttsWarmedUp = false;
     // Tizen 5 AVPlay cold-start: the first new Audio().play() of a session takes
-    // ~466ms to wake the decoder + speaker driver, eating the first word.
-    // The server's `pad=N` parameter prepends real ffmpeg-encoded silence to the
-    // first TTS chunk; AVPlay decodes it during cold-start and the actual voice
-    // arrives in a warm pipeline. (Note: the previous _generate_silence_mp3
-    // implementation prepended synthetic frames with all-zero data, which MP3
-    // decoders treat as LAME padding and skip — ineffective. Fixed server-side
-    // to use ffmpeg+libmp3lame on 2026-05-04.)
-    this._ttsAvPlayPadFirstChunk = true;
+    // ~466ms to wake the decoder + speaker driver, eating the first word. The
+    // server's `pad=N` parameter prepends real ffmpeg-encoded silence to the
+    // chunk; AVPlay decodes it during cold-start and the actual voice arrives
+    // in a warm pipeline. _ttsSessionNeedsPad stays true until a chunk has
+    // actually been played (audio onplay event), not just URL-built — so a
+    // preload that consumes a padded URL but never plays (e.g. user clicks
+    // Play before preload completes, triggering a fresh fetch) doesn't strand
+    // the actual playback with an unpadded chunk-1.
+    this._ttsSessionNeedsPad = true;
     window.log('TTS', 'Initialized (proxy=' + !!this.settings.proxyEnabled + ' url=' + (this.settings.proxyUrl || 'none') + ')');
     var self = this;
     setTimeout(function() { self._warmupAudioPipeline(); }, 0);
@@ -48,7 +49,11 @@ IPTVApp.prototype.getTTSUrl = function() {
     return null;
 };
 
-IPTVApp.prototype.buildTTSUrl = function(ttsUrl, text, lang, engine) {
+IPTVApp.prototype._getTTSPadForChunk = function(chunkIndex) {
+    return (this._ttsSessionNeedsPad && chunkIndex === 0) ? 600 : 0;
+};
+
+IPTVApp.prototype.buildTTSUrl = function(ttsUrl, text, lang, engine, padMs) {
     var url = ttsUrl + '/tts?lang=' + encodeURIComponent(lang || I18n.getLocale()) + '&text=' + encodeURIComponent(text) + proxyDuidParam();
     if (engine) {
         url += '&engine=' + encodeURIComponent(engine);
@@ -65,10 +70,8 @@ IPTVApp.prototype.buildTTSUrl = function(ttsUrl, text, lang, engine) {
     if (this.settings.ttsPitch) {
         url += '&pitch=' + encodeURIComponent((this.settings.ttsPitch >= 0 ? '+' : '') + this.settings.ttsPitch + 'Hz');
     }
-    if (this._ttsAvPlayPadFirstChunk) {
-        url += '&pad=600';
-        this._ttsAvPlayPadFirstChunk = false;
-        window.log('TTS', 'pad=600 applied to first chunk URL');
+    if (padMs && padMs > 0) {
+        url += '&pad=' + padMs;
     }
     return url;
 };
@@ -334,7 +337,7 @@ IPTVApp.prototype.preloadTTS = function(text) {
     this.ttsPreloadedText = text;
     var chunks = this.splitTTSChunks(text);
     if (chunks.length === 1) {
-        var url = this.buildTTSUrl(ttsUrl, text);
+        var url = this.buildTTSUrl(ttsUrl, text, null, null, this._getTTSPadForChunk(0));
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'blob';
@@ -353,7 +356,7 @@ IPTVApp.prototype.preloadTTS = function(text) {
         this.ttsPreloadedChunksText = text;
         for (var i = 0; i < chunks.length; i++) {
             (function(idx, chunk) {
-                var url = self.buildTTSUrl(ttsUrl, chunk);
+                var url = self.buildTTSUrl(ttsUrl, chunk, null, null, self._getTTSPadForChunk(idx));
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
                 xhr.responseType = 'blob';
@@ -436,7 +439,7 @@ IPTVApp.prototype._doSpeakText = function(text, lang, engine) {
     }
     var chunks = this.splitTTSChunks(text);
     if (chunks.length === 1) {
-        var url = this.buildTTSUrl(ttsUrl, text, lang, engine);
+        var url = this.buildTTSUrl(ttsUrl, text, lang, engine, this._getTTSPadForChunk(0));
         this.ttsLoading = true;
         if (descEl) {
             descEl.classList.remove('speaking');
@@ -479,7 +482,7 @@ IPTVApp.prototype._doSpeakText = function(text, lang, engine) {
     }
     for (var i = 0; i < chunks.length; i++) {
         (function(idx, chunk) {
-            var url = self.buildTTSUrl(ttsUrl, chunk, lang, engine);
+            var url = self.buildTTSUrl(ttsUrl, chunk, lang, engine, self._getTTSPadForChunk(i));
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.responseType = 'blob';
@@ -534,6 +537,10 @@ IPTVApp.prototype.playNextChunk = function(isPreloaded) {
     this.ttsAudio = new Audio();
     this.ttsAudio.onplay = function() {
         self.ttsSpeaking = true;
+        if (self._ttsSessionNeedsPad && self.ttsChunkIndex === 0) {
+            self._ttsSessionNeedsPad = false;
+            window.log('TTS', 'pad consumed (first chunk played)');
+        }
         self._stopAudioPrimer();
         if (descEl) descEl.classList.add('speaking');
     };
@@ -588,6 +595,10 @@ IPTVApp.prototype.playTTSAudio = function(audioUrl, descEl, isPreloaded) {
     };
     this.ttsAudio.onplay = function() {
         self.ttsSpeaking = true;
+        if (self._ttsSessionNeedsPad) {
+            self._ttsSessionNeedsPad = false;
+            window.log('TTS', 'pad consumed (single-blob played)');
+        }
         self._stopAudioPrimer();
         if (descEl) descEl.classList.add('speaking');
     };

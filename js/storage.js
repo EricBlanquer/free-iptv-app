@@ -621,6 +621,17 @@ IPTVApp.prototype.loadProviderCacheLocal = function(playlistId) {
                     else {
                         window.log('Provider cache hit from LOCAL for ' + playlistId + ' (age: ' + ageMinutes + 'min)');
                     }
+                    var vodStreams = cache.data && cache.data.vod && cache.data.vod.streams;
+                    if (vodStreams && vodStreams.length > 0) {
+                        var s0 = vodStreams[0];
+                        var sLast = vodStreams[vodStreams.length - 1];
+                        var keyShape = function(s) {
+                            if (!s) return 'undef';
+                            var k = s._dedupKey;
+                            return (typeof k === 'string' ? k.substring(0, 8) : (k === undefined ? 'noKey' : typeof k)) + '/v' + (s._dedupFormatVersion || 'none');
+                        };
+                        window.log('CACHE', 'LOAD vod streams=' + vodStreams.length + ' ts=' + cache.timestamp + ' first[' + s0.stream_id + ']=' + keyShape(s0) + ' last[' + sLast.stream_id + ']=' + keyShape(sLast));
+                    }
                     cache.data._cacheTimestamp = cache.timestamp;
                     cache.data._cacheSource = 'cache';
                     resolve(cache.data);
@@ -675,7 +686,14 @@ IPTVApp.prototype.saveProviderCache = function(playlistId, data) {
         return new Promise(function(resolve) {
             try {
                 var dataSize = JSON.stringify(lightData).length;
-                window.log('CACHE', 'saveProviderCache: writing ' + Math.round(dataSize / 1024) + 'KB for ' + playlistId);
+                var vodSt = lightData.vod && lightData.vod.streams;
+                var sampleKey = function(s) {
+                    if (!s) return 'undef';
+                    var k = s._dedupKey;
+                    return (typeof k === 'string' ? k.substring(0, 8) : (k === undefined ? 'noKey' : typeof k));
+                };
+                var sampleSummary = vodSt && vodSt.length > 0 ? ' vod=' + vodSt.length + ' first=' + sampleKey(vodSt[0]) + ' last=' + sampleKey(vodSt[vodSt.length - 1]) : '';
+                window.log('CACHE', 'saveProviderCache: writing ' + Math.round(dataSize / 1024) + 'KB for ' + playlistId + ' ts=' + timestamp + sampleSummary);
                 var transaction = db.transaction([PROVIDER_CACHE_STORE_NAME], 'readwrite');
                 var store = transaction.objectStore(PROVIDER_CACHE_STORE_NAME);
                 var cache = {
@@ -1074,13 +1092,16 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
                     if (!arr[ti]._playlistId) arr[ti]._playlistId = playlistId;
                 }
             };
-            self.api.cache.vodCategories = cacheData.vod.categories;
+            self.api.cache.vodCategories = cacheData.vod.categories || [];
+            tagRefresh(self.api.cache.vodCategories);
             self.api.cache.vodStreams['_all'] = cacheData.vod.streams || [];
             tagRefresh(self.api.cache.vodStreams['_all']);
-            self.api.cache.seriesCategories = cacheData.series.categories;
+            self.api.cache.seriesCategories = cacheData.series.categories || [];
+            tagRefresh(self.api.cache.seriesCategories);
             self.api.cache.series['_all'] = cacheData.series.streams || [];
             tagRefresh(self.api.cache.series['_all']);
-            self.api.cache.liveCategories = cacheData.live.categories;
+            self.api.cache.liveCategories = cacheData.live.categories || [];
+            tagRefresh(self.api.cache.liveCategories);
             self.api.cache.liveStreams['_all'] = cacheData.live.streams || [];
             tagRefresh(self.api.cache.liveStreams['_all']);
             window.log('Background refresh: updated in-memory cache for ' + playlistId);
@@ -1098,6 +1119,9 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
                 if (self.currentScreen === 'browse' && self.currentSection) {
                     var section = self.currentSection;
                     var sectionData = self.data[section];
+                    if (sectionData && sectionData.categories && sectionData.streams) {
+                        self.renderCategories(sectionData.categories, sectionData.streams);
+                    }
                     if (sectionData && sectionData.streams && Object.keys(oldStreamIds).length > 0) {
                         var newCount = 0;
                         for (var ni = 0; ni < sectionData.streams.length; ni++) {

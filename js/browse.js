@@ -910,6 +910,10 @@ IPTVApp.prototype.openSection = function(section) {
         this.showSettings();
         return;
     }
+    if (this.settings && this.settings.lastViewedSection !== section) {
+        this.settings.lastViewedSection = section;
+        this.saveSettings();
+    }
     this.currentSection = section;
     this.showScreen('browse');
     this.showElement('sidebar');
@@ -1741,6 +1745,57 @@ IPTVApp.prototype.renderCategories = function(categories, streams) {
         container.appendChild(item);
         isFirst = false;
     });
+    var realCategoryCount = preparedCategories.length;
+    window.log('SIDEBAR', 'render section=' + section + ' inputCats=' + categories.length + ' afterCountFilter=' + realCategoryCount + ' streams=' + (streams ? streams.length : 0));
+    var sectionExpectsCategories = ['live', 'vod', 'series', 'sport', 'manga', 'entertainment'].indexOf(section) !== -1 || section.indexOf('custom_') === 0;
+    if (sectionExpectsCategories && realCategoryCount === 0 && streams && streams.length > 0 && !this._sidebarRecovering) {
+        this._sidebarRecovering = true;
+        var recoverSelf = this;
+        var apiSection = ['sport', 'manga', 'entertainment'].indexOf(section) !== -1 || section.indexOf('custom_') === 0 ? 'vod' : section;
+        var rawCats = null, rawStreams = null;
+        if (this.api && this.api.cache) {
+            if (apiSection === 'vod') {
+                rawCats = (this.api.cache.vodCategories || []).slice();
+                rawStreams = (this.api.cache.vodStreams && this.api.cache.vodStreams['_all']) || [];
+                if (section === 'manga' || section.indexOf('custom_') === 0) {
+                    var seriesCats = (this.api.cache.seriesCategories || []).slice();
+                    var seriesStreams = (this.api.cache.series && this.api.cache.series['_all']) || [];
+                    seriesCats.forEach(function(c) { c._sourceType = 'series'; });
+                    seriesStreams.forEach(function(s) { s._sourceType = 'series'; });
+                    rawCats.forEach(function(c) { c._sourceType = 'vod'; });
+                    rawStreams.forEach(function(s) { s._sourceType = 'vod'; });
+                    rawCats = rawCats.concat(seriesCats);
+                    rawStreams = rawStreams.concat(seriesStreams);
+                }
+            }
+            else if (apiSection === 'series') {
+                rawCats = (this.api.cache.seriesCategories || []).slice();
+                rawStreams = (this.api.cache.series && this.api.cache.series['_all']) || [];
+            }
+            else if (apiSection === 'live') {
+                rawCats = (this.api.cache.liveCategories || []).slice();
+                rawStreams = (this.api.cache.liveStreams && this.api.cache.liveStreams['_all']) || [];
+            }
+        }
+        var rerender = function() {
+            var d = recoverSelf.data[section];
+            window.log('SIDEBAR', 'recovery rerender section=' + section + ' cats=' + (d && d.categories ? d.categories.length : 'none') + ' streams=' + (d && d.streams ? d.streams.length : 'none'));
+            if (d && d.categories) recoverSelf.renderCategories(d.categories, d.streams);
+            recoverSelf._sidebarRecovering = false;
+        };
+        if (rawCats && rawStreams && rawCats.length > 0 && rawStreams.length > 0) {
+            window.log('SIDEBAR', 'EMPTY: forcing re-preprocess for section=' + section + ' apiSection=' + apiSection + ' rawCats=' + rawCats.length + ' rawStreams=' + rawStreams.length);
+            if (this.data[section]) delete this.data[section]._dedupGroups;
+            var maybePromise = this._preprocessSection(section, rawCats, rawStreams);
+            if (maybePromise && maybePromise.then) maybePromise.then(rerender);
+            else rerender();
+        }
+        else {
+            window.log('SIDEBAR', 'EMPTY: cannot recover (no api.cache for apiSection=' + apiSection + ')');
+            this._sidebarRecovering = false;
+        }
+        return;
+    }
     // Find index of selected category and add arrow to text
     var categoryItems = container.querySelectorAll('.category-item');
     var selectedIndex = 0;
@@ -2809,20 +2864,15 @@ IPTVApp.prototype.preloadSections = function(onDone) {
 };
 
 IPTVApp.prototype._invalidatePreprocessCache = function(onDone) {
-    var sections = ['vod', 'series', 'sport', 'manga', 'entertainment', 'custom'];
+    var sections = ['vod', 'series', 'live', 'sport', 'manga', 'entertainment'];
+    var customCats = this.settings.customCategories || [];
+    for (var k = 0; k < customCats.length; k++) {
+        sections.push('custom_' + customCats[k].id);
+    }
     for (var i = 0; i < sections.length; i++) {
         if (this.data[sections[i]]) {
             delete this.data[sections[i]]._dedupGroups;
         }
-    }
-    var customSections = ['sport', 'manga', 'entertainment'];
-    for (var j = 0; j < customSections.length; j++) {
-        this.data[customSections[j]] = { categories: [], streams: [] };
-    }
-    var customCats = this.settings.customCategories || [];
-    for (var k = 0; k < customCats.length; k++) {
-        var cid = 'custom_' + customCats[k].id;
-        this.data[cid] = { categories: [], streams: [] };
     }
     this.preloadSections(onDone);
     window.log('CACHE', 'Preprocessing cache invalidated + sections reloaded');
@@ -3036,6 +3086,16 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
     var beforeCount = streams.length;
     var BATCH_SIZE = 2000;
     var hasPreprocessedData = streams.length > 0 && streams[0]._dedupKey && streams[0]._dedupFormatVersion === DEDUP_FORMAT_VERSION;
+    if (streams.length > 100) {
+        var sampleKeyShape = function(idx) {
+            var s = streams[idx];
+            if (!s) return 'undef';
+            var k = s._dedupKey;
+            var prefix = k && typeof k === 'string' ? k.substring(0, 6) : (k === undefined ? 'noKey' : typeof k);
+            return idx + ':' + prefix + '/' + (s._dedupFormatVersion === undefined ? 'noVer' : 'v' + s._dedupFormatVersion) + '/tmdb=' + (s.tmdb || 'none');
+        };
+        window.log('DEDUP', 'enter ' + (categories[0] && categories[0]._sourceType ? 'multi' : 'single') + ' streams=' + streams.length + ' fast=' + hasPreprocessedData + ' samples: ' + sampleKeyShape(0) + ' | ' + sampleKeyShape(Math.floor(streams.length / 2)) + ' | ' + sampleKeyShape(streams.length - 1));
+    }
     var computeFields = function(s) {
         if (s._dedupKey !== undefined && s._dedupFormatVersion === DEDUP_FORMAT_VERSION) return;
         var title = self.getStreamTitle(s);
@@ -3183,6 +3243,7 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
                 return true;
             });
         }
+        var preConsolidateKeys = Object.keys(dedupGroups).length;
         self._consolidateDedupGroupsByCleanTitle(dedupGroups);
         var keys = Object.keys(dedupGroups);
         for (var k = 0; k < keys.length; k++) {
@@ -3191,6 +3252,12 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
             });
         }
         if (needsGenre) genreSet = self._mergeGenrePlurals(genreSet);
+        if (filtered.length > 100 && keys.length < filtered.length / 4) {
+            var topGroups = keys.map(function(k) { return { k: k, n: dedupGroups[k].length }; })
+                .sort(function(a, b) { return b.n - a.n; }).slice(0, 5);
+            var top5Str = topGroups.map(function(g) { return g.n + 'x"' + g.k.substring(0, 60) + '"'; }).join(' | ');
+            window.log('DEDUP', 'ANOMALY: ' + filtered.length + ' streams collapsed to ' + keys.length + ' groups (preConsolidate=' + preConsolidateKeys + '), top5: ' + top5Str);
+        }
         window.log('DEDUP', 'Preprocessed ' + filtered.length + ' streams into ' + keys.length + ' groups' + (hasPreprocessedData ? ' (fast path from cache)' : ''));
         window.log('PERF', 'preprocessStreams: ' + (Date.now() - t0) + 'ms' + (hasPreprocessedData ? ' (fast)' : ''));
         return {

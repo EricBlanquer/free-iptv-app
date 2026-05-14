@@ -219,18 +219,76 @@ describe('TTS', function() {
             expect(url).toContain('rate=' + encodeURIComponent('-20%'));
         });
 
-        it('should add pad=600 on the first chunk and clear the flag', function() {
-            // Server now uses ffmpeg+libmp3lame to produce real silent MP3 frames
-            // (verified: pad=2000 increases ffprobe duration from 1.656s → 3.720s).
-            // 600ms covers the measured ~466ms AVPlay cold-start with margin.
-            app._ttsAvPlayPadFirstChunk = true;
-            var url = app.buildTTSUrl('http://proxy.example.com', 'test');
-            expect(url).toContain('pad=600');
-            expect(app._ttsAvPlayPadFirstChunk).toBe(false);
+        it('should add &pad=N when padMs > 0 is passed', function() {
+            var url = app.buildTTSUrl('http://proxy.example.com', 'test', null, null, 1000);
+            expect(url).toContain('pad=1000');
         });
-        it('should NOT add pad on subsequent chunks (only the first per session)', function() {
-            app._ttsAvPlayPadFirstChunk = false;
-            var url = app.buildTTSUrl('http://proxy.example.com', 'test');
+        it('should NOT add &pad= when padMs is 0 / undefined / negative', function() {
+            expect(app.buildTTSUrl('http://proxy.example.com', 'test', null, null, 0)).not.toContain('pad=');
+            expect(app.buildTTSUrl('http://proxy.example.com', 'test', null, null)).not.toContain('pad=');
+            expect(app.buildTTSUrl('http://proxy.example.com', 'test', null, null, -1)).not.toContain('pad=');
+        });
+        it('buildTTSUrl no longer auto-clears the session pad flag (decoupled from URL build)', function() {
+            app._ttsSessionNeedsPad = true;
+            app.buildTTSUrl('http://proxy.example.com', 'test', null, null, 1000);
+            expect(app._ttsSessionNeedsPad).toBe(true);
+        });
+    });
+
+    describe('_getTTSPadForChunk', function() {
+        it('returns 600 when session needs pad AND chunk index is 0', function() {
+            app._ttsSessionNeedsPad = true;
+            expect(app._getTTSPadForChunk(0)).toBe(600);
+        });
+        it('returns 0 for non-first chunks even if session needs pad', function() {
+            app._ttsSessionNeedsPad = true;
+            expect(app._getTTSPadForChunk(1)).toBe(0);
+            expect(app._getTTSPadForChunk(4)).toBe(0);
+        });
+        it('returns 0 once the session pad has been consumed (chunk played)', function() {
+            app._ttsSessionNeedsPad = false;
+            expect(app._getTTSPadForChunk(0)).toBe(0);
+        });
+    });
+
+    describe('preload + re-fetch race (the actual user-reported bug)', function() {
+        // Bug captured 2026-05-14: user opened "Joy" details, preload fired
+        // a padded chunk-1 URL, then user pressed Play before preload
+        // completed. _doSpeakText hit "Preloaded chunks incomplete, fetching
+        // normally", re-built all 5 chunk URLs — but the OLD code consumed
+        // the pad flag during preload's URL build, so the re-fetched chunks
+        // had no pad and AVPlay cold-start ate the first word ("Années").
+        // The fix decouples flag consumption from URL building: the flag
+        // stays true through any number of URL builds and is only cleared
+        // when a chunk actually starts playing.
+        it('preload of chunk 1 does not consume the session pad flag', function() {
+            app._ttsSessionNeedsPad = true;
+            app.buildTTSUrl('http://proxy.example.com', 'Hello', null, null, app._getTTSPadForChunk(0));
+            expect(app._ttsSessionNeedsPad).toBe(true);
+        });
+        it('after preload, a fresh fetch of chunk 1 still gets pad=600 (regression)', function() {
+            app._ttsSessionNeedsPad = true;
+            var preloadUrl = app.buildTTSUrl('http://proxy.example.com', 'Hello', null, null, app._getTTSPadForChunk(0));
+            expect(preloadUrl).toContain('pad=600');
+            expect(app._ttsSessionNeedsPad).toBe(true);
+            var refetchUrl = app.buildTTSUrl('http://proxy.example.com', 'Hello chunk 1', null, null, app._getTTSPadForChunk(0));
+            expect(refetchUrl).toContain('pad=600');
+        });
+        it('multi-chunk re-fetch: only chunk 0 gets pad, chunks 1-4 do not', function() {
+            app._ttsSessionNeedsPad = true;
+            var urls = [];
+            for (var i = 0; i < 5; i++) {
+                urls.push(app.buildTTSUrl('http://proxy.example.com', 'chunk ' + i, null, null, app._getTTSPadForChunk(i)));
+            }
+            expect(urls[0]).toContain('pad=600');
+            expect(urls[1]).not.toContain('pad=');
+            expect(urls[2]).not.toContain('pad=');
+            expect(urls[3]).not.toContain('pad=');
+            expect(urls[4]).not.toContain('pad=');
+        });
+        it('after first chunk has played, subsequent sessions do not pad', function() {
+            app._ttsSessionNeedsPad = false;
+            var url = app.buildTTSUrl('http://proxy.example.com', 'next session', null, null, app._getTTSPadForChunk(0));
             expect(url).not.toContain('pad=');
         });
     });
