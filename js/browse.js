@@ -556,6 +556,37 @@ IPTVApp.prototype._getStreamById = function(streamId) {
 IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, done) {
     var self = this;
     if (gridItem && gridItem.classList && gridItem.classList.contains('freebox-file')) {
+        if (gridItem.dataset.fbMime === 'image' && gridItem.dataset.fbPath) {
+            var thumbImg = gridItem.querySelector('.fb-thumb-img');
+            if (!thumbImg) { done(); return; }
+            FreeboxAPI.fetchFileBytes(gridItem.dataset.fbPath, 196608).then(function(buffer) {
+                if (self._imageQueueId !== queueId) { done(); return; }
+                var thumbBlob = self._extractExifThumbnail(buffer);
+                if (!thumbBlob) {
+                    window.log('THUMB no EXIF thumbnail in ' + gridItem.dataset.fbPath);
+                    done();
+                    return;
+                }
+                var orient = self._extractExifOrientationFromBuffer(buffer);
+                var transform = self._orientationToTransform(orient);
+                thumbImg.style.transform = 'translate(-50%, -50%) ' + (transform || '');
+                if (orient === 5 || orient === 6 || orient === 7 || orient === 8) {
+                    thumbImg.classList.add('fb-thumb-img-rotated');
+                }
+                thumbImg.onload = function() {
+                    if (self._imageQueueId !== queueId) return;
+                    div.classList.add('fb-icon-hidden');
+                    div.dataset.loaded = 'fb-thumb';
+                };
+                thumbImg.onerror = function() { done(); };
+                thumbImg.src = URL.createObjectURL(thumbBlob);
+                done();
+            }).catch(function(err) {
+                window.log('THUMB fetch error: ' + (err.message || err));
+                done();
+            });
+            return;
+        }
         div.dataset.loaded = 'skip';
         done();
         return;
@@ -3903,6 +3934,18 @@ IPTVApp.prototype._createFreeboxItem = function(stream) {
     icon.className = 'material-symbols-outlined fb-icon-glyph';
     icon.textContent = iconName;
     image.appendChild(icon);
+    if (stream._fbMime === 'image' && !stream._fbIsDir && !stream._fbIsUp) {
+        var thumbImg = document.createElement('img');
+        thumbImg.className = 'fb-thumb-img';
+        image.appendChild(thumbImg);
+    }
+    var overlayBottom = document.createElement('div');
+    overlayBottom.className = 'grid-overlay-bottom';
+    var titleSpan = document.createElement('span');
+    titleSpan.className = 'grid-title';
+    titleSpan.textContent = stream.name || '';
+    overlayBottom.appendChild(titleSpan);
+    image.appendChild(overlayBottom);
     item.appendChild(image);
     var info = document.createElement('div');
     info.className = 'grid-item-info';

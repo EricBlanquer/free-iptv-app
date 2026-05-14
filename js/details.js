@@ -3837,6 +3837,7 @@ IPTVApp.prototype._renderDownloadsWithBrowser = function(downloadItems) {
     }
     this._applyFreeboxSortLabels(true);
     this.showElement('sort-filters');
+    this.showElement('view-mode-filters');
     document.body.classList.add('downloads-browser');
     var restoreFocus = function() {
         if (restoreSort) {
@@ -4272,6 +4273,90 @@ IPTVApp.prototype._parseExifOrientation = function(url) {
         req.ontimeout = function() { window.log('EXIF timeout'); resolve(1); };
         req.send();
     });
+};
+
+IPTVApp.prototype._extractExifThumbnail = function(buffer) {
+    try {
+        var view = new DataView(buffer);
+        if (view.byteLength < 4 || view.getUint16(0) !== 0xFFD8) return null;
+        var offset = 2;
+        while (offset < view.byteLength - 4) {
+            var marker = view.getUint16(offset);
+            if ((marker & 0xFF00) !== 0xFF00) return null;
+            var segLen = view.getUint16(offset + 2);
+            if (marker === 0xFFE1 && offset + 10 < view.byteLength && view.getUint32(offset + 4) === 0x45786966) {
+                var tiffStart = offset + 10;
+                var byteOrder = view.getUint16(tiffStart);
+                var le;
+                if (byteOrder === 0x4949) le = true;
+                else if (byteOrder === 0x4D4D) le = false;
+                else return null;
+                if (view.getUint16(tiffStart + 2, le) !== 42) return null;
+                var ifd0Offset = tiffStart + view.getUint32(tiffStart + 4, le);
+                if (ifd0Offset >= view.byteLength - 2) return null;
+                var ifd0NumTags = view.getUint16(ifd0Offset, le);
+                var ifd1OffsetPos = ifd0Offset + 2 + ifd0NumTags * 12;
+                if (ifd1OffsetPos + 4 > view.byteLength) return null;
+                var ifd1Offset = view.getUint32(ifd1OffsetPos, le);
+                if (!ifd1Offset) return null;
+                ifd1Offset = tiffStart + ifd1Offset;
+                if (ifd1Offset >= view.byteLength - 2) return null;
+                var ifd1NumTags = view.getUint16(ifd1Offset, le);
+                var thumbOff = 0, thumbLen = 0;
+                for (var i = 0; i < ifd1NumTags; i++) {
+                    var tagOffset = ifd1Offset + 2 + i * 12;
+                    if (tagOffset + 10 >= view.byteLength) break;
+                    var tagId = view.getUint16(tagOffset, le);
+                    if (tagId === 0x0201) thumbOff = view.getUint32(tagOffset + 8, le);
+                    else if (tagId === 0x0202) thumbLen = view.getUint32(tagOffset + 8, le);
+                }
+                if (!thumbOff || !thumbLen) return null;
+                var absOff = tiffStart + thumbOff;
+                if (absOff + thumbLen > view.byteLength) return null;
+                return new Blob([buffer.slice(absOff, absOff + thumbLen)], { type: 'image/jpeg' });
+            }
+            offset += 2 + segLen;
+        }
+        return null;
+    } catch (ex) {
+        return null;
+    }
+};
+
+IPTVApp.prototype._extractExifOrientationFromBuffer = function(buffer) {
+    try {
+        var view = new DataView(buffer);
+        if (view.byteLength < 4 || view.getUint16(0) !== 0xFFD8) return 1;
+        var offset = 2;
+        while (offset < view.byteLength - 4) {
+            var marker = view.getUint16(offset);
+            if ((marker & 0xFF00) !== 0xFF00) return 1;
+            var segLen = view.getUint16(offset + 2);
+            if (marker === 0xFFE1 && offset + 10 < view.byteLength && view.getUint32(offset + 4) === 0x45786966) {
+                var tiffStart = offset + 10;
+                var byteOrder = view.getUint16(tiffStart);
+                var le;
+                if (byteOrder === 0x4949) le = true;
+                else if (byteOrder === 0x4D4D) le = false;
+                else return 1;
+                if (view.getUint16(tiffStart + 2, le) !== 42) return 1;
+                var ifdOffset = tiffStart + view.getUint32(tiffStart + 4, le);
+                if (ifdOffset >= view.byteLength - 2) return 1;
+                var numTags = view.getUint16(ifdOffset, le);
+                for (var i = 0; i < numTags; i++) {
+                    var tagOffset = ifdOffset + 2 + i * 12;
+                    if (tagOffset >= view.byteLength - 10) break;
+                    var tagId = view.getUint16(tagOffset, le);
+                    if (tagId === 0x0112) return view.getUint16(tagOffset + 8, le) || 1;
+                }
+                return 1;
+            }
+            offset += 2 + segLen;
+        }
+        return 1;
+    } catch (ex) {
+        return 1;
+    }
 };
 
 IPTVApp.prototype._orientationToTransform = function(o) {

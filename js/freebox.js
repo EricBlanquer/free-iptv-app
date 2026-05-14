@@ -483,6 +483,31 @@ var FreeboxAPI = (function() {
         });
     }
 
+    function fetchFileBytes(path, maxBytes) {
+        return ensureSession().then(function() {
+            return new Promise(function(resolve, reject) {
+                var req = new XMLHttpRequest();
+                req.open('GET', apiUrl('/api/v4/dl/' + encodePath(path)), true);
+                req.setRequestHeader('X-Fbx-App-Auth', config.sessionToken);
+                if (maxBytes && maxBytes > 0) {
+                    try { req.setRequestHeader('Range', 'bytes=0-' + (maxBytes - 1)); } catch (ex) {}
+                }
+                req.responseType = 'arraybuffer';
+                req.timeout = 12000;
+                req.onload = function() {
+                    if (req.status === 200 || req.status === 206) {
+                        resolve(req.response);
+                    } else {
+                        reject(new Error('Download failed: ' + req.status));
+                    }
+                };
+                req.onerror = function() { reject(new Error('Network error')); };
+                req.ontimeout = function() { reject(new Error('Timeout')); };
+                req.send();
+            });
+        });
+    }
+
     function fetchFileBlob(path) {
         return ensureSession().then(function() {
             return new Promise(function(resolve, reject) {
@@ -528,6 +553,7 @@ var FreeboxAPI = (function() {
         fsLs: fsLs,
         fsRm: fsRm,
         getStreamUrl: getStreamUrl,
-        fetchFileBlob: fetchFileBlob
+        fetchFileBlob: fetchFileBlob,
+        fetchFileBytes: fetchFileBytes
     };
 })();
