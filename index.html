@@ -92,6 +92,7 @@
                     <div class="settings-options">
                         <div class="settings-option focusable selected" data-setting="playlistType" data-value="provider" data-i18n="settings.playlistTypeProvider">API Server</div>
                         <div class="settings-option focusable" data-setting="playlistType" data-value="m3u" data-i18n="settings.playlistTypeM3u">M3U</div>
+                        <div class="settings-option focusable" data-setting="playlistType" data-value="jellyfin" data-i18n="settings.playlistTypeJellyfin">Jellyfin</div>
                     </div>
                 </div>
             </div>
@@ -108,23 +109,25 @@
                     <span class="settings-label" data-i18n="settings.password">Password</span>
                     <input type="password" id="playlist-password" class="settings-input focusable" placeholder="Password" data-i18n-placeholder="settings.password">
                 </div>
-                <div class="settings-row">
-                    <span class="settings-label" data-i18n="settings.defaultSubtitleLang">Default subtitles</span>
-                    <div class="settings-options" id="playlist-subtitle-lang-options">
-                        <!-- Dynamically populated -->
+                <div id="playlist-provider-only-fields">
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.defaultSubtitleLang">Default subtitles</span>
+                        <div class="settings-options" id="playlist-subtitle-lang-options">
+                            <!-- Dynamically populated -->
+                        </div>
                     </div>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label" data-i18n="settings.defaultAudioLang">Default audio</span>
-                    <div class="settings-options" id="playlist-audio-lang-options">
-                        <!-- Dynamically populated -->
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.defaultAudioLang">Default audio</span>
+                        <div class="settings-options" id="playlist-audio-lang-options">
+                            <!-- Dynamically populated -->
+                        </div>
                     </div>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label" data-i18n="settings.defaultAudioChannels">Audio channels</span>
-                    <div class="settings-options" id="playlist-audio-channels-options">
-                        <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="stereo" data-i18n="settings.audioChannelsStereo">Stereo</div>
-                        <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="surround" data-i18n="settings.audioChannelsSurround">Surround</div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.defaultAudioChannels">Audio channels</span>
+                        <div class="settings-options" id="playlist-audio-channels-options">
+                            <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="stereo" data-i18n="settings.audioChannelsStereo">Stereo</div>
+                            <div class="settings-option focusable" data-setting="defaultAudioChannels" data-value="surround" data-i18n="settings.audioChannelsSurround">Surround</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1217,6 +1220,7 @@
     <script src="js/i18n-data.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/provider.js"></script>
+    <script src="js/jellyfin.js"></script>
     <script src="js/tmdb.js"></script>
     <script src="js/opensubtitles.js"></script>
     <script src="js/subdl.js"></script>

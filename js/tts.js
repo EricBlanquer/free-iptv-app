@@ -323,19 +323,11 @@ IPTVApp.prototype.preloadTTS = function(text) {
     var ttsUrl = this.getTTSUrl();
     if (!text) return;
     if (!ttsUrl || text === this.ttsPreloadedText) return;
-    if (this.ttsPreloadedUrl) {
-        URL.revokeObjectURL(this.ttsPreloadedUrl);
-        this.ttsPreloadedUrl = null;
-    }
-    if (this.ttsPreloadedChunks) {
-        for (var ci = 0; ci < this.ttsPreloadedChunks.length; ci++) {
-            if (this.ttsPreloadedChunks[ci]) URL.revokeObjectURL(this.ttsPreloadedChunks[ci]);
-        }
-        this.ttsPreloadedChunks = null;
-        this.ttsPreloadedChunksText = null;
-    }
+    this.clearTTSPreload();
     this.ttsPreloadedText = text;
+    this.ttsPreloadXhrs = [];
     var chunks = this.splitTTSChunks(text);
+    window.log('TTS', 'preload start: ' + chunks.length + ' chunk(s) for "' + text.substring(0, 40) + '..."');
     if (chunks.length === 1) {
         var url = this.buildTTSUrl(ttsUrl, text, null, null, this._getTTSPadForChunk(0));
         var xhr = new XMLHttpRequest();
@@ -347,7 +339,11 @@ IPTVApp.prototype.preloadTTS = function(text) {
                 self.ttsPreloadedUrl = URL.createObjectURL(blob);
                 window.log('TTS', 'Preloaded ' + blob.size + ' bytes');
             }
+            else if (self.ttsPreloadedText !== text) {
+                window.log('TTS', 'preload xhr discarded (text changed)');
+            }
         };
+        this.ttsPreloadXhrs.push(xhr);
         xhr.send();
     }
     else {
@@ -365,7 +361,11 @@ IPTVApp.prototype.preloadTTS = function(text) {
                         self.ttsPreloadedChunks[idx] = URL.createObjectURL(xhr.response);
                         window.log('TTS', 'Preloaded chunk ' + (idx + 1) + '/' + chunks.length);
                     }
+                    else if (self.ttsPreloadedChunksText !== text) {
+                        window.log('TTS', 'preload chunk ' + (idx + 1) + ' discarded (text changed)');
+                    }
                 };
+                self.ttsPreloadXhrs.push(xhr);
                 xhr.send();
             })(i, chunks[i]);
         }
@@ -534,7 +534,25 @@ IPTVApp.prototype.playNextChunk = function(isPreloaded) {
     this.ttsLoading = false;
     if (descEl) descEl.classList.remove('loading');
     this.highlightTTSChunk(descEl, this.ttsChunkIndex);
+    var chunkLabel = (this.ttsChunkIndex + 1) + '/' + this.ttsChunks.length;
     this.ttsAudio = new Audio();
+    this.ttsAudio.preload = 'auto';
+    var started = false;
+    var fireStart = function() {
+        if (started || !self.ttsAudio || self.ttsCancelled) return;
+        started = true;
+        self.ttsAudio.oncanplaythrough = null;
+        self.ttsAudio.onloadeddata = null;
+        var dur = self.ttsAudio.duration;
+        window.log('TTS', 'chunk ' + chunkLabel + ' ready to play (duration=' + (isFinite(dur) ? dur.toFixed(2) + 's' : '?') + ')');
+        self.ttsAudio.play().then(function() {
+            window.log('TTS', 'Playing chunk ' + chunkLabel);
+        }).catch(function(err) {
+            window.log('TTS', 'Chunk play error: ' + err.message);
+            self.ttsSpeaking = false;
+            if (descEl) descEl.classList.remove('speaking');
+        });
+    };
     this.ttsAudio.onplay = function() {
         self.ttsSpeaking = true;
         if (self._ttsSessionNeedsPad && self.ttsChunkIndex === 0) {
@@ -544,7 +562,14 @@ IPTVApp.prototype.playNextChunk = function(isPreloaded) {
         self._stopAudioPrimer();
         if (descEl) descEl.classList.add('speaking');
     };
+    this.ttsAudio.oncanplaythrough = fireStart;
+    this.ttsAudio.onloadeddata = function() {
+        window.log('TTS', 'chunk ' + chunkLabel + ' loadeddata (currentTime=' + self.ttsAudio.currentTime.toFixed(3) + ')');
+    };
     this.ttsAudio.onended = function() {
+        var played = self.ttsAudio ? self.ttsAudio.currentTime : 0;
+        var dur = self.ttsAudio ? self.ttsAudio.duration : 0;
+        window.log('TTS', 'chunk ' + chunkLabel + ' ended (played=' + played.toFixed(2) + 's / ' + (isFinite(dur) ? dur.toFixed(2) + 's' : '?') + ')');
         if (!isPreloaded) URL.revokeObjectURL(audioUrl);
         self.ttsChunkIndex++;
         if (self.ttsCancelled) return;
@@ -559,20 +584,21 @@ IPTVApp.prototype.playNextChunk = function(isPreloaded) {
         }
     };
     this.ttsAudio.onerror = function(e) {
-        window.log('TTS', 'Chunk ' + (self.ttsChunkIndex + 1) + ' error');
+        var code = (self.ttsAudio && self.ttsAudio.error) ? self.ttsAudio.error.code : '?';
+        window.log('TTS', 'chunk ' + chunkLabel + ' error (mediaError=' + code + ')');
         if (!isPreloaded) URL.revokeObjectURL(audioUrl);
         self.ttsChunkIndex++;
         if (self.ttsCancelled) return;
         self.playNextChunk(isPreloaded);
     };
+    window.log('TTS', 'chunk ' + chunkLabel + ' src set, waiting for canplaythrough');
     this.ttsAudio.src = audioUrl;
-    this.ttsAudio.play().then(function() {
-        window.log('TTS', 'Playing chunk ' + (self.ttsChunkIndex + 1) + '/' + self.ttsChunks.length);
-    }).catch(function(err) {
-        window.log('TTS', 'Chunk play error: ' + err.message);
-        self.ttsSpeaking = false;
-        if (descEl) descEl.classList.remove('speaking');
-    });
+    setTimeout(function() {
+        if (!started && self.ttsAudio && !self.ttsCancelled && self.ttsAudio.readyState >= 3) {
+            window.log('TTS', 'chunk ' + chunkLabel + ' canplaythrough timeout fallback (readyState=' + self.ttsAudio.readyState + ')');
+            fireStart();
+        }
+    }, 2000);
 };
 
 IPTVApp.prototype.playTTSAudio = function(audioUrl, descEl, isPreloaded) {
@@ -671,6 +697,7 @@ IPTVApp.prototype.stopTTS = function() {
         this.ttsAudio.onended = null;
         this.ttsAudio.onerror = null;
         this.ttsAudio.oncanplaythrough = null;
+        this.ttsAudio.onloadeddata = null;
         this.ttsAudio.src = '';
         this.ttsAudio = null;
     }
@@ -696,6 +723,19 @@ IPTVApp.prototype.stopTTS = function() {
 };
 
 IPTVApp.prototype.clearTTSPreload = function() {
+    var aborted = 0;
+    if (this.ttsPreloadXhrs && this.ttsPreloadXhrs.length) {
+        for (var x = 0; x < this.ttsPreloadXhrs.length; x++) {
+            try {
+                if (this.ttsPreloadXhrs[x].readyState !== 4) {
+                    this.ttsPreloadXhrs[x].abort();
+                    aborted++;
+                }
+            }
+            catch (e) {}
+        }
+        this.ttsPreloadXhrs = null;
+    }
     if (this.ttsPreloadedUrl) {
         URL.revokeObjectURL(this.ttsPreloadedUrl);
         this.ttsPreloadedUrl = null;
@@ -707,6 +747,9 @@ IPTVApp.prototype.clearTTSPreload = function() {
         }
         this.ttsPreloadedChunks = null;
         this.ttsPreloadedChunksText = null;
+    }
+    if (aborted > 0) {
+        window.log('TTS', 'preload cleared (aborted ' + aborted + ' in-flight XHR)');
     }
 };
 

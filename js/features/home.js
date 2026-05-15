@@ -7,8 +7,10 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
     var configured = this.isIPTVConfigured();
     var playlist = this.getActivePlaylist();
     var isM3U = playlist && playlist.type === 'm3u';
+    var isJellyfin = playlist && playlist.type === 'jellyfin';
     var homeButtons = document.querySelectorAll('#home-grid > .home-btn');
     var providerOnlySections = ['vod', 'series', 'sport', 'manga', 'entertainment', 'history'];
+    var jellyfinHiddenSections = ['live', 'sport', 'manga', 'entertainment'];
     var patterns = this.getCategoryPatterns();
     var hasPatterns = {
         sport: patterns.sport && patterns.sport.length > 0,
@@ -31,6 +33,9 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
         else if (isM3U && providerOnlySections.indexOf(section) !== -1) {
             btn.style.display = 'none';
         }
+        else if (isJellyfin && jellyfinHiddenSections.indexOf(section) !== -1) {
+            btn.style.display = 'none';
+        }
         else if (isHidden || noPatterns) {
             btn.style.display = 'none';
         }
@@ -42,7 +47,7 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
     if (dlBtn) {
         dlBtn.style.display = this.hasAppDownloads() ? '' : 'none';
     }
-    this.renderCustomCategoryButtons(configured, isM3U, patterns);
+    this.renderCustomCategoryButtons(configured, isM3U || isJellyfin, patterns);
     this.updateHomeGridLayout();
     this.invalidateFocusables();
     if (this.focusArea === 'home') {

@@ -494,6 +494,7 @@
     "playlistName": "Ad (isteğe bağlı)",
     "playlistType": "Tür",
     "playlistTypeM3u": "M3U",
+    "playlistTypeJellyfin": "Jellyfin",
     "playlistTypeProvider": "API Sunucusu",
     "playlists": "Oynatma listeleri",
     "preferHtml5": "HTML5 Oynatıcı",

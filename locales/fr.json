@@ -498,6 +498,7 @@
     "playlistName": "Nom (optionnel)",
     "playlistType": "Type",
     "playlistTypeM3u": "M3U",
+    "playlistTypeJellyfin": "Jellyfin",
     "playlistTypeProvider": "Serveur API",
     "playlists": "Playlists",
     "preferHtml5": "Lecteur HTML5",

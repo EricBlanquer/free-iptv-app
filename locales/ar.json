@@ -497,6 +497,7 @@
     "playlistName": "الاسم (اختياري)",
     "playlistType": "النوع",
     "playlistTypeM3u": "M3U",
+    "playlistTypeJellyfin": "Jellyfin",
     "playlistTypeProvider": "خادم API",
     "playlists": "قوائم التشغيل",
     "preferHtml5": "مشغل HTML5",

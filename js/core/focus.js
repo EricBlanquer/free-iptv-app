@@ -52,6 +52,9 @@ IPTVApp.prototype.bindKeys = function() {
                 }
                 if (key === 10009 || key === 8 || key === 27) {
                     e.preventDefault();
+                    if (typeof tizen !== 'undefined' && typeof webapis !== 'undefined') {
+                        return;
+                    }
                     self.goBack();
                     return;
                 }

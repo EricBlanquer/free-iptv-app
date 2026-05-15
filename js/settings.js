@@ -1342,7 +1342,7 @@ IPTVApp.prototype.renderPlaylistsList = function() {
         iconEl.className = 'playlist-icon';
         var iconSpan = document.createElement('span');
         iconSpan.className = 'material-symbols-outlined';
-        iconSpan.textContent = p.type === 'provider' ? 'satellite_alt' : 'list_alt';
+        iconSpan.textContent = p.type === 'provider' ? 'satellite_alt' : (p.type === 'jellyfin' ? 'theaters' : 'list_alt');
         iconEl.appendChild(iconSpan);
         item.appendChild(iconEl);
         var info = document.createElement('div');
@@ -1353,7 +1353,7 @@ IPTVApp.prototype.renderPlaylistsList = function() {
         info.appendChild(nameEl);
         var typeEl = document.createElement('div');
         typeEl.className = 'playlist-type';
-        typeEl.textContent = p.type === 'provider' ? I18n.t('settings.playlistTypeProvider', 'API Server') : I18n.t('settings.playlistTypeM3u', 'M3U');
+        typeEl.textContent = p.type === 'provider' ? I18n.t('settings.playlistTypeProvider', 'API Server') : (p.type === 'jellyfin' ? I18n.t('settings.playlistTypeJellyfin', 'Jellyfin') : I18n.t('settings.playlistTypeM3u', 'M3U'));
         info.appendChild(typeEl);
         item.appendChild(info);
         // Add checking indicator (will be updated by validation)
@@ -1458,8 +1458,13 @@ IPTVApp.prototype.setPlaylistType = function(type) {
             options[i].classList.remove('selected');
         }
     }
-    this.setHidden(providerFields, type !== 'provider');
-    this.setHidden(m3uFields, type === 'provider');
+    var isCredentialsType = (type === 'provider' || type === 'jellyfin');
+    this.setHidden(providerFields, !isCredentialsType);
+    this.setHidden(m3uFields, isCredentialsType);
+    var providerOnly = document.getElementById('playlist-provider-only-fields');
+    if (providerOnly) {
+        this.setHidden(providerOnly, type !== 'provider');
+    }
     this.currentPlaylistType = type;
     this.invalidateFocusables();
 };
@@ -1487,6 +1492,28 @@ IPTVApp.prototype.savePlaylist = function() {
         playlist.defaultAudioLang = selectedAudLang ? selectedAudLang.dataset.value : '';
         var selectedAudChannels = document.querySelector('#playlist-audio-channels-options .settings-option.selected');
         playlist.defaultAudioChannels = selectedAudChannels ? selectedAudChannels.dataset.value : 'stereo';
+    }
+    else if (type === 'jellyfin') {
+        playlist.serverUrl = document.getElementById('playlist-serverUrl').value.trim();
+        playlist.username = document.getElementById('playlist-username').value.trim();
+        playlist.password = document.getElementById('playlist-password').value.trim();
+        if (!playlist.serverUrl || !playlist.username || !playlist.password) {
+            return;
+        }
+        var existing = null;
+        for (var ei = 0; ei < this.settings.playlists.length; ei++) {
+            if (this.sameId(this.settings.playlists[ei].id, playlist.id)) {
+                existing = this.settings.playlists[ei];
+                break;
+            }
+        }
+        if (existing && existing.type === 'jellyfin'
+            && existing.serverUrl === playlist.serverUrl
+            && existing.username === playlist.username
+            && existing.password === playlist.password) {
+            playlist.jellyfinUserId = existing.jellyfinUserId || null;
+            playlist.jellyfinToken = existing.jellyfinToken || null;
+        }
     }
     else {
         var m3uUrl = document.getElementById('playlist-m3uUrl').value.trim();
@@ -1927,7 +1954,42 @@ IPTVApp.prototype.validatePlaylist = function(playlist) {
     else if (playlist.type === 'm3u') {
         return this.validateM3UPlaylist(playlist);
     }
+    else if (playlist.type === 'jellyfin') {
+        return this.validateJellyfinPlaylist(playlist);
+    }
     return Promise.resolve({ valid: false, error: 'Unknown type' });
+};
+
+IPTVApp.prototype.validateJellyfinPlaylist = function(playlist) {
+    var self = this;
+    if (!playlist.serverUrl || !playlist.username || !playlist.password) {
+        return Promise.resolve({ valid: false, error: 'incomplete' });
+    }
+    var api = new JellyfinAPI(playlist.serverUrl, playlist.username, playlist.password,
+        playlist.jellyfinUserId || null, playlist.jellyfinToken || null);
+    api.playlistId = playlist.id;
+    var probe;
+    if (api.accessToken && api.userId) {
+        probe = api.fetchJellyfin('/Users/' + encodeURIComponent(api.userId), { timeout: 10000 });
+    }
+    else {
+        probe = api.authenticate().then(function() {
+            playlist.jellyfinToken = api.accessToken;
+            playlist.jellyfinUserId = api.userId;
+            self.saveSettings();
+            return { Name: playlist.username };
+        });
+    }
+    return probe.then(function(user) {
+        return { valid: true, info: { username: user && user.Name } };
+    }).catch(function(err) {
+        var msg = (err && err.message) || '';
+        if (msg.indexOf('Invalid credentials') !== -1 || msg === 'HTTP 401') {
+            return { valid: false, error: 'auth_failed' };
+        }
+        if (msg === 'Timeout') return { valid: false, error: 'timeout' };
+        return { valid: false, error: msg || 'network' };
+    });
 };
 
 IPTVApp.prototype.validateProviderPlaylist = function(playlist) {

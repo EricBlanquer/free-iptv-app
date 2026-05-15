@@ -718,6 +718,60 @@ class IPTVApp {
                 }).catch(onM3UError);
             }).catch(onM3UError);
         }
+        else if (playlist.type === 'jellyfin') {
+            this.api = new JellyfinAPI(playlist.serverUrl, playlist.username, playlist.password, playlist.jellyfinUserId, playlist.jellyfinToken);
+            this.api.playlistId = playlist.id;
+            var ensureAuth = (this.api.accessToken && this.api.userId)
+                ? Promise.resolve()
+                : this.api.authenticate().then(function(data) {
+                    playlist.jellyfinUserId = self.api.userId;
+                    playlist.jellyfinToken = self.api.accessToken;
+                    self.saveSettings();
+                });
+            ensureAuth.then(function() {
+                if (self._connectingPlaylistId !== playlist.id) {
+                    window.log('CACHE', 'autoConnect: aborted, playlist changed');
+                    return;
+                }
+                window.log('INIT', 'autoConnect: Jellyfin authenticated');
+                self.cacheLoading = true;
+                self.api.preloadCache(function(step, total, name) {
+                    self.updateCacheStatus(step, total, name);
+                    if (step === -1) {
+                        document.getElementById('home-grid').style.visibility = '';
+                        self.showLoading(false);
+                    }
+                    else if (step === 0) {
+                        self.cacheLoading = false;
+                        var tagPlaylistId = function(arr) {
+                            if (!arr) return;
+                            for (var ti = 0; ti < arr.length; ti++) {
+                                if (!arr[ti]._playlistId) arr[ti]._playlistId = playlist.id;
+                            }
+                        };
+                        tagPlaylistId(self.api.cache.vodCategories);
+                        tagPlaylistId(self.api.cache.seriesCategories);
+                        tagPlaylistId(self.api.cache.vodStreams['_all']);
+                        tagPlaylistId(self.api.cache.series['_all']);
+                        var now = Date.now();
+                        self.providerCacheInfo = { source: 'jellyfin', timestamp: now };
+                        self.playlistCacheTimestamps = self.playlistCacheTimestamps || {};
+                        self.playlistCacheTimestamps[playlist.id] = now;
+                        self.updateHomeMenuVisibility();
+                        document.getElementById('home-grid').style.visibility = '';
+                        self.showLoading(false);
+                        setTimeout(function() {
+                            if (self._connectingPlaylistId === playlist.id) self.preloadSections();
+                        }, 100);
+                    }
+                });
+            }).catch(function(err) {
+                window.log('ERROR', 'autoConnect Jellyfin: ' + (err ? err.message || err : 'unknown'));
+                self.updateHomeMenuVisibility();
+                document.getElementById('home-grid').style.visibility = '';
+                done();
+            });
+        }
         else {
             done();
         }
