@@ -188,10 +188,33 @@ class JellyfinAPI {
     }
 
     _streamUrl(itemId, container) {
-        var ext = container ? '.' + container : '';
+        // Skip extension when missing or when Jellyfin returns the FFmpeg
+        // multi-format probe (e.g. "mov,mp4,m4a,3gp,3g2,mj2") which is not a
+        // valid extension and confuses the Tizen player. Jellyfin reconstructs
+        // the right Content-Type from MediaSourceId either way.
+        var ext = (container && container.indexOf(',') === -1) ? '.' + container : '';
         return this.server + '/Videos/' + itemId + '/stream' + ext
             + '?api_key=' + (this.accessToken || '')
             + '&Static=true&MediaSourceId=' + itemId;
+    }
+
+    getVodStreamUrl(streamId, extension) {
+        return this._streamUrl(streamId, extension || 'mkv');
+    }
+
+    getSeriesStreamUrl(streamId, extension) {
+        return this._streamUrl(streamId, extension || 'mkv');
+    }
+
+    getLiveStreamUrl(streamId, extension) {
+        return this._streamUrl(streamId, extension || 'ts');
+    }
+
+    _isoToUnixSeconds(iso) {
+        if (!iso) return '';
+        var t = Date.parse(iso);
+        if (isNaN(t)) return '';
+        return String(Math.floor(t / 1000));
     }
 
     _mapItemToVod(item, libId) {
@@ -210,6 +233,7 @@ class JellyfinAPI {
             rating_5based: item.CommunityRating ? (item.CommunityRating / 2) : 0,
             genre: (item.Genres || []).join(', '),
             tmdb: '',
+            added: this._isoToUnixSeconds(item.DateCreated),
             url: this._streamUrl(item.Id, item.Container),
             _jellyfin: true,
             _jellyfinItem: item
@@ -230,6 +254,7 @@ class JellyfinAPI {
             rating_5based: item.CommunityRating ? (item.CommunityRating / 2) : 0,
             genre: (item.Genres || []).join(', '),
             tmdb: '',
+            added: this._isoToUnixSeconds(item.DateCreated),
             _jellyfin: true,
             _jellyfinItem: item
         };
@@ -264,7 +289,7 @@ class JellyfinAPI {
         }
         await this._loadLibraries();
         var cats = [];
-        var allLibs = [].concat(this._libraries.movies || [], this._libraries.homevideos || []);
+        var allLibs = this._libraries.movies || [];
         for (var i = 0; i < allLibs.length; i++) {
             cats.push({
                 category_id: allLibs[i].ItemId,
@@ -296,7 +321,7 @@ class JellyfinAPI {
             var all = [];
             for (var i = 0; i < cats.length; i++) {
                 var libId = cats[i].category_id;
-                var items = await this._fetchItems(libId, 'Movie,Video');
+                var items = await this._fetchItems(libId, 'Movie');
                 for (var j = 0; j < items.length; j++) {
                     all.push(this._mapItemToVod(items[j], libId));
                 }
@@ -305,7 +330,7 @@ class JellyfinAPI {
             window.log('INIT Jellyfin vodStreams total=' + all.length);
             return all;
         }
-        var items2 = await this._fetchItems(categoryId, 'Movie,Video');
+        var items2 = await this._fetchItems(categoryId, 'Movie');
         var streams = items2.map(function(it) { return this._mapItemToVod(it, categoryId); }, this);
         this.cache.vodStreams[key] = streams;
         return streams;
@@ -363,43 +388,87 @@ class JellyfinAPI {
     }
 
     async getSeriesInfo(seriesId) {
+        var self = this;
         var seasonsResp = await this.fetchJellyfin('/Shows/' + encodeURIComponent(seriesId) + '/Seasons?userId=' + this.userId);
         var seasons = (seasonsResp && seasonsResp.Items) || [];
-        var episodesResp = await this.fetchJellyfin('/Shows/' + encodeURIComponent(seriesId) + '/Episodes?userId=' + this.userId
-            + '&Fields=Overview,ProductionYear,Path,Container,RunTimeTicks,DateCreated'
-            + '&ImageTypeLimit=1&EnableImageTypes=Primary');
-        var allEps = (episodesResp && episodesResp.Items) || [];
         var seriesItem = await this.fetchJellyfin('/Users/' + this.userId + '/Items/' + encodeURIComponent(seriesId)
             + '?Fields=Overview,ProductionYear,CommunityRating,Genres,People');
+        // Assign a stable season number per season Id. Real IndexNumbers
+        // win; seasons whose IndexNumber is null (Jellyfin "Season Unknown"
+        // for media files that don't match its naming convention) get a
+        // synthetic non-colliding slot starting at 0 — so the user sees
+        // them as a separate season button, not silently merged with S1.
+        var seasonNumById = {};
+        var usedNums = {};
+        seasons.forEach(function(s) {
+            if (typeof s.IndexNumber === 'number') {
+                seasonNumById[s.Id] = s.IndexNumber;
+                usedNums[s.IndexNumber] = true;
+            }
+        });
+        var nextSynth = 0;
+        seasons.forEach(function(s) {
+            if (seasonNumById[s.Id] === undefined) {
+                while (usedNums[nextSynth]) nextSynth++;
+                seasonNumById[s.Id] = nextSynth;
+                usedNums[nextSynth] = true;
+                nextSynth++;
+            }
+        });
+        // Fetch episodes per season in parallel. The bulk /Episodes call
+        // returns the same data but mixes ParentIndexNumber=null episodes
+        // into season 1 via the fallback — per-season fetch groups them
+        // correctly by their actual season Id.
+        var seasonEpisodeFetches = seasons.map(function(s) {
+            return self.fetchJellyfin('/Shows/' + encodeURIComponent(seriesId)
+                + '/Episodes?userId=' + self.userId
+                + '&seasonId=' + encodeURIComponent(s.Id)
+                + '&Fields=Overview,ProductionYear,Path,Container,RunTimeTicks,DateCreated'
+                + '&ImageTypeLimit=1&EnableImageTypes=Primary')
+                .then(function(resp) { return { season: s, items: (resp && resp.Items) || [] }; });
+        });
+        var seasonGroups = await Promise.all(seasonEpisodeFetches);
         var byNumber = {};
-        var self = this;
-        for (var i = 0; i < allEps.length; i++) {
-            var ep = allEps[i];
-            var seasonNum = (typeof ep.ParentIndexNumber === 'number') ? ep.ParentIndexNumber : 1;
+        var leadingNumRe = /^\s*(\d{1,4})\b/;
+        seasonGroups.forEach(function(group) {
+            var seasonNum = seasonNumById[group.season.Id];
             var key = String(seasonNum);
             if (!byNumber[key]) byNumber[key] = [];
-            byNumber[key].push({
-                id: ep.Id,
-                title: ep.Name,
-                episode_num: ep.IndexNumber,
-                container_extension: ep.Container || 'mkv',
-                added: ep.DateCreated || '',
-                info: {
-                    name: ep.Name,
-                    plot: ep.Overview || '',
-                    season: seasonNum,
-                    episode_num: ep.IndexNumber,
-                    movie_image: self._imageUrl(ep.Id, 'Primary'),
-                    cover_big: self._imageUrl(ep.Id, 'Primary', 1280),
-                    year: ep.ProductionYear,
-                    duration_secs: Math.floor((ep.RunTimeTicks || 0) / 10000000),
-                    rating: 0
-                },
-                _jellyfin: true,
-                _jellyfinItem: ep,
-                url: self._streamUrl(ep.Id, ep.Container)
+            group.items.forEach(function(ep, idx) {
+                var epNum = ep.IndexNumber;
+                if (typeof epNum !== 'number') {
+                    // Many libraries with broken Jellyfin metadata still
+                    // carry the episode number as a prefix in the file
+                    // name ("04 La Main droite du Seigneur"). Use that
+                    // first, then fall back to positional ordering so
+                    // episode_num is always a real number downstream.
+                    var m = String(ep.Name || '').match(leadingNumRe);
+                    epNum = m ? parseInt(m[1], 10) : (idx + 1);
+                }
+                byNumber[key].push({
+                    id: ep.Id,
+                    title: ep.Name,
+                    episode_num: epNum,
+                    container_extension: ep.Container || 'mkv',
+                    added: ep.DateCreated || '',
+                    info: {
+                        name: ep.Name,
+                        plot: ep.Overview || '',
+                        season: seasonNum,
+                        episode_num: epNum,
+                        movie_image: self._imageUrl(ep.Id, 'Primary'),
+                        cover_big: self._imageUrl(ep.Id, 'Primary', 1280),
+                        year: ep.ProductionYear,
+                        duration_secs: Math.floor((ep.RunTimeTicks || 0) / 10000000),
+                        rating: 0
+                    },
+                    _jellyfin: true,
+                    _jellyfinItem: ep,
+                    url: self._streamUrl(ep.Id, ep.Container)
+                });
             });
-        }
+            byNumber[key].sort(function(a, b) { return a.episode_num - b.episode_num; });
+        });
         return {
             info: {
                 name: seriesItem ? seriesItem.Name : '',
@@ -417,7 +486,7 @@ class JellyfinAPI {
             },
             seasons: seasons.map(function(s) {
                 return {
-                    season_number: s.IndexNumber,
+                    season_number: seasonNumById[s.Id],
                     name: s.Name,
                     cover: self._imageUrl(s.Id, 'Primary'),
                     overview: s.Overview || ''

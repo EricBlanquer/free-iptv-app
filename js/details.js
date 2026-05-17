@@ -1689,7 +1689,8 @@ IPTVApp.prototype.renderEpisodes = function(episodes) {
         var displayTitle = tmdbEp && tmdbEp.name ? tmdbEp.name : cleanTitle;
         var rawDate = tmdbEp && tmdbEp.air_date ? tmdbEp.air_date : (ep.info && (ep.info.releasedate || ep.info.air_date) ? (ep.info.releasedate || ep.info.air_date) : null);
         var episodeDate = rawDate ? self.formatLocalDate(rawDate) : null;
-        var isJustEpisodeNum = !displayTitle || /^[ÉEe]pisode\s*\d+$/i.test(displayTitle) || displayTitle === ep.episode_num.toString();
+        var epNumStr = (ep.episode_num !== undefined && ep.episode_num !== null) ? String(ep.episode_num) : '';
+        var isJustEpisodeNum = !displayTitle || /^[ÉEe]pisode\s*\d+$/i.test(displayTitle) || displayTitle === epNumStr;
         if (isJustEpisodeNum && episodeDate) {
             titleDiv.textContent = episodeDate;
         }

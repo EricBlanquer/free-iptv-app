@@ -21,6 +21,14 @@
     "today": "Bugün",
     "yesterday": "Dün"
   },
+  "cache": {
+    "newMovies_one": "+{n} yeni film",
+    "newMovies_other": "+{n} yeni film",
+    "newSeries_one": "+{n} yeni dizi",
+    "newSeries_other": "+{n} yeni dizi",
+    "newChannels_one": "+{n} yeni kanal",
+    "newChannels_other": "+{n} yeni kanal"
+  },
   "categoryPatterns": {
     "entertainment": {
       "blindtest": [

@@ -21,6 +21,14 @@
     "today": "Сегодня",
     "yesterday": "Вчера"
   },
+  "cache": {
+    "newMovies_one": "+{n} новый фильм",
+    "newMovies_other": "+{n} новых фильмов",
+    "newSeries_one": "+{n} новый сериал",
+    "newSeries_other": "+{n} новых сериалов",
+    "newChannels_one": "+{n} новый канал",
+    "newChannels_other": "+{n} новых каналов"
+  },
   "categoryPatterns": {
     "entertainment": {
       "blindtest": [

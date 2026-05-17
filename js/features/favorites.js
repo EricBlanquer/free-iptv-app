@@ -85,7 +85,7 @@ IPTVApp.prototype._getRatedEntriesForSection = function(section) {
     Object.keys(ratings).forEach(function(tmdbId) {
         var entry = ratings[tmdbId];
         if (typeof entry === 'number') {
-            entries.push({ tmdbId: tmdbId, value: entry, title: '', year: '', posterPath: '' });
+            entries.push({ tmdbId: tmdbId, value: entry, title: '', year: '', posterPath: '', addedAt: 0 });
         }
         else {
             entries.push({
@@ -93,7 +93,8 @@ IPTVApp.prototype._getRatedEntriesForSection = function(section) {
                 value: entry.value || 0,
                 title: entry.title || '',
                 year: entry.year || '',
-                posterPath: entry.posterPath || ''
+                posterPath: entry.posterPath || '',
+                addedAt: entry.addedAt || 0
             });
         }
     });
@@ -151,6 +152,7 @@ IPTVApp.prototype.showRatedInGrid = function() {
             if (matched && !matched.tmdb_id) matched.tmdb_id = e.tmdbId;
         }
         if (matched) {
+            matched._addedAt = e.addedAt || matched._addedAt || 0;
             items.push(matched);
         }
         else {
@@ -160,7 +162,8 @@ IPTVApp.prototype.showRatedInGrid = function() {
                 stream_icon: e.posterPath ? 'https://image.tmdb.org/t/p/w300' + e.posterPath : '',
                 _type: streamType,
                 tmdb_id: e.tmdbId,
-                _tmdbOnly: true
+                _tmdbOnly: true,
+                _addedAt: e.addedAt || 0
             });
         }
     });

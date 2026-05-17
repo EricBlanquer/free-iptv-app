@@ -849,11 +849,17 @@ TMDB.getAllMyRated = function(type, callback) {
                 var title = type === 'tv' ? item.name : item.title;
                 var dateField = type === 'tv' ? item.first_air_date : item.release_date;
                 var year = dateField ? String(dateField).substring(0, 4) : '';
+                var createdAt = 0;
+                if (item.account_rating && item.account_rating.created_at) {
+                    var parsed = Date.parse(item.account_rating.created_at);
+                    if (!isNaN(parsed)) createdAt = parsed;
+                }
                 all[item.id] = {
                     value: ratingValue,
                     title: title || '',
                     year: year,
-                    posterPath: item.poster_path || ''
+                    posterPath: item.poster_path || '',
+                    addedAt: createdAt
                 };
             });
             if (page < (data.total_pages || 1)) {

@@ -21,6 +21,14 @@
     "today": "Vandaag",
     "yesterday": "Gisteren"
   },
+  "cache": {
+    "newMovies_one": "+{n} nieuwe film",
+    "newMovies_other": "+{n} nieuwe films",
+    "newSeries_one": "+{n} nieuwe serie",
+    "newSeries_other": "+{n} nieuwe series",
+    "newChannels_one": "+{n} nieuwe zender",
+    "newChannels_other": "+{n} nieuwe zenders"
+  },
   "categoryPatterns": {
     "entertainment": {
       "blindtest": [

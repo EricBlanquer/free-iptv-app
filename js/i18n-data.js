@@ -1083,6 +1083,14 @@ var I18nData = {
                             "today": "اليوم",
                             "yesterday": "أمس"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} فيلم جديد",
+                            "newMovies_other": "+{n} أفلام جديدة",
+                            "newSeries_one": "+{n} مسلسل جديد",
+                            "newSeries_other": "+{n} مسلسلات جديدة",
+                            "newChannels_one": "+{n} قناة جديدة",
+                            "newChannels_other": "+{n} قنوات جديدة"
+                    },
                     "categorySort": {
                             "alpha": "ترتيب أبجدي",
                             "count": "الترتيب حسب العدد",
@@ -1643,6 +1651,14 @@ var I18nData = {
                     "catchup": {
                             "today": "Heute",
                             "yesterday": "Gestern"
+                    },
+                    "cache": {
+                            "newMovies_one": "+{n} neuer Film",
+                            "newMovies_other": "+{n} neue Filme",
+                            "newSeries_one": "+{n} neue Serie",
+                            "newSeries_other": "+{n} neue Serien",
+                            "newChannels_one": "+{n} neuer Sender",
+                            "newChannels_other": "+{n} neue Sender"
                     },
                     "categorySort": {
                             "alpha": "Alphabetisch sortieren",
@@ -2205,6 +2221,14 @@ var I18nData = {
                             "today": "Today",
                             "yesterday": "Yesterday"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} new movie",
+                            "newMovies_other": "+{n} new movies",
+                            "newSeries_one": "+{n} new series",
+                            "newSeries_other": "+{n} new series",
+                            "newChannels_one": "+{n} new channel",
+                            "newChannels_other": "+{n} new channels"
+                    },
                     "categorySort": {
                             "alpha": "Sort alphabetically",
                             "count": "Sort by item count",
@@ -2765,6 +2789,14 @@ var I18nData = {
                     "catchup": {
                             "today": "Hoy",
                             "yesterday": "Ayer"
+                    },
+                    "cache": {
+                            "newMovies_one": "+{n} película nueva",
+                            "newMovies_other": "+{n} películas nuevas",
+                            "newSeries_one": "+{n} serie nueva",
+                            "newSeries_other": "+{n} series nuevas",
+                            "newChannels_one": "+{n} canal nuevo",
+                            "newChannels_other": "+{n} canales nuevos"
                     },
                     "categorySort": {
                             "alpha": "Ordenar alfabéticamente",
@@ -3327,6 +3359,14 @@ var I18nData = {
                             "today": "Aujourd'hui",
                             "yesterday": "Hier"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} nouveau film",
+                            "newMovies_other": "+{n} nouveaux films",
+                            "newSeries_one": "+{n} nouvelle série",
+                            "newSeries_other": "+{n} nouvelles séries",
+                            "newChannels_one": "+{n} nouvelle chaîne",
+                            "newChannels_other": "+{n} nouvelles chaînes"
+                    },
                     "categorySort": {
                             "alpha": "Tri alphabétique",
                             "count": "Tri par nombre d'éléments",
@@ -3887,6 +3927,14 @@ var I18nData = {
                     "catchup": {
                             "today": "Oggi",
                             "yesterday": "Ieri"
+                    },
+                    "cache": {
+                            "newMovies_one": "+{n} nuovo film",
+                            "newMovies_other": "+{n} nuovi film",
+                            "newSeries_one": "+{n} nuova serie",
+                            "newSeries_other": "+{n} nuove serie",
+                            "newChannels_one": "+{n} nuovo canale",
+                            "newChannels_other": "+{n} nuovi canali"
                     },
                     "categorySort": {
                             "alpha": "Ordina alfabeticamente",
@@ -4449,6 +4497,14 @@ var I18nData = {
                             "today": "Vandaag",
                             "yesterday": "Gisteren"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} nieuwe film",
+                            "newMovies_other": "+{n} nieuwe films",
+                            "newSeries_one": "+{n} nieuwe serie",
+                            "newSeries_other": "+{n} nieuwe series",
+                            "newChannels_one": "+{n} nieuwe zender",
+                            "newChannels_other": "+{n} nieuwe zenders"
+                    },
                     "categorySort": {
                             "alpha": "Alfabetisch sorteren",
                             "count": "Sorteren op aantal",
@@ -5009,6 +5065,14 @@ var I18nData = {
                     "catchup": {
                             "today": "Dzisiaj",
                             "yesterday": "Wczoraj"
+                    },
+                    "cache": {
+                            "newMovies_one": "+{n} nowy film",
+                            "newMovies_other": "+{n} nowych filmów",
+                            "newSeries_one": "+{n} nowy serial",
+                            "newSeries_other": "+{n} nowych seriali",
+                            "newChannels_one": "+{n} nowy kanał",
+                            "newChannels_other": "+{n} nowych kanałów"
                     },
                     "categorySort": {
                             "alpha": "Sortuj alfabetycznie",
@@ -5571,6 +5635,14 @@ var I18nData = {
                             "today": "Hoje",
                             "yesterday": "Ontem"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} novo filme",
+                            "newMovies_other": "+{n} novos filmes",
+                            "newSeries_one": "+{n} nova série",
+                            "newSeries_other": "+{n} novas séries",
+                            "newChannels_one": "+{n} novo canal",
+                            "newChannels_other": "+{n} novos canais"
+                    },
                     "categorySort": {
                             "alpha": "Ordenar alfabeticamente",
                             "count": "Ordenar por quantidade",
@@ -6132,6 +6204,14 @@ var I18nData = {
                             "today": "Сегодня",
                             "yesterday": "Вчера"
                     },
+                    "cache": {
+                            "newMovies_one": "+{n} новый фильм",
+                            "newMovies_other": "+{n} новых фильмов",
+                            "newSeries_one": "+{n} новый сериал",
+                            "newSeries_other": "+{n} новых сериалов",
+                            "newChannels_one": "+{n} новый канал",
+                            "newChannels_other": "+{n} новых каналов"
+                    },
                     "categorySort": {
                             "alpha": "Сортировать по алфавиту",
                             "count": "Сортировать по количеству",
@@ -6692,6 +6772,14 @@ var I18nData = {
                     "catchup": {
                             "today": "Bugün",
                             "yesterday": "Dün"
+                    },
+                    "cache": {
+                            "newMovies_one": "+{n} yeni film",
+                            "newMovies_other": "+{n} yeni film",
+                            "newSeries_one": "+{n} yeni dizi",
+                            "newSeries_other": "+{n} yeni dizi",
+                            "newChannels_one": "+{n} yeni kanal",
+                            "newChannels_other": "+{n} yeni kanal"
                     },
                     "categorySort": {
                             "alpha": "Alfabetik sırala",

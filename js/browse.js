@@ -2602,8 +2602,15 @@ IPTVApp.prototype._sortByDateAdded = function(streams, asc) {
     if (n < 2) return;
     var withIdx = new Array(n);
     for (var i = 0; i < n; i++) {
-        var raw = streams[i].added;
-        var added = (raw === undefined || raw === null || raw === '') ? 0 : (parseInt(raw, 10) || 0);
+        var local = streams[i]._addedAt;
+        var added;
+        if (local) {
+            added = local;
+        }
+        else {
+            var raw = streams[i].added;
+            added = (raw === undefined || raw === null || raw === '') ? 0 : (parseInt(raw, 10) || 0);
+        }
         withIdx[i] = { s: streams[i], i: i, added: added };
     }
     withIdx.sort(function(a, b) {
@@ -2680,7 +2687,11 @@ IPTVApp.prototype.applyFilters = function() {
         streams.forEach(function(s) {
             if (s._sortYear === undefined) {
                 var m = self.getStreamTitle(s).match(yearRegex);
-                s._sortYear = m ? parseInt(m[1]) : 0;
+                var extracted = m ? parseInt(m[1]) : 0;
+                if (!extracted && s.year) {
+                    extracted = parseInt(s.year, 10) || 0;
+                }
+                s._sortYear = extracted;
             }
         });
     }

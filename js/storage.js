@@ -1126,9 +1126,11 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
             tagRefresh(self.api.cache.liveStreams['_all']);
             window.log('Background refresh: updated in-memory cache for ' + playlistId);
             var oldStreamIds = {};
-            if (self.currentScreen === 'browse' && self.currentSection && self.currentStreams) {
-                for (var si = 0; si < self.currentStreams.length; si++) {
-                    var sid = self.currentStreams[si].stream_id || self.currentStreams[si].series_id;
+            if (self.currentScreen === 'browse' && self.currentSection) {
+                var oldSectionData = self.data[self.currentSection];
+                var oldStreams = oldSectionData && oldSectionData.streams ? oldSectionData.streams : [];
+                for (var si = 0; si < oldStreams.length; si++) {
+                    var sid = oldStreams[si].stream_id || oldStreams[si].series_id;
                     if (sid) oldStreamIds[sid] = true;
                 }
             }
@@ -1153,7 +1155,10 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
                             var selectedCategory = document.querySelector('.category-item.selected');
                             var currentCategoryId = selectedCategory ? selectedCategory.dataset.categoryId : '';
                             self.loadStreams(currentCategoryId, { preserveFilters: true });
-                            self.showToast('+' + newCount + ' ' + I18n.t('home.' + (section === 'series' ? 'series' : 'vod'), section));
+                            var toastKey = section === 'series' ? 'cache.newSeries'
+                                : section === 'live' ? 'cache.newChannels'
+                                : 'cache.newMovies';
+                            self.showToast(I18n.plural(toastKey, newCount));
                         }
                     }
                 }
@@ -1593,11 +1598,14 @@ IPTVApp.prototype.updateLocalTMDBRating = function(tmdbId, type, value, title, y
     if (!this.myTMDBRatings) this.myTMDBRatings = this.loadMyTMDBRatings();
     var bucket = (type === 'tv' || type === 'series') ? 'tv' : 'movies';
     if (value > 0) {
+        var existing = this.myTMDBRatings[bucket][tmdbId];
+        var existingAddedAt = (existing && typeof existing === 'object' && existing.addedAt) || 0;
         this.myTMDBRatings[bucket][tmdbId] = {
             value: value,
             title: title || '',
             year: year || '',
-            posterPath: posterPath || ''
+            posterPath: posterPath || '',
+            addedAt: existingAddedAt || Date.now()
         };
     }
     else {
@@ -1617,7 +1625,22 @@ IPTVApp.prototype.getMyTMDBRatingsCount = function(section) {
 IPTVApp.prototype.loadFavorites = function() {
     try {
         var data = localStorage.getItem('favorites');
-        return data ? JSON.parse(data) : [];
+        var arr = data ? JSON.parse(data) : [];
+        var missing = false;
+        for (var i = 0; i < arr.length; i++) {
+            if (!arr[i]._addedAt) { missing = true; break; }
+        }
+        if (missing && arr.length > 0) {
+            var now = Date.now();
+            for (var j = 0; j < arr.length; j++) {
+                if (!arr[j]._addedAt) arr[j]._addedAt = now - (arr.length - 1 - j) * 1000;
+            }
+            try {
+                localStorage.setItem('favorites', JSON.stringify(arr));
+            }
+            catch (ex) { /* storage error */ }
+        }
+        return arr;
     }
     catch (e) {
         return [];
@@ -1685,6 +1708,7 @@ IPTVApp.prototype.toggleFavorite = function(stream, type) {
         stream._type = type;
         stream._section = this.currentSection;
         stream._playlistId = playlistId;
+        stream._addedAt = Date.now();
         this.favorites.push(stream);
     }
     this.saveFavorites();

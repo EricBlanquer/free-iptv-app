@@ -237,7 +237,8 @@ IPTVApp.prototype.showContinueInGrid = function() {
             _episodeTitle: item.episodeTitle,
             _playlistId: item.playlistId || null,
             _tmdbId: item.tmdbId || null,
-            _tmdbType: item.tmdbType || null
+            _tmdbType: item.tmdbType || null,
+            _addedAt: item.date || 0
         };
         return self._enrichHistoryStream(virtual, item);
     });

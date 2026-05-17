@@ -21,6 +21,14 @@
     "today": "اليوم",
     "yesterday": "أمس"
   },
+  "cache": {
+    "newMovies_one": "+{n} فيلم جديد",
+    "newMovies_other": "+{n} أفلام جديدة",
+    "newSeries_one": "+{n} مسلسل جديد",
+    "newSeries_other": "+{n} مسلسلات جديدة",
+    "newChannels_one": "+{n} قناة جديدة",
+    "newChannels_other": "+{n} قنوات جديدة"
+  },
   "categoryPatterns": {
     "entertainment": {
       "blindtest": [

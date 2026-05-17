@@ -291,7 +291,35 @@ describe('saveFavorites / loadFavorites', () => {
         var data = [{ stream_id: 1, name: 'A' }];
         localStorage.setItem('favorites', JSON.stringify(data));
         var result = app.loadFavorites();
-        expect(result).toEqual(data);
+        expect(result.length).toBe(1);
+        expect(result[0].stream_id).toBe(1);
+        expect(result[0].name).toBe('A');
+        // Legacy favorites without _addedAt get backfilled at load time so the
+        // "sort by date added" order is deterministic across sessions.
+        expect(typeof result[0]._addedAt).toBe('number');
+        expect(result[0]._addedAt).toBeGreaterThan(0);
+    });
+
+    it('should backfill missing _addedAt preserving original array order', () => {
+        var data = [
+            { stream_id: 1, name: 'oldest' },
+            { stream_id: 2, name: 'middle' },
+            { stream_id: 3, name: 'newest' }
+        ];
+        localStorage.setItem('favorites', JSON.stringify(data));
+        var result = app.loadFavorites();
+        expect(result[0]._addedAt).toBeLessThan(result[1]._addedAt);
+        expect(result[1]._addedAt).toBeLessThan(result[2]._addedAt);
+        var stored = JSON.parse(localStorage.getItem('favorites'));
+        expect(stored[0]._addedAt).toBe(result[0]._addedAt);
+    });
+
+    it('should preserve existing _addedAt without re-stamping', () => {
+        var ts = 1000000000000;
+        var data = [{ stream_id: 1, name: 'A', _addedAt: ts }];
+        localStorage.setItem('favorites', JSON.stringify(data));
+        var result = app.loadFavorites();
+        expect(result[0]._addedAt).toBe(ts);
     });
 
     it('should return empty array when no data', () => {
