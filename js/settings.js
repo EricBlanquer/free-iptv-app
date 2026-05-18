@@ -1867,7 +1867,8 @@ IPTVApp.prototype._loadM3UXHR = function(url, onProgress) {
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== 4) return;
             window.log('loadM3UPlaylist: status=' + xhr.status + ' length=' + (xhr.responseText ? xhr.responseText.length : 0));
-            if (xhr.status !== 200) {
+            var isLocalOk = xhr.status === 0 && xhr.responseText;
+            if (xhr.status !== 200 && !isLocalOk) {
                 reject(new Error('Failed to load M3U: ' + xhr.status));
                 return;
             }
@@ -1897,8 +1898,9 @@ IPTVApp.prototype.loadM3UPlaylist = function(url, onProgress) {
     var self = this;
     var lang = self.getEffectiveProviderLanguage();
     var supportsStreaming = (typeof fetch === 'function') && (typeof TextDecoder === 'function');
-    window.log('loadM3UPlaylist: loading ' + url + ' lang=' + lang + ' streaming=' + supportsStreaming + ' (timeout=' + (M3U_TIMEOUT_MS / 1000) + 's)');
-    if (!supportsStreaming) {
+    var isFileScheme = window.location.protocol === 'file:';
+    window.log('loadM3UPlaylist: loading ' + url + ' lang=' + lang + ' streaming=' + supportsStreaming + ' fileScheme=' + isFileScheme + ' (timeout=' + (M3U_TIMEOUT_MS / 1000) + 's)');
+    if (!supportsStreaming || isFileScheme) {
         return self._loadM3UXHR(url, onProgress);
     }
     return self._loadM3UStreaming(url, onProgress).catch(function(err) {

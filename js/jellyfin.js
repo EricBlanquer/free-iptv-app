@@ -167,11 +167,13 @@ class JellyfinAPI {
     }
 
     async _loadLibraries() {
-        var libs = await this.fetchJellyfin('/Library/VirtualFolders');
+        var path = this.userId ? '/Users/' + this.userId + '/Views' : '/Library/VirtualFolders';
+        var resp = await this.fetchJellyfin(path);
+        var libs = Array.isArray(resp) ? resp : ((resp && resp.Items) || []);
         this._libraries = { movies: [], tvshows: [], homevideos: [], mixed: [] };
-        if (!Array.isArray(libs)) return [];
         for (var i = 0; i < libs.length; i++) {
             var lib = libs[i];
+            if (!lib.ItemId && lib.Id) lib.ItemId = lib.Id;
             var ct = lib.CollectionType || 'mixed';
             if (!this._libraries[ct]) this._libraries[ct] = [];
             this._libraries[ct].push(lib);
