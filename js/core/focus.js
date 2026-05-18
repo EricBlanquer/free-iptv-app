@@ -26,6 +26,14 @@ IPTVApp.prototype.bindKeys = function() {
         backBtn.appendChild(icon);
         document.body.appendChild(backBtn);
     }
+    window.addEventListener('softkeyboardchange', function(e) {
+        if (e && e.state === 'off') {
+            var el = document.activeElement;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+                el.blur();
+            }
+        }
+    });
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
         var logAfter = function() {
@@ -39,7 +47,8 @@ IPTVApp.prototype.bindKeys = function() {
         var activeEl = document.activeElement;
         var isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
         if (isInput) {
-            if (key === 38 || key === 40 || key === 10009 || key === 8 || key === 27) {
+            var backspaceOnEmpty = key === 8 && activeEl.value === '';
+            if (key === 38 || key === 40 || key === 10009 || key === 27 || backspaceOnEmpty) {
                 activeEl.blur();
                 if (key === 38) {
                     var gridItems = document.querySelectorAll('#content-grid .grid-item');
@@ -50,7 +59,7 @@ IPTVApp.prototype.bindKeys = function() {
                     }
                     return;
                 }
-                if (key === 10009 || key === 8 || key === 27) {
+                if (key === 10009 || key === 27 || backspaceOnEmpty) {
                     e.preventDefault();
                     if (typeof tizen !== 'undefined' && typeof webapis !== 'undefined') {
                         return;
