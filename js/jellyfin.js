@@ -263,11 +263,21 @@ class JellyfinAPI {
     async _fetchItems(parentId, includeTypes) {
         var path = '/Users/' + this.userId + '/Items?ParentId=' + encodeURIComponent(parentId)
             + '&IncludeItemTypes=' + includeTypes + '&Recursive=true'
-            + '&Fields=Overview,ProductionYear,CommunityRating,Genres,Path,Container,DateCreated'
+            + '&Fields=Overview,ProductionYear,CommunityRating,Genres,Path,Container,DateCreated,ChildCount,RecursiveItemCount'
             + '&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop'
             + '&SortBy=SortName&SortOrder=Ascending';
         var data = await this.fetchJellyfin(path, { timeout: this.longTimeout });
         return (data && data.Items) || [];
+    }
+
+    _hasContent(item) {
+        // Jellyfin keeps the metadata of a series even after its files
+        // are deleted / moved / renamed (or when something like Sonarr
+        // pushes metadata without the actual content). Such "ghost"
+        // entries have RecursiveItemCount = 0. Keep the entry when the
+        // field is missing entirely (older Jellyfin / schema change) —
+        // we never want to silently hide real content.
+        return item.RecursiveItemCount === undefined || item.RecursiveItemCount > 0;
     }
 
     async getLiveCategories() {
@@ -374,6 +384,7 @@ class JellyfinAPI {
                 var libId = cats[i].category_id;
                 var items = await this._fetchItems(libId, 'Series');
                 for (var j = 0; j < items.length; j++) {
+                    if (!this._hasContent(items[j])) continue;
                     all.push(this._mapItemToSeries(items[j], libId));
                 }
             }
@@ -382,7 +393,10 @@ class JellyfinAPI {
             return all;
         }
         var items2 = await this._fetchItems(categoryId, 'Series');
-        var seriesArr = items2.map(function(it) { return this._mapItemToSeries(it, categoryId); }, this);
+        var self = this;
+        var seriesArr = items2
+            .filter(function(it) { return self._hasContent(it); })
+            .map(function(it) { return self._mapItemToSeries(it, categoryId); });
         this.cache.series[key] = seriesArr;
         return seriesArr;
     }
