@@ -79,7 +79,7 @@ class TVPlayer {
                 tizen.tvinputdevice.registerKey('ChannelUp');
                 tizen.tvinputdevice.registerKey('ChannelDown');
             }
-            window.log('INIT', 'Player initialized');
+            window.log('INIT', 'Player initialized webapis=' + (typeof webapis !== 'undefined') + ' avplay=' + (typeof webapis !== 'undefined' && !!webapis.avplay) + ' AndroidBridge=' + (typeof window.Android !== 'undefined' && !!window.Android));
             return true;
         } catch (ex) {
             window.log('ERROR', 'Player init: ' + (ex.message || ex));
@@ -436,7 +436,10 @@ class TVPlayer {
         var self = this;
         try {
             // Use HTML5 if preferred or if AVPlay is not available
-            if (this.preferHtml5 || typeof webapis === 'undefined' || !webapis.avplay) {
+            var hasWebapis = typeof webapis !== 'undefined';
+            var hasAvplay = hasWebapis && !!webapis.avplay;
+            if (this.preferHtml5 || !hasWebapis || !hasAvplay) {
+                window.log('PLAYER', 'Routing to HTML5: preferHtml5=' + this.preferHtml5 + ' hasWebapis=' + hasWebapis + ' hasAvplay=' + hasAvplay);
                 this.playHtml5(url);
                 return;
             }

@@ -683,7 +683,7 @@
     <div id="player-screen" class="screen">
         <div id="player-container">
             <object id="av-player" type="application/avplayer"></object>
-            <video id="html5-video" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#000;z-index:1;"></video>
+            <video id="html5-video" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#000;z-index:1;transform:translateZ(0);will-change:transform;"></video>
         </div>
         <div id="subtitle-display"></div>
         <div id="buffer-indicator" class="hidden"></div>
@@ -1215,6 +1215,7 @@
             document.head.appendChild(script);
         })();
     </script>
+    <script src="tizen-shim.js" onerror="this.remove()"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" async onerror="this.remove()"></script>
     <script src="js/vendor/qrcode.js"></script>
     <script src="js/i18n-data.js"></script>
