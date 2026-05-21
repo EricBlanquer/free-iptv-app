@@ -329,9 +329,15 @@
     width: 100%;
 }
 
+.season-row-area {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
 #details-season-selector {
     display: flex;
-    margin-bottom: 20px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -351,6 +357,36 @@
     cursor: pointer;
     margin-right: 10px;
     flex-shrink: 0;
+    position: relative;
+}
+
+.seasons-wrap-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    color: #00d4ff;
+    font-size: 28px;
+    pointer-events: none;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.seasons-wrap-arrow-left {
+    left: -38px;
+}
+
+.seasons-wrap-arrow-right {
+    right: -38px;
+}
+
+.season-row-area.show-left-wrap .seasons-wrap-arrow-left,
+.season-row-area.show-right-wrap .seasons-wrap-arrow-right {
+    opacity: 1;
 }
 
 .season-btn:focus,

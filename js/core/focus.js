@@ -922,6 +922,8 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
             }
         }
     }
+    var seasonsContainer = document.getElementById('details-season-selector');
+    var seasonsWrap = seasonsContainer && seasonsContainer.classList.contains('has-wrap');
     switch (ctx.direction) {
         case 'left':
             if (currentZone === 'episodes' && zones.episodes) {
@@ -930,6 +932,8 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
                 } else {
                     newIndex--;
                 }
+            } else if (currentZone === 'seasons' && zones.seasons && seasonsWrap && newIndex === zones.seasons.start) {
+                newIndex = zones.seasons.end;
             } else if (currentZone === 'favorite' && zones.download) {
                 newIndex = zones.download.start;
             } else if ((currentZone === 'favorite' || currentZone === 'download') && zones.title) {
@@ -953,6 +957,8 @@ IPTVApp.prototype._navigateDetails = function(ctx) {
                 } else {
                     newIndex++;
                 }
+            } else if (currentZone === 'seasons' && zones.seasons && seasonsWrap && newIndex === zones.seasons.end) {
+                newIndex = zones.seasons.start;
             } else if (currentZone === 'download' && zones.favorite) {
                 newIndex = zones.favorite.start;
             } else if (currentZone === 'title') {
@@ -1472,6 +1478,23 @@ IPTVApp.prototype.applyMarqueeToFocusedElement = function(el) {
     }
 };
 
+IPTVApp.prototype._updateSeasonsWrapArrows = function(el) {
+    var area = document.querySelector('.season-row-area');
+    if (!area) return;
+    area.classList.remove('show-left-wrap', 'show-right-wrap');
+    var container = document.getElementById('details-season-selector');
+    if (!container || !container.classList.contains('has-wrap')) return;
+    if (!el || !container.contains(el)) return;
+    var focusables = container.querySelectorAll('.focusable');
+    if (focusables.length === 0) return;
+    if (el === focusables[0]) {
+        area.classList.add('show-left-wrap');
+    }
+    if (el === focusables[focusables.length - 1]) {
+        area.classList.add('show-right-wrap');
+    }
+};
+
 IPTVApp.prototype.updateFocus = function() {
     var self = this;
     var wasDescription = this._lastFocusedEl && this._lastFocusedEl.id === 'details-description';
@@ -1497,6 +1520,7 @@ IPTVApp.prototype.updateFocus = function() {
         var el = focusables[this.focusIndex];
         el.classList.add('focused');
         this._lastFocusedEl = el;
+        this._updateSeasonsWrapArrows(el);
         this.applyMarqueeToFocusedElement(el);
         if (el.id === 'details-description' && !wasDescription) {
             this._descriptionFocusedAt = Date.now();

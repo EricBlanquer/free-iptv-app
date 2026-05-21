@@ -1406,11 +1406,15 @@ IPTVApp.prototype.findFirstEpisode = function(seriesData) {
 IPTVApp.prototype.renderSeasons = function(seriesData) {
     var container = document.getElementById('details-season-selector');
     container.innerHTML = '';
+    container.classList.remove('has-wrap');
     var self = this;
     if (!seriesData.episodes) return;
     var seasonNumbers = Object.keys(seriesData.episodes).sort(function(a, b) {
         return parseInt(a) - parseInt(b);
     });
+    if (seasonNumbers.length > 2) {
+        container.classList.add('has-wrap');
+    }
     seasonNumbers.forEach(function(seasonNum) {
         var btn = document.createElement('button');
         btn.className = 'season-btn focusable' + (parseInt(seasonNum) === self.currentSeason ? ' selected' : '');
