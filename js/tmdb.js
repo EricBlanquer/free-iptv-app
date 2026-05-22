@@ -597,6 +597,30 @@ TMDB.SHORT_FILM_MAX_RUNTIME = 40;
 // short id 316541 vs feature id 218836 with 921 votes).
 TMDB._featureCollisionCache = {};
 
+// Cache for getMovieRuntime keyed by movie id → runtime (or null when unknown).
+// Used by the short-film filter to verify each match's actual duration against
+// the user-chosen [min, max] bounds, because TMDB's with_runtime.gte/lte on
+// /discover/movie is unreliable even combined with the short-film keyword
+// (e.g. with_runtime.gte=10 AND lte=5 returns 15 results — La vie en lumière
+// id=594530 runtime=7 leaks through a gte=10 query).
+TMDB._runtimeCache = {};
+
+TMDB.getMovieRuntime = function(movieId, callback) {
+    if (!this.isEnabled() || !movieId) { callback(null); return; }
+    var key = String(movieId);
+    if (this._runtimeCache.hasOwnProperty(key)) {
+        callback(this._runtimeCache[key]);
+        return;
+    }
+    var self = this;
+    var url = this.baseUrl + '/movie/' + movieId + '?api_key=' + this.apiKey;
+    this._fetch(url, function(data) {
+        var rt = (data && typeof data.runtime === 'number') ? data.runtime : null;
+        self._runtimeCache[key] = rt;
+        callback(rt);
+    });
+};
+
 TMDB.findFeatureCollision = function(title, year, excludeId, callback) {
     if (!this.isEnabled() || !title || !year) { callback(null); return; }
     var normExclude = this._normalizeTitleForMatch(title);

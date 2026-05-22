@@ -2589,7 +2589,10 @@ IPTVApp.prototype._fetchGenrePagesBatch = function(requestId, onComplete, isInit
                     }
                 };
                 if (isShortFilter && allMatches.length) {
-                    self._filterShortCollisions(allMatches, requestId, finish);
+                    self._filterShortCollisions(allMatches, requestId, function(noCollisions) {
+                        if (self._genreRequestId !== requestId) { finish([]); return; }
+                        self._filterShortRuntimes(noCollisions, requestId, finish);
+                    });
                 } else {
                     finish(allMatches);
                 }
@@ -2599,6 +2602,48 @@ IPTVApp.prototype._fetchGenrePagesBatch = function(requestId, onComplete, isInit
     for (var p = startPage; p <= endPage; p++) {
         TMDB.discover(type, genreId, p, onPage(p), discoverOptions);
     }
+};
+
+// For each short-film match candidate, fetch the TMDB runtime and drop matches
+// whose actual runtime is outside the user-chosen [min, max] bounds. Required
+// because TMDB's with_runtime filter on /discover/movie is unreliable even when
+// combined with the short-film keyword (the paradox query gte=10 AND lte=5
+// returns ~15 results, and concretely "La vie en lumière" id=594530 runtime=7
+// leaks through a gte=10 filter, ending up matched against a user catalog
+// stream that expected 10–30min content).
+IPTVApp.prototype._filterShortRuntimes = function(matches, requestId, callback) {
+    var self = this;
+    if (!matches.length) { callback(matches); return; }
+    var min = this._getShortMin();
+    var max = this._getShortRuntime();
+    var pending = matches.length;
+    var kept = [];
+    matches.forEach(function(m) {
+        var item = m.tmdbItem;
+        TMDB.getMovieRuntime(item.id, function(rt) {
+            if (self._genreRequestId !== requestId) {
+                pending--;
+                if (pending === 0) callback([]);
+                return;
+            }
+            if (rt == null) {
+                // Unknown runtime: be conservative and drop. Most "unknown
+                // runtime" entries on TMDB are unreleased films or contributor
+                // placeholders that shouldn't surface as shorts.
+                window.log('GENRE', 'short-skip runtime-unknown: tmdb=' + item.id + ' "' + (item.title || item.name) + '"');
+            } else if (rt < min || rt > max) {
+                window.log('GENRE', 'short-skip runtime: tmdb=' + item.id + ' "' + (item.title || item.name) + '" runtime=' + rt + ' outside [' + min + ',' + max + ']');
+            } else {
+                kept.push(m);
+            }
+            pending--;
+            if (pending === 0) {
+                kept.sort(function(a, b) { return a.order - b.order; });
+                window.log('GENRE', 'short-runtime pass: kept ' + kept.length + '/' + matches.length + ' in [' + min + ',' + max + ']');
+                callback(kept);
+            }
+        });
+    });
 };
 
 // For each short-film match candidate, check whether TMDB has another entry with

@@ -868,6 +868,52 @@ describe('TMDB', function() {
         });
     });
 
+    describe('getMovieRuntime', function() {
+        beforeEach(function() {
+            TMDB._runtimeCache = {};
+        });
+
+        it('fetches /movie/{id} and returns the runtime field (regression: TMDB discover with_runtime is unreliable, e.g. La vie en lumière 7min leaks through gte=10 filter)', function(done) {
+            TMDB.getMovieRuntime(594530, function(rt) {
+                expect(rt).toBe(7);
+                done();
+            });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('/movie/594530');
+            respondXHR(xhrInstances[0], { id: 594530, runtime: 7 });
+        });
+
+        it('returns null when runtime field is missing', function(done) {
+            TMDB.getMovieRuntime(123, function(rt) {
+                expect(rt).toBeNull();
+                done();
+            });
+            respondXHR(xhrInstances[0], { id: 123 });
+        });
+
+        it('caches by id (second call same id fires no XHR)', function(done) {
+            TMDB.getMovieRuntime(456, function() {
+                var n = xhrInstances.length;
+                TMDB.getMovieRuntime(456, function(rt) {
+                    expect(rt).toBe(15);
+                    expect(xhrInstances.length).toBe(n);
+                    done();
+                });
+            });
+            respondXHR(xhrInstances[0], { id: 456, runtime: 15 });
+        });
+
+        it('returns null when API is disabled (no XHR)', function(done) {
+            TMDB.defaultApiKey = '';
+            TMDB.setApiKey('');
+            TMDB.getMovieRuntime(999, function(rt) {
+                expect(rt).toBeNull();
+                expect(xhrInstances.length).toBe(0);
+                done();
+            });
+        });
+    });
+
     describe('getGenresList', function() {
         beforeEach(function() {
             TMDB._genresCache = {};
