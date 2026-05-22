@@ -1626,7 +1626,12 @@ var I18nData = {
                             "clear": "مسح",
                             "sortPopularity": "الشعبية",
                             "sortRating": "التقييم",
-                            "sortDate": "التاريخ"
+                            "sortDate": "التاريخ",
+                            "shortFilm": "فيلم قصير",
+                            "shortRuntimeTitle": "مدة الفيلم القصير",
+                            "shortMin": "الحد الأدنى",
+                            "shortMax": "الحد الأقصى",
+                            "apply": "تصفية"
                     }
             },
             "de": {
@@ -2195,7 +2200,12 @@ var I18nData = {
                             "clear": "Löschen",
                             "sortPopularity": "Beliebtheit",
                             "sortRating": "Bewertung",
-                            "sortDate": "Datum"
+                            "sortDate": "Datum",
+                            "shortFilm": "Kurzfilm",
+                            "shortRuntimeTitle": "Kurzfilm-Dauer",
+                            "shortMin": "Min",
+                            "shortMax": "Max",
+                            "apply": "Filtern"
                     }
             },
             "en": {
@@ -2764,7 +2774,12 @@ var I18nData = {
                             "clear": "Clear",
                             "sortPopularity": "Popularity",
                             "sortRating": "Rating",
-                            "sortDate": "Date"
+                            "sortDate": "Date",
+                            "shortFilm": "Short film",
+                            "shortRuntimeTitle": "Short film duration",
+                            "shortMin": "Min",
+                            "shortMax": "Max",
+                            "apply": "Filter"
                     }
             },
             "es": {
@@ -3333,7 +3348,12 @@ var I18nData = {
                             "clear": "Borrar",
                             "sortPopularity": "Popularidad",
                             "sortRating": "Valoración",
-                            "sortDate": "Fecha"
+                            "sortDate": "Fecha",
+                            "shortFilm": "Cortometraje",
+                            "shortRuntimeTitle": "Duración del cortometraje",
+                            "shortMin": "Mín",
+                            "shortMax": "Máx",
+                            "apply": "Filtrar"
                     }
             },
             "fr": {
@@ -3902,7 +3922,12 @@ var I18nData = {
                             "clear": "Effacer",
                             "sortPopularity": "Popularité",
                             "sortRating": "Note",
-                            "sortDate": "Date"
+                            "sortDate": "Date",
+                            "shortFilm": "Court-métrage",
+                            "shortRuntimeTitle": "Durée du court-métrage",
+                            "shortMin": "Min",
+                            "shortMax": "Max",
+                            "apply": "Filtrer"
                     }
             },
             "it": {
@@ -4471,7 +4496,12 @@ var I18nData = {
                             "clear": "Cancella",
                             "sortPopularity": "Popolarità",
                             "sortRating": "Voto",
-                            "sortDate": "Data"
+                            "sortDate": "Data",
+                            "shortFilm": "Cortometraggio",
+                            "shortRuntimeTitle": "Durata del cortometraggio",
+                            "shortMin": "Min",
+                            "shortMax": "Max",
+                            "apply": "Filtra"
                     }
             },
             "nl": {
@@ -5040,7 +5070,12 @@ var I18nData = {
                             "clear": "Wissen",
                             "sortPopularity": "Populariteit",
                             "sortRating": "Beoordeling",
-                            "sortDate": "Datum"
+                            "sortDate": "Datum",
+                            "shortFilm": "Korte film",
+                            "shortRuntimeTitle": "Duur van korte film",
+                            "shortMin": "Min",
+                            "shortMax": "Max",
+                            "apply": "Filteren"
                     }
             },
             "pl": {
@@ -5609,7 +5644,12 @@ var I18nData = {
                             "clear": "Wyczyść",
                             "sortPopularity": "Popularność",
                             "sortRating": "Ocena",
-                            "sortDate": "Data"
+                            "sortDate": "Data",
+                            "shortFilm": "Film krótkometrażowy",
+                            "shortRuntimeTitle": "Czas trwania filmu krótkometrażowego",
+                            "shortMin": "Min",
+                            "shortMax": "Maks",
+                            "apply": "Filtruj"
                     }
             },
             "pt": {
@@ -6178,7 +6218,12 @@ var I18nData = {
                             "clear": "Limpar",
                             "sortPopularity": "Popularidade",
                             "sortRating": "Avaliação",
-                            "sortDate": "Data"
+                            "sortDate": "Data",
+                            "shortFilm": "Curta-metragem",
+                            "shortRuntimeTitle": "Duração da curta-metragem",
+                            "shortMin": "Mín",
+                            "shortMax": "Máx",
+                            "apply": "Filtrar"
                     }
             },
             "ru": {
@@ -6747,7 +6792,12 @@ var I18nData = {
                             "clear": "Очистить",
                             "sortPopularity": "Популярность",
                             "sortRating": "Рейтинг",
-                            "sortDate": "Дата"
+                            "sortDate": "Дата",
+                            "shortFilm": "Короткометражка",
+                            "shortRuntimeTitle": "Длительность короткометражки",
+                            "shortMin": "Мин",
+                            "shortMax": "Макс",
+                            "apply": "Фильтр"
                     }
             },
             "tr": {
@@ -7316,7 +7366,12 @@ var I18nData = {
                             "clear": "Temizle",
                             "sortPopularity": "Popülerlik",
                             "sortRating": "Puan",
-                            "sortDate": "Tarih"
+                            "sortDate": "Tarih",
+                            "shortFilm": "Kısa film",
+                            "shortRuntimeTitle": "Kısa film süresi",
+                            "shortMin": "Min",
+                            "shortMax": "Maks",
+                            "apply": "Filtrele"
                     }
             }
     }

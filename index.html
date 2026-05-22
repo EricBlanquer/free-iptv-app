@@ -924,6 +924,21 @@
         </div>
     </div>
 
+    <!-- Short-film runtime modal (opened when user picks 'Court-métrage' in the genre picker) -->
+    <div id="short-runtime-modal" class="modal hidden">
+        <div class="modal-content short-runtime-content">
+            <div class="modal-title" data-i18n="genrePicker.shortRuntimeTitle">Short film duration</div>
+            <div id="short-runtime-controls">
+                <button id="short-min-btn" class="focusable modal-btn"><span data-i18n="genrePicker.shortMin">Min</span>&nbsp;: <span id="short-min-value">1</span>&nbsp;min</button>
+                <button id="short-max-btn" class="focusable modal-btn"><span data-i18n="genrePicker.shortMax">Max</span>&nbsp;: <span id="short-max-value">40</span>&nbsp;min</button>
+            </div>
+            <div id="short-runtime-buttons">
+                <button id="short-runtime-cancel-btn" class="focusable modal-btn" data-i18n="common.cancel">Cancel</button>
+                <button id="short-runtime-apply-btn" class="focusable modal-btn" data-i18n="genrePicker.apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Catchup/Replay Modal -->
     <div id="catchup-modal" class="modal hidden">
         <div class="modal-content catchup-modal-content">

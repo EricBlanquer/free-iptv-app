@@ -674,6 +674,11 @@
     "clear": "Clear",
     "sortPopularity": "Popularity",
     "sortRating": "Rating",
-    "sortDate": "Date"
+    "sortDate": "Date",
+    "shortFilm": "Short film",
+    "shortRuntimeTitle": "Short film duration",
+    "shortMin": "Min",
+    "shortMax": "Max",
+    "apply": "Filter"
   }
 }

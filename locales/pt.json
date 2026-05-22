@@ -658,6 +658,11 @@
     "clear": "Limpar",
     "sortPopularity": "Popularidade",
     "sortRating": "Avaliação",
-    "sortDate": "Data"
+    "sortDate": "Data",
+    "shortFilm": "Curta-metragem",
+    "shortRuntimeTitle": "Duração da curta-metragem",
+    "shortMin": "Mín",
+    "shortMax": "Máx",
+    "apply": "Filtrar"
   }
 }

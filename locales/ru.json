@@ -652,6 +652,11 @@
     "clear": "Очистить",
     "sortPopularity": "Популярность",
     "sortRating": "Рейтинг",
-    "sortDate": "Дата"
+    "sortDate": "Дата",
+    "shortFilm": "Короткометражка",
+    "shortRuntimeTitle": "Длительность короткометражки",
+    "shortMin": "Мин",
+    "shortMax": "Макс",
+    "apply": "Фильтр"
   }
 }

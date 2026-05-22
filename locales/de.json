@@ -650,6 +650,11 @@
     "clear": "Löschen",
     "sortPopularity": "Beliebtheit",
     "sortRating": "Bewertung",
-    "sortDate": "Datum"
+    "sortDate": "Datum",
+    "shortFilm": "Kurzfilm",
+    "shortRuntimeTitle": "Kurzfilm-Dauer",
+    "shortMin": "Min",
+    "shortMax": "Max",
+    "apply": "Filtern"
   }
 }

@@ -285,7 +285,21 @@ IPTVApp.prototype.selectHandlers = {
         if (current.classList.contains('genre-picker-item')) {
             var id = current.dataset.genreId;
             var name = current.dataset.genreName;
-            this.applyGenreFilter(id, name);
+            if (id === 'short') {
+                this.openShortRuntimeModal(name);
+            } else {
+                this.applyGenreFilter(id, name);
+            }
+        }
+    },
+    'short-runtime': function() {
+        var current = document.querySelector('#short-runtime-modal .focusable.focused');
+        if (!current) return;
+        switch (current.id) {
+            case 'short-min-btn': this.cycleShortMin(); return;
+            case 'short-max-btn': this.cycleShortMax(); return;
+            case 'short-runtime-cancel-btn': this.closeShortRuntimeModal(); return;
+            case 'short-runtime-apply-btn': this.applyShortRuntimeModal(); return;
         }
     },
     playlists: function() {
@@ -326,6 +340,9 @@ IPTVApp.prototype.backHandlers = {
     },
     'focusArea:genre-picker': function() {
         this.closeGenrePicker();
+    },
+    'focusArea:short-runtime': function() {
+        this.closeShortRuntimeModal();
     },
     'focusArea:fb-photo': function() {
         this.closeFreeboxPhoto();

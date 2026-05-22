@@ -688,6 +688,11 @@
     "clear": "Effacer",
     "sortPopularity": "Popularité",
     "sortRating": "Note",
-    "sortDate": "Date"
+    "sortDate": "Date",
+    "shortFilm": "Court-métrage",
+    "shortRuntimeTitle": "Durée du court-métrage",
+    "shortMin": "Min",
+    "shortMax": "Max",
+    "apply": "Filtrer"
   }
 }

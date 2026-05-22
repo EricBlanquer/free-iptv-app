@@ -555,21 +555,93 @@ TMDB._genresCache = {};
 TMDB.getGenresList = function(type, callback) {
     var path = (type === 'tv' || type === 'series') ? 'tv' : 'movie';
     var cacheKey = path + ':' + this.language;
+    var self = this;
+    var withVirtuals = function(tmdbGenres) {
+        if (path !== 'movie') return tmdbGenres.slice();
+        var shortLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('genrePicker.shortFilm') : 'Short film';
+        return [{ id: 'short', name: shortLabel, virtual: true }].concat(tmdbGenres);
+    };
     if (this._genresCache[cacheKey]) {
-        callback(this._genresCache[cacheKey]);
+        callback(withVirtuals(this._genresCache[cacheKey]));
         return;
     }
     if (!this.isEnabled()) {
         callback([]);
         return;
     }
-    var self = this;
     var url = this.baseUrl + '/genre/' + path + '/list?api_key=' + this.apiKey + '&language=' + this.language;
     this._fetch(url, function(data) {
         var genres = (data && data.genres) ? data.genres : [];
         self._genresCache[cacheKey] = genres;
-        callback(genres);
+        callback(withVirtuals(genres));
     });
+};
+
+// 'short film' keyword on TMDB. Manually curated by contributors — reliable
+// signal but sometimes applied to mid-length works (e.g. Werewolf by Night 55min,
+// Guardians of the Galaxy Holiday Special 45min). We combine it with a runtime
+// upper bound to exclude those false positives.
+//
+// Note: TMDB's with_runtime filter is broken on /discover/movie when used alone
+// (Jungle Cruise 127min passes with_runtime.lte=40, and the paradox lte=40 AND
+// gte=80 returns ~700 hits). But combined with with_keywords=short-film it
+// behaves correctly — the paradox drops to 37 results, and Werewolf by Night /
+// Love 2015 are properly excluded. Hence the gte=1 + lte=40 pair below.
+TMDB.SHORT_FILM_KEYWORD_ID = 263548;
+TMDB.SHORT_FILM_MAX_RUNTIME = 40;
+
+// Cache for findFeatureCollision keyed by `<normalizedTitle>|<year>` → TMDB result
+// (the colliding feature/series, or null when none exists). Used by the short-film
+// filter to skip matches where the user catalog stream is more likely the popular
+// feature than the obscure short with the same French title (e.g. "Planes 2" 2014
+// short id 316541 vs feature id 218836 with 921 votes).
+TMDB._featureCollisionCache = {};
+
+TMDB.findFeatureCollision = function(title, year, excludeId, callback) {
+    if (!this.isEnabled() || !title || !year) { callback(null); return; }
+    var normExclude = this._normalizeTitleForMatch(title);
+    var cacheKey = normExclude + '|' + year + '|x' + excludeId;
+    if (this._featureCollisionCache.hasOwnProperty(cacheKey)) {
+        callback(this._featureCollisionCache[cacheKey]);
+        return;
+    }
+    var self = this;
+    var url = this.baseUrl + '/search/movie?api_key=' + this.apiKey +
+        '&language=' + this.language +
+        '&query=' + encodeURIComponent(title) +
+        '&year=' + year +
+        '&include_adult=false';
+    this._fetch(url, function(data) {
+        var found = null;
+        var results = (data && data.results) ? data.results : [];
+        for (var i = 0; i < results.length; i++) {
+            var r = results[i];
+            if (r.id === excludeId) continue;
+            var ry = (r.release_date || '').substring(0, 4);
+            if (String(parseInt(ry, 10)) !== String(year)) continue;
+            var normR = self._normalizeTitleForMatch(r.title || '');
+            var normRo = self._normalizeTitleForMatch(r.original_title || '');
+            if (normR === normExclude || normRo === normExclude) {
+                found = r;
+                break;
+            }
+        }
+        self._featureCollisionCache[cacheKey] = found;
+        callback(found);
+    });
+};
+
+// Minimal title normalizer used by findFeatureCollision. Mirrors browse.js
+// _normalizeTitleForGenre semantics (strip diacritics + non-ASCII + parens) so
+// keys produced here line up with the discover/match pipeline.
+TMDB._normalizeTitleForMatch = function(s) {
+    if (!s) return '';
+    return s.toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/\([^)]*\)/g, ' ')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 };
 
 TMDB.discover = function(type, genreId, page, callback, options) {
@@ -586,8 +658,16 @@ TMDB.discover = function(type, genreId, page, callback, options) {
         '&language=' + this.language +
         '&sort_by=' + encodeURIComponent(sortBy) +
         '&include_adult=false' +
-        '&with_genres=' + encodeURIComponent(genreId) +
         '&page=' + p;
+    if (genreId === 'short') {
+        var maxRt = opts.shortFilmMaxRuntime || this.SHORT_FILM_MAX_RUNTIME;
+        var minRt = opts.shortFilmMinRuntime || 1;
+        url += '&with_keywords=' + this.SHORT_FILM_KEYWORD_ID +
+            '&with_runtime.gte=' + minRt +
+            '&with_runtime.lte=' + maxRt;
+    } else {
+        url += '&with_genres=' + encodeURIComponent(genreId);
+    }
     if (opts.voteCountMin) {
         url += '&vote_count.gte=' + opts.voteCountMin;
     }

@@ -646,6 +646,11 @@
     "clear": "Cancella",
     "sortPopularity": "Popolarità",
     "sortRating": "Voto",
-    "sortDate": "Data"
+    "sortDate": "Data",
+    "shortFilm": "Cortometraggio",
+    "shortRuntimeTitle": "Durata del cortometraggio",
+    "shortMin": "Min",
+    "shortMax": "Max",
+    "apply": "Filtra"
   }
 }

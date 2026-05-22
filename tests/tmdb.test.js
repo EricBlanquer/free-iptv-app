@@ -767,6 +767,105 @@ describe('TMDB', function() {
             TMDB.discover('movie', 28, 1, function() {}, { dateLte: {} });
             expect(xhrInstances[0].url).not.toContain('.lte=');
         });
+
+        it('should combine with_keywords=short-film and with_runtime bounds when genreId is "short"', function() {
+            TMDB.discover('movie', 'short', 1, function() {});
+            var url = xhrInstances[0].url;
+            expect(url).not.toContain('with_genres=');
+            expect(url).toContain('with_keywords=' + TMDB.SHORT_FILM_KEYWORD_ID);
+            expect(url).toContain('with_runtime.gte=1');
+            expect(url).toContain('with_runtime.lte=' + TMDB.SHORT_FILM_MAX_RUNTIME);
+        });
+
+        it('should honor options.shortFilmMin/MaxRuntime when overriding defaults', function() {
+            TMDB.discover('movie', 'short', 1, function() {}, { shortFilmMinRuntime: 5, shortFilmMaxRuntime: 10 });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('with_runtime.gte=5');
+            expect(url).toContain('with_runtime.lte=10');
+        });
+    });
+
+    describe('findFeatureCollision', function() {
+        beforeEach(function() {
+            TMDB._featureCollisionCache = {};
+        });
+
+        it('returns the feature when another TMDB record has the same title+year (regression: Planes 2 2014 short id=316541 vs feature id=218836)', function(done) {
+            TMDB.findFeatureCollision('Planes 2', 2014, 316541, function(found) {
+                expect(found).not.toBeNull();
+                expect(found.id).toBe(218836);
+                done();
+            });
+            var url = xhrInstances[0].url;
+            expect(url).toContain('/search/movie');
+            expect(url).toContain('query=Planes%202');
+            expect(url).toContain('year=2014');
+            respondXHR(xhrInstances[0], {
+                results: [
+                    { id: 218836, title: 'Planes 2', release_date: '2014-07-17', vote_count: 921 },
+                    { id: 316541, title: 'Planes 2', release_date: '2014-11-04', vote_count: 3 }
+                ]
+            });
+        });
+
+        it('returns null when only the short itself appears (no collision)', function(done) {
+            TMDB.findFeatureCollision('Martin poids lourd', 2010, 148605, function(found) {
+                expect(found).toBeNull();
+                done();
+            });
+            respondXHR(xhrInstances[0], {
+                results: [
+                    { id: 148605, title: 'Martin poids lourd', release_date: '2010-07-30', vote_count: 115 }
+                ]
+            });
+        });
+
+        it('ignores results with different year (year filter is exact)', function(done) {
+            TMDB.findFeatureCollision('Saw', 2003, 246355, function(found) {
+                expect(found).toBeNull();
+                done();
+            });
+            respondXHR(xhrInstances[0], {
+                results: [
+                    { id: 246355, title: 'Saw', release_date: '2003-10-16', vote_count: 672 },
+                    { id: 176, title: 'Saw', release_date: '2004-10-01', vote_count: 10040 }
+                ]
+            });
+        });
+
+        it('ignores results with different normalized title', function(done) {
+            TMDB.findFeatureCollision('Underwater', 2020, 999, function(found) {
+                expect(found).toBeNull();
+                done();
+            });
+            respondXHR(xhrInstances[0], {
+                results: [
+                    { id: 443791, title: 'Something Else', release_date: '2020-01-08', vote_count: 5000 }
+                ]
+            });
+        });
+
+        it('serves from cache on second call (no second XHR)', function(done) {
+            TMDB.findFeatureCollision('X', 2022, 1, function(first) {
+                var n = xhrInstances.length;
+                TMDB.findFeatureCollision('X', 2022, 1, function(second) {
+                    expect(second).toEqual(first);
+                    expect(xhrInstances.length).toBe(n);
+                    done();
+                });
+            });
+            respondXHR(xhrInstances[0], { results: [] });
+        });
+
+        it('returns null when API is disabled', function(done) {
+            TMDB.defaultApiKey = '';
+            TMDB.setApiKey('');
+            TMDB.findFeatureCollision('Anything', 2024, 123, function(found) {
+                expect(found).toBeNull();
+                expect(xhrInstances.length).toBe(0);
+                done();
+            });
+        });
     });
 
     describe('getGenresList', function() {
@@ -774,10 +873,12 @@ describe('TMDB', function() {
             TMDB._genresCache = {};
         });
 
-        it('should fetch movie genres list', function(done) {
+        it('should fetch movie genres list (prepended with virtual short-film entry)', function(done) {
             TMDB.getGenresList('movie', function(genres) {
-                expect(genres.length).toBe(2);
-                expect(genres[0].name).toBe('Action');
+                expect(genres.length).toBe(3);
+                expect(genres[0].id).toBe('short');
+                expect(genres[0].virtual).toBe(true);
+                expect(genres[1].name).toBe('Action');
                 done();
             });
             var url = xhrInstances[0].url;
@@ -791,6 +892,15 @@ describe('TMDB', function() {
             });
         });
 
+        it('should not prepend virtual short entry for tv genres', function(done) {
+            TMDB.getGenresList('tv', function(genres) {
+                expect(genres.length).toBe(1);
+                expect(genres[0].name).toBe('Drama');
+                done();
+            });
+            respondXHR(xhrInstances[0], { genres: [{ id: 18, name: 'Drama' }] });
+        });
+
         it('should fetch tv genres list when type is tv or series', function() {
             TMDB.getGenresList('tv', function() {});
             expect(xhrInstances[0].url).toContain('/genre/tv/list');
@@ -802,10 +912,10 @@ describe('TMDB', function() {
 
         it('should serve from cache on second call (no XHR)', function(done) {
             TMDB.getGenresList('movie', function(genres1) {
-                expect(genres1.length).toBe(1);
+                expect(genres1.length).toBe(2);
                 var xhrCountAfterFirst = xhrInstances.length;
                 TMDB.getGenresList('movie', function(genres2) {
-                    expect(genres2.length).toBe(1);
+                    expect(genres2.length).toBe(2);
                     expect(xhrInstances.length).toBe(xhrCountAfterFirst);
                     done();
                 });

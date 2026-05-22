@@ -70,8 +70,9 @@ IPTVApp.prototype._buildTitleYearIndex = function(streams) {
     return { byTitleYear: byTitleYear, byTitleOnly: byTitleOnly };
 };
 
-IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index) {
+IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index, opts) {
     if (!tmdbResult || !index) return null;
+    var requireYear = !!(opts && opts.requireYear);
     var titles = [];
     if (isMovie) {
         if (tmdbResult.title) titles.push(tmdbResult.title);
@@ -87,14 +88,18 @@ IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index) {
     var dateField = isMovie ? tmdbResult.release_date : tmdbResult.first_air_date;
     var year = dateField ? parseInt(String(dateField).substring(0, 4), 10) : null;
     for (var i = 0; i < titles.length; i++) {
-        var t = this._normalizeTitleForGenre(titles[i]);
+        var orig = titles[i] || '';
+        var t = this._normalizeTitleForGenre(orig);
         if (!t) continue;
+        if (orig.length >= 4 && t.length * 2 < orig.length) continue;
         if (year) {
             var hit = index.byTitleYear[t + '|' + year];
             if (hit && hit.length) return hit[0];
+            if (requireYear) continue;
             hit = index.byTitleYear[t + '|' + (year - 1)] || index.byTitleYear[t + '|' + (year + 1)];
             if (hit && hit.length) return hit[0];
         }
+        if (requireYear) continue;
         var titleHit = index.byTitleOnly[t];
         if (titleHit && titleHit.length) return titleHit[0];
     }
@@ -147,6 +152,16 @@ IPTVApp.prototype._todayIso = function() {
     return y + '-' + m + '-' + day;
 };
 
+IPTVApp.prototype._getShortRuntime = function() {
+    var v = this.settings && this.settings.shortFilmMaxRuntime;
+    return (typeof v === 'number' && v > 0) ? v : 40;
+};
+
+IPTVApp.prototype._getShortMin = function() {
+    var v = this.settings && this.settings.shortFilmMinRuntime;
+    return (typeof v === 'number' && v > 0) ? v : 1;
+};
+
 IPTVApp.prototype._buildDiscoverOptions = function(type, sort) {
     var dir = sort.asc ? 'asc' : 'desc';
     var opts = {};
@@ -161,6 +176,10 @@ IPTVApp.prototype._buildDiscoverOptions = function(type, sort) {
         opts.voteCountMin = this._GENRE_DATE_VOTE_MIN;
     } else {
         opts.sortBy = 'popularity.' + dir;
+    }
+    if (this.genreFilter && this.genreFilter.id === 'short') {
+        opts.shortFilmMinRuntime = this._getShortMin();
+        opts.shortFilmMaxRuntime = this._getShortRuntime();
     }
     return opts;
 };
@@ -380,6 +399,60 @@ describe('Genre filter helpers', function() {
             expect(app._matchTMDBToStream(null, true, index)).toBeNull();
             expect(app._matchTMDBToStream({}, true, null)).toBeNull();
         });
+        it('opts.requireYear: skips title-only fallback (regression: short-film "Underwater 2016" matched user catalog "Underwater 2020" 95min)', function() {
+            // No title-only fallback when year diverges by more than 1.
+            var hit = app._matchTMDBToStream(
+                { title: 'Inception', release_date: '2030-01-01' },
+                true,
+                index,
+                { requireYear: true }
+            );
+            expect(hit).toBeNull();
+        });
+        it('opts.requireYear: matches only on EXACT year, no ±1 tolerance (regression: Saw 2003 short matched Saw 2004 feature with ±1)', function() {
+            // Exact year matches
+            var hit = app._matchTMDBToStream(
+                { title: 'Inception', release_date: '2010-01-01' },
+                true,
+                index,
+                { requireYear: true }
+            );
+            expect(hit && hit.stream_id).toBe(1);
+            // ±1 year does NOT match when requireYear is true
+            var miss = app._matchTMDBToStream(
+                { title: 'Inception', release_date: '2011-01-01' },
+                true,
+                index,
+                { requireYear: true }
+            );
+            expect(miss).toBeNull();
+        });
+        it('skips foreign-script title that collapsed to ASCII fragment (regression: Japanese "ネット版　仮面ライダー…X…" → "x" matched user catalog "X 2022")', function() {
+            // User catalog: Ti West's "X" 2022 (105min feature)
+            var idx = app._buildTitleYearIndex([{ stream_id: 42, name: 'X (2022)', year: 2022 }]);
+            // TMDB short: Japanese Kamen Rider, original_title contains 'X' but rest is non-ASCII
+            var hit = app._matchTMDBToStream(
+                {
+                    title: 'Kamen Rider OOO: The Birth of Birth X Prologue',
+                    original_title: 'ネット版　仮面ライダーオーズ　バースX誕生・序章',
+                    release_date: '2022-03-13'
+                },
+                true,
+                idx,
+                { requireYear: true }
+            );
+            expect(hit).toBeNull();
+        });
+        it('keeps legitimate short titles like "Up" or "X" when the original is itself short (no stripping)', function() {
+            var idx = app._buildTitleYearIndex([{ stream_id: 7, name: 'X (2022)', year: 2022 }]);
+            var hit = app._matchTMDBToStream(
+                { title: 'X', release_date: '2022-01-01' },
+                true,
+                idx,
+                { requireYear: true }
+            );
+            expect(hit && hit.stream_id).toBe(7);
+        });
     });
 
     describe('clearGenreFilter', function() {
@@ -474,6 +547,26 @@ describe('Genre filter helpers', function() {
         it('falls back to popularity.desc on unknown group', function() {
             var opts = app._buildDiscoverOptions('movie', { group: 'unknown', asc: false });
             expect(opts.sortBy).toBe('popularity.desc');
+        });
+        it('passes shortFilmMin+MaxRuntime from settings when genreFilter.id is "short"', function() {
+            app.genreFilter = { id: 'short', name: 'Court-métrage', type: 'movie' };
+            app.settings = { shortFilmMinRuntime: 5, shortFilmMaxRuntime: 15 };
+            var opts = app._buildDiscoverOptions('movie', { group: 'popularity', asc: false });
+            expect(opts.shortFilmMinRuntime).toBe(5);
+            expect(opts.shortFilmMaxRuntime).toBe(15);
+        });
+        it('defaults shortFilm runtimes (min=1, max=40) when unset', function() {
+            app.genreFilter = { id: 'short', name: 'Court-métrage', type: 'movie' };
+            app.settings = {};
+            var opts = app._buildDiscoverOptions('movie', { group: 'popularity', asc: false });
+            expect(opts.shortFilmMinRuntime).toBe(1);
+            expect(opts.shortFilmMaxRuntime).toBe(40);
+        });
+        it('does NOT add shortFilm runtimes when filter is not short', function() {
+            app.genreFilter = { id: 28, name: 'Action', type: 'movie' };
+            var opts = app._buildDiscoverOptions('movie', { group: 'popularity', asc: false });
+            expect(opts.shortFilmMaxRuntime).toBeUndefined();
+            expect(opts.shortFilmMinRuntime).toBeUndefined();
         });
     });
 

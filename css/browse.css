@@ -1335,3 +1335,26 @@ body.downloads-browser #content-grid:not(.list-view) .grid-item.freebox-file .gr
 .sort-btn.genre-disabled {
     opacity: 0.4;
 }
+
+/* Short-film runtime sub-modal (min/max selection after picking "Court-métrage") */
+.short-runtime-content {
+    min-width: 460px;
+    text-align: center;
+}
+
+#short-runtime-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 24px 0 32px;
+}
+
+#short-runtime-controls .modal-btn {
+    margin: 6px 10px;
+    min-width: 170px;
+}
+
+#short-runtime-buttons {
+    display: flex;
+    justify-content: center;
+}

@@ -606,6 +606,18 @@ IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, 
         img.onload = function() {
             clearTimeout(timeoutId);
             var duration = Date.now() - startTime;
+            // Some providers return 200 OK with a placeholder (1x1 transparent gif,
+            // "no cover" sentinel) instead of 404 when they don't have the artwork.
+            // The browser fires onload normally, so without a size check we'd display
+            // the placeholder and never reach the TMDB poster fallback. Threshold 50px
+            // is well below any real movie poster (TMDB's w92 is 92×138 minimum).
+            if (img.naturalWidth < 50 || img.naturalHeight < 50) {
+                window.log('HTTP', 'IMG [' + idx + '] PLACEHOLDER ' + img.naturalWidth + 'x' + img.naturalHeight + ' (treating as missing): ' + optimizedUrl);
+                div.dataset.loaded = 'error';
+                div.classList.add('no-image');
+                onDone();
+                return;
+            }
             div.style.backgroundImage = cssUrl(self.proxyImageUrl(optimizedUrl));
             div.dataset.loaded = 'ok';
             div.classList.remove('no-image');
@@ -2130,8 +2142,9 @@ IPTVApp.prototype._buildTitleYearIndex = function(streams) {
     return { byTitleYear: byTitleYear, byTitleOnly: byTitleOnly };
 };
 
-IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index) {
+IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index, opts) {
     if (!tmdbResult || !index) return null;
+    var requireYear = !!(opts && opts.requireYear);
     var titles = [];
     if (isMovie) {
         if (tmdbResult.title) titles.push(tmdbResult.title);
@@ -2147,14 +2160,29 @@ IPTVApp.prototype._matchTMDBToStream = function(tmdbResult, isMovie, index) {
     var dateField = isMovie ? tmdbResult.release_date : tmdbResult.first_air_date;
     var year = dateField ? parseInt(String(dateField).substring(0, 4), 10) : null;
     for (var i = 0; i < titles.length; i++) {
-        var t = this._normalizeTitleForGenre(titles[i]);
+        var orig = titles[i] || '';
+        var t = this._normalizeTitleForGenre(orig);
         if (!t) continue;
+        // Skip foreign-script titles that collapsed to a tiny ASCII fragment after
+        // stripping non-ASCII. E.g. "ネット版　仮面ライダーオーズ　バースX誕生・序章" → "x", which
+        // would otherwise false-match any stream titled "X". Short titles like "M",
+        // "X", "Up" stay valid because their original is itself short (no stripping).
+        if (orig.length >= 4 && t.length * 2 < orig.length) continue;
         if (year) {
             var hit = index.byTitleYear[t + '|' + year];
             if (hit && hit.length) return hit[0];
+            // Skip the ±1 year fallback when requireYear is true. The short-film
+            // filter cannot afford ±1 tolerance: e.g. Saw (2003, original 9min
+            // short) would otherwise match a user catalog entry "Saw (2004)" which
+            // is the 103min feature film.
+            if (requireYear) continue;
             hit = index.byTitleYear[t + '|' + (year - 1)] || index.byTitleYear[t + '|' + (year + 1)];
             if (hit && hit.length) return hit[0];
         }
+        // Skip the title-only fallback when the caller demands a year match.
+        // Generic titles ("Love", "Underwater", "Hello") otherwise produce false
+        // positives for genres with few results (notably the short-film virtual filter).
+        if (requireYear) continue;
         var titleHit = index.byTitleOnly[t];
         if (titleHit && titleHit.length) return titleHit[0];
     }
@@ -2244,6 +2272,7 @@ IPTVApp.prototype.closeGenrePicker = function() {
 IPTVApp.prototype._GENRE_PAGES_PER_BATCH = 3;
 IPTVApp.prototype._GENRE_MAX_PAGES = 50; // 1000 titles per genre — big genres (sci-fi, drama) need more depth when matching against a provider catalog
 IPTVApp.prototype._GENRE_PREFETCH_THRESHOLD = 10; // start fetch when ≤ N items left
+IPTVApp.prototype._SHORT_AUTO_TARGET = 30; // short-film filter only: auto-fetch batches without user scroll until ≥ N matches accumulated. Required because TMDB pagination is popularity-sorted and a given short (e.g. Martin poids lourd id=148605, runtime=5) lands on page 5 at ≤5min but page 11 at ≤10min, so 3-page initial batches never reach it.
 IPTVApp.prototype._GENRE_RATING_VOTE_MIN = 200;  // floor on TMDB vote_count when sorting by rating (filters out obscure 10/10)
 IPTVApp.prototype._GENRE_DATE_VOTE_MIN = 10;  // light floor when sorting by date (filters truly unknown films but stays permissive)
 
@@ -2251,6 +2280,11 @@ IPTVApp.prototype._getGenrePickerSort = function() {
     var s = this.settings && this.settings.genrePickerSort;
     if (s && s.group) return { group: s.group, asc: !!s.asc };
     return { group: 'popularity', asc: false };
+};
+
+IPTVApp.prototype._getShortRuntime = function() {
+    var v = this.settings && this.settings.shortFilmMaxRuntime;
+    return (typeof v === 'number' && v > 0) ? v : 40;
 };
 
 IPTVApp.prototype._buildDiscoverOptions = function(type, sort) {
@@ -2270,6 +2304,10 @@ IPTVApp.prototype._buildDiscoverOptions = function(type, sort) {
         opts.voteCountMin = this._GENRE_DATE_VOTE_MIN;
     } else {
         opts.sortBy = 'popularity.' + dir;
+    }
+    if (this.genreFilter && this.genreFilter.id === 'short') {
+        opts.shortFilmMinRuntime = this._getShortMin();
+        opts.shortFilmMaxRuntime = this._getShortRuntime();
     }
     return opts;
 };
@@ -2300,6 +2338,93 @@ IPTVApp.prototype._updateGenrePickerSortButtons = function() {
             }
         }
     });
+};
+
+IPTVApp.prototype.SHORT_MIN_PRESETS = [1, 5, 10, 15, 20, 30];
+IPTVApp.prototype.SHORT_MAX_PRESETS = [5, 10, 15, 20, 30, 40, 60];
+
+IPTVApp.prototype._getShortMin = function() {
+    var v = this.settings && this.settings.shortFilmMinRuntime;
+    return (typeof v === 'number' && v > 0) ? v : 1;
+};
+
+IPTVApp.prototype._cyclePreset = function(presets, current) {
+    var idx = presets.indexOf(current);
+    return presets[(idx + 1) % presets.length];
+};
+
+IPTVApp.prototype.openShortRuntimeModal = function(genreName) {
+    var modal = document.getElementById('short-runtime-modal');
+    if (!modal) return;
+    this._pendingShortGenreName = genreName;
+    this._pendingShortMin = this._getShortMin();
+    this._pendingShortMax = this._getShortRuntime();
+    this._updateShortRuntimeModal();
+    this.setHidden(modal, false);
+    this._previousFocusAreaShort = this.focusArea;
+    this._previousFocusIndexShort = this.focusIndex;
+    this.focusArea = 'short-runtime';
+    this.focusIndex = 3; // default focus on "Filtrer"
+    this.invalidateFocusables();
+    this.updateFocus();
+};
+
+IPTVApp.prototype.closeShortRuntimeModal = function() {
+    var modal = document.getElementById('short-runtime-modal');
+    if (!modal) return;
+    this.setHidden(modal, true);
+    if (this._previousFocusAreaShort) {
+        this.focusArea = this._previousFocusAreaShort;
+        this.focusIndex = this._previousFocusIndexShort || 0;
+        this._previousFocusAreaShort = null;
+        this._previousFocusIndexShort = null;
+    }
+    this.invalidateFocusables();
+    this.updateFocus();
+};
+
+IPTVApp.prototype._updateShortRuntimeModal = function() {
+    var minEl = document.getElementById('short-min-value');
+    var maxEl = document.getElementById('short-max-value');
+    if (minEl) minEl.textContent = this._pendingShortMin;
+    if (maxEl) maxEl.textContent = this._pendingShortMax;
+};
+
+IPTVApp.prototype.cycleShortMin = function() {
+    var next = this._cyclePreset(this.SHORT_MIN_PRESETS, this._pendingShortMin);
+    this._pendingShortMin = next;
+    // Bump max if it's now below the new min.
+    if (this._pendingShortMax < next) {
+        for (var i = 0; i < this.SHORT_MAX_PRESETS.length; i++) {
+            if (this.SHORT_MAX_PRESETS[i] >= next) { this._pendingShortMax = this.SHORT_MAX_PRESETS[i]; break; }
+        }
+    }
+    this._updateShortRuntimeModal();
+    window.log('ACTION', 'cycleShortMin → ' + next + 'min');
+};
+
+IPTVApp.prototype.cycleShortMax = function() {
+    var next = this._cyclePreset(this.SHORT_MAX_PRESETS, this._pendingShortMax);
+    this._pendingShortMax = next;
+    if (this._pendingShortMin > next) {
+        for (var i = this.SHORT_MIN_PRESETS.length - 1; i >= 0; i--) {
+            if (this.SHORT_MIN_PRESETS[i] <= next) { this._pendingShortMin = this.SHORT_MIN_PRESETS[i]; break; }
+        }
+    }
+    this._updateShortRuntimeModal();
+    window.log('ACTION', 'cycleShortMax → ' + next + 'min');
+};
+
+IPTVApp.prototype.applyShortRuntimeModal = function() {
+    if (typeof this.settings !== 'object') this.settings = {};
+    this.settings.shortFilmMinRuntime = this._pendingShortMin;
+    this.settings.shortFilmMaxRuntime = this._pendingShortMax;
+    this.saveSettings();
+    var name = this._pendingShortGenreName || 'Court-métrage';
+    window.log('ACTION', 'applyShortRuntimeModal min=' + this._pendingShortMin + ' max=' + this._pendingShortMax);
+    this.closeShortRuntimeModal();
+    this.closeGenrePicker();
+    this.applyGenreFilter('short', name);
 };
 
 IPTVApp.prototype.applyGenrePickerSort = function(group) {
@@ -2355,7 +2480,32 @@ IPTVApp.prototype.applyGenreFilter = function(genreId, genreName) {
         window.log('GENRE', 'initial batch: ' + newStreams.length + ' matched streams for genre=' + genreName +
             ' (totalPages=' + self._genreTotalPages + ')');
         self.applyFilters();
+        if (genreId === 'short') self._autoPaginateShorts(requestId);
     }, true);
+};
+
+// For the short-film virtual filter, keep fetching batches (without waiting for
+// user scroll) until we have at least _SHORT_AUTO_TARGET matches accumulated or
+// TMDB pagination is exhausted. Required because match rate is sparse (~0-2 per
+// page) and the popularity-sorted pagination pushes specific shorts far down
+// when the runtime window widens (Martin poids lourd at page 5 with ≤5min,
+// page 11 with ≤10min, page 26 with ≤40min).
+IPTVApp.prototype._autoPaginateShorts = function(requestId) {
+    var self = this;
+    if (!this.genreFilter || this.genreFilter.id !== 'short') return;
+    if (this._genreRequestId !== requestId) return;
+    if (this._genreReachedEnd) return;
+    var current = (this._genreFilteredStreams || []).length;
+    if (current >= this._SHORT_AUTO_TARGET) return;
+    if (this._genreFetchInProgress) return;
+    this._fetchGenrePagesBatch(requestId, function(newStreams) {
+        if (self._genreRequestId !== requestId) return;
+        if (newStreams.length) self._appendGenreMatches(newStreams);
+        else window.log('GENRE', 'auto-paginate: 0 matches in batch (nextPage=' + self._genreNextPage + ', total=' + (self._genreFilteredStreams || []).length + ')');
+        // Recursion is driven by finish() in _fetchGenrePagesBatch, not here, so
+        // scroll-triggered prefetches that race in via loadMoreItems also re-arm
+        // the auto-paginate chain instead of killing it.
+    }, false);
 };
 
 // Fetch the next batch of TMDB discover pages (3 at a time) and append matches to
@@ -2387,6 +2537,8 @@ IPTVApp.prototype._fetchGenrePagesBatch = function(requestId, onComplete, isInit
     var seenIds = this._genreSeenStreamIds || {};
     var sawEmptyPage = false;
     var discoverOptions = this._buildDiscoverOptions(type, this._getGenrePickerSort());
+    var isShortFilter = !!(this.genreFilter && this.genreFilter.id === 'short');
+    var matchOpts = { requireYear: isShortFilter };
     var onPage = function(pageNum) {
         return function(data) {
             fetched++;
@@ -2397,33 +2549,88 @@ IPTVApp.prototype._fetchGenrePagesBatch = function(requestId, onComplete, isInit
                 if (data.results) {
                     if (data.results.length === 0) sawEmptyPage = true;
                     for (var i = 0; i < data.results.length; i++) {
-                        var match = self._matchTMDBToStream(data.results[i], type === 'movie', self._genreMatchIndex);
+                        var tmdbItem = data.results[i];
+                        var match = self._matchTMDBToStream(tmdbItem, type === 'movie', self._genreMatchIndex, matchOpts);
                         if (!match) continue;
                         var sid = match.stream_id || match.vod_id || match.series_id;
                         var key = sid != null ? String(sid) : (match.name || '') + '|p' + pageNum + 'i' + i;
                         if (seenIds[key]) continue;
                         seenIds[key] = true;
-                        allMatches.push({ stream: match, order: pageNum * 1000 + i });
+                        if (isShortFilter) {
+                            window.log('GENRE', 'short-match: tmdb=' + tmdbItem.id + ' "' + (tmdbItem.title || tmdbItem.name) + '" (' + (tmdbItem.release_date || tmdbItem.first_air_date || '?') + ') ↔ stream=' + sid + ' "' + (match.name || '') + '"');
+                        }
+                        var tmdbYear = parseInt((tmdbItem.release_date || tmdbItem.first_air_date || '').substring(0, 4), 10) || null;
+                        allMatches.push({ stream: match, order: pageNum * 1000 + i, tmdbItem: tmdbItem, tmdbYear: tmdbYear });
                     }
                 }
             }
             if (fetched === pagesRequested) {
-                self._genreFetchInProgress = false;
-                if (self._genreRequestId !== requestId) return;
+                if (self._genreRequestId !== requestId) {
+                    self._genreFetchInProgress = false;
+                    return;
+                }
                 self._genreSeenStreamIds = seenIds;
                 self._genreNextPage = endPage + 1;
                 if (sawEmptyPage || (self._genreTotalPages && self._genreNextPage > self._genreTotalPages) || self._genreNextPage > self._GENRE_MAX_PAGES) {
                     self._genreReachedEnd = true;
                 }
                 allMatches.sort(function(a, b) { return a.order - b.order; });
-                var streams = allMatches.map(function(m) { return m.stream; });
-                onComplete(streams, !!isInitial);
+                var finish = function(finalMatches) {
+                    self._genreFetchInProgress = false;
+                    if (self._genreRequestId !== requestId) return;
+                    var streams = finalMatches.map(function(m) { return m.stream; });
+                    onComplete(streams, !!isInitial);
+                    // For short-film filter: chain another auto-paginate after ANY
+                    // batch completes (auto OR scroll-driven prefetch). Prevents the
+                    // auto-paginate chain from dying when prefetch races in via
+                    // loadMoreItems → _maybePrefetchGenrePages.
+                    if (self.genreFilter && self.genreFilter.id === 'short') {
+                        self._autoPaginateShorts(requestId);
+                    }
+                };
+                if (isShortFilter && allMatches.length) {
+                    self._filterShortCollisions(allMatches, requestId, finish);
+                } else {
+                    finish(allMatches);
+                }
             }
         };
     };
     for (var p = startPage; p <= endPage; p++) {
         TMDB.discover(type, genreId, p, onPage(p), discoverOptions);
     }
+};
+
+// For each short-film match candidate, check whether TMDB has another entry with
+// the same title+year (= likely a feature film the user actually has in their
+// catalog). Skip those matches. Runs all checks in parallel via the TMDB queue,
+// preserves order.
+IPTVApp.prototype._filterShortCollisions = function(matches, requestId, callback) {
+    var self = this;
+    var pending = matches.length;
+    var kept = [];
+    matches.forEach(function(m) {
+        var item = m.tmdbItem;
+        var title = item.title || item.name || '';
+        TMDB.findFeatureCollision(title, m.tmdbYear, item.id, function(collision) {
+            if (self._genreRequestId !== requestId) {
+                pending--;
+                if (pending === 0) callback([]);
+                return;
+            }
+            if (collision) {
+                window.log('GENRE', 'short-skip collision: tmdb=' + item.id + ' "' + title + '" (' + m.tmdbYear + ') → feature id=' + collision.id + ' (' + (collision.vote_count || 0) + ' votes)');
+            } else {
+                kept.push(m);
+            }
+            pending--;
+            if (pending === 0) {
+                kept.sort(function(a, b) { return a.order - b.order; });
+                window.log('GENRE', 'short-collision pass: kept ' + kept.length + '/' + matches.length);
+                callback(kept);
+            }
+        });
+    });
 };
 
 // Hook called from loadMoreItems when the user is near the end of currentStreams.
@@ -2457,6 +2664,11 @@ IPTVApp.prototype._appendGenreMatches = function(newStreams) {
     this.updateGridSpacer();
     this.invalidateFocusables();
     this.loadMoreItems();
+    // loadMoreItems only calls loadVisibleImages on the first batch — newly appended
+    // items via genre pagination (especially short-film auto-pagination) otherwise
+    // wait for an unrelated trigger (scroll, focus change) before their posters
+    // load. Force a refresh here so the new items are processed immediately.
+    this.loadVisibleImages();
 };
 
 IPTVApp.prototype.clearGenreFilter = function(skipRender) {

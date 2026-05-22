@@ -328,6 +328,7 @@ IPTVApp.prototype.bindKeys = function() {
             { id: 'tts-voice-modal', area: 'tts-voice-modal' },
             { id: 'tmdb-connect-modal', area: 'tmdb-connect-modal' },
             { id: 'genre-picker-modal', area: 'genre-picker' },
+            { id: 'short-runtime-modal', area: 'short-runtime' },
             { id: 'playlist-selector', area: 'home' },
             { id: 'home-grid', area: 'home' },
             { id: 'continue-grid', area: 'continue' },
@@ -538,7 +539,7 @@ IPTVApp.prototype.navigate = function(direction, isRepeat) {
     } else if (this.focusArea === 'actor') {
         result = this._navigateActor(navContext);
         if (result.handled) return;
-    } else if (this.focusArea === 'settings' || this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal' || this.focusArea === 'genre-picker') {
+    } else if (this.focusArea === 'settings' || this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal' || this.focusArea === 'genre-picker' || this.focusArea === 'short-runtime') {
         result = { index: this.navigate2D(focusables, newIndex, direction) };
     } else {
         result = { index: newIndex };
@@ -1242,6 +1243,9 @@ IPTVApp.prototype.getFocusables = function() {
             break;
         case 'genre-picker':
             selector = '#genre-picker-modal .focusable';
+            break;
+        case 'short-runtime':
+            selector = '#short-runtime-modal .focusable';
             break;
     }
     if (!selector) {

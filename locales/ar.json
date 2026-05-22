@@ -654,6 +654,11 @@
     "clear": "مسح",
     "sortPopularity": "الشعبية",
     "sortRating": "التقييم",
-    "sortDate": "التاريخ"
+    "sortDate": "التاريخ",
+    "shortFilm": "فيلم قصير",
+    "shortRuntimeTitle": "مدة الفيلم القصير",
+    "shortMin": "الحد الأدنى",
+    "shortMax": "الحد الأقصى",
+    "apply": "تصفية"
   }
 }

@@ -649,6 +649,11 @@
     "clear": "Wissen",
     "sortPopularity": "Populariteit",
     "sortRating": "Beoordeling",
-    "sortDate": "Datum"
+    "sortDate": "Datum",
+    "shortFilm": "Korte film",
+    "shortRuntimeTitle": "Duur van korte film",
+    "shortMin": "Min",
+    "shortMax": "Max",
+    "apply": "Filteren"
   }
 }

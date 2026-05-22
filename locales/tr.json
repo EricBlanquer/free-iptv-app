@@ -651,6 +651,11 @@
     "clear": "Temizle",
     "sortPopularity": "Popülerlik",
     "sortRating": "Puan",
-    "sortDate": "Tarih"
+    "sortDate": "Tarih",
+    "shortFilm": "Kısa film",
+    "shortRuntimeTitle": "Kısa film süresi",
+    "shortMin": "Min",
+    "shortMax": "Maks",
+    "apply": "Filtrele"
   }
 }

@@ -1406,6 +1406,8 @@ IPTVApp.prototype.loadSettings = function() {
         freeboxBrowserEnabled: true,
         freeboxSlideshowInterval: 5,
         useGenreCategories: true,
+        shortFilmMinRuntime: 1,
+        shortFilmMaxRuntime: 40,
         bufferPreset: 'standard',
         bufferPlay: 2,
         bufferRebuffer: 5,

@@ -651,6 +651,11 @@
     "clear": "Wyczyść",
     "sortPopularity": "Popularność",
     "sortRating": "Ocena",
-    "sortDate": "Data"
+    "sortDate": "Data",
+    "shortFilm": "Film krótkometrażowy",
+    "shortRuntimeTitle": "Czas trwania filmu krótkometrażowego",
+    "shortMin": "Min",
+    "shortMax": "Maks",
+    "apply": "Filtruj"
   }
 }
