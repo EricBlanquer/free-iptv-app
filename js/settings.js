@@ -2924,6 +2924,8 @@ IPTVApp.prototype.confirmDeleteCategory = function(categoryId) {
         else {
             self.removeCustomCategory(categoryId);
         }
+        self._invalidatePreprocessCache();
+        self.updatePatternCounts();
         self.renderPatternCategories();
         self.updateHomeMenuVisibility();
     });
