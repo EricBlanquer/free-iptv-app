@@ -43,7 +43,15 @@ const fragment = [
     slice('navigate2D')
 ].join('\n');
 
-const ctx = vm.createContext({ IPTVApp: IPTVApp, Date: Date, Math: Math });
+const ctx = vm.createContext({
+    IPTVApp: IPTVApp,
+    Date: Date,
+    Math: Math,
+    document: {
+        getElementById: () => null,
+        querySelector: () => null
+    }
+});
 vm.runInContext(fragment, ctx);
 
 function makeBtn(spec) {

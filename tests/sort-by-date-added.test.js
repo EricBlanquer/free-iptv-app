@@ -133,25 +133,33 @@ describe('IPTVApp.prototype._sortByDateAdded', () => {
         expect(streams).toEqual([{ stream_id: 42, added: '1700000000' }]);
     });
 
-    it('prefers _addedAt (local timestamp) over added (provider date)', () => {
-        // In "Continuer" / "Ma liste" / "Mes notes", sort by date added must use
-        // the date the user added the item, not the provider's catalog date.
+    it('uses _addedAt when useLocalDate is true (favorites/continue/rated)', () => {
         const streams = [
             { stream_id: 1, name: 'Old movie added today', added: '1000000000', _addedAt: Date.now() },
             { stream_id: 2, name: 'New movie added yesterday', added: '1745000000', _addedAt: Date.now() - 86400000 },
             { stream_id: 3, name: 'Mid movie added 2 days ago', added: '1500000000', _addedAt: Date.now() - 172800000 }
         ];
-        app._sortByDateAdded(streams, false);
+        app._sortByDateAdded(streams, false, true);
         expect(streams.map(s => s.stream_id)).toEqual([1, 2, 3]);
     });
 
-    it('falls back to added when _addedAt is missing or 0', () => {
+    it('ignores _addedAt when useLocalDate is false (provider sections)', () => {
+        const streams = [
+            { stream_id: 1, added: '1000000000', _addedAt: Date.now() },
+            { stream_id: 2, added: '1745000000', _addedAt: Date.now() - 86400000 },
+            { stream_id: 3, added: '1500000000' }
+        ];
+        app._sortByDateAdded(streams, false, false);
+        expect(streams.map(s => s.stream_id)).toEqual([2, 3, 1]);
+    });
+
+    it('falls back to added when _addedAt is missing even with useLocalDate true', () => {
         const streams = [
             { stream_id: 1, added: '1700000000' },
             { stream_id: 2, added: '1745000000', _addedAt: 0 },
             { stream_id: 3, added: '1500000000' }
         ];
-        app._sortByDateAdded(streams, false);
+        app._sortByDateAdded(streams, false, true);
         expect(streams.map(s => s.stream_id)).toEqual([2, 1, 3]);
     });
 });

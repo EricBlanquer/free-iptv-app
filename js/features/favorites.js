@@ -67,6 +67,7 @@ IPTVApp.prototype.showFavoritesInGrid = function() {
         this.showEmptyMessage(container, 'home.noFavorites', 'No favorites');
         return;
     }
+    this._sortByDateAdded(filteredFavorites, false, true);
     this.originalStreams = filteredFavorites;
     this.currentStreams = filteredFavorites;
     this.currentStreamType = section === 'live' ? 'live' : (section === 'series' ? 'series' : 'vod');

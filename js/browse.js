@@ -2854,15 +2854,14 @@ IPTVApp.prototype._consolidateDedupGroupsByCleanTitle = function(dedupGroups) {
     }
 };
 
-IPTVApp.prototype._sortByDateAdded = function(streams, asc) {
+IPTVApp.prototype._sortByDateAdded = function(streams, asc, useLocalDate) {
     var n = streams.length;
     if (n < 2) return;
     var withIdx = new Array(n);
     for (var i = 0; i < n; i++) {
-        var local = streams[i]._addedAt;
         var added;
-        if (local) {
-            added = local;
+        if (useLocalDate && streams[i]._addedAt) {
+            added = streams[i]._addedAt;
         }
         else {
             var raw = streams[i].added;
@@ -2959,7 +2958,8 @@ IPTVApp.prototype.applyFilters = function() {
         // Sort phase skipped: Freebox file browser pre-sorts items via _sortFreeboxEntries.
     }
     else if ((this.currentSort === 'default' || this.currentSort === 'default-asc') && this.currentSection !== 'entertainment') {
-        this._sortByDateAdded(streams, this.currentSort === 'default-asc');
+        var userSections = { favorites: 1, continue: 1, rated: 1 };
+        this._sortByDateAdded(streams, this.currentSort === 'default-asc', !!userSections[this.currentSection]);
     }
     else if (this.currentSort === 'default-asc' && this.currentSection === 'entertainment') {
         streams.reverse();

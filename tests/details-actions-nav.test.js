@@ -37,7 +37,11 @@ const fragment = [
 const ctx = vm.createContext({
     IPTVApp: IPTVApp,
     Date: Date,
-    Math: Math
+    Math: Math,
+    document: {
+        getElementById: () => null,
+        querySelector: () => null
+    }
 });
 vm.runInContext(fragment, ctx);
 

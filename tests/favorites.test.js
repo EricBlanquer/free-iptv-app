@@ -182,6 +182,13 @@ describe('toggleFavorite', () => {
         app.toggleFavorite(stream, 'vod');
         expect(app.updateGridFavoriteIcon).toHaveBeenCalledWith(1, true, 'playlist1');
     });
+
+    it('should set _addedAt on the stream when adding to favorites', () => {
+        var stream = { stream_id: 99, name: 'Provider Movie', added: '1700000000' };
+        app.toggleFavorite(stream, 'vod');
+        expect(app.favorites[0]._addedAt).toBeGreaterThan(0);
+        expect(app.favorites[0].stream_id).toBe(99);
+    });
 });
 
 describe('moveFavorite', () => {
