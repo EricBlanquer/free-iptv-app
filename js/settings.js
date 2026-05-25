@@ -1253,12 +1253,15 @@ IPTVApp.prototype.applyRemoteConfig = function(config) {
     }
     if (config.tmdbApiKey) {
         this.settings.tmdbApiKey = config.tmdbApiKey;
+        TMDB.setApiKey(config.tmdbApiKey);
     }
     if (config.openSubtitlesApiKey) {
         this.settings.openSubtitlesApiKey = config.openSubtitlesApiKey;
+        if (typeof OpenSubtitles !== 'undefined') OpenSubtitles.setApiKey(config.openSubtitlesApiKey);
     }
     if (config.subDLApiKey) {
         this.settings.subDLApiKey = config.subDLApiKey;
+        if (typeof SubDL !== 'undefined') SubDL.setApiKey(config.subDLApiKey);
     }
     if (config.locale) {
         this.settings.locale = config.locale;
@@ -1267,6 +1270,31 @@ IPTVApp.prototype.applyRemoteConfig = function(config) {
     if (config.providerLanguage) {
         this.settings.providerLanguage = config.providerLanguage;
     }
+    if (config.proxyUrl) {
+        this.settings.proxyUrl = config.proxyUrl;
+        this.settings.proxyEnabled = true;
+    }
+    if (config.streamProxy !== undefined) {
+        this.settings.streamProxy = !!config.streamProxy;
+    }
+    if (config.ttsRate !== undefined) this.settings.ttsRate = config.ttsRate;
+    if (config.ttsVolume !== undefined) this.settings.ttsVolume = config.ttsVolume;
+    if (config.ttsPitch !== undefined) this.settings.ttsPitch = config.ttsPitch;
+    if (config.textSize) {
+        this.settings.textSize = config.textSize;
+        this.applyTextSize(config.textSize);
+    }
+    if (config.subtitleSize) this.settings.subtitleSize = config.subtitleSize;
+    if (config.bufferPreset) this.settings.bufferPreset = config.bufferPreset;
+    if (config.liveFormat) this.settings.liveFormat = config.liveFormat;
+    if (config.cacheRefreshHours) this.settings.cacheRefreshHours = config.cacheRefreshHours;
+    if (config.freeboxEnabled !== undefined) {
+        this.settings.freeboxEnabled = !!config.freeboxEnabled;
+        if (config.freeboxHost) this.settings.freeboxHost = config.freeboxHost;
+        if (config.freeboxAppToken) this.settings.freeboxAppToken = config.freeboxAppToken;
+    }
+    if (config.hideSD !== undefined) this.settings.hideSD = !!config.hideSD;
+    if (config.categoryPatterns) this.settings.categoryPatterns = config.categoryPatterns;
     if (config.licenseCode) {
         Premium.validateCode(config.licenseCode, function(valid) {
             if (valid) {

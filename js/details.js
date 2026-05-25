@@ -1948,12 +1948,12 @@ IPTVApp.prototype.hideTracksModal = function() {
     this.setHidden('tracks-modal', true);
     this.trackModalItems = [];
     if (this.currentScreen === 'player') {
+        this.focusArea = 'player';
         this.playerTracksFocused = true;
         this.updatePlayerTracksFocus();
-    }
-    this.focusArea = this.previousFocusArea || 'details';
-    if (this.currentScreen === 'player') {
         this.showPlayerOverlay();
+    } else {
+        this.focusArea = this.previousFocusArea || 'details';
     }
 };
 

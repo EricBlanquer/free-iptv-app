@@ -600,7 +600,14 @@
   "subtitleSearch": {
     "back": "Wstecz",
     "searchOpenSubtitles": "Szukaj OpenSubtitles...",
-    "searchSubDL": "Szukaj SubDL..."
+    "searchSubDL": "Szukaj SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 dzień temu",

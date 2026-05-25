@@ -607,7 +607,14 @@
   "subtitleSearch": {
     "back": "Voltar",
     "searchOpenSubtitles": "Pesquisar OpenSubtitles...",
-    "searchSubDL": "Pesquisar SubDL..."
+    "searchSubDL": "Pesquisar SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "há 1 dia",

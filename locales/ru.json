@@ -601,7 +601,14 @@
   "subtitleSearch": {
     "back": "Назад",
     "searchOpenSubtitles": "Поиск OpenSubtitles...",
-    "searchSubDL": "Поиск SubDL..."
+    "searchSubDL": "Поиск SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 день назад",

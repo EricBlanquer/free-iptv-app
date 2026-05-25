@@ -598,7 +598,14 @@
   "subtitleSearch": {
     "back": "Terug",
     "searchOpenSubtitles": "Zoek OpenSubtitles...",
-    "searchSubDL": "Zoek SubDL..."
+    "searchSubDL": "Zoek SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 dag geleden",

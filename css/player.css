@@ -505,6 +505,68 @@
     background: #66BB6A;
 }
 
+.track-section-header {
+    padding: 8px 25px 4px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.track-item-action {
+    background: rgba(0, 119, 204, 0.3);
+    border: 1px solid rgba(0, 119, 204, 0.5);
+    text-align: center;
+    margin-top: 15px;
+}
+
+#sub-timeline-panel {
+    position: fixed;
+    top: 50px;
+    right: 30px;
+    bottom: 50px;
+    width: 380px;
+    background: rgba(10, 10, 24, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    overflow-y: auto;
+    padding: 15px;
+    z-index: 9999;
+}
+
+#sub-timeline-panel .st-line {
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    color: #999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sub-timeline-panel .st-line.st-current {
+    background: rgba(0, 119, 204, 0.4);
+    color: #fff;
+}
+
+#sub-timeline-panel .st-line.st-next {
+    color: #ccc;
+}
+
+#sub-timeline-panel .st-line.st-marker {
+    background: none;
+    border-top: 2px solid #0af;
+    padding: 0;
+    margin: 8px 0;
+    height: 0;
+}
+
+#sub-timeline-panel .st-time {
+    color: #0af;
+    margin-right: 10px;
+    display: inline-block;
+    min-width: 75px;
+}
+
 /* Subtitle Options Modal */
 .sub-options-content {
     min-width: 600px;

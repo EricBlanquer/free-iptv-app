@@ -603,8 +603,15 @@
   },
   "subtitleSearch": {
     "back": "Retour",
+    "language": "Langue",
+    "search": "Rechercher",
     "searchOpenSubtitles": "Rechercher OpenSubtitles...",
-    "searchSubDL": "Rechercher SubDL..."
+    "searchSubDL": "Rechercher SubDL...",
+    "type": "Type",
+    "typeAll": "Tous",
+    "typeForced": "Forcés / Parties étrangères",
+    "typeFull": "Complets",
+    "typeSDH": "SDH (malentendants)"
   },
   "time": {
     "dayAgo": "il y a 1 jour",

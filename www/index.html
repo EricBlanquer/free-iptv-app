@@ -723,8 +723,12 @@
                 <button class="btn btn-secondary" onclick="saveAndAddAnother()" style="width:100%;" data-i18n="addAnother">+ Add another playlist</button>
             </div>
 
-            <!-- VOD Filter - hidden, configurable from app only -->
-            <div id="vod-filter-section" class="card hidden" style="display:none">
+            <div class="advanced-toggle-row" style="text-align:center; margin-bottom:20px;">
+                <button type="button" class="btn btn-secondary" id="advanced-toggle" onclick="toggleAdvancedMode()" data-i18n="advancedMode">Advanced mode</button>
+            </div>
+
+            <!-- VOD Filter - advanced -->
+            <div id="vod-filter-section" class="card advanced-section hidden">
                 <div id="vod-filter-content" class="collapsible-content collapsed">
                     <select id="pref-provider-lang">
                         <option value="ALL">All languages</option>
@@ -733,8 +737,8 @@
                 </div>
             </div>
 
-            <!-- VOD Categories - hidden, configurable from app only -->
-            <div id="categories-section" class="card hidden" style="display:none">
+            <!-- VOD Categories - advanced -->
+            <div id="categories-section" class="card advanced-section hidden">
                 <div class="collapsible-header collapsed" onclick="toggleCollapsible('categories')">
                     <h2 data-i18n="categoriesTitle">VOD Categories</h2>
                     <span class="arrow">▼</span>
@@ -850,8 +854,8 @@
                 </div><!-- /collapsible-content -->
             </div>
 
-            <!-- Services (proxy + TTS) - hidden, configurable from app only -->
-            <div id="services-section" class="card" style="display:none">
+            <!-- Services (proxy + TTS) - advanced -->
+            <div id="services-section" class="card advanced-section hidden">
                 <div class="collapsible-header collapsed" onclick="toggleCollapsible('services')">
                     <h2 data-i18n="servicesTitle">Services (optional)</h2>
                     <span class="arrow">▼</span>
@@ -897,8 +901,8 @@
                     </div>
                 </div>
 
-            <!-- APIs - hidden, configurable from app only -->
-            <div id="apis-section" class="card" style="display:none">
+            <!-- APIs - advanced -->
+            <div id="apis-section" class="card advanced-section hidden">
                 <div class="collapsible-header collapsed" onclick="toggleCollapsible('apis')">
                     <h2 data-i18n="apisOptional">APIs (optional)</h2>
                     <span class="arrow">▼</span>
@@ -918,6 +922,83 @@
                         <label data-i18n="subdlKey">SubDL API Key</label>
                         <div class="api-desc"><span data-i18n="subdlDesc">Subtitles (alternative).</span> <a href="https://subdl.com/panel/api" target="_blank" data-i18n="getKey">Get a key</a></div>
                         <input type="text" id="api-subdl" placeholder="ex: abc789...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other settings - advanced -->
+            <div id="other-settings-section" class="card advanced-section hidden">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('other-settings')">
+                    <h2 data-i18n="otherSettings">Other settings</h2>
+                    <span class="arrow">▼</span>
+                </div>
+                <div id="other-settings-content" class="collapsible-content collapsed">
+                    <div class="form-group" style="margin-top:15px;">
+                        <label data-i18n="textSize">Text size</label>
+                        <select id="pref-text-size">
+                            <option value="">—</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="xlarge">X-Large</option>
+                            <option value="xxlarge">XX-Large</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subtitleSize">Subtitle size</label>
+                        <select id="pref-subtitle-size">
+                            <option value="">—</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="xlarge">X-Large</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="bufferPreset">Buffer preset</label>
+                        <select id="pref-buffer-preset">
+                            <option value="">—</option>
+                            <option value="low">Low latency</option>
+                            <option value="default">Default</option>
+                            <option value="high">High buffer</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="liveFormat">Live format</label>
+                        <select id="pref-live-format">
+                            <option value="">—</option>
+                            <option value="ts">TS (MPEG-TS)</option>
+                            <option value="m3u8">HLS (m3u8)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="cacheRefreshHours">Cache refresh (hours)</label>
+                        <input type="number" id="pref-cache-refresh" min="1" max="168" placeholder="24">
+                    </div>
+                    <div class="form-group">
+                        <label>Freebox</label>
+                        <div class="type-buttons">
+                            <button type="button" class="type-btn active" id="freebox-off-btn" onclick="toggleFreebox(false)" data-i18n="no">No</button>
+                            <button type="button" class="type-btn" id="freebox-on-btn" onclick="toggleFreebox(true)" data-i18n="yes">Yes</button>
+                        </div>
+                    </div>
+                    <div id="freebox-fields" class="hidden">
+                        <div class="form-group">
+                            <label data-i18n="freeboxHost">Freebox host</label>
+                            <input type="text" id="pref-freebox-host" placeholder="http://mafreebox.freebox.fr">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="freeboxAppToken">Freebox app token</label>
+                            <input type="text" id="pref-freebox-token" placeholder="token...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="hideSD">Hide SD streams</label>
+                        <div class="type-buttons">
+                            <button type="button" class="type-btn active" id="hide-sd-off-btn" onclick="toggleHideSD(false)" data-i18n="no">No</button>
+                            <button type="button" class="type-btn" id="hide-sd-on-btn" onclick="toggleHideSD(true)" data-i18n="yes">Yes</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1156,7 +1237,18 @@
                 installAndroid: 'Installer sur Android',
                 yourCode: 'Votre code de licence\u00A0:',
                 enterInSettings: "Entrez ce code dans l'app Paramètres > Licence",
-                noCodeFound: 'Aucune licence trouvée pour cet email. Veuillez patienter quelques minutes après votre don.'
+                noCodeFound: 'Aucune licence trouvée pour cet email. Veuillez patienter quelques minutes après votre don.',
+                advancedMode: 'Mode avancé',
+                hideAdvanced: 'Masquer le mode avancé',
+                otherSettings: 'Autres paramètres',
+                textSize: 'Taille du texte',
+                subtitleSize: 'Taille des sous-titres',
+                bufferPreset: 'Buffer',
+                liveFormat: 'Format live',
+                cacheRefreshHours: 'Rafraîchissement du cache (heures)',
+                freeboxHost: 'Hôte Freebox',
+                freeboxAppToken: 'Token Freebox',
+                hideSD: 'Masquer les flux SD'
             },
             en: {
                 tvCode: 'TV Code',
@@ -1245,7 +1337,18 @@
                 installAndroid: 'Install on Android',
                 yourCode: 'Your license code:',
                 enterInSettings: 'Enter this code in the app Settings > License',
-                noCodeFound: 'No license found for this email. Please allow a few minutes after your donation.'
+                noCodeFound: 'No license found for this email. Please allow a few minutes after your donation.',
+                advancedMode: 'Advanced mode',
+                hideAdvanced: 'Hide advanced mode',
+                otherSettings: 'Other settings',
+                textSize: 'Text size',
+                subtitleSize: 'Subtitle size',
+                bufferPreset: 'Buffer',
+                liveFormat: 'Live format',
+                cacheRefreshHours: 'Cache refresh (hours)',
+                freeboxHost: 'Freebox host',
+                freeboxAppToken: 'Freebox app token',
+                hideSD: 'Hide SD streams'
             },
             es: {
                 tvCode: 'Código TV',
@@ -2252,11 +2355,34 @@
         }
 
         var streamProxy = false;
+        var freeboxEnabled = false;
+        var hideSD = false;
+
+        function toggleAdvancedMode() {
+            var sections = document.querySelectorAll('.advanced-section');
+            var btn = document.getElementById('advanced-toggle');
+            var showing = sections[0] && !sections[0].classList.contains('hidden');
+            sections.forEach(function(s) { s.classList.toggle('hidden', showing); });
+            btn.textContent = showing ? t('advancedMode') : t('hideAdvanced');
+        }
 
         function toggleStreamProxy(enabled) {
             streamProxy = enabled;
             document.getElementById('stream-proxy-on-btn').classList.toggle('active', enabled);
             document.getElementById('stream-proxy-off-btn').classList.toggle('active', !enabled);
+        }
+
+        function toggleFreebox(enabled) {
+            freeboxEnabled = enabled;
+            document.getElementById('freebox-on-btn').classList.toggle('active', enabled);
+            document.getElementById('freebox-off-btn').classList.toggle('active', !enabled);
+            document.getElementById('freebox-fields').classList.toggle('hidden', !enabled);
+        }
+
+        function toggleHideSD(enabled) {
+            hideSD = enabled;
+            document.getElementById('hide-sd-on-btn').classList.toggle('active', enabled);
+            document.getElementById('hide-sd-off-btn').classList.toggle('active', !enabled);
         }
 
         function checkTTSAvailability() {
@@ -2300,6 +2426,43 @@
                 activePlaylistId: playlists[0].id,
                 locale: document.getElementById('page-locale').value
             };
+
+            var tmdb = document.getElementById('api-tmdb').value.trim();
+            if (tmdb) config.tmdbApiKey = tmdb;
+            var openSub = document.getElementById('api-opensubtitles').value.trim();
+            if (openSub) config.openSubtitlesApiKey = openSub;
+            var subdl = document.getElementById('api-subdl').value.trim();
+            if (subdl) config.subDLApiKey = subdl;
+            var proxyUrl = document.getElementById('pref-proxy-url').value.trim();
+            if (proxyUrl) config.proxyUrl = proxyUrl;
+            if (streamProxy) config.streamProxy = true;
+            var provLang = document.getElementById('pref-provider-lang').value;
+            if (provLang && provLang !== 'AUTO') config.providerLanguage = provLang;
+            var ttsRate = document.getElementById('pref-tts-rate').value;
+            if (parseInt(ttsRate)) config.ttsRate = parseInt(ttsRate);
+            var ttsVolume = document.getElementById('pref-tts-volume').value;
+            if (parseInt(ttsVolume)) config.ttsVolume = parseInt(ttsVolume);
+            var ttsPitch = document.getElementById('pref-tts-pitch').value;
+            if (parseInt(ttsPitch)) config.ttsPitch = parseInt(ttsPitch);
+            var textSize = document.getElementById('pref-text-size').value;
+            if (textSize) config.textSize = textSize;
+            var subtitleSize = document.getElementById('pref-subtitle-size').value;
+            if (subtitleSize) config.subtitleSize = subtitleSize;
+            var bufferPreset = document.getElementById('pref-buffer-preset').value;
+            if (bufferPreset) config.bufferPreset = bufferPreset;
+            var liveFormat = document.getElementById('pref-live-format').value;
+            if (liveFormat) config.liveFormat = liveFormat;
+            var cacheRefresh = document.getElementById('pref-cache-refresh').value;
+            if (cacheRefresh) config.cacheRefreshHours = parseInt(cacheRefresh);
+            if (freeboxEnabled) {
+                config.freeboxEnabled = true;
+                var fbHost = document.getElementById('pref-freebox-host').value.trim();
+                if (fbHost) config.freeboxHost = fbHost;
+                var fbToken = document.getElementById('pref-freebox-token').value.trim();
+                if (fbToken) config.freeboxAppToken = fbToken;
+            }
+            if (hideSD) config.hideSD = true;
+            if (categoryPatterns !== defaultKeywords) config.categoryPatterns = categoryPatterns;
 
             document.getElementById('error-msg').classList.add('hidden');
 

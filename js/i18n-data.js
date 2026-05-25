@@ -1575,7 +1575,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "رجوع",
                             "searchOpenSubtitles": "بحث OpenSubtitles...",
-                            "searchSubDL": "بحث SubDL..."
+                            "searchSubDL": "بحث SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "منذ يوم",
@@ -2149,7 +2156,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Zurück",
                             "searchOpenSubtitles": "OpenSubtitles durchsuchen...",
-                            "searchSubDL": "SubDL durchsuchen..."
+                            "searchSubDL": "SubDL durchsuchen...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "vor 1 Tag",
@@ -2722,8 +2736,15 @@ var I18nData = {
                     },
                     "subtitleSearch": {
                             "back": "Back",
+                            "language": "Language",
+                            "search": "Search",
                             "searchOpenSubtitles": "Search OpenSubtitles...",
-                            "searchSubDL": "Search SubDL..."
+                            "searchSubDL": "Search SubDL...",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 day ago",
@@ -3297,7 +3318,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Volver",
                             "searchOpenSubtitles": "Buscar OpenSubtitles...",
-                            "searchSubDL": "Buscar SubDL..."
+                            "searchSubDL": "Buscar SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "hace 1 día",
@@ -3870,8 +3898,15 @@ var I18nData = {
                     },
                     "subtitleSearch": {
                             "back": "Retour",
+                            "language": "Langue",
+                            "search": "Rechercher",
                             "searchOpenSubtitles": "Rechercher OpenSubtitles...",
-                            "searchSubDL": "Rechercher SubDL..."
+                            "searchSubDL": "Rechercher SubDL...",
+                            "type": "Type",
+                            "typeAll": "Tous",
+                            "typeForced": "Forcés / Parties étrangères",
+                            "typeFull": "Complets",
+                            "typeSDH": "SDH (malentendants)"
                     },
                     "time": {
                             "dayAgo": "il y a 1 jour",
@@ -4445,7 +4480,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Indietro",
                             "searchOpenSubtitles": "Cerca OpenSubtitles...",
-                            "searchSubDL": "Cerca SubDL..."
+                            "searchSubDL": "Cerca SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 giorno fa",
@@ -5019,7 +5061,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Terug",
                             "searchOpenSubtitles": "Zoek OpenSubtitles...",
-                            "searchSubDL": "Zoek SubDL..."
+                            "searchSubDL": "Zoek SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 dag geleden",
@@ -5593,7 +5642,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Wstecz",
                             "searchOpenSubtitles": "Szukaj OpenSubtitles...",
-                            "searchSubDL": "Szukaj SubDL..."
+                            "searchSubDL": "Szukaj SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 dzień temu",
@@ -6167,7 +6223,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Voltar",
                             "searchOpenSubtitles": "Pesquisar OpenSubtitles...",
-                            "searchSubDL": "Pesquisar SubDL..."
+                            "searchSubDL": "Pesquisar SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "há 1 dia",
@@ -6741,7 +6804,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Назад",
                             "searchOpenSubtitles": "Поиск OpenSubtitles...",
-                            "searchSubDL": "Поиск SubDL..."
+                            "searchSubDL": "Поиск SubDL...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 день назад",
@@ -7315,7 +7385,14 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Geri",
                             "searchOpenSubtitles": "OpenSubtitles ara...",
-                            "searchSubDL": "SubDL ara..."
+                            "searchSubDL": "SubDL ara...",
+                            "language": "Language",
+                            "search": "Search",
+                            "type": "Type",
+                            "typeAll": "All",
+                            "typeForced": "Forced / Foreign parts",
+                            "typeFull": "Full",
+                            "typeSDH": "SDH (hearing impaired)"
                     },
                     "time": {
                             "dayAgo": "1 gün önce",

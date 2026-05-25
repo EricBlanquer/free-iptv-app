@@ -130,7 +130,8 @@ var OpenSubtitles = (function() {
         if (params.season_number !== undefined) queryParts.push('season_number=' + params.season_number);
         if (params.episode_number !== undefined) queryParts.push('episode_number=' + params.episode_number);
         if (params.type) queryParts.push('type=' + encodeURIComponent(params.type));
-        // Languages (don't encode comma, don't map to ISO 639-2B)
+        if (params.foreign_parts_only) queryParts.push('foreign_parts_only=' + encodeURIComponent(params.foreign_parts_only));
+        if (params.hearing_impaired) queryParts.push('hearing_impaired=' + encodeURIComponent(params.hearing_impaired));
         var langs = params.languages || 'fr,en';
         queryParts.push('languages=' + langs);
         var endpoint = '/subtitles?' + queryParts.join('&');

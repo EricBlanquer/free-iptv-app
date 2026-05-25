@@ -600,7 +600,14 @@
   "subtitleSearch": {
     "back": "Geri",
     "searchOpenSubtitles": "OpenSubtitles ara...",
-    "searchSubDL": "SubDL ara..."
+    "searchSubDL": "SubDL ara...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 gün önce",

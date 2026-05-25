@@ -595,7 +595,14 @@
   "subtitleSearch": {
     "back": "Indietro",
     "searchOpenSubtitles": "Cerca OpenSubtitles...",
-    "searchSubDL": "Cerca SubDL..."
+    "searchSubDL": "Cerca SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 giorno fa",

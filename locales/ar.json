@@ -603,7 +603,14 @@
   "subtitleSearch": {
     "back": "رجوع",
     "searchOpenSubtitles": "بحث OpenSubtitles...",
-    "searchSubDL": "بحث SubDL..."
+    "searchSubDL": "بحث SubDL...",
+    "language": "Language",
+    "search": "Search",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "منذ يوم",

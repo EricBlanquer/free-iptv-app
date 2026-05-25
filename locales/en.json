@@ -598,8 +598,15 @@
   },
   "subtitleSearch": {
     "back": "Back",
+    "language": "Language",
+    "search": "Search",
     "searchOpenSubtitles": "Search OpenSubtitles...",
-    "searchSubDL": "Search SubDL..."
+    "searchSubDL": "Search SubDL...",
+    "type": "Type",
+    "typeAll": "All",
+    "typeForced": "Forced / Foreign parts",
+    "typeFull": "Full",
+    "typeSDH": "SDH (hearing impaired)"
   },
   "time": {
     "dayAgo": "1 day ago",
