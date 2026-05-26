@@ -604,6 +604,8 @@
   "subtitleSearch": {
     "back": "Retour",
     "language": "Langue",
+    "noResults": "Aucun sous-titre trouvé",
+    "reactivate": "Réactiver le sous-titre externe",
     "search": "Rechercher",
     "searchOpenSubtitles": "Rechercher OpenSubtitles...",
     "searchSubDL": "Rechercher SubDL...",

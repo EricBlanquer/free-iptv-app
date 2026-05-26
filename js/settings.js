@@ -1315,6 +1315,11 @@ IPTVApp.prototype.findSimilarPlaylist = function(newPlaylist) {
                 return i;
             }
         }
+        else if (newPlaylist.type === 'jellyfin') {
+            if (existing.serverUrl === newPlaylist.serverUrl && existing.username === newPlaylist.username) {
+                return i;
+            }
+        }
         else if (newPlaylist.type === 'm3u') {
             if (existing.url === newPlaylist.url) {
                 return i;

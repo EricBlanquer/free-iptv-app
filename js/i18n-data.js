@@ -1582,7 +1582,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "منذ يوم",
@@ -2163,7 +2165,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "vor 1 Tag",
@@ -2737,6 +2741,8 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Back",
                             "language": "Language",
+                            "noResults": "No subtitles found",
+                            "reactivate": "Reactivate external subtitle",
                             "search": "Search",
                             "searchOpenSubtitles": "Search OpenSubtitles...",
                             "searchSubDL": "Search SubDL...",
@@ -3325,7 +3331,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "hace 1 día",
@@ -3899,6 +3907,8 @@ var I18nData = {
                     "subtitleSearch": {
                             "back": "Retour",
                             "language": "Langue",
+                            "noResults": "Aucun sous-titre trouvé",
+                            "reactivate": "Réactiver le sous-titre externe",
                             "search": "Rechercher",
                             "searchOpenSubtitles": "Rechercher OpenSubtitles...",
                             "searchSubDL": "Rechercher SubDL...",
@@ -4487,7 +4497,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "1 giorno fa",
@@ -5068,7 +5080,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "1 dag geleden",
@@ -5649,7 +5663,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "1 dzień temu",
@@ -6230,7 +6246,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "há 1 dia",
@@ -6811,7 +6829,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "1 день назад",
@@ -7392,7 +7412,9 @@ var I18nData = {
                             "typeAll": "All",
                             "typeForced": "Forced / Foreign parts",
                             "typeFull": "Full",
-                            "typeSDH": "SDH (hearing impaired)"
+                            "typeSDH": "SDH (hearing impaired)",
+                            "reactivate": "Reactivate external subtitle",
+                            "noResults": "No subtitles found"
                     },
                     "time": {
                             "dayAgo": "1 gün önce",

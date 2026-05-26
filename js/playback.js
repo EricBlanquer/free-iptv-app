@@ -2432,6 +2432,18 @@ IPTVApp.prototype.showTrackSelectionModal = function(type) {
         if (this.currentSubtitleIndex === -1 || this.currentSubtitleIndex === undefined) noSubItem.classList.add('selected');
         subtitleList.appendChild(noSubItem);
         this.trackModalItems.push(noSubItem);
+        if (this.externalSubtitleContent && this.currentSubtitleIndex !== -2 && this._subtitleIndexBeforeDisable === -2) {
+            var reactivateItem = document.createElement('div');
+            reactivateItem.className = 'track-item focusable';
+            reactivateItem.dataset.type = 'reactivate-external';
+            var reIcon = document.createElement('span');
+            reIcon.className = 'material-symbols-outlined';
+            reIcon.textContent = 'subtitles';
+            reactivateItem.appendChild(reIcon);
+            reactivateItem.appendChild(document.createTextNode(' ' + I18n.t('subtitleSearch.reactivate', 'Reactivate external subtitle')));
+            subtitleList.appendChild(reactivateItem);
+            this.trackModalItems.push(reactivateItem);
+        }
         for (var j = 0; j < tracks.subtitle.length; j++) {
             var subItem = document.createElement('div');
             subItem.className = 'track-item focusable';
@@ -2497,7 +2509,6 @@ IPTVApp.prototype.confirmTrackSelection = function() {
         if (index === -1) {
             this.currentSubtitleIndex = -1;
             this._subtitleManuallySelected = false;
-            this.externalSubtitles = null;
             this.lastExternalSubtitle = null;
             this.player.hideSubtitles();
             this.saveSeriesSubtitlePref('disabled');
@@ -2513,6 +2524,21 @@ IPTVApp.prototype.confirmTrackSelection = function() {
             this.saveSeriesSubtitlePref(trackLang.toLowerCase());
             document.getElementById('player-subtitle-label').textContent = item.textContent;
         }
+    }
+    else if (type === 'reactivate-external') {
+        if (!this.externalSubtitles) {
+            this.parseAndLoadSubtitle(this.externalSubtitleContent);
+        }
+        this.currentSubtitleIndex = -2;
+        this._subtitleIndexBeforeDisable = -2;
+        this._subtitleManuallySelected = true;
+        this.player.subtitlesEnabled = true;
+        this.player.hideSubtitles();
+        document.getElementById('player-subtitle-label').textContent = I18n.t('player.external', 'External');
+        this.hideTracksModal();
+        this.focusArea = 'player';
+        this.showPlayerOverlay(true);
+        return;
     }
     else if (type === 'subdl') {
         this.showSubtitleFilterModal('subdl');
@@ -2677,10 +2703,12 @@ IPTVApp.prototype.searchOpenSubtitles = function() {
         window.log('OpenSubtitles.search result err=' + err + ' count=' + (results ? results.length : 0));
         if (err) {
             self.showLoading(false);
+            self.showToast(I18n.t('subtitleSearch.noResults', 'No subtitles found'), 3000);
             return;
         }
         if (!results || results.length === 0) {
             self.showLoading(false);
+            self.showToast(I18n.t('subtitleSearch.noResults', 'No subtitles found'), 3000);
             return;
         }
         if (filterType === 'full') {
@@ -2689,6 +2717,10 @@ IPTVApp.prototype.searchOpenSubtitles = function() {
             results = results.filter(function(s) { return s.foreign_parts_only; });
         } else if (filterType === 'sdh') {
             results = results.filter(function(s) { return s.hearing_impaired; });
+        }
+        if (results.length === 0) {
+            self.showToast(I18n.t('subtitleSearch.noResults', 'No subtitles found'), 3000);
+            return;
         }
         self.showOpenSubtitlesResults(results);
     });
@@ -2722,10 +2754,12 @@ IPTVApp.prototype.searchSubDL = function() {
         window.log('SubDL.search result err=' + err + ' count=' + (results ? results.length : 0));
         if (err) {
             self.showLoading(false);
+            self.showToast(I18n.t('subtitleSearch.noResults', 'No subtitles found'), 3000);
             return;
         }
         if (!results || results.length === 0) {
             self.showLoading(false);
+            self.showToast(I18n.t('subtitleSearch.noResults', 'No subtitles found'), 3000);
             return;
         }
         if (filterType === 'full') {
@@ -2954,8 +2988,11 @@ IPTVApp.prototype.adjustSubtitleOffset = function(deltaMs) {
     if (this.currentSubtitleIndex >= 0 && this.player) {
         this.player.setSubtitleSync(this.subtitleOffset);
     }
+    this.lastExternalSubtitle = null;
+    if (this.currentSubtitleIndex === -2 && this.player) {
+        this.displayExternalSubtitle(this.player.currentTime || 0);
+    }
     this._updateSubtitleTimeline();
-    this._showNextSubtitlePreview();
 };
 
 IPTVApp.prototype._showSubtitleTimeline = function() {
@@ -3031,11 +3068,17 @@ IPTVApp.prototype._updateSubtitleTimeline = function() {
         this._markerEl.className = 'st-line st-marker';
     }
     if (this._markerEl.parentNode) this._markerEl.parentNode.removeChild(this._markerEl);
+    var scrollTarget = null;
     if (isInGap && activeIdx >= 0 && this._timelineEls[activeIdx]) {
         this._timelineEls[activeIdx].el.parentNode.insertBefore(this._markerEl, this._timelineEls[activeIdx].el);
-        this._markerEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        scrollTarget = this._markerEl;
     } else if (!isInGap && this._timelineEls[activeIdx]) {
-        this._timelineEls[activeIdx].el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        scrollTarget = this._timelineEls[activeIdx].el;
+    }
+    if (scrollTarget) {
+        var panel = document.getElementById('sub-timeline-panel');
+        var targetTop = scrollTarget.offsetTop - panel.offsetTop;
+        panel.scrollTop = targetTop - panel.clientHeight / 2;
     }
 };
 

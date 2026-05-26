@@ -608,7 +608,9 @@
     "typeAll": "All",
     "typeForced": "Forced / Foreign parts",
     "typeFull": "Full",
-    "typeSDH": "SDH (hearing impaired)"
+    "typeSDH": "SDH (hearing impaired)",
+    "reactivate": "Reactivate external subtitle",
+    "noResults": "No subtitles found"
   },
   "time": {
     "dayAgo": "1 день назад",

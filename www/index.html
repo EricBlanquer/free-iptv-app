@@ -689,13 +689,10 @@
             <div id="add-playlist-form" class="card">
                 <h2 id="form-title" data-i18n="addPlaylist">Add a playlist</h2>
                 <div class="form-group">
-                    <label data-i18n="nameOptional">Name (optional)</label>
-                    <input type="text" id="pl-name" data-i18n-placeholder="myPlaylist">
-                </div>
-                <div class="form-group">
                     <label data-i18n="type">Type</label>
                     <div class="type-buttons">
                         <button type="button" class="type-btn active" data-type="provider" onclick="selectType('provider')">API Server</button>
+                        <button type="button" class="type-btn" data-type="jellyfin" onclick="selectType('jellyfin')">Jellyfin</button>
                         <button type="button" class="type-btn" data-type="m3u" onclick="selectType('m3u')">URL M3U</button>
                     </div>
                 </div>
@@ -713,22 +710,39 @@
                         <input type="text" id="pl-password" placeholder="password">
                     </div>
                 </div>
+                <div id="jellyfin-fields" class="hidden">
+                    <div class="form-group">
+                        <label data-i18n="serverUrl">Server URL</label>
+                        <input type="text" id="pl-jf-server" placeholder="http://192.168.1.x:8096">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="username">Username</label>
+                        <input type="text" id="pl-jf-username" placeholder="username">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="password">Password</label>
+                        <input type="text" id="pl-jf-password" placeholder="password">
+                    </div>
+                </div>
                 <div id="m3u-fields" class="hidden">
-                    <div class="warning-hint" data-i18n="m3uWarning">Prefer API Server if available. M3U only supports live TV and may have compatibility issues.</div>
                     <div class="form-group">
                         <label data-i18n="m3uUrl">URL M3U</label>
                         <input type="text" id="pl-m3u" placeholder="http://example.com/playlist.m3u">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label data-i18n="nameOptional">Name (optional)</label>
+                    <input type="text" id="pl-name" data-i18n-placeholder="myPlaylist">
+                </div>
                 <button class="btn btn-secondary" onclick="saveAndAddAnother()" style="width:100%;" data-i18n="addAnother">+ Add another playlist</button>
             </div>
 
-            <div class="advanced-toggle-row" style="text-align:center; margin-bottom:20px;">
-                <button type="button" class="btn btn-secondary" id="advanced-toggle" onclick="toggleAdvancedMode()" data-i18n="advancedMode">Advanced mode</button>
+            <div style="text-align:center; margin-bottom:20px;">
+                <span id="advanced-toggle" onclick="toggleAdvancedMode()" style="color:#666; cursor:pointer; font-size:13px; text-decoration:underline;" data-i18n="advancedMode">Advanced mode</span>
             </div>
 
-            <!-- VOD Filter - advanced -->
-            <div id="vod-filter-section" class="card advanced-section hidden">
+            <!-- VOD Filter - internal only -->
+            <div id="vod-filter-section" class="card hidden" style="display:none">
                 <div id="vod-filter-content" class="collapsible-content collapsed">
                     <select id="pref-provider-lang">
                         <option value="ALL">All languages</option>
@@ -737,8 +751,8 @@
                 </div>
             </div>
 
-            <!-- VOD Categories - advanced -->
-            <div id="categories-section" class="card advanced-section hidden">
+            <!-- VOD Categories - shown by initCategories when playlists exist -->
+            <div id="categories-section" class="card hidden" style="display:none">
                 <div class="collapsible-header collapsed" onclick="toggleCollapsible('categories')">
                     <h2 data-i18n="categoriesTitle">VOD Categories</h2>
                     <span class="arrow">▼</span>
@@ -1162,7 +1176,6 @@
                 serverUrl: 'URL du serveur',
                 username: 'Identifiant',
                 password: 'Mot de passe',
-                m3uWarning: 'Préférez Serveur API si disponible. M3U ne supporte que la TV en direct et peut poser des problèmes de compatibilité.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Ajouter une autre playlist',
                 preferences: 'Préférences',
@@ -1262,7 +1275,6 @@
                 serverUrl: 'Server URL',
                 username: 'Username',
                 password: 'Password',
-                m3uWarning: 'Prefer Serveur API if available. M3U only supports live TV and may have compatibility issues.',
                 m3uUrl: 'M3U URL',
                 addAnother: '+ Add another playlist',
                 preferences: 'Preferences',
@@ -1362,7 +1374,6 @@
                 serverUrl: 'URL del servidor',
                 username: 'Usuario',
                 password: 'Contraseña',
-                m3uWarning: 'Prefiera Serveur API si está disponible. M3U solo soporta TV en vivo y puede tener problemas de compatibilidad.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Agregar otra playlist',
                 preferences: 'Preferencias',
@@ -1451,7 +1462,6 @@
                 serverUrl: 'Server-URL',
                 username: 'Benutzername',
                 password: 'Passwort',
-                m3uWarning: 'Bevorzugen Sie Serveur API, falls verfügbar. M3U unterstützt nur Live-TV und kann Kompatibilitätsprobleme haben.',
                 m3uUrl: 'M3U-URL',
                 addAnother: '+ Weitere Playlist hinzufügen',
                 preferences: 'Einstellungen',
@@ -1540,7 +1550,6 @@
                 serverUrl: 'URL del server',
                 username: 'Nome utente',
                 password: 'Password',
-                m3uWarning: 'Preferisci Serveur API se disponibile. M3U supporta solo TV in diretta e potrebbe avere problemi di compatibilità.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Aggiungi un\'altra playlist',
                 preferences: 'Preferenze',
@@ -1629,7 +1638,6 @@
                 serverUrl: 'URL do servidor',
                 username: 'Usuário',
                 password: 'Senha',
-                m3uWarning: 'Prefira Serveur API se disponível. M3U suporta apenas TV ao vivo e pode ter problemas de compatibilidade.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Adicionar outra playlist',
                 preferences: 'Preferências',
@@ -1718,7 +1726,6 @@
                 serverUrl: 'Server-URL',
                 username: 'Gebruikersnaam',
                 password: 'Wachtwoord',
-                m3uWarning: 'Geef de voorkeur aan Serveur API indien beschikbaar. M3U ondersteunt alleen live TV en kan compatibiliteitsproblemen hebben.',
                 m3uUrl: 'M3U-URL',
                 addAnother: '+ Nog een afspeellijst toevoegen',
                 preferences: 'Voorkeuren',
@@ -1807,7 +1814,6 @@
                 serverUrl: 'URL serwera',
                 username: 'Nazwa użytkownika',
                 password: 'Hasło',
-                m3uWarning: 'Preferuj Serveur API, jeśli dostępne. M3U obsługuje tylko telewizję na żywo i może mieć problemy z kompatybilnością.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Dodaj kolejną playlistę',
                 preferences: 'Preferencje',
@@ -1896,7 +1902,6 @@
                 serverUrl: 'URL сервера',
                 username: 'Имя пользователя',
                 password: 'Пароль',
-                m3uWarning: 'Предпочтительно Serveur API, если доступно. M3U поддерживает только прямой эфир и может иметь проблемы совместимости.',
                 m3uUrl: 'URL M3U',
                 addAnother: '+ Добавить еще плейлист',
                 preferences: 'Настройки',
@@ -1985,7 +1990,6 @@
                 serverUrl: 'Sunucu URL',
                 username: 'Kullanıcı adı',
                 password: 'Şifre',
-                m3uWarning: 'Varsa Serveur API tercih edin. M3U yalnızca canlı TV destekler ve uyumluluk sorunları olabilir.',
                 m3uUrl: 'M3U URL',
                 addAnother: '+ Başka oynatma listesi ekle',
                 preferences: 'Tercihler',
@@ -2074,7 +2078,6 @@
                 serverUrl: 'رابط الخادم',
                 username: 'اسم المستخدم',
                 password: 'كلمة المرور',
-                m3uWarning: 'يفضل استخدام Serveur API إذا كان متاحاً. M3U يدعم فقط البث المباشر وقد يواجه مشاكل توافق.',
                 m3uUrl: 'رابط M3U',
                 addAnother: '+ إضافة قائمة تشغيل أخرى',
                 preferences: 'التفضيلات',
@@ -2240,6 +2243,7 @@
                 btn.classList.toggle('active', btn.dataset.type === type);
             });
             document.getElementById('provider-fields').classList.toggle('hidden', type !== 'provider');
+            document.getElementById('jellyfin-fields').classList.toggle('hidden', type !== 'jellyfin');
             document.getElementById('m3u-fields').classList.toggle('hidden', type !== 'm3u');
         }
 
@@ -2248,16 +2252,23 @@
             var p = playlists[index];
             document.getElementById('form-title').textContent = t('editPlaylist');
             document.getElementById('pl-name').value = p.name || '';
+            document.getElementById('pl-server').value = '';
+            document.getElementById('pl-username').value = '';
+            document.getElementById('pl-password').value = '';
+            document.getElementById('pl-jf-server').value = '';
+            document.getElementById('pl-jf-username').value = '';
+            document.getElementById('pl-jf-password').value = '';
+            document.getElementById('pl-m3u').value = '';
             if (p.type === 'provider') {
                 document.getElementById('pl-server').value = p.serverUrl || '';
                 document.getElementById('pl-username').value = p.username || '';
                 document.getElementById('pl-password').value = p.password || '';
-                document.getElementById('pl-m3u').value = '';
+            } else if (p.type === 'jellyfin') {
+                document.getElementById('pl-jf-server').value = p.serverUrl || '';
+                document.getElementById('pl-jf-username').value = p.username || '';
+                document.getElementById('pl-jf-password').value = p.password || '';
             } else {
                 document.getElementById('pl-m3u').value = p.url || '';
-                document.getElementById('pl-server').value = '';
-                document.getElementById('pl-username').value = '';
-                document.getElementById('pl-password').value = '';
             }
             selectType(p.type);
             document.getElementById('add-playlist-form').scrollIntoView({ behavior: 'smooth' });
@@ -2276,6 +2287,9 @@
             var serverUrl = document.getElementById('pl-server').value.trim();
             var username = document.getElementById('pl-username').value.trim();
             var password = document.getElementById('pl-password').value.trim();
+            var jfServer = document.getElementById('pl-jf-server').value.trim();
+            var jfUsername = document.getElementById('pl-jf-username').value.trim();
+            var jfPassword = document.getElementById('pl-jf-password').value.trim();
             var m3uUrl = document.getElementById('pl-m3u').value.trim();
 
             var hasData = false;
@@ -2285,12 +2299,23 @@
                     if (!silent) alert(t('fillProviderFields'));
                     return false;
                 }
+            } else if (type === 'jellyfin') {
+                hasData = jfServer || jfUsername || jfPassword;
+                if (hasData && (!jfServer || !jfUsername || !jfPassword)) {
+                    if (!silent) alert(t('fillProviderFields'));
+                    return false;
+                }
             } else {
                 hasData = !!m3uUrl;
             }
 
             if (!hasData) {
                 return true;
+            }
+
+            if (!name) {
+                var url = type === 'provider' ? serverUrl : (type === 'jellyfin' ? jfServer : m3uUrl);
+                try { name = new URL(url).hostname.replace(/^www\./, ''); } catch (e) { name = url; }
             }
 
             var playlist = {
@@ -2303,6 +2328,10 @@
                 playlist.serverUrl = serverUrl;
                 playlist.username = username;
                 playlist.password = password;
+            } else if (type === 'jellyfin') {
+                playlist.serverUrl = jfServer;
+                playlist.username = jfUsername;
+                playlist.password = jfPassword;
             } else {
                 playlist.url = m3uUrl;
             }
@@ -2328,6 +2357,9 @@
             document.getElementById('pl-server').value = '';
             document.getElementById('pl-username').value = '';
             document.getElementById('pl-password').value = '';
+            document.getElementById('pl-jf-server').value = '';
+            document.getElementById('pl-jf-username').value = '';
+            document.getElementById('pl-jf-password').value = '';
             document.getElementById('pl-m3u').value = '';
             selectType('provider');
         }
@@ -2340,7 +2372,7 @@
             } else {
                 listCard.classList.remove('hidden');
                 playlists.forEach(function(p, i) {
-                    var typeLabel = p.type === 'provider' ? 'Serveur API' : 'M3U';
+                    var typeLabel = p.type === 'provider' ? 'Serveur API' : (p.type === 'jellyfin' ? 'Jellyfin' : 'M3U');
                     html += '<div class="playlist-item">';
                     html += '<div class="info"><div class="name">' + (p.name || t('playlist') + ' ' + (i+1)) + '</div>';
                     html += '<div class="type">' + typeLabel + '</div></div>';
@@ -2405,6 +2437,15 @@
         }
 
         document.getElementById('pref-proxy-url').addEventListener('change', checkTTSAvailability);
+
+        function suggestName(url) {
+            var nameField = document.getElementById('pl-name');
+            if (nameField.value.trim()) return;
+            try { nameField.value = new URL(url).hostname.replace(/^www\./, ''); } catch (e) {}
+        }
+        document.getElementById('pl-server').addEventListener('input', function() { suggestName(this.value); });
+        document.getElementById('pl-jf-server').addEventListener('input', function() { suggestName(this.value); });
+        document.getElementById('pl-m3u').addEventListener('input', function() { suggestName(this.value); });
 
         function updateRangeLabel(id) {
             var input = document.getElementById('pref-' + id);

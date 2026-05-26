@@ -599,6 +599,8 @@
   "subtitleSearch": {
     "back": "Back",
     "language": "Language",
+    "noResults": "No subtitles found",
+    "reactivate": "Reactivate external subtitle",
     "search": "Search",
     "searchOpenSubtitles": "Search OpenSubtitles...",
     "searchSubDL": "Search SubDL...",
