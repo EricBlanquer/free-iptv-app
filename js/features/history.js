@@ -250,10 +250,12 @@ IPTVApp.prototype.showContinueScreen = function() {
     this.resetFilters();
     var self = this;
     var minMs = (this.settings.minProgressMinutes || 2) * 60000;
+    var activePlaylistId = this.settings.activePlaylistId;
     var continueItems = [];
     for (var i = 0; i < this.watchHistory.length; i++) {
         var item = this.watchHistory[i];
         if (item.playlistId === '_fb_') continue;
+        if (activePlaylistId && item.playlistId && item.playlistId !== activePlaylistId) continue;
         if ((item.type === 'vod' || item.type === 'movie') && !item.watched && item.position >= minMs) {
             continueItems.push({
                 id: item.id,
@@ -378,10 +380,12 @@ IPTVApp.prototype.showHistoryScreen = function() {
     this.setHidden('search-filters', true);
     this.setHidden('rating-filters', true);
     this.setHidden('sort-filters', true);
+    var activePlaylistId = this.settings.activePlaylistId;
     var historyItems = [];
     var seen = {};
     for (var i = 0; i < this.watchHistory.length; i++) {
         var item = this.watchHistory[i];
+        if (activePlaylistId && item.playlistId && item.playlistId !== activePlaylistId) continue;
         var dayKey = this.getHistoryDayKey(item.date || 0);
         var itemKey = (item.playlistId || '') + '_' + item.id + '_' + dayKey;
         if (seen[itemKey]) continue;

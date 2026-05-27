@@ -4488,12 +4488,14 @@ IPTVApp.prototype.getFilteredContinueHistory = function(section) {
     var self = this;
     var minMs = (this.settings.minProgressMinutes || 2) * 60000;
     section = section || this.currentSection;
+    var activePlaylistId = this.settings.activePlaylistId;
     var vodSubsections = ['sport', 'entertainment', 'manga'];
     var isVodSubsection = vodSubsections.indexOf(section) !== -1;
     var isCustom = section.indexOf('custom_') === 0;
     var seenSeries = {};
     return this.watchHistory.filter(function(item) {
         if (item.playlistId === '_fb_') return false;
+        if (activePlaylistId && item.playlistId && item.playlistId !== activePlaylistId) return false;
         if (item.watched) return false;
         if (item.type !== 'series' && (!item.position || item.position < minMs)) return false;
         if (item.type === 'series') {
@@ -4519,10 +4521,12 @@ IPTVApp.prototype.getContinueCount = function() {
 
 IPTVApp.prototype.getFavoritesCount = function() {
     var section = this.currentSection;
+    var activePlaylistId = this.settings.activePlaylistId;
     var vodSubsections = ['sport', 'entertainment', 'manga'];
     var isVodSubsection = vodSubsections.indexOf(section) !== -1;
     var isCustom = section.indexOf('custom_') === 0;
     return this.favorites.filter(function(fav) {
+        if (activePlaylistId && fav._playlistId && fav._playlistId !== activePlaylistId) return false;
         var favType = fav._type || 'vod';
         var favSection = fav._section || favType;
         if (isVodSubsection || isCustom) return favSection === section;

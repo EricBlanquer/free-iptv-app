@@ -23,12 +23,14 @@ IPTVApp.prototype.showFavoritesInGrid = function() {
     this._gridRowHeight = 0;
     var self = this;
     var section = this.currentSection;
+    var activePlaylistId = this.settings.activePlaylistId;
     this.filteredFavoriteIndices = [];
     var filteredFavorites = [];
     var vodSubsections = ['sport', 'entertainment', 'manga'];
     var isVodSubsection = vodSubsections.indexOf(section) !== -1;
     var isCustom = section.indexOf('custom_') === 0;
     this.favorites.forEach(function(fav, idx) {
+        if (activePlaylistId && fav._playlistId && fav._playlistId !== activePlaylistId) return;
         var favType = fav._type || 'vod';
         var favSection = fav._section || favType;
         var match = false;
