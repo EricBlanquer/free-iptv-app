@@ -1,0 +1,34 @@
+Title: Free IPTV Player
+Short description: Live-TV, Filme und Serien von Ihren M3U-Playlists auf jedem Android-Gerät streamen.
+Full description:
+Free IPTV ist ein leistungsstarker Mediaplayer für Android TV, Smartphones und Tablets. Streamen Sie Ihre persönlichen IPTV-Inhalte mit einer modernen, benutzerfreundlichen Oberfläche, die für Touch- und Fernbedienungsnavigation optimiert ist.
+
+FUNKTIONEN:
+• Live-TV-Kanäle mit EPG (Elektronischer Programmführer)
+• Filme (VOD) mit Posterbildern von TMDB
+• TV-Serien mit Staffel- und Episodennavigation
+• Mehrsprachige Audio- und Untertitelunterstützung (eingebettet + extern über OpenSubtitles / SubDL)
+• Wiedergabe fortsetzen — dort weiterschauen, wo Sie aufgehört haben
+• Favoriten, Bewertungen und Wiedergabeverlauf
+• Raster- und Listenansicht
+• Intelligente Suche und Kategoriefilter
+• Stream-Proxy-Unterstützung für VPN-/Routing-Konfigurationen
+• Fernkonfiguration über jeden Webbrowser
+• 11 Oberflächensprachen: Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch, Niederländisch, Polnisch, Russisch, Arabisch, Türkisch
+• Optimiert für Android TV mit D-Pad-Navigation
+
+UNTERSTÜTZTE FORMATE:
+• M3U / M3U8 Playlists
+• Xtream Codes API
+• Jellyfin-Medienserver
+• HLS- und DASH-Streaming (mit ExoPlayer)
+
+DATENSCHUTZ:
+• Keine Werbung, kein Tracking, keine Datenerfassung
+• Alle Einstellungen lokal auf Ihrem Gerät gespeichert
+• Datenschutzrichtlinie: https://iptv.blanquer.org/privacy.html
+
+HAFTUNGSAUSSCHLUSS:
+Diese Anwendung stellt keine Inhalte bereit. Die Nutzer müssen ihre eigenen IPTV-Playlists konfigurieren und sind allein dafür verantwortlich, sicherzustellen, dass sie das Recht haben, auf solche Inhalte zuzugreifen.
+
+Voraussetzungen: Internetverbindung, M3U-Playlist oder Xtream Codes / Jellyfin-Server

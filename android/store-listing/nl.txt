@@ -1,0 +1,34 @@
+Title: Free IPTV Player
+Short description: Bekijk live TV, films en series van je M3U-afspeellijsten op elk Android-apparaat.
+Full description:
+Free IPTV is een krachtige mediaspeler voor Android TV, telefoons en tablets. Stream je persoonlijke IPTV-content met een moderne, gebruiksvriendelijke interface, ontworpen voor zowel touch- als afstandsbedieningsnavigatie.
+
+FUNCTIES:
+• Live TV-zenders met EPG (Elektronische Programmagids)
+• Films (VOD) met posterafbeeldingen van TMDB
+• TV-series met seizoen- en afleveringsnavigatie
+• Ondersteuning voor meerdere audiotracks en ondertitels (ingebed + extern via OpenSubtitles / SubDL)
+• Verder kijken — hervat het afspelen waar je was gebleven
+• Favorieten, beoordelingen en kijkgeschiedenis
+• Raster- en lijstweergave
+• Slim zoeken en categoriefilters
+• Stream proxy-ondersteuning voor VPN-/routeringsconfiguraties
+• Configuratie op afstand vanuit elke webbrowser
+• 11 interfacetalen: Nederlands, Engels, Frans, Duits, Spaans, Italiaans, Portugees, Pools, Russisch, Arabisch, Turks
+• Geoptimaliseerd voor Android TV met D-pad-navigatie
+
+ONDERSTEUNDE FORMATEN:
+• M3U / M3U8 afspeellijsten
+• Xtream Codes API
+• Jellyfin-mediaservers
+• HLS- en DASH-streaming (met ExoPlayer)
+
+PRIVACY:
+• Geen advertenties, geen tracking, geen gegevensverzameling
+• Alle instellingen lokaal opgeslagen op je apparaat
+• Privacybeleid: https://iptv.blanquer.org/privacy.html
+
+DISCLAIMER:
+Deze applicatie biedt geen content aan. Gebruikers moeten hun eigen IPTV-afspeellijsten configureren en zijn zelf verantwoordelijk om te zorgen dat ze het wettelijke recht hebben om toegang te krijgen tot dergelijke content.
+
+Vereisten: internetverbinding, M3U-afspeellijst of Xtream Codes / Jellyfin-server
