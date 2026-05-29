@@ -242,7 +242,7 @@ IPTVApp.prototype.showContinueInGrid = function() {
         };
         return self._enrichHistoryStream(virtual, item);
     });
-    this.showStreamGrid(streams, 'history');
+    this.showStreamGrid(streams, 'history', true);
 };
 
 IPTVApp.prototype.showContinueScreen = function() {

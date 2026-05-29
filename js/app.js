@@ -68,7 +68,10 @@ class IPTVApp {
             series: { categories: [], streams: [] }
         };
         this.cacheLoading = false;
-        this.gridColumns = 5;
+        this.gridColumnsNarrow = 5;
+        this.gridColumnsWide = 6;
+        this.gridColumns = this.gridColumnsNarrow;
+        this._categoriesCollapsed = false;
         this.overlayTimer = null;
         this.selectedStream = null;
         this.currentStreams = [];

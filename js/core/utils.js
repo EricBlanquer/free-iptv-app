@@ -98,13 +98,19 @@ IPTVApp.prototype.showEmptyMessage = function(container, messageKey, defaultText
     container.innerHTML = '<div class="empty-message">' + I18n.t(messageKey, defaultText) + '</div>';
 };
 
-IPTVApp.prototype.showStreamGrid = function(streams, streamType) {
+IPTVApp.prototype.showStreamGrid = function(streams, streamType, keepFocus) {
     this.originalStreams = streams;
     this.currentStreams = streams;
     this.currentStreamType = streamType;
     this.displayedCount = 0;
     this.loadMoreItems();
-    this.setFocus('grid', 0);
+    if (keepFocus) {
+        this.invalidateFocusables();
+        this.deferUpdateFocus();
+    }
+    else {
+        this.setFocus('grid', 0);
+    }
 };
 
 IPTVApp.prototype.initBrowseScreen = function(section, streamType, titleKey, titleDefault) {

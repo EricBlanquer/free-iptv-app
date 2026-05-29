@@ -1412,6 +1412,7 @@ IPTVApp.prototype.updateCategorySelection = function(categoryId) {
         }
         this.saveSelectedCategories();
     }
+    this.updateCurrentCategoryLabel();
 };
 
 // Category rendering

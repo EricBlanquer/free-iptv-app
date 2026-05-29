@@ -282,6 +282,12 @@ body[data-home-theme="aurora"] #settings-screen {
     background: transparent;
 }
 
+/* Use the theme wallpaper behind the loading screen instead of a flat dark
+   fill, so loading categories/streams keeps the selected theme's background. */
+body[data-home-theme="aurora"] #loading {
+    background: #020712 url(../assets/home/aurora/wallpaper.png) center center / cover no-repeat;
+}
+
 #home-grid[data-home-theme="aurora"] {
     width: 1512px;
 }

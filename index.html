@@ -563,6 +563,10 @@
     <!-- Browse Screen - categories left, content right -->
     <div id="browse-screen" class="screen">
         <div id="filters-bar">
+            <div id="current-category-label">
+                <span class="material-symbols-outlined">folder_open</span>
+                <span id="current-category-name"></span>
+            </div>
             <div id="sidebar-header">
                 <div id="sidebar-title" data-i18n="home.categories">Categories</div>
                 <div id="category-sort-bar">
@@ -601,6 +605,9 @@
             </div>
             <div id="content">
                 <div id="content-grid"></div>
+            </div>
+            <div id="categories-reveal-hint" aria-hidden="true">
+                <span class="material-symbols-outlined">chevron_left</span>
             </div>
         </div>
     </div>

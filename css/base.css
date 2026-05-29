@@ -318,7 +318,7 @@ body.text-small .guide-channel-number { font-size: 18px; }
 body.text-small .guide-program-time { font-size: 18px; }
 body.text-small .guide-program-title-inner { font-size: 20px; }
 /* Browse: small */
-body.text-small #sidebar-title { font-size: 24px; }
+body.text-small #sidebar-title, body.text-small #current-category-label { font-size: 24px; }
 body.text-small .grid-item-epg,
 body.text-small .grid-item-date { font-size: 16px; }
 body.text-small .view-btn { font-size: 16px; }
@@ -451,13 +451,14 @@ body.text-small .premium-message { font-size: 22px; }
 body.text-small .premium-btn { font-size: 22px; }
 body.text-small .premium-site-info { font-size: 16px; }
 body.text-small #premium-status-text { font-size: 18px; }
+body.text-small #categories-reveal-hint .material-symbols-outlined { font-size: 16px; }
 
 /* Touch devices: larger text for finger interaction */
 body.touch #content-grid.list-view .grid-item-info { font-size: 28px; }
 body.touch #content-grid.list-view .grid-item-epg { font-size: 24px; }
 body.touch #content-grid.list-view .grid-item-date { font-size: 22px; }
 body.touch .category-item { font-size: 32px; }
-body.touch #sidebar-title { font-size: 32px; }
+body.touch #sidebar-title, body.touch #current-category-label { font-size: 32px; }
 body.touch .playlist-tab { font-size: 24px; }
 body.touch .sort-btn,
 body.touch .filter-btn { font-size: 24px; }
@@ -507,7 +508,7 @@ body.text-medium .guide-channel-number { font-size: 20px; }
 body.text-medium .guide-program-time { font-size: 20px; }
 body.text-medium .guide-program-title-inner { font-size: 22px; }
 /* Browse: medium */
-body.text-medium #sidebar-title { font-size: 28px; }
+body.text-medium #sidebar-title, body.text-medium #current-category-label { font-size: 28px; }
 body.text-medium .grid-item-epg,
 body.text-medium .grid-item-date { font-size: 18px; }
 body.text-medium .view-btn { font-size: 18px; }
@@ -640,6 +641,7 @@ body.text-medium .premium-message { font-size: 26px; }
 body.text-medium .premium-btn { font-size: 26px; }
 body.text-medium .premium-site-info { font-size: 18px; }
 body.text-medium #premium-status-text { font-size: 20px; }
+body.text-medium #categories-reveal-hint .material-symbols-outlined { font-size: 16px; }
 
 /* Text size: large (+4px sur chaque valeur) */
 body.text-large .grid-item-info { font-size: 24px; }
@@ -683,7 +685,7 @@ body.text-large .guide-channel-number { font-size: 24px; }
 body.text-large .guide-program-time { font-size: 24px; }
 body.text-large .guide-program-title-inner { font-size: 26px; }
 /* Browse: large */
-body.text-large #sidebar-title { font-size: 32px; }
+body.text-large #sidebar-title, body.text-large #current-category-label { font-size: 32px; }
 body.text-large .grid-item-epg,
 body.text-large .grid-item-date { font-size: 22px; }
 body.text-large .view-btn { font-size: 22px; }
@@ -816,6 +818,7 @@ body.text-large .premium-message { font-size: 30px; }
 body.text-large .premium-btn { font-size: 30px; }
 body.text-large .premium-site-info { font-size: 20px; }
 body.text-large #premium-status-text { font-size: 22px; }
+body.text-large #categories-reveal-hint .material-symbols-outlined { font-size: 18px; }
 
 .toast-message {
     position: fixed;
@@ -935,7 +938,7 @@ body.text-xlarge .guide-filter { font-size: 31px; }
 body.text-xlarge .guide-channel-number { font-size: 28px; }
 body.text-xlarge .guide-program-time { font-size: 28px; }
 body.text-xlarge .guide-program-title-inner { font-size: 31px; }
-body.text-xlarge #sidebar-title { font-size: 38px; }
+body.text-xlarge #sidebar-title, body.text-xlarge #current-category-label { font-size: 38px; }
 body.text-xlarge .grid-item-epg,
 body.text-xlarge .grid-item-date { font-size: 26px; }
 body.text-xlarge .view-btn { font-size: 26px; }
@@ -1064,6 +1067,7 @@ body.text-xlarge .premium-message { font-size: 36px; }
 body.text-xlarge .premium-btn { font-size: 36px; }
 body.text-xlarge .premium-site-info { font-size: 24px; }
 body.text-xlarge #premium-status-text { font-size: 26px; }
+body.text-xlarge #categories-reveal-hint .material-symbols-outlined { font-size: 18px; }
 
 /* text-xxlarge: 44% larger than text-large */
 body.text-xxlarge .grid-item-info { font-size: 34px; }
@@ -1104,7 +1108,7 @@ body.text-xxlarge .guide-filter { font-size: 37px; }
 body.text-xxlarge .guide-channel-number { font-size: 34px; }
 body.text-xxlarge .guide-program-time { font-size: 34px; }
 body.text-xxlarge .guide-program-title-inner { font-size: 37px; }
-body.text-xxlarge #sidebar-title { font-size: 46px; }
+body.text-xxlarge #sidebar-title, body.text-xxlarge #current-category-label { font-size: 46px; }
 body.text-xxlarge .grid-item-epg,
 body.text-xxlarge .grid-item-date { font-size: 31px; }
 body.text-xxlarge .view-btn { font-size: 31px; }
@@ -1233,3 +1237,4 @@ body.text-xxlarge .premium-message { font-size: 43px; }
 body.text-xxlarge .premium-btn { font-size: 43px; }
 body.text-xxlarge .premium-site-info { font-size: 28px; }
 body.text-xxlarge #premium-status-text { font-size: 31px; }
+body.text-xxlarge #categories-reveal-hint .material-symbols-outlined { font-size: 18px; }

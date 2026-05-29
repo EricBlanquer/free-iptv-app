@@ -1499,8 +1499,43 @@ IPTVApp.prototype._updateSeasonsWrapArrows = function(el) {
     }
 };
 
+IPTVApp.prototype.updateCategoriesVisibility = function() {
+    var screen = document.getElementById('browse-screen');
+    if (!screen) return;
+    var collapse = false;
+    if (this.currentScreen === 'browse' && (this.focusArea === 'grid' || this.focusArea === 'filters')) {
+        var sidebar = document.getElementById('sidebar');
+        var sidebarAvailable = sidebar && sidebar.style.display !== 'none';
+        if (sidebarAvailable && document.querySelector('#content-grid .grid-item')) {
+            collapse = true;
+        }
+    }
+    if (collapse === this._categoriesCollapsed) return;
+    this._categoriesCollapsed = collapse;
+    screen.classList.toggle('categories-collapsed', collapse);
+    this.gridColumns = collapse ? this.gridColumnsWide : this.gridColumnsNarrow;
+    if (collapse) this.updateCurrentCategoryLabel();
+    this.invalidateFocusables();
+};
+
+IPTVApp.prototype.updateCurrentCategoryLabel = function() {
+    var nameEl = document.getElementById('current-category-name');
+    if (!nameEl) return;
+    var selected = document.querySelector('#categories-list .category-item.selected .category-text');
+    var name;
+    if (selected) {
+        name = selected.textContent.replace(/^▶\s*/, '');
+    }
+    else {
+        var title = document.getElementById('sidebar-title');
+        name = title ? title.textContent : '';
+    }
+    nameEl.textContent = name;
+};
+
 IPTVApp.prototype.updateFocus = function() {
     var self = this;
+    this.updateCategoriesVisibility();
     var wasDescription = this._lastFocusedEl && this._lastFocusedEl.id === 'details-description';
     if (this._lastFocusedEl) {
         this._lastFocusedEl.classList.remove('focused');

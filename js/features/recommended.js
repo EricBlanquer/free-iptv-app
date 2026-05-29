@@ -368,12 +368,13 @@ IPTVApp.prototype.showRecommendedInGrid = function() {
     this._ensureRecommendationsState();
     var cached = this._recommendationsCache[section];
     var restoreGridFocus = function(count) {
-        self.focusArea = 'grid';
-        var target = Math.min(self.lastGridIndex || 0, count - 1);
-        if (target < 0) target = 0;
-        self.focusIndex = target;
-        self.lastGridIndex = target;
         self.invalidateFocusables();
+        if (self.focusArea === 'grid') {
+            var target = Math.min(self.lastGridIndex || 0, count - 1);
+            if (target < 0) target = 0;
+            self.focusIndex = target;
+            self.lastGridIndex = target;
+        }
         self.updateFocus();
     };
     var renderResult = function(streams) {
