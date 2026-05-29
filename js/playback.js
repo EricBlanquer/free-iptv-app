@@ -938,6 +938,7 @@ IPTVApp.prototype.stopPlayback = function() {
     this.bufferPercent = undefined;
     this.setHidden('buffer-indicator', true);
     this.player.stop();
+    this.stopSubtitlePolling();
     this.resumePausedDownloads();
     // Show details for series/VOD (even if launched from history)
     var showDetails = this.selectedStream && (isSeries || this.selectedStream.type === 'vod');
@@ -1083,6 +1084,7 @@ IPTVApp.prototype.onPlaybackCompleted = function() {
     this.bufferPercent = undefined;
     this.setHidden('buffer-indicator', true);
     this.player.stop();
+    this.stopSubtitlePolling();
     this.resumePausedDownloads();
     if (isSeries) {
         // Wait for series info if still loading (from history playback)
@@ -2943,6 +2945,7 @@ IPTVApp.prototype.parseAndLoadSubtitle = function(srtContent) {
     if (this.externalSubtitles.length > 0) {
         var first = this.externalSubtitles[0];
         window.log('SUBTITLE first: start=' + first.start + 'ms end=' + first.end + 'ms text=' + first.text.substring(0, 30));
+        this.startSubtitlePolling();
     }
 };
 
@@ -3217,6 +3220,37 @@ IPTVApp.prototype.displayExternalSubtitle = function(currentTimeMs) {
             this.lastExternalSubtitle = null;
             this.resetSubtitlePosition(subtitleEl);
         }
+    }
+};
+
+IPTVApp.prototype.getSubtitlePlaybackTimeMs = function() {
+    var p = this.player;
+    if (!p) return 0;
+    if (p.useHtml5 && p.videoElement) {
+        return p.videoElement.currentTime * 1000;
+    }
+    return p.currentTime || 0;
+};
+
+// External subtitles are normally driven by onTimeUpdate, but on Android the
+// native HTML5 'timeupdate' event can stall during long dialogue-free passages,
+// leaving the last cue frozen on screen until the next cue fires. Poll the live
+// playback position so a cue is cleared at its end regardless of timeupdate cadence.
+IPTVApp.prototype.startSubtitlePolling = function() {
+    var self = this;
+    this.stopSubtitlePolling();
+    this._subtitlePollInterval = setInterval(function() {
+        if (self.currentSubtitleIndex !== -2 || !self.externalSubtitles || self.externalSubtitles.length === 0) {
+            return;
+        }
+        self.displayExternalSubtitle(self.getSubtitlePlaybackTimeMs());
+    }, 250);
+};
+
+IPTVApp.prototype.stopSubtitlePolling = function() {
+    if (this._subtitlePollInterval) {
+        clearInterval(this._subtitlePollInterval);
+        this._subtitlePollInterval = null;
     }
 };
 

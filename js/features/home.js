@@ -3,6 +3,73 @@
  * Handles home screen layout, visibility, and navigation
  */
 
+var HOME_ICONS = {
+    live: { emoji: '📡' },
+    vod: { emoji: '🎬' },
+    series: { emoji: '📺' },
+    manga: { emoji: '🇯🇵' },
+    sport: { emoji: '⚽' },
+    entertainment: { emoji: '🎭' },
+    history: { emoji: '🕒' },
+    downloads: { emoji: '📁' },
+    settings: { emoji: '⚙️' }
+};
+
+var HOME_THEME_PRESETS = {
+    emoji: { icon: 'emoji', tile: 'flat' },
+    aurora: { icon: 'image', tile: 'image', assetDir: 'assets/home/aurora/' }
+};
+
+IPTVApp.prototype.applyHomeTheme = function() {
+    var grid = document.getElementById('home-grid');
+    if (!grid) return;
+    var theme = (this.settings && this.settings.homeTheme) || 'aurora';
+    if (!HOME_THEME_PRESETS[theme]) theme = 'aurora';
+    var savedTheme = theme;
+    var licenseExpired = (typeof Premium !== 'undefined') && Premium.getState() === Premium.STATE_EXPIRED;
+    if (licenseExpired) theme = 'emoji';
+    var banner = document.getElementById('home-license-banner');
+    if (banner) {
+        banner.classList.toggle('hidden', !licenseExpired);
+        if (licenseExpired) {
+            var bannerKey = savedTheme === 'emoji' ? 'home.licenseExpiredPlain' : 'home.licenseExpired';
+            banner.setAttribute('data-i18n', bannerKey);
+            banner.textContent = I18n.t(bannerKey, 'License expired');
+        }
+    }
+    var cfg = HOME_THEME_PRESETS[theme];
+    var labelsOn = !this.settings || this.settings.homeLabels !== false;
+    grid.setAttribute('data-home-theme', theme);
+    grid.setAttribute('data-tile', cfg.tile);
+    grid.setAttribute('data-labels', labelsOn ? 'on' : 'off');
+    var homeScreen = document.getElementById('home-screen');
+    if (homeScreen) homeScreen.setAttribute('data-home-theme', theme);
+    if (document.body) document.body.setAttribute('data-home-theme', theme);
+    var btns = grid.querySelectorAll('.home-btn');
+    for (var i = 0; i < btns.length; i++) {
+        var btn = btns[i];
+        if (btn.classList.contains('custom-category')) continue;
+        var def = HOME_ICONS[btn.dataset.section];
+        var iconEl = btn.querySelector('.home-icon');
+        if (!def || !iconEl) continue;
+        while (iconEl.firstChild) {
+            iconEl.removeChild(iconEl.firstChild);
+        }
+        if (cfg.icon === 'image') {
+            btn.classList.add('has-art');
+            var img = document.createElement('img');
+            img.className = 'home-art';
+            img.src = cfg.assetDir + btn.dataset.section + '.png';
+            img.alt = '';
+            iconEl.appendChild(img);
+        }
+        else {
+            btn.classList.remove('has-art');
+            iconEl.textContent = def.emoji;
+        }
+    }
+};
+
 IPTVApp.prototype.updateHomeMenuVisibility = function() {
     var configured = this.isIPTVConfigured();
     var playlist = this.getActivePlaylist();
@@ -48,6 +115,7 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
         dlBtn.style.display = this.hasAppDownloads() ? '' : 'none';
     }
     this.renderCustomCategoryButtons(configured, isM3U || isJellyfin, patterns);
+    this.applyHomeTheme();
     this.updateHomeGridLayout();
     this.invalidateFocusables();
     if (this.focusArea === 'home') {

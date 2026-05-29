@@ -39,8 +39,18 @@ function formatTimeAgo(timestamp) {
 }
 
 IPTVApp.prototype.onAppResumed = function() {
+    window.log('RESUME', 'app resumed - re-running startup checks (license, update, playlists)');
     if (typeof this.setupRemoteDebug === 'function') {
         this.setupRemoteDebug();
+    }
+    if (typeof Premium !== 'undefined' && typeof Premium.init === 'function') {
+        Premium.init(this.deviceId);
+    }
+    if (typeof this.checkPendingApkUpdate === 'function') {
+        this.checkPendingApkUpdate();
+    }
+    if (typeof this.updateHomeMenuVisibility === 'function') {
+        this.updateHomeMenuVisibility();
     }
     if (typeof this.renderPlaylistSelector === 'function') {
         this.renderPlaylistSelector();

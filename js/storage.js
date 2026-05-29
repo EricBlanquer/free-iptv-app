@@ -1414,7 +1414,10 @@ IPTVApp.prototype.loadSettings = function() {
         bufferMin: 30,
         bufferMax: 60,
         exitConfirmation: true,
-        cacheRefreshHours: 12
+        cacheRefreshHours: 12,
+        homeTheme: 'aurora',
+        homeLabels: true,
+        homeProviderList: true
     };
     try {
         var data = localStorage.getItem('settings');
@@ -2138,4 +2141,3 @@ IPTVApp.prototype.showLoadingBackdrop = function() {
         })(imgDivs[i], selection[i]);
     }
 };
-

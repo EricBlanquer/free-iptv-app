@@ -883,6 +883,8 @@ IPTVApp.prototype.onPairingSuccess = function() {
     setTimeout(function() {
         self.autoConnect();
         self.updateHomeMenuVisibility();
+        self.renderPlaylistSelector();
+        self.startPlaylistAgeTimer();
         self.showScreen('home');
         self.currentScreen = 'home';
         self.focusArea = 'home';
@@ -1058,6 +1060,12 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
                 }
                 this.setupRemoteDebug();
             }
+            if (setting === 'homeLabels') {
+                this.applyHomeTheme();
+            }
+            if (setting === 'homeProviderList') {
+                this.renderPlaylistSelector();
+            }
             this.saveSettings();
         }
     }
@@ -1127,6 +1135,9 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             }
             this.clearProviderCache();
             this.data = {};
+        }
+        if (optSetting === 'homeTheme') {
+            this.applyHomeTheme();
         }
         this.saveSettings();
     }
@@ -3208,6 +3219,7 @@ IPTVApp.prototype.formatSettingValue = function(key, value) {
 };
 
 IPTVApp.prototype.updatePremiumStatus = function() {
+    this.applyHomeTheme();
     var statusEl = document.getElementById('premium-status-text');
     var licenseInput = document.getElementById('setting-licenseCode');
     var validateBtn = document.getElementById('validate-license-btn');

@@ -16,43 +16,44 @@
 <body>
     <!-- Home Screen - 4 big buttons -->
     <div id="home-screen" class="screen active">
+        <div id="home-license-banner" class="hidden" data-i18n="home.licenseExpired">License expired</div>
         <div id="playlist-selector" class="hidden"></div>
         <div id="home-grid" style="visibility: hidden;">
             <div class="home-btn focusable" data-section="live">
-                <div class="home-icon">📡</div>
+                <div class="home-icon"><span class="material-symbols-outlined">live_tv</span></div>
                 <span data-i18n="home.live">Live TV</span>
             </div>
             <div class="home-btn focusable" data-section="vod">
-                <div class="home-icon">🎬</div>
+                <div class="home-icon"><span class="material-symbols-outlined">movie</span></div>
                 <span data-i18n="home.movies">Movies</span>
             </div>
             <div class="home-btn focusable" data-section="series">
-                <div class="home-icon">📺</div>
+                <div class="home-icon"><span class="material-symbols-outlined">tv</span></div>
                 <span data-i18n="home.series">Series</span>
             </div>
             <div class="home-btn focusable" data-section="manga">
-                <div class="home-icon">🇯🇵</div>
+                <div class="home-icon"><span class="material-symbols-outlined">auto_stories</span></div>
                 <span data-i18n="home.manga">Manga</span>
             </div>
             <div class="home-btn focusable" data-section="sport">
-                <div class="home-icon">⚽</div>
+                <div class="home-icon"><span class="material-symbols-outlined">sports_soccer</span></div>
                 <span data-i18n="home.sport">Sport</span>
             </div>
             <div class="home-btn focusable" data-section="entertainment">
-                <div class="home-icon">🎭</div>
+                <div class="home-icon"><span class="material-symbols-outlined">theater_comedy</span></div>
                 <span data-i18n="home.entertainment">Entertainment</span>
             </div>
             <div class="home-btn focusable" data-section="history">
-                <div class="home-icon"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg></div>
+                <div class="home-icon"><span class="material-symbols-outlined">history</span></div>
                 <span data-i18n="home.history">History</span>
             </div>
             <!-- Custom categories inserted before settings button -->
             <div class="home-btn focusable" data-section="downloads" id="home-downloads-btn" style="display:none;">
-                <div class="home-icon"><svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></div>
+                <div class="home-icon"><span class="material-symbols-outlined">folder</span></div>
                 <span data-i18n="home.downloads">Files</span>
             </div>
             <div class="home-btn focusable" data-section="settings" id="home-settings-btn">
-                <div class="home-icon"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></div>
+                <div class="home-icon"><span class="material-symbols-outlined">settings</span></div>
                 <span data-i18n="home.settings">Settings</span>
             </div>
         </div>
@@ -406,6 +407,21 @@
                             <div class="settings-option focusable preview-xlarge" data-setting="textSize" data-value="xlarge" data-i18n="settings.textXLarge">Extra Large</div>
                             <div class="settings-option focusable preview-xxlarge" data-setting="textSize" data-value="xxlarge" data-i18n="settings.textXXLarge">Maximum</div>
                         </div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.themeSection">Theme</span>
+                        <div class="settings-options" id="home-theme-options">
+                            <div class="settings-option focusable" data-setting="homeTheme" data-value="emoji" data-i18n="settings.themeEmojis">Emojis</div>
+                            <div class="settings-option focusable selected" data-setting="homeTheme" data-value="aurora" data-i18n="settings.themeAurora">Aurora</div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.homeLabels">Tile labels</span>
+                        <div class="settings-toggle focusable" data-setting="homeLabels" data-value="true" data-i18n="settings.yes">Yes</div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.homeProviderList">Provider list</span>
+                        <div class="settings-toggle focusable" data-setting="homeProviderList" data-value="true" data-i18n="settings.yes">Yes</div>
                     </div>
                 </div>
             </div>

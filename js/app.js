@@ -279,6 +279,12 @@ class IPTVApp {
         var playlists = this.settings.playlists || [];
         var visiblePlaylists = playlists.filter(function(p) { return p.showOnHome !== false; });
         var providerAgeEl = document.getElementById('home-provider-age');
+        if (this.settings.homeProviderList === false) {
+            this.setHidden(container, true);
+            container.innerHTML = '';
+            if (providerAgeEl) this.setHidden(providerAgeEl, true);
+            return;
+        }
         if (visiblePlaylists.length < 2) {
             this.setHidden(container, true);
             container.innerHTML = '';
