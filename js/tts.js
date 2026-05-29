@@ -41,6 +41,21 @@ IPTVApp.prototype._warmupAudioPipeline = function() {
     });
 };
 
+IPTVApp.prototype.markTTSPipelineCold = function() {
+    // End of video playback (player.stop → webapis.avplay.close) puts the audio
+    // decoder + speaker driver back to sleep, so the next new Audio().play() is
+    // a cold-start again — exactly like at app launch. Re-arm the first-chunk
+    // pad, drop any preload built while the pipeline was warm (it carries no
+    // pad), and replay the warmup primer so the next spoken description keeps
+    // its first word.
+    if (this.ttsSpeaking || this.ttsLoading) return;
+    if (this._ttsSessionNeedsPad) return;
+    this._ttsSessionNeedsPad = true;
+    this.clearTTSPreload();
+    this._warmupAudioPipeline();
+    window.log('TTS', 'pipeline marked cold after playback — pad re-armed');
+};
+
 IPTVApp.prototype.getTTSUrl = function() {
     if (this.settings.proxyEnabled) {
         var url = this.settings.proxyUrl || 'https://tts.blanquer.org';

@@ -10,6 +10,7 @@ class TVPlayer {
         this.currentTime = 0;
         this.onTimeUpdate = null;
         this.onStateChange = null;
+        this.onStopped = null;
         this.onError = null;
         this.onFrozen = null;
         this.useHtml5 = false;
@@ -779,6 +780,7 @@ class TVPlayer {
             this.isPaused = false;
             this.useHtml5 = false;
             if (this.onStateChange) this.onStateChange('stopped');
+            if (this.onStopped) this.onStopped();
         } catch (ex) {
             window.log('ERROR', 'Stop: ' + (ex.message || ex));
         }

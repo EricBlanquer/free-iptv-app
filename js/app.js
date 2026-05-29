@@ -32,6 +32,7 @@ class IPTVApp {
     constructor() {
         this.api = null;
         this.player = new TVPlayer();
+        this.player.onStopped = this.markTTSPipelineCold.bind(this);
         this.deviceId = null; // Will be set in init()
         this.currentScreen = 'home';
         this.currentSection = null; // live, vod, series
