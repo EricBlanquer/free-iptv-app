@@ -271,6 +271,93 @@ IPTVApp.prototype.bindTouchEvents = function() {
         }
         // Generic focusable areas - handled by focus.js click handler
     });
+    this.bindPlayerGestures();
+};
+
+IPTVApp.prototype.bindPlayerGestures = function() {
+    var self = this;
+    if (!/Android/.test(navigator.userAgent)) {
+        window.log('GESTURE', 'bind skipped: not Android UA');
+        return;
+    }
+    if (typeof Android === 'undefined' || !Android || typeof Android.setBrightness !== 'function') {
+        window.log('GESTURE', 'bind skipped: Android.setBrightness unavailable (Android=' + (typeof Android) + ')');
+        return;
+    }
+    var playerScreen = document.getElementById('player-screen');
+    if (!playerScreen) {
+        window.log('GESTURE', 'bind skipped: no #player-screen');
+        return;
+    }
+    window.log('GESTURE', 'bound on #player-screen');
+    var hud = document.getElementById('player-gesture-hud');
+    var icon = document.getElementById('player-gesture-icon');
+    var fill = document.getElementById('player-gesture-fill');
+    var SENSITIVITY = 0.7;
+    var THRESHOLD_PX = 12;
+    var state = null;
+    var hideTimer = null;
+    var showHud = function(side, value) {
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+            hideTimer = null;
+        }
+        if (side === 'brightness') {
+            icon.textContent = value < 0.34 ? 'brightness_low' : (value < 0.67 ? 'brightness_6' : 'brightness_high');
+        } else {
+            icon.textContent = value <= 0 ? 'volume_off' : (value < 0.5 ? 'volume_down' : 'volume_up');
+        }
+        fill.style.height = Math.round(value * 100) + '%';
+        self.setHidden(hud, false);
+    };
+    var clampUnit = function(v) {
+        if (typeof v !== 'number' || isNaN(v)) return 0.5;
+        return Math.max(0, Math.min(1, v));
+    };
+    playerScreen.addEventListener('touchstart', function(e) {
+        if (self.currentScreen !== 'player' || e.touches.length !== 1) {
+            state = null;
+            return;
+        }
+        var target = e.target;
+        if (target.closest('#player-tracks') || target.closest('#android-back-btn') || target.closest('.modal')) {
+            state = null;
+            return;
+        }
+        var t = e.touches[0];
+        var side = t.clientX < window.innerWidth / 2 ? 'brightness' : 'volume';
+        var startValue = clampUnit(side === 'brightness' ? Android.getBrightness() : Android.getVolume());
+        state = { startX: t.clientX, startY: t.clientY, side: side, startValue: startValue, active: false };
+        window.log('GESTURE', 'touchstart side=' + side + ' x=' + Math.round(t.clientX) + '/' + window.innerWidth + ' startValue=' + startValue.toFixed(3));
+    }, { passive: true });
+    playerScreen.addEventListener('touchmove', function(e) {
+        if (!state) return;
+        var t = e.touches[0];
+        var dx = t.clientX - state.startX;
+        var dy = t.clientY - state.startY;
+        if (!state.active) {
+            if (Math.abs(dy) < THRESHOLD_PX || Math.abs(dy) <= Math.abs(dx)) return;
+            state.active = true;
+            window.log('GESTURE', 'activated side=' + state.side + ' dy=' + Math.round(dy));
+        }
+        if (e.cancelable) e.preventDefault();
+        var value = clampUnit(state.startValue - dy / (window.innerHeight * SENSITIVITY));
+        state.value = value;
+        if (state.side === 'brightness') Android.setBrightness(value);
+        else Android.setVolume(value);
+        showHud(state.side, value);
+    }, { passive: false });
+    var endGesture = function() {
+        if (!state) return;
+        if (state.active) {
+            window.log('GESTURE', state.side + ' end -> ' + clampUnit(state.value).toFixed(3));
+            self._suppressNextClickUntil = Date.now() + 500;
+            hideTimer = setTimeout(function() { self.setHidden(hud, true); }, 600);
+        }
+        state = null;
+    };
+    playerScreen.addEventListener('touchend', endGesture, { passive: true });
+    playerScreen.addEventListener('touchcancel', endGesture, { passive: true });
 };
 
 IPTVApp.prototype.acceptDisclaimer = function() {
@@ -302,6 +389,10 @@ IPTVApp.prototype.showScreen = function(screen) {
         screens[i].classList.remove('active');
     }
     document.getElementById(screen + '-screen').classList.add('active');
+    if (this.currentScreen === 'player' && screen !== 'player'
+        && typeof Android !== 'undefined' && Android && typeof Android.setBrightness === 'function') {
+        Android.setBrightness(-1);
+    }
     this.currentScreen = screen;
     this.invalidateFocusables();
     var backBtn = document.getElementById('android-back-btn');

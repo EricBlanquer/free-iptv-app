@@ -74,6 +74,11 @@ public class MainActivity extends Activity {
         setupWebView();
         applyImmersiveMode();
         mWebUpdater = new WebUpdater(this);
+        boolean devNoUpdate = new java.io.File(getFilesDir(), "DEV_NO_UPDATE").exists();
+        if (devNoUpdate) {
+            mWebView.loadUrl("file:///android_asset/index.html");
+            return;
+        }
         mWebUpdater.rollbackUnhealthyCacheIfNeeded();
         String localWebPath = mWebUpdater.getLocalWebPath();
         if (localWebPath != null) {
@@ -481,6 +486,58 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void exitApp() {
             runOnUiThread(() -> moveTaskToBack(true));
+        }
+
+        @JavascriptInterface
+        public float getBrightness() {
+            try {
+                float current = getWindow().getAttributes().screenBrightness;
+                if (current >= 0f) return current;
+                int sys = android.provider.Settings.System.getInt(
+                    getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS, 128);
+                return sys / 255f;
+            }
+            catch (Exception ex) {
+                return 0.5f;
+            }
+        }
+
+        @JavascriptInterface
+        public void setBrightness(float level) {
+            final float value = level < 0f
+                ? WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                : Math.max(0.01f, Math.min(1f, level));
+            runOnUiThread(() -> {
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.screenBrightness = value;
+                getWindow().setAttributes(lp);
+            });
+        }
+
+        @JavascriptInterface
+        public float getVolume() {
+            try {
+                android.media.AudioManager am = (android.media.AudioManager) getSystemService(AUDIO_SERVICE);
+                if (am == null) return 0.5f;
+                int max = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
+                if (max <= 0) return 0.5f;
+                return am.getStreamVolume(android.media.AudioManager.STREAM_MUSIC) / (float) max;
+            }
+            catch (Exception ex) {
+                return 0.5f;
+            }
+        }
+
+        @JavascriptInterface
+        public void setVolume(float level) {
+            try {
+                android.media.AudioManager am = (android.media.AudioManager) getSystemService(AUDIO_SERVICE);
+                if (am == null) return;
+                int max = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
+                int target = Math.round(Math.max(0f, Math.min(1f, level)) * max);
+                am.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, target, 0);
+            }
+            catch (Exception ex) { /* ignore */ }
         }
 
         @JavascriptInterface

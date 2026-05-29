@@ -899,6 +899,10 @@ body.text-large #categories-reveal-hint .material-symbols-outlined { font-size: 
     pointer-events: none;
 }
 
+#player-gesture-icon {
+    font-size: 56px;
+}
+
 /* text-xlarge: 20% larger than text-large */
 body.text-xlarge .grid-item-info { font-size: 28px; }
 body.text-xlarge .episode-number,
