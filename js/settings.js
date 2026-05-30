@@ -1672,7 +1672,7 @@ IPTVApp.prototype.handlePlaylistsSelect = function() {
 IPTVApp.prototype.togglePlaylistVisibility = function(playlistId) {
     for (var i = 0; i < this.settings.playlists.length; i++) {
         if (this.sameId(this.settings.playlists[i].id, playlistId)) {
-            this.settings.playlists[i].showOnHome = this.settings.playlists[i].showOnHome === false ? true : false;
+            this.settings.playlists[i].showOnHome = this.settings.playlists[i].showOnHome === false;
             break;
         }
     }

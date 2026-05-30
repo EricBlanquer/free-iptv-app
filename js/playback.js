@@ -2361,7 +2361,7 @@ IPTVApp.prototype.toggleLiveFormat = function() {
 };
 
 IPTVApp.prototype.toggleLiveAutoFormatSwitch = function() {
-    var next = this.settings.liveAutoFormatSwitch === false ? true : false;
+    var next = this.settings.liveAutoFormatSwitch === false;
     this.settings.liveAutoFormatSwitch = next;
     this.saveSettings();
     window.log('ACTION', 'toggleLiveAutoFormatSwitch: ' + next);

@@ -419,7 +419,7 @@ IPTVApp.prototype._canScrollMore = function() {
 // every row but the focused one without a TMDB-fetched poster).
 IPTVApp.prototype._getVisibleItemRange = function(items, forceFromStart) {
     var grid = document.getElementById('content-grid');
-    var isListView = grid ? grid.classList.contains('list-view') : false;
+    var isListView = grid && grid.classList.contains('list-view');
     var cols = isListView ? 1 : this.gridColumns;
     var firstItem = items[0];
     var rowHeight = firstItem ? firstItem.offsetHeight + 10 : (isListView ? 95 : 300);
