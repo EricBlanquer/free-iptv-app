@@ -1,0 +1,98 @@
+=== Submission ===
+Version: 1.0.8
+Date: 2026-05-31
+Type: Feature update (submitted while 1.0.7 is still in review)
+
+=== Note for Tester ===
+WHAT'S NEW
+
+Feature update over 1.0.7. New "Aurora" home screen with artwork tiles and a refreshed look. Continue Watching, History and Favourites are now scoped to the active playlist. Fixed series resume opening season 1 instead of the last-watched season. Fixed movie descriptions briefly appearing then disappearing. Smoother playlist setup.
+
+HOW TO TEST
+
+No login or account required.
+
+Option A - Bundled demo (recommended):
+  1. On first launch, accept "Would you like to try a demo playlist?".
+  2. The app jumps to Live TV with several channels (DW, France 24, Al Jazeera English).
+  3. Click any channel - it should start playing within seconds.
+
+Option B - Configure manually:
+  Settings > Playlists > Add Playlist, then enter an M3U URL or Xtream credentials (server URL, username, password).
+
+=== English ===
+- New "Aurora" home screen with artwork tiles and a refreshed look.
+- Continue Watching, History and Favourites are now filtered by the active playlist, so items from other playlists no longer appear or cause playback errors.
+- Fixed resuming a series opening season 1 instead of the last-watched season.
+- Fixed movie descriptions sometimes appearing and then disappearing.
+- Smoother playlist setup: the demo playlist is offered again if you leave Settings without configuring one, and a newly added playlist is selected automatically.
+
+=== German ===
+- Neuer Startbildschirm "Aurora" mit Artwork-Kacheln und aufgefrischtem Design.
+- "Weiter ansehen", Verlauf und Favoriten werden jetzt nach der aktiven Wiedergabeliste gefiltert, sodass Eintraege aus anderen Wiedergabelisten nicht mehr erscheinen oder Wiedergabefehler verursachen.
+- Behoben: Beim Fortsetzen einer Serie wurde Staffel 1 statt der zuletzt angesehenen Staffel geoeffnet.
+- Behoben: Filmbeschreibungen wurden manchmal angezeigt und verschwanden dann wieder.
+- Reibungslosere Einrichtung der Wiedergabeliste: Die Demo-Wiedergabeliste wird erneut angeboten, wenn Sie die Einstellungen ohne Konfiguration verlassen, und eine neu hinzugefuegte Wiedergabeliste wird automatisch ausgewaehlt.
+
+=== Arabic ===
+- شاشة رئيسية جديدة "Aurora" بمربعات صور ومظهر محدّث.
+- يتم الآن تصفية "متابعة المشاهدة" والسجل والمفضلة حسب قائمة التشغيل النشطة، بحيث لم تعد العناصر من قوائم التشغيل الأخرى تظهر أو تسبب أخطاء في التشغيل.
+- تم إصلاح استئناف المسلسل الذي كان يفتح الموسم 1 بدلاً من آخر موسم تمت مشاهدته.
+- تم إصلاح أوصاف الأفلام التي كانت تظهر أحيانًا ثم تختفي.
+- إعداد أسهل لقائمة التشغيل: يتم عرض قائمة التشغيل التجريبية مرة أخرى إذا غادرت الإعدادات دون تكوين أي قائمة، ويتم تحديد قائمة التشغيل المضافة حديثًا تلقائيًا.
+
+=== Spanish ===
+- Nueva pantalla de inicio "Aurora" con mosaicos ilustrados y un aspecto renovado.
+- Continuar viendo, Historial y Favoritos ahora se filtran por la lista de reproduccion activa, de modo que los elementos de otras listas ya no aparecen ni causan errores de reproduccion.
+- Corregido que al reanudar una serie se abria la temporada 1 en lugar de la ultima temporada vista.
+- Corregido que las descripciones de las peliculas a veces aparecian y luego desaparecian.
+- Configuracion de listas mas fluida: la lista de demostracion se ofrece de nuevo si sales de Ajustes sin configurar ninguna, y una lista recien anadida se selecciona automaticamente.
+
+=== French ===
+- Nouvel ecran d'accueil "Aurora" avec des vignettes illustrees et un design rafraichi.
+- "Reprendre la lecture", l'historique et les favoris sont desormais filtres selon la playlist active, afin que les elements des autres playlists n'apparaissent plus et ne provoquent plus d'erreurs de lecture.
+- Correction de la reprise d'une serie qui ouvrait la saison 1 au lieu de la derniere saison regardee.
+- Correction des descriptions de films qui apparaissaient puis disparaissaient parfois.
+- Configuration des playlists plus fluide : la playlist de demonstration est a nouveau proposee si vous quittez les Reglages sans en configurer une, et une playlist nouvellement ajoutee est selectionnee automatiquement.
+
+=== Italian ===
+- Nuova schermata principale "Aurora" con riquadri illustrati e un aspetto rinnovato.
+- Continua a guardare, Cronologia e Preferiti ora vengono filtrati in base alla playlist attiva, cosi gli elementi di altre playlist non compaiono piu ne causano errori di riproduzione.
+- Risolto il problema per cui riprendendo una serie veniva aperta la stagione 1 invece dell'ultima stagione guardata.
+- Risolto il problema per cui le descrizioni dei film a volte comparivano e poi scomparivano.
+- Configurazione delle playlist piu fluida: la playlist demo viene riproposta se esci dalle Impostazioni senza configurarne una, e una playlist appena aggiunta viene selezionata automaticamente.
+
+=== Dutch ===
+- Nieuw startscherm "Aurora" met afbeeldingstegels en een vernieuwd uiterlijk.
+- Verder kijken, Geschiedenis en Favorieten worden nu gefilterd op de actieve afspeellijst, zodat items uit andere afspeellijsten niet meer verschijnen of afspeelfouten veroorzaken.
+- Opgelost: bij het hervatten van een serie werd seizoen 1 geopend in plaats van het laatst bekeken seizoen.
+- Opgelost: filmbeschrijvingen verschenen soms en verdwenen dan weer.
+- Soepelere instelling van afspeellijsten: de demo-afspeellijst wordt opnieuw aangeboden als je Instellingen verlaat zonder er een te configureren, en een nieuw toegevoegde afspeellijst wordt automatisch geselecteerd.
+
+=== Polish ===
+- Nowy ekran glowny "Aurora" z kafelkami z grafika i odswiezonym wygladem.
+- Kontynuuj ogladanie, Historia i Ulubione sa teraz filtrowane wedlug aktywnej playlisty, dzieki czemu elementy z innych playlist juz sie nie pojawiaja ani nie powoduja bledow odtwarzania.
+- Naprawiono wznawianie serialu, ktore otwieralo sezon 1 zamiast ostatnio ogladanego sezonu.
+- Naprawiono opisy filmow, ktore czasami pojawialy sie, a potem znikaly.
+- Plynniejsza konfiguracja playlist: playlista demonstracyjna jest oferowana ponownie, jesli opuscisz Ustawienia bez skonfigurowania zadnej, a nowo dodana playlista jest wybierana automatycznie.
+
+=== Portuguese ===
+- Nova tela inicial "Aurora" com blocos ilustrados e um visual renovado.
+- Continuar assistindo, Historico e Favoritos agora sao filtrados pela playlist ativa, para que os itens de outras playlists nao aparecam mais nem causem erros de reproducao.
+- Corrigido o retomar de uma serie que abria a temporada 1 em vez da ultima temporada assistida.
+- Corrigidas as descricoes de filmes que as vezes apareciam e depois sumiam.
+- Configuracao de playlists mais fluida: a playlist de demonstracao e oferecida novamente se voce sair das Configuracoes sem configurar nenhuma, e uma playlist recem-adicionada e selecionada automaticamente.
+
+=== Russian ===
+- Новый главный экран "Aurora" с плитками-обложками и обновлённым оформлением.
+- «Продолжить просмотр», история и избранное теперь фильтруются по активному плейлисту, поэтому элементы из других плейлистов больше не отображаются и не вызывают ошибок воспроизведения.
+- Исправлено возобновление сериала, при котором открывался сезон 1 вместо последнего просмотренного сезона.
+- Исправлены описания фильмов, которые иногда появлялись, а затем исчезали.
+- Более удобная настройка плейлистов: демо-плейлист предлагается снова, если выйти из настроек, не настроив ни одного, а только что добавленный плейлист выбирается автоматически.
+
+=== Turkish ===
+- Gorsel kutucuklar ve yenilenmis bir gorunume sahip yeni "Aurora" ana ekrani.
+- Izlemeye Devam Et, Gecmis ve Favoriler artik etkin oynatma listesine gore filtreleniyor, boylece diger oynatma listelerindeki ogeler artik gorunmuyor veya oynatma hatalarina yol acmiyor.
+- Bir diziyi surdururken son izlenen sezon yerine 1. sezonun acilmasi sorunu duzeltildi.
+- Film aciklamalarinin bazen gorunup sonra kaybolmasi sorunu duzeltildi.
+- Daha akici oynatma listesi kurulumu: hicbirini yapilandirmadan Ayarlar'dan cikarsaniz demo oynatma listesi yeniden sunulur ve yeni eklenen bir oynatma listesi otomatik olarak secilir.
