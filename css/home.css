@@ -379,8 +379,12 @@ body[data-home-theme="aurora"] #loading {
 #home-grid[data-home-theme="aurora"] .home-btn.focused {
     background: #050914;
     border-color: var(--cat);
-    transform: scale(1.035);
-    box-shadow: 0 0 0 3px var(--cat), 0 0 30px 0 var(--cat);
+    transform: scale(1.07);
+    z-index: 5;
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.85),
+        0 0 0 7px var(--cat),
+        0 0 52px 10px var(--cat);
 }
 
 #home-grid[data-home-theme="aurora"] .home-icon {
