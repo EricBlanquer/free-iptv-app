@@ -324,11 +324,10 @@ body[data-home-theme="aurora"] #loading {
     width: 456px;
     height: 257px;
     margin: 14px 24px;
-    border: 2px solid transparent;
-    border-radius: 8px;
+    border: none;
     background: transparent;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 #home-grid[data-home-theme="aurora"].cols-4 .home-btn {
@@ -372,16 +371,31 @@ body[data-home-theme="aurora"] #loading {
 #home-grid[data-home-theme="aurora"] .home-btn[data-section="downloads"] { --cat: #2dd4bf; }
 #home-grid[data-home-theme="aurora"] .home-btn[data-section="settings"] { --cat: #c2cad8; }
 
+#home-grid[data-home-theme="aurora"] .home-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 0 34px 8px var(--cat);
+}
+
 #home-grid[data-home-theme="aurora"] .home-btn:focus,
 #home-grid[data-home-theme="aurora"] .home-btn.focused {
     background: transparent;
-    border-color: var(--cat);
+    border-color: transparent;
     transform: scale(1.07);
     z-index: 5;
-    box-shadow:
-        0 0 0 3px rgba(255, 255, 255, 0.85),
-        0 0 0 7px var(--cat),
-        0 0 52px 10px var(--cat);
+    box-shadow: none;
+}
+
+#home-grid[data-home-theme="aurora"] .home-btn:focus::before,
+#home-grid[data-home-theme="aurora"] .home-btn.focused::before {
+    opacity: 1;
 }
 
 #home-grid[data-home-theme="aurora"] .home-icon {
@@ -395,12 +409,17 @@ body[data-home-theme="aurora"] #loading {
     margin: 0;
     min-height: 0;
     color: inherit;
+    z-index: 1;
+}
+
+#home-grid[data-home-theme="aurora"] .home-btn.has-art .home-icon {
+    overflow: hidden;
+    border-radius: 8px;
 }
 
 #home-grid[data-home-theme="aurora"] .home-art {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     display: block;
 }
 
@@ -411,6 +430,7 @@ body[data-home-theme="aurora"] #loading {
     bottom: 0;
     left: 0;
     height: 62%;
+    z-index: 1;
     background: linear-gradient(180deg, rgba(3, 6, 15, 0) 0%, rgba(3, 6, 15, 0.16) 36%, rgba(3, 6, 15, 0.52) 70%, rgba(3, 6, 15, 0.86) 100%);
 }
 
