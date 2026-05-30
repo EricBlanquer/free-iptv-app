@@ -272,6 +272,68 @@ IPTVApp.prototype.bindTouchEvents = function() {
         // Generic focusable areas - handled by focus.js click handler
     });
     this.bindPlayerGestures();
+    this.bindBrowseGestures();
+};
+
+IPTVApp.prototype.bindBrowseGestures = function() {
+    var self = this;
+    if (!/Android/.test(navigator.userAgent)) return;
+    var browseScreen = document.getElementById('browse-screen');
+    if (!browseScreen) return;
+    var H_THRESHOLD_PX = 40;
+    var TRIGGER_PX = 70;
+    var DELETABLE = '#content-grid .grid-item[data-is-download="1"], #content-grid .grid-item[data-is-history="1"], #content-grid .grid-item.freebox-file:not([data-fb-is-up="1"])';
+    var state = null;
+    browseScreen.addEventListener('touchstart', function(e) {
+        if (self.currentScreen !== 'browse' || e.touches.length !== 1) {
+            state = null;
+            return;
+        }
+        var target = e.target;
+        if (target.closest(DELETABLE) || target.closest('.modal')) {
+            state = null;
+            return;
+        }
+        var t = e.touches[0];
+        state = { startX: t.clientX, startY: t.clientY, dx: 0, active: false };
+    }, { passive: true });
+    browseScreen.addEventListener('touchmove', function(e) {
+        if (!state) return;
+        var t = e.touches[0];
+        var dx = t.clientX - state.startX;
+        var dy = t.clientY - state.startY;
+        state.dx = dx;
+        if (!state.active) {
+            if (Math.abs(dx) < H_THRESHOLD_PX || Math.abs(dx) <= Math.abs(dy)) return;
+            state.active = true;
+        }
+    }, { passive: true });
+    var revealSidebar = function() {
+        if (self.focusArea !== 'grid' && self.focusArea !== 'filters') return;
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar || sidebar.style.display === 'none') return;
+        self.lastGridIndex = self.focusIndex;
+        self.setFocus('sidebar', self.getSelectedSidebarIndex());
+    };
+    var hideSidebar = function() {
+        if (self.focusArea !== 'sidebar') return;
+        self.lastSidebarIndex = self.focusIndex;
+        var gridItems = document.querySelectorAll('#content-grid .grid-item');
+        var idx = (self.lastGridIndex != null && self.lastGridIndex < gridItems.length) ? self.lastGridIndex : 0;
+        self.setFocus('grid', idx);
+    };
+    var endGesture = function() {
+        if (!state) return;
+        var active = state.active;
+        var dx = state.dx;
+        state = null;
+        if (!active) return;
+        self._suppressNextClickUntil = Date.now() + 500;
+        if (dx >= TRIGGER_PX) revealSidebar();
+        else if (dx <= -TRIGGER_PX) hideSidebar();
+    };
+    browseScreen.addEventListener('touchend', endGesture, { passive: true });
+    browseScreen.addEventListener('touchcancel', endGesture, { passive: true });
 };
 
 IPTVApp.prototype.bindPlayerGestures = function() {
