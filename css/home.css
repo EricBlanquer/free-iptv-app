@@ -324,14 +324,11 @@ body[data-home-theme="aurora"] #loading {
     width: 456px;
     height: 257px;
     margin: 14px 24px;
-    border: 2px solid rgba(150, 172, 220, 0.42);
+    border: 2px solid transparent;
     border-radius: 8px;
-    background: #050914;
+    background: transparent;
     position: relative;
     overflow: hidden;
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.55),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 #home-grid[data-home-theme="aurora"].cols-4 .home-btn {
@@ -377,7 +374,7 @@ body[data-home-theme="aurora"] #loading {
 
 #home-grid[data-home-theme="aurora"] .home-btn:focus,
 #home-grid[data-home-theme="aurora"] .home-btn.focused {
-    background: #050914;
+    background: transparent;
     border-color: var(--cat);
     transform: scale(1.07);
     z-index: 5;
