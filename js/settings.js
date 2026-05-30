@@ -1597,8 +1597,6 @@ IPTVApp.prototype.savePlaylist = function() {
     }
     if (!found) {
         this.settings.playlists.push(playlist);
-    }
-    if (this.settings.playlists.length === 1) {
         this.settings.activePlaylistId = playlist.id;
     }
     this.saveSettings();

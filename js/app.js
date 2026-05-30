@@ -357,6 +357,26 @@ class IPTVApp {
         this.updateFocus();
     }
 
+    reconnectIfActivePlaylistChanged() {
+        if (!this.isIPTVConfigured()) return;
+        var playlists = this.settings.playlists || [];
+        var desiredId = (!this.settings.activePlaylistId && playlists.length >= 2)
+            ? 'merge'
+            : this.getActivePlaylist().id;
+        if (this.api && this.sameId(this._connectingPlaylistId, desiredId)) {
+            return;
+        }
+        if (this.api) {
+            this.data = {
+                live: { categories: [], streams: [] },
+                vod: { categories: [], streams: [] },
+                series: { categories: [], streams: [] }
+            };
+            this._forceRefresh = true;
+        }
+        this.autoConnect();
+    }
+
     initAPIs() {
         var self = this;
         TMDB.setApiKey(this.settings.tmdbApiKey);

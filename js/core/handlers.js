@@ -545,10 +545,13 @@ IPTVApp.prototype.backHandlers = {
         this.currentScreen = 'home';
         this.focusArea = 'home';
         this.updateHomeMenuVisibility();
-        if (this.isIPTVConfigured() && !this.api) {
-            this.autoConnect();
+        if (!this.isIPTVConfigured()) {
+            this.showWelcomeDemo();
+            return;
         }
-        this.focusIndex = this.isIPTVConfigured() ? this.lastHomeIndex : 0;
+        this.renderPlaylistSelector();
+        this.reconnectIfActivePlaylistChanged();
+        this.focusIndex = this.lastHomeIndex;
         this.clampHomeFocusIndex();
         this.updateFocus();
     },
