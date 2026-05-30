@@ -1416,7 +1416,7 @@ IPTVApp.prototype.loadSettings = function() {
         exitConfirmation: true,
         cacheRefreshHours: 12,
         homeTheme: 'aurora',
-        homeLabels: true,
+        homeLabels: false,
         homeProviderList: true
     };
     try {

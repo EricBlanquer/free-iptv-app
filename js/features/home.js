@@ -38,7 +38,9 @@ IPTVApp.prototype.applyHomeTheme = function() {
         }
     }
     var cfg = HOME_THEME_PRESETS[theme];
-    var labelsOn = !this.settings || this.settings.homeLabels !== false;
+    // Emoji tiles need their labels (including when forced by an expired license);
+    // Aurora tiles carry their own artwork, so labels follow the setting (off by default).
+    var labelsOn = theme === 'emoji' || !!(this.settings && this.settings.homeLabels);
     grid.setAttribute('data-home-theme', theme);
     grid.setAttribute('data-tile', cfg.tile);
     grid.setAttribute('data-labels', labelsOn ? 'on' : 'off');
