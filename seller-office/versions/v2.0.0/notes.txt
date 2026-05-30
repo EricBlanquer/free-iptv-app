@@ -1,12 +1,12 @@
 === Submission ===
-Version: 1.0.8
+Version: 2.0.0
 Date: 2026-05-31
-Type: Feature update (submitted while 1.0.7 is still in review)
+Type: Major feature update (supersedes the 1.0.x line)
 
 === Note for Tester ===
 WHAT'S NEW
 
-Feature update over 1.0.7. New "Aurora" home screen with artwork tiles and a refreshed look. Continue Watching, History and Favourites are now scoped to the active playlist. Fixed series resume opening season 1 instead of the last-watched season. Fixed movie descriptions briefly appearing then disappearing. Smoother playlist setup.
+Major update (2.0). New "Aurora" home screen with artwork tiles and a refreshed look. Continue Watching, History and Favourites are now scoped to the active playlist. Fixed series resume opening season 1 instead of the last-watched season. Fixed movie descriptions briefly appearing then disappearing. Smoother playlist setup.
 
 HOW TO TEST
 
