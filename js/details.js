@@ -1162,9 +1162,14 @@ IPTVApp.prototype.loadSeriesInfo = function(seriesId) {
             });
             self.currentSeason = parseInt(sortedSeasons[0]);
             self.updateSeriesContinueButton(data);
-            var targetSeason = (self.seriesContinueEpisode && data.episodes[self.seriesContinueEpisode.season])
-                ? self.seriesContinueEpisode.season
-                : parseInt(sortedSeasons[0]);
+            var targetSeason;
+            if (self.seriesDisplaySeason != null && data.episodes[self.seriesDisplaySeason]) {
+                targetSeason = self.seriesDisplaySeason;
+            } else if (self.seriesContinueEpisode && data.episodes[self.seriesContinueEpisode.season]) {
+                targetSeason = self.seriesContinueEpisode.season;
+            } else {
+                targetSeason = parseInt(sortedSeasons[0]);
+            }
             self.currentSeason = targetSeason;
             self.renderSeasons(data);
             self.renderEpisodes(data.episodes[targetSeason]);
@@ -1220,6 +1225,7 @@ IPTVApp.prototype.updateVodButtons = function() {
 
 IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
     var self = this;
+    this.seriesDisplaySeason = null;
     var continueBtn = document.getElementById('continue-btn');
     var playBtn = document.getElementById('play-btn');
     var statusEl = document.getElementById('series-status');
@@ -1267,6 +1273,7 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
             position: inProgressProgress.position,
             containerExtension: inProgressEpisode.container_extension || null
         };
+        this.seriesDisplaySeason = inProgressSeason;
         this.setHidden(statusEl, true);
         return;
     }
@@ -1296,6 +1303,7 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
                     position: 0,
                     containerExtension: nextEpisode.containerExtension || null
                 };
+                this.seriesDisplaySeason = nextEpisode.season;
             }
             // Status: X new episode(s)
             var statusText = I18n.t('series.lastWatched', 'Last watched:') + ' ' + lastEpLabel + ', ';
@@ -1318,6 +1326,7 @@ IPTVApp.prototype.updateSeriesContinueButton = function(seriesData) {
                 this.setHidden(playBtn, false);
                 this.seriesContinueEpisode = { id: firstEp.id, season: firstEp.season, episode: firstEp.episode, position: 0, containerExtension: firstEp.containerExtension || null };
             }
+            this.seriesDisplaySeason = lastWatched.season;
             statusEl.textContent = I18n.t('series.lastWatched', 'Last watched:') + ' ' + lastEpLabel + ', ' + I18n.t('series.noNewEpisode', 'no new episode');
             this.setHidden(statusEl, false);
             return;
