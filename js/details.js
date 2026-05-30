@@ -196,6 +196,7 @@ IPTVApp.prototype._resetDetailsUI = function(imageUrl, title, streamData) {
     this.clearElement('details-episodes-grid');
     this.setHidden('series-status', true);
     this._versionInfosPromise = null;
+    this._vodInfoPromise = null;
     this.currentSeriesInfo = null;
     var actionsEl = document.getElementById('details-actions');
     var oldVersionBtns = actionsEl.querySelectorAll('.version-btn');
@@ -263,45 +264,63 @@ IPTVApp.prototype._setupVersionSelector = function(streamData, isSeries) {
     return result;
 };
 
-IPTVApp.prototype._loadSingleStreamBitrate = function(streamData) {
+IPTVApp.prototype._loadProviderVodInfo = function(streamData) {
     var self = this;
-    var streamId = streamData.stream_id || streamData.series_id;
-    if (!streamId) return;
-    var api = this._getApiForPlaylist(streamData._playlistId);
-    if (!api || !api.getVodInfo) return;
-    var session = self._detailsSession;
-    api.getVodInfo(streamId).then(function(data) {
+    var streamId = streamData && (streamData.stream_id || streamData.vod_id);
+    var api = streamId ? this._getApiForPlaylist(streamData._playlistId) : null;
+    if (!api || !api.getVodInfo) return null;
+    var session = this._detailsSession;
+    return api.getVodInfo(streamId).then(function(data) {
         if (self._detailsSession !== session) {
-            window.log('SESSION', '_loadSingleStreamBitrate stale (was=' + session + ' now=' + self._detailsSession + ') id=' + streamId);
-            return;
+            window.log('SESSION', '_loadProviderVodInfo stale (was=' + session + ' now=' + self._detailsSession + ') id=' + streamId);
+            return null;
         }
-        if (!data || !data.info || !data.info.bitrate) return;
-        var playBtn = document.getElementById('play-btn');
-        if (!playBtn || playBtn.classList.contains('hidden')) return;
-        var bitrateLabel = self._formatBitrate(parseInt(data.info.bitrate));
-        if (!bitrateLabel) return;
-        var existing = playBtn.querySelector('.version-bitrate');
-        if (existing) existing.remove();
-        playBtn.appendChild(document.createTextNode(' '));
-        var span = document.createElement('span');
-        span.className = 'version-bitrate';
-        span.textContent = bitrateLabel;
-        playBtn.appendChild(span);
-        if (data.info.tmdb_id && self.selectedStream && self.selectedStream.data) {
-            var providedId = String(data.info.tmdb_id);
-            self.selectedStream.data.tmdb_id = providedId;
-            var currentId = self.tmdbInfo ? String(self.tmdbInfo.id) : null;
-            var type = self.selectedStream.type === 'series' ? 'tv' : 'movie';
-            if (currentId !== providedId) {
-                window.log('TMDB', 'Re-fetching with tmdb_id from get_vod_info: ' + providedId + ' (current=' + currentId + ')');
-                self.fetchTMDBDetailsById(providedId, type);
-            }
-            else if (self.tmdbInfo && !self._titleReplacedByTmdb) {
-                window.log('TMDB', 'Confirming title from get_vod_info tmdb_id=' + providedId);
-                self.displayTMDBDetails(self.tmdbInfo, self.tmdbInfo._type || type);
-            }
+        var info = data && data.info ? data.info : null;
+        self._applyVodBitrate(info);
+        if (info && info.tmdb_id && self.selectedStream && self.selectedStream.data) {
+            self.selectedStream.data.tmdb_id = String(info.tmdb_id);
         }
-    }).catch(function() {});
+        return info && info.tmdb_id ? String(info.tmdb_id) : null;
+    }).catch(function() {
+        return null;
+    });
+};
+
+IPTVApp.prototype._loadSingleStreamBitrate = function(streamData) {
+    this._vodInfoPromise = this._loadProviderVodInfo(streamData);
+};
+
+IPTVApp.prototype._ensureTmdbIdThen = function(streamData, done) {
+    if (streamData && (streamData.tmdb_id || streamData._tmdbId)) {
+        done();
+        return;
+    }
+    var promise = this._loadProviderVodInfo(streamData);
+    if (!promise) {
+        done();
+        return;
+    }
+    var self = this;
+    var session = this._detailsSession;
+    promise.then(function() {
+        if (self._detailsSession !== session) return;
+        done();
+    });
+};
+
+IPTVApp.prototype._applyVodBitrate = function(info) {
+    if (!info || !info.bitrate) return;
+    var playBtn = document.getElementById('play-btn');
+    if (!playBtn || playBtn.classList.contains('hidden')) return;
+    var bitrateLabel = this._formatBitrate(parseInt(info.bitrate));
+    if (!bitrateLabel) return;
+    var existing = playBtn.querySelector('.version-bitrate');
+    if (existing) existing.remove();
+    playBtn.appendChild(document.createTextNode(' '));
+    var span = document.createElement('span');
+    span.className = 'version-bitrate';
+    span.textContent = bitrateLabel;
+    playBtn.appendChild(span);
 };
 
 IPTVApp.prototype._getApiForPlaylist = function(playlistId) {
@@ -551,10 +570,22 @@ IPTVApp.prototype._showDetailsVod = function(streamId, streamData) {
             }
             self._doShowDetailsVod(streamId, streamData);
         });
+        return;
     }
-    else {
-        this._doShowDetailsVod(streamId, streamData);
+    var haveId = streamData && (streamData.tmdb_id || streamData._tmdbId);
+    if (this._vodInfoPromise && !haveId) {
+        var session = this._detailsSession;
+        this._vodInfoPromise.then(function(tmdbId) {
+            if (self._detailsSession !== session) return;
+            if (tmdbId && self.selectedStream && self.selectedStream.data
+                && !self.selectedStream.data.tmdb_id && !self.selectedStream.data._tmdbId) {
+                self.selectedStream.data.tmdb_id = tmdbId;
+            }
+            self._doShowDetailsVod(streamId, streamData);
+        });
+        return;
     }
+    this._doShowDetailsVod(streamId, streamData);
 };
 
 IPTVApp.prototype._doShowDetailsVod = function(streamId, streamData) {
@@ -649,7 +680,10 @@ IPTVApp.prototype.prepareDetailsFromHistory = function() {
         this.setHidden('details-episodes-section', true);
         this.clearElement('details-season-selector');
         this.clearElement('details-episodes-grid');
-        this.fetchTMDBInfo(cleanDisplayTitle, 'movie');
+        var selfHistory = this;
+        this._ensureTmdbIdThen(streamData, function() {
+            selfHistory.fetchTMDBInfo(cleanDisplayTitle, 'movie');
+        });
     }
 };
 
@@ -3117,7 +3151,10 @@ IPTVApp.prototype.showDetailsFromFilmography = function(streamId, streamType, fi
             } else {
                 playBtn.textContent = I18n.t('player.play', 'Play');
             }
-            this.fetchTMDBInfo(title, 'movie');
+            var selfFilmography = this;
+            this._ensureTmdbIdThen(stream, function() {
+                selfFilmography.fetchTMDBInfo(title, 'movie');
+            });
         }
         else {
             // Series: hide play buttons until episodes are loaded
