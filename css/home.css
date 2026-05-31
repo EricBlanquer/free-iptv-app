@@ -278,7 +278,12 @@ body[data-home-theme="aurora"] {
 
 body[data-home-theme="aurora"] #genre-screen,
 body[data-home-theme="aurora"] #continue-screen,
-body[data-home-theme="aurora"] #settings-screen {
+body[data-home-theme="aurora"] #settings-screen,
+body[data-home-theme="aurora"] #playlists-screen,
+body[data-home-theme="aurora"] #playlist-edit-screen,
+body[data-home-theme="aurora"] #details-screen,
+body[data-home-theme="aurora"] #actor-screen,
+body[data-home-theme="aurora"] #guide-screen {
     background: transparent;
 }
 
