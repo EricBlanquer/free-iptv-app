@@ -82,21 +82,12 @@ IPTVApp.prototype.showSettings = function() {
         versionSpan.id = 'settings-version';
         var versionText = 'v' + APP_VERSION;
         var isAndroid = (typeof Android !== 'undefined' && Android);
-        if (isAndroid && Android.getAppVersion) {
+        if (isAndroid && Android.getWebBuildHash) {
             try {
-                var nativeVersion = Android.getAppVersion();
-                if (nativeVersion) versionText = 'v' + nativeVersion;
+                var buildHash = Android.getWebBuildHash();
+                if (buildHash) versionText += ' [' + buildHash + ']';
             }
-            catch (ex) {
-                window.log('ERROR getAppVersion: ' + (ex.message || ex));
-            }
-            if (Android.getWebBuildHash) {
-                try {
-                    var buildHash = Android.getWebBuildHash();
-                    if (buildHash) versionText += ' [' + buildHash + ']';
-                }
-                catch (ex) {}
-            }
+            catch (ex) {}
         }
         versionSpan.textContent = versionText;
         header.appendChild(versionSpan);
