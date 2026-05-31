@@ -8,7 +8,8 @@
     "openSettings": "Instellingen openen",
     "permissionNeeded": "Android vereist dat u de installatie vanuit deze app toestaat. Open de instellingen om de toestemming te verlenen en probeer het opnieuw.",
     "permissionTitle": "Toestemming vereist",
-    "title": "Update beschikbaar"
+    "title": "Update beschikbaar",
+    "unavailable": "Automatische update is niet beschikbaar op dit apparaat. Download de nieuwste versie van iptv.blanquer.org."
   },
   "app": {
     "exitMessage": "Wilt u de app afsluiten?",

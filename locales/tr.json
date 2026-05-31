@@ -8,7 +8,8 @@
     "openSettings": "Ayarları aç",
     "permissionNeeded": "Android, bu uygulamadan yüklemeye izin vermenizi gerektirir. İzin vermek için ayarları açın ve tekrar deneyin.",
     "permissionTitle": "İzin gerekli",
-    "title": "Güncelleme mevcut"
+    "title": "Güncelleme mevcut",
+    "unavailable": "Otomatik güncelleme bu cihazda kullanılamıyor. En son sürümü iptv.blanquer.org adresinden indirin."
   },
   "app": {
     "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",

@@ -1234,7 +1234,16 @@ class IPTVApp {
 
     startApkDownload() {
         if (typeof Android === 'undefined' || !Android.downloadAndInstallApk) return;
-        if (Android.canInstallPackages && !Android.canInstallPackages()) {
+        var canInstall = true;
+        try {
+            if (Android.canInstallPackages) canInstall = Android.canInstallPackages();
+        }
+        catch (ex) {
+            window.log('ERROR canInstallPackages: ' + (ex.message || ex));
+            this._showApkUpdateUnavailable();
+            return;
+        }
+        if (!canInstall) {
             var self = this;
             this.showConfirmModal(
                 I18n.t('apkUpdate.permissionNeeded', 'Allow installation of unknown apps, then come back and try again.'),
@@ -1252,7 +1261,16 @@ class IPTVApp {
         }
         this._showApkDownloadToast(0);
         try { Android.downloadAndInstallApk(); }
-        catch (ex) { window.log('ERROR startApkDownload: ' + (ex.message || ex)); }
+        catch (ex) {
+            window.log('ERROR startApkDownload: ' + (ex.message || ex));
+            this._showApkUpdateUnavailable();
+        }
+    }
+
+    _showApkUpdateUnavailable() {
+        window.log('APK auto-update unavailable on this build (self-install not permitted)');
+        var msg = I18n.t('apkUpdate.unavailable', 'Automatic update is not available on this device. Download the latest version from iptv.blanquer.org.');
+        if (this._showToast) this._showToast(msg);
     }
 
     updateApkDownloadProgress(percent) {

@@ -8,7 +8,8 @@
     "openSettings": "Einstellungen öffnen",
     "permissionNeeded": "Android verlangt, dass Sie die Installation aus dieser App zulassen. Öffnen Sie die Einstellungen, um die Berechtigung zu erteilen, und versuchen Sie es dann erneut.",
     "permissionTitle": "Berechtigung erforderlich",
-    "title": "Update verfügbar"
+    "title": "Update verfügbar",
+    "unavailable": "Das automatische Update ist auf diesem Gerät nicht verfügbar. Laden Sie die neueste Version von iptv.blanquer.org herunter."
   },
   "app": {
     "exitMessage": "Möchten Sie die App beenden?",

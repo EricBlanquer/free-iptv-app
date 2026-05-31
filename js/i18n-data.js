@@ -1070,7 +1070,8 @@ var I18nData = {
                             "openSettings": "فتح الإعدادات",
                             "permissionNeeded": "يتطلب أندرويد السماح بالتثبيت من هذا التطبيق. افتح الإعدادات لمنح الإذن ثم حاول مرة أخرى.",
                             "permissionTitle": "الإذن مطلوب",
-                            "title": "تحديث متاح"
+                            "title": "تحديث متاح",
+                            "unavailable": "التحديث التلقائي غير متاح على هذا الجهاز. نزّل أحدث إصدار من iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "هل تريد الخروج من التطبيق؟",
@@ -1683,7 +1684,8 @@ var I18nData = {
                             "openSettings": "Einstellungen öffnen",
                             "permissionNeeded": "Android verlangt, dass Sie die Installation aus dieser App zulassen. Öffnen Sie die Einstellungen, um die Berechtigung zu erteilen, und versuchen Sie es dann erneut.",
                             "permissionTitle": "Berechtigung erforderlich",
-                            "title": "Update verfügbar"
+                            "title": "Update verfügbar",
+                            "unavailable": "Das automatische Update ist auf diesem Gerät nicht verfügbar. Laden Sie die neueste Version von iptv.blanquer.org herunter."
                     },
                     "app": {
                             "exitMessage": "Möchten Sie die App beenden?",
@@ -2296,7 +2298,8 @@ var I18nData = {
                             "openSettings": "Open settings",
                             "permissionNeeded": "Android requires you to allow installation from this app. Open settings to grant permission, then come back and retry.",
                             "permissionTitle": "Permission required",
-                            "title": "Update available"
+                            "title": "Update available",
+                            "unavailable": "Automatic update is not available on this device. Download the latest version from iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Do you want to exit the app?",
@@ -2909,7 +2912,8 @@ var I18nData = {
                             "openSettings": "Abrir configuración",
                             "permissionNeeded": "Android requiere que permita la instalación desde esta aplicación. Abra la configuración para otorgar el permiso y vuelva a intentarlo.",
                             "permissionTitle": "Permiso requerido",
-                            "title": "Actualización disponible"
+                            "title": "Actualización disponible",
+                            "unavailable": "La actualización automática no está disponible en este dispositivo. Descarga la última versión desde iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "¿Quieres salir de la aplicación?",
@@ -3522,7 +3526,8 @@ var I18nData = {
                             "openSettings": "Ouvrir les réglages",
                             "permissionNeeded": "Android exige que vous autorisiez l'installation depuis cette application. Ouvrez les réglages pour accorder la permission, puis revenez et réessayez.",
                             "permissionTitle": "Autorisation requise",
-                            "title": "Mise à jour disponible"
+                            "title": "Mise à jour disponible",
+                            "unavailable": "La mise à jour automatique n'est pas disponible sur cet appareil. Téléchargez la dernière version sur iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Voulez-vous quitter l'application ?",
@@ -4135,7 +4140,8 @@ var I18nData = {
                             "openSettings": "Apri impostazioni",
                             "permissionNeeded": "Android richiede di consentire l'installazione da questa app. Apri le impostazioni per concedere l'autorizzazione, poi torna e riprova.",
                             "permissionTitle": "Autorizzazione richiesta",
-                            "title": "Aggiornamento disponibile"
+                            "title": "Aggiornamento disponibile",
+                            "unavailable": "L'aggiornamento automatico non è disponibile su questo dispositivo. Scarica l'ultima versione da iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Vuoi uscire dall'app?",
@@ -4748,7 +4754,8 @@ var I18nData = {
                             "openSettings": "Instellingen openen",
                             "permissionNeeded": "Android vereist dat u de installatie vanuit deze app toestaat. Open de instellingen om de toestemming te verlenen en probeer het opnieuw.",
                             "permissionTitle": "Toestemming vereist",
-                            "title": "Update beschikbaar"
+                            "title": "Update beschikbaar",
+                            "unavailable": "Automatische update is niet beschikbaar op dit apparaat. Download de nieuwste versie van iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Wilt u de app afsluiten?",
@@ -5361,7 +5368,8 @@ var I18nData = {
                             "openSettings": "Otwórz ustawienia",
                             "permissionNeeded": "Android wymaga zezwolenia na instalację z tej aplikacji. Otwórz ustawienia, aby udzielić uprawnienia, a następnie spróbuj ponownie.",
                             "permissionTitle": "Wymagane uprawnienie",
-                            "title": "Dostępna aktualizacja"
+                            "title": "Dostępna aktualizacja",
+                            "unavailable": "Aktualizacja automatyczna nie jest dostępna na tym urządzeniu. Pobierz najnowszą wersję z iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Czy chcesz wyjść z aplikacji?",
@@ -5974,7 +5982,8 @@ var I18nData = {
                             "openSettings": "Abrir configurações",
                             "permissionNeeded": "O Android exige que você permita a instalação a partir deste app. Abra as configurações para conceder a permissão e tente novamente.",
                             "permissionTitle": "Permissão necessária",
-                            "title": "Atualização disponível"
+                            "title": "Atualização disponível",
+                            "unavailable": "A atualização automática não está disponível neste dispositivo. Baixe a versão mais recente em iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Deseja sair do aplicativo?",
@@ -6587,7 +6596,8 @@ var I18nData = {
                             "openSettings": "Открыть настройки",
                             "permissionNeeded": "Android требует разрешить установку из этого приложения. Откройте настройки, чтобы предоставить разрешение, затем повторите попытку.",
                             "permissionTitle": "Требуется разрешение",
-                            "title": "Доступно обновление"
+                            "title": "Доступно обновление",
+                            "unavailable": "Автоматическое обновление недоступно на этом устройстве. Скачайте последнюю версию с iptv.blanquer.org."
                     },
                     "app": {
                             "exitMessage": "Вы хотите выйти из приложения?",
@@ -7200,7 +7210,8 @@ var I18nData = {
                             "openSettings": "Ayarları aç",
                             "permissionNeeded": "Android, bu uygulamadan yüklemeye izin vermenizi gerektirir. İzin vermek için ayarları açın ve tekrar deneyin.",
                             "permissionTitle": "İzin gerekli",
-                            "title": "Güncelleme mevcut"
+                            "title": "Güncelleme mevcut",
+                            "unavailable": "Otomatik güncelleme bu cihazda kullanılamıyor. En son sürümü iptv.blanquer.org adresinden indirin."
                     },
                     "app": {
                             "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",

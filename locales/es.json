@@ -8,7 +8,8 @@
     "openSettings": "Abrir configuración",
     "permissionNeeded": "Android requiere que permita la instalación desde esta aplicación. Abra la configuración para otorgar el permiso y vuelva a intentarlo.",
     "permissionTitle": "Permiso requerido",
-    "title": "Actualización disponible"
+    "title": "Actualización disponible",
+    "unavailable": "La actualización automática no está disponible en este dispositivo. Descarga la última versión desde iptv.blanquer.org."
   },
   "app": {
     "exitMessage": "¿Quieres salir de la aplicación?",
