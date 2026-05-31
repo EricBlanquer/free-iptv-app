@@ -588,9 +588,10 @@ class IPTVApp {
                     document.getElementById('home-grid').style.visibility = '';
                     self.showLoading(false);
                     if (providerCache._needsRefresh || self._forceRefresh) {
+                        var hardRefresh = self._forceRefresh;
                         self._forceRefresh = false;
                         setTimeout(function() {
-                            self.refreshProviderCacheBackground(playlist.id);
+                            self.refreshProviderCacheBackground(playlist.id, hardRefresh);
                         }, 2000);
                     }
                     self.startCacheRefreshTimer(playlist.id);

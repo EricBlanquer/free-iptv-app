@@ -513,6 +513,24 @@ body[data-home-theme="aurora"] #loading {
     display: none;
 }
 
+/* Mobile landscape with limited height: float the provider tabs over the top
+   of the grid instead of pushing it down (the forced width=1920 viewport makes
+   a phone's CSS height ~820-890px, while a 16:9 TV stays at 1080px). */
+@media (max-height: 1000px) {
+    body.touch #home-screen #playlist-selector {
+        position: absolute;
+        top: 14px;
+        right: 25px;
+        margin-bottom: 0;
+        z-index: 5;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    body.touch #home-screen #playlist-selector .playlist-tab {
+        margin: 4px 0;
+    }
+}
+
 .playlist-tab {
     display: flex;
     flex-direction: column;

@@ -1013,7 +1013,7 @@ IPTVApp.prototype._computeCacheFingerprint = function(cache) {
     return parts.join('|');
 };
 
-IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
+IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId, force) {
     var self = this;
     // Prevent multiple concurrent refreshes for the same playlist
     if (!this._backgroundRefreshInProgress) {
@@ -1050,7 +1050,7 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId) {
         window.log('Background refresh: cache loaded for ' + playlistId);
         var newFingerprint = self._computeCacheFingerprint(api.cache);
         var oldFingerprint = self._cacheFingerprints && self._cacheFingerprints[playlistId];
-        if (oldFingerprint && oldFingerprint === newFingerprint) {
+        if (!force && oldFingerprint && oldFingerprint === newFingerprint) {
             window.log('Background refresh: data unchanged for ' + playlistId + ' (fingerprint: ' + newFingerprint + ')');
             var now = Date.now();
             self.playlistCacheTimestamps = self.playlistCacheTimestamps || {};

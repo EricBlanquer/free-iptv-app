@@ -946,38 +946,7 @@ class TVPlayer {
                 if (this.onError) this.onError(errorInfo);
             },
             onsubtitlechange: (duration, text, data3, data4) => {
-                var subtitleText = text || data3 || data4 || '';
-                var subtitleEl = document.getElementById('subtitle-display');
-                if (subtitleEl && this.subtitlesEnabled && subtitleText) {
-                    // Clear previous subtitle timer
-                    if (this.subtitleClearTimer) {
-                        clearTimeout(this.subtitleClearTimer);
-                    }
-                    // Parse ASS/SSA tags if app is available
-                    var align = null, pos = null;
-                    if (window.app && window.app.parseAssaTags) {
-                        var parsed = window.app.parseAssaTags(subtitleText);
-                        subtitleText = parsed.text;
-                        align = parsed.align;
-                        pos = parsed.pos;
-                        window.app.applySubtitlePosition(subtitleEl, align, pos);
-                    }
-                    // Also clean \n and \r for embedded subtitles
-                    subtitleText = subtitleText.replace(/\r\n|\r|\n/g, '<br>').replace(/(<br>\s*)+/g, '<br>').replace(/^<br>|<br>$/g, '');
-                    window.displaySubtitle(subtitleEl, subtitleText);
-                    if (duration > 0) {
-                        var self = this;
-                        this.subtitleStartTime = Date.now();
-                        this.subtitleDuration = duration;
-                        this.subtitleClearTimer = setTimeout(function() {
-                            window.displaySubtitle(subtitleEl, '');
-                            self.subtitleDuration = 0;
-                            if (window.app && window.app.resetSubtitlePosition) {
-                                window.app.resetSubtitlePosition(subtitleEl);
-                            }
-                        }, duration);
-                    }
-                }
+                this._renderSubtitleCue(duration, text || data3 || data4 || '');
             },
             ondrmevent: (drmEvent, drmData) => {
                 window.log('PLAYER', 'DRM event: ' + drmEvent);
@@ -1262,6 +1231,42 @@ class TVPlayer {
             }
         } catch (e) { /* player may not be ready */ }
         return true;
+    }
+
+    _renderSubtitleCue(duration, text) {
+        var subtitleEl = document.getElementById('subtitle-display');
+        if (!subtitleEl || !this.subtitlesEnabled) return;
+        if (this.subtitleClearTimer) {
+            clearTimeout(this.subtitleClearTimer);
+            this.subtitleClearTimer = null;
+        }
+        if (!text) {
+            window.displaySubtitle(subtitleEl, '');
+            this.subtitleDuration = 0;
+            if (window.app && window.app.resetSubtitlePosition) {
+                window.app.resetSubtitlePosition(subtitleEl);
+            }
+            return;
+        }
+        if (window.app && window.app.parseAssaTags) {
+            var parsed = window.app.parseAssaTags(text);
+            text = parsed.text;
+            window.app.applySubtitlePosition(subtitleEl, parsed.align, parsed.pos);
+        }
+        text = text.replace(/\r\n|\r|\n/g, '<br>').replace(/(<br>\s*)+/g, '<br>').replace(/^<br>|<br>$/g, '');
+        window.displaySubtitle(subtitleEl, text);
+        if (duration > 0) {
+            var self = this;
+            this.subtitleStartTime = Date.now();
+            this.subtitleDuration = duration;
+            this.subtitleClearTimer = setTimeout(function() {
+                window.displaySubtitle(subtitleEl, '');
+                self.subtitleDuration = 0;
+                if (window.app && window.app.resetSubtitlePosition) {
+                    window.app.resetSubtitlePosition(subtitleEl);
+                }
+            }, duration);
+        }
     }
 
     // Playback speed control

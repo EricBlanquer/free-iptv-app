@@ -180,6 +180,76 @@ IPTVApp.prototype.hideSeekIndicator = function() {
     var indicator = document.getElementById('seek-indicator');
     indicator.classList.remove('visible');
 };
+
+IPTVApp.prototype.beginTouchSeek = function() {
+    var isLive = this.currentPlayingType === 'live';
+    var isCatchup = this.currentPlayingType === 'catchup';
+    var duration = this.player ? this.player.duration : 0;
+    if (isLive || isCatchup || !(duration > 0)) {
+        return false;
+    }
+    this.clearTimer('seekDebounceTimer');
+    this.clearTimer('seekSafetyTimeout');
+    if (this.seekInterval) {
+        clearInterval(this.seekInterval);
+        this.seekInterval = null;
+    }
+    this.seekDirection = 0;
+    this._touchSeekActive = true;
+    this._touchSeekDuration = duration;
+    this._touchSeekWasPlaying = this.player.isPlaying && !this.player.isPaused;
+    this._touchSeekStartPos = Math.max(0, Math.min(duration, this.player.currentTime || 0));
+    this.seekTargetPosition = this._touchSeekStartPos;
+    if (this._touchSeekWasPlaying) {
+        this.player.pause();
+    }
+    this.showPlayerOverlay();
+    return true;
+};
+
+IPTVApp.prototype.updateTouchSeek = function(deltaMs) {
+    if (!this._touchSeekActive) return;
+    var duration = this._touchSeekDuration;
+    this.seekTargetPosition = Math.max(0, Math.min(duration, this._touchSeekStartPos + deltaMs));
+    var percent = duration > 0 ? (this.seekTargetPosition / duration) * 100 : 0;
+    this.setProgressBarWidth(Math.min(100, percent));
+    var remaining = Math.max(0, duration - this.seekTargetPosition);
+    document.getElementById('player-time').textContent = this.player.formatTime(this.seekTargetPosition);
+    document.getElementById('player-remaining').textContent = this.player.formatTime(remaining);
+    var delta = this.seekTargetPosition - this._touchSeekStartPos;
+    var indicator = document.getElementById('seek-indicator');
+    if (indicator) {
+        var arrow = delta >= 0 ? '▶▶' : '◀◀';
+        indicator.textContent = arrow + ' ' + this.player.formatTime(this.seekTargetPosition);
+        indicator.classList.add('visible');
+    }
+    this.showPlayerOverlay();
+};
+
+IPTVApp.prototype.endTouchSeek = function() {
+    if (!this._touchSeekActive) return;
+    this._touchSeekActive = false;
+    this.hideSeekIndicator();
+    var target = this.seekTargetPosition;
+    var wasPlaying = this._touchSeekWasPlaying;
+    var duration = this._touchSeekDuration;
+    if (duration > 0 && target >= duration && !this._completionTriggered) {
+        this._completionTriggered = true;
+        this.onPlaybackCompleted();
+        return;
+    }
+    if (this.player.isBuffering) {
+        this._pendingSeekPosition = target;
+        this._pendingSeekResume = wasPlaying;
+    }
+    else {
+        this.player.seekTo(target);
+        this.lastSeekTime = Date.now();
+        if (wasPlaying) {
+            this.player.resume();
+        }
+    }
+};
 // Return to live (exit timeshift)
 IPTVApp.prototype.returnToLive = function() {
     window.log('ACTION', 'returnToLive');
@@ -1196,7 +1266,7 @@ IPTVApp.prototype.setProgressBarWidth = function(percent) {
 };
 
 IPTVApp.prototype.updatePlayerProgress = function(current, total) {
-    if (this.seekDirection !== 0 || this.seekDebounceTimer || this._pendingSeekPosition !== undefined) {
+    if (this.seekDirection !== 0 || this.seekDebounceTimer || this._pendingSeekPosition !== undefined || this._touchSeekActive) {
         return;
     }
     // Don't update progress for live in timeshift - handled by updatePlayerStateIndicator

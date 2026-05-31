@@ -16,7 +16,7 @@ IPTVApp.prototype._isKeyRepeat = function(keyCode) {
 
 IPTVApp.prototype.bindKeys = function() {
     var self = this;
-    if (/Android/.test(navigator.userAgent)) {
+    if (window.isMobileTouch) {
         var backBtn = document.createElement('div');
         backBtn.id = 'android-back-btn';
         backBtn.style.display = 'flex';

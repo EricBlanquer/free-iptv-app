@@ -389,30 +389,51 @@ IPTVApp.prototype.bindPlayerGestures = function() {
         var t = e.touches[0];
         var side = t.clientX < window.innerWidth / 2 ? 'brightness' : 'volume';
         var startValue = clampUnit(side === 'brightness' ? Android.getBrightness() : Android.getVolume());
-        state = { startX: t.clientX, startY: t.clientY, side: side, startValue: startValue, active: false };
-        window.log('GESTURE', 'touchstart side=' + side + ' x=' + Math.round(t.clientX) + '/' + window.innerWidth + ' startValue=' + startValue.toFixed(3));
+        state = { startX: t.clientX, startY: t.clientY, side: side, startValue: startValue, axis: null };
     }, { passive: true });
     playerScreen.addEventListener('touchmove', function(e) {
         if (!state) return;
         var t = e.touches[0];
         var dx = t.clientX - state.startX;
         var dy = t.clientY - state.startY;
-        if (!state.active) {
-            if (Math.abs(dy) < THRESHOLD_PX || Math.abs(dy) <= Math.abs(dx)) return;
-            state.active = true;
-            window.log('GESTURE', 'activated side=' + state.side + ' dy=' + Math.round(dy));
+        if (!state.axis) {
+            if (Math.abs(dx) >= THRESHOLD_PX && Math.abs(dx) > Math.abs(dy)) {
+                if (self.beginTouchSeek()) {
+                    state.axis = 'seek';
+                    window.log('GESTURE', 'activated seek dx=' + Math.round(dx));
+                }
+                else {
+                    state = null;
+                    return;
+                }
+            }
+            else if (Math.abs(dy) >= THRESHOLD_PX && Math.abs(dy) > Math.abs(dx)) {
+                state.axis = state.side;
+                window.log('GESTURE', 'activated side=' + state.side + ' dy=' + Math.round(dy));
+            }
+            else {
+                return;
+            }
         }
         if (e.cancelable) e.preventDefault();
+        if (state.axis === 'seek') {
+            self.updateTouchSeek((dx / window.innerWidth) * self._touchSeekDuration);
+            return;
+        }
         var value = clampUnit(state.startValue - dy / (window.innerHeight * SENSITIVITY));
         state.value = value;
-        if (state.side === 'brightness') Android.setBrightness(value);
+        if (state.axis === 'brightness') Android.setBrightness(value);
         else Android.setVolume(value);
-        showHud(state.side, value);
+        showHud(state.axis, value);
     }, { passive: false });
     var endGesture = function() {
         if (!state) return;
-        if (state.active) {
-            window.log('GESTURE', state.side + ' end -> ' + clampUnit(state.value).toFixed(3));
+        if (state.axis === 'seek') {
+            self._suppressNextClickUntil = Date.now() + 500;
+            self.endTouchSeek();
+        }
+        else if (state.axis) {
+            window.log('GESTURE', state.axis + ' end -> ' + clampUnit(state.value).toFixed(3));
             self._suppressNextClickUntil = Date.now() + 500;
             hideTimer = setTimeout(function() { self.setHidden(hud, true); }, 600);
         }
