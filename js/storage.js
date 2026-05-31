@@ -1209,14 +1209,12 @@ IPTVApp.prototype.updateRefreshProgress = function(playlistId, step, total, name
     var playlists = this.settings.playlists || [];
     var isSingleProvider = playlists.filter(function(p) { return p.showOnHome !== false; }).length < 2;
     if (!isActiveProvider && !isSingleProvider) return;
+    if (this.settings.homeProviderAge !== true) {
+        this.setHidden(providerAgeEl, true);
+        return;
+    }
     if (!name || (step === 0 && total === 0)) {
-        var ts = (this.playlistCacheTimestamps || {})[playlistId];
-        while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
-        var doneIcon = document.createElement('span');
-        doneIcon.className = 'material-symbols-outlined';
-        doneIcon.textContent = 'schedule';
-        providerAgeEl.appendChild(doneIcon);
-        providerAgeEl.appendChild(document.createTextNode(' ' + (ts ? formatTimeAgo(ts) : '')));
+        this.updateProviderAge();
     } else {
         while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
         var hg2 = document.createElement('span');
@@ -1416,8 +1414,9 @@ IPTVApp.prototype.loadSettings = function() {
         exitConfirmation: true,
         cacheRefreshHours: 12,
         homeTheme: 'aurora',
-        homeLabels: false,
-        homeProviderList: true
+        homeLabels: true,
+        homeProviderList: true,
+        homeProviderAge: true
     };
     try {
         var data = localStorage.getItem('settings');

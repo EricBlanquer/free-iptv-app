@@ -1054,7 +1054,7 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             if (setting === 'homeLabels') {
                 this.applyHomeTheme();
             }
-            if (setting === 'homeProviderList') {
+            if (setting === 'homeProviderList' || setting === 'homeProviderAge') {
                 this.renderPlaylistSelector();
             }
             this.saveSettings();

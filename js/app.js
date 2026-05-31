@@ -282,52 +282,15 @@ class IPTVApp {
         var container = document.getElementById('playlist-selector');
         var playlists = this.settings.playlists || [];
         var visiblePlaylists = playlists.filter(function(p) { return p.showOnHome !== false; });
-        var providerAgeEl = document.getElementById('home-provider-age');
-        if (this.settings.homeProviderList === false) {
+        this.updateProviderAge(visiblePlaylists);
+        if (this.settings.homeProviderList === false || visiblePlaylists.length < 2) {
             this.setHidden(container, true);
             container.innerHTML = '';
-            if (providerAgeEl) this.setHidden(providerAgeEl, true);
             return;
-        }
-        if (visiblePlaylists.length < 2) {
-            this.setHidden(container, true);
-            container.innerHTML = '';
-            if (providerAgeEl && visiblePlaylists.length === 1) {
-                var ts = (this.playlistCacheTimestamps || {})[visiblePlaylists[0].id];
-                if (ts) {
-                    while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
-                    var icon = document.createElement('span');
-                    icon.className = 'material-symbols-outlined';
-                    icon.textContent = 'schedule';
-                    providerAgeEl.appendChild(icon);
-                    providerAgeEl.appendChild(document.createTextNode(' ' + formatTimeAgo(ts)));
-                    this.setHidden(providerAgeEl, false);
-                } else {
-                    this.setHidden(providerAgeEl, true);
-                }
-            } else if (providerAgeEl) {
-                this.setHidden(providerAgeEl, true);
-            }
-            return;
-        }
-        if (providerAgeEl) {
-            var activeTs = (this.playlistCacheTimestamps || {})[this.settings.activePlaylistId];
-            if (activeTs) {
-                while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
-                var ageIcon = document.createElement('span');
-                ageIcon.className = 'material-symbols-outlined';
-                ageIcon.textContent = 'schedule';
-                providerAgeEl.appendChild(ageIcon);
-                providerAgeEl.appendChild(document.createTextNode(' ' + formatTimeAgo(activeTs)));
-                this.setHidden(providerAgeEl, false);
-            } else {
-                this.setHidden(providerAgeEl, true);
-            }
         }
         this.setHidden(container, false);
         container.innerHTML = '';
         var activeId = this.settings.activePlaylistId;
-        var timestamps = this.playlistCacheTimestamps || {};
         visiblePlaylists.forEach(function(p) {
             var tab = document.createElement('div');
             tab.className = 'playlist-tab focusable' + (self.sameId(p.id, activeId) ? ' active' : '');
@@ -339,6 +302,32 @@ class IPTVApp {
             container.appendChild(tab);
         });
         this.invalidateFocusables();
+    }
+
+    updateProviderAge(visiblePlaylists) {
+        var providerAgeEl = document.getElementById('home-provider-age');
+        if (!providerAgeEl) return;
+        if (this.settings.homeProviderAge !== true) {
+            this.setHidden(providerAgeEl, true);
+            return;
+        }
+        if (!visiblePlaylists) {
+            visiblePlaylists = (this.settings.playlists || []).filter(function(p) { return p.showOnHome !== false; });
+        }
+        var pid = this.settings.activePlaylistId
+            || (visiblePlaylists.length === 1 ? visiblePlaylists[0].id : null);
+        var ts = pid ? (this.playlistCacheTimestamps || {})[pid] : null;
+        if (!ts) {
+            this.setHidden(providerAgeEl, true);
+            return;
+        }
+        while (providerAgeEl.firstChild) providerAgeEl.removeChild(providerAgeEl.firstChild);
+        var icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined';
+        icon.textContent = 'schedule';
+        providerAgeEl.appendChild(icon);
+        providerAgeEl.appendChild(document.createTextNode(' ' + formatTimeAgo(ts)));
+        this.setHidden(providerAgeEl, false);
     }
 
     switchPlaylist(playlistId) {
