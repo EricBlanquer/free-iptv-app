@@ -61,7 +61,7 @@ IPTVApp.prototype.applyHomeTheme = function() {
             btn.classList.add('has-art');
             var img = document.createElement('img');
             img.className = 'home-art';
-            img.src = cfg.assetDir + btn.dataset.section + '.png';
+            img.src = cfg.assetDir + btn.dataset.section + '.webp';
             img.alt = '';
             iconEl.appendChild(img);
         }

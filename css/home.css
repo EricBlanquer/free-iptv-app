@@ -244,7 +244,7 @@
 }
 
 #home-screen[data-home-theme="aurora"] {
-    background: #020712 url(../assets/home/aurora/wallpaper.png) center center/cover no-repeat;
+    background: #020712 url(../assets/home/aurora/wallpaper.webp) center center/cover no-repeat;
     overflow: hidden;
 }
 
@@ -273,7 +273,7 @@
 body[data-home-theme="aurora"] {
     background:
         linear-gradient(180deg, rgba(4, 6, 16, 0.74) 0%, rgba(4, 6, 16, 0.82) 100%),
-        url(../assets/home/aurora/wallpaper.png) center center / cover no-repeat;
+        url(../assets/home/aurora/wallpaper.webp) center center / cover no-repeat;
 }
 
 body[data-home-theme="aurora"] #genre-screen,
@@ -285,7 +285,7 @@ body[data-home-theme="aurora"] #settings-screen {
 /* Use the theme wallpaper behind the loading screen instead of a flat dark
    fill, so loading categories/streams keeps the selected theme's background. */
 body[data-home-theme="aurora"] #loading {
-    background: #020712 url(../assets/home/aurora/wallpaper.png) center center / cover no-repeat;
+    background: #020712 url(../assets/home/aurora/wallpaper.webp) center center / cover no-repeat;
 }
 
 #home-grid[data-home-theme="aurora"] {
@@ -468,7 +468,7 @@ body[data-home-theme="aurora"] #loading {
 #home-grid[data-home-theme="aurora"] .home-btn.custom-category {
     background:
         linear-gradient(180deg, rgba(6, 10, 22, 0.58) 0%, rgba(4, 7, 16, 0.84) 100%),
-        url(../assets/home/aurora/wallpaper.png) center center / cover no-repeat;
+        url(../assets/home/aurora/wallpaper.webp) center center / cover no-repeat;
     border-color: rgba(143, 179, 255, 0.24);
 }
 
