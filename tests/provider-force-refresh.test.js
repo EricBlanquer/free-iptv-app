@@ -13,6 +13,7 @@ const fs = require('fs');
 
 const appCode = fs.readFileSync('./js/app.js', 'utf8');
 const storageCode = fs.readFileSync('./js/storage.js', 'utf8');
+const settingsCode = fs.readFileSync('./js/settings.js', 'utf8');
 
 function methodBody(src, header) {
     const start = src.indexOf(header);
@@ -21,8 +22,14 @@ function methodBody(src, header) {
 }
 
 describe('selecting a provider tab forces a hard refresh', () => {
-    it('switchPlaylist marks a forced refresh', () => {
+    it('switchPlaylist (home tabs) marks a forced refresh', () => {
         const body = methodBody(appCode, 'switchPlaylist(playlistId) {');
+        expect(body).toMatch(/this\._forceRefresh\s*=\s*true/);
+        expect(body).toMatch(/this\.autoConnect\(\)/);
+    });
+
+    it('selectPlaylist (settings provider list) also marks a forced refresh', () => {
+        const body = methodBody(settingsCode, 'selectPlaylist = function(playlistId) {');
         expect(body).toMatch(/this\._forceRefresh\s*=\s*true/);
         expect(body).toMatch(/this\.autoConnect\(\)/);
     });

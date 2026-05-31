@@ -1627,6 +1627,7 @@ IPTVApp.prototype.selectPlaylist = function(playlistId) {
         vod: { categories: [], streams: [] },
         series: { categories: [], streams: [] }
     };
+    this._forceRefresh = true;
     this.autoConnect();
     this.showScreen('home');
     this.currentScreen = 'home';
