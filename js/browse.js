@@ -3587,24 +3587,9 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
         for (var i = 0; i < streams.length; i++) processStream(streams[i]);
         return finalize();
     }
-    if (!onProgress) onProgress = function() {};
-    return new Promise(function(resolve) {
-        var idx = 0;
-        var processBatch = function() {
-            var end = Math.min(idx + BATCH_SIZE, streams.length);
-            for (var i = idx; i < end; i++) processStream(streams[i]);
-            idx = end;
-            var percent = Math.round(idx / streams.length * 100);
-            onProgress(percent);
-            if (idx < streams.length) {
-                setTimeout(processBatch, 0);
-            }
-            else {
-                resolve(finalize());
-            }
-        };
-        processBatch();
-    });
+    return this.runLowPriority(streams.length, function(start, end) {
+        for (var i = start; i < end; i++) processStream(streams[i]);
+    }, onProgress).then(finalize);
 };
 
 IPTVApp.prototype._applyDedup = function(streams) {

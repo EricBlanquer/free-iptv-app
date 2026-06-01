@@ -954,9 +954,28 @@ IPTVApp.prototype.applyQualityFiltersToSection = function(categories, streams) {
     filteredStreams = filteredStreams.filter(function(s) {
         return categoryIds[s.category_id];
     });
-    if (this.settings.hideSD) {
-        var titleMap = {};
-        filteredStreams.forEach(function(s) {
+    var applyHide3D = function() {
+        if (self.settings.hide3D) {
+            filteredStreams = filteredStreams.filter(function(s) {
+                return !self.is3D(s);
+            });
+            var streamCategoryIds3D = {};
+            filteredStreams.forEach(function(s) { streamCategoryIds3D[s.category_id] = true; });
+            filteredCategories = filteredCategories.filter(function(cat) {
+                var name = (cat.category_name || '').toUpperCase();
+                if (name.indexOf('3D') === -1) return true;
+                return streamCategoryIds3D[cat.category_id];
+            });
+        }
+        return { categories: filteredCategories, streams: filteredStreams };
+    };
+    if (!this.settings.hideSD) {
+        return Promise.resolve(applyHide3D());
+    }
+    var titleMap = {};
+    return this.runLowPriority(filteredStreams.length, function(start, end) {
+        for (var i = start; i < end; i++) {
+            var s = filteredStreams[i];
             var cleanTitle = self.cleanTitle(self.getStreamTitle(s)).toLowerCase();
             if (!titleMap[cleanTitle]) {
                 titleMap[cleanTitle] = { sd: [], hd: [] };
@@ -967,7 +986,8 @@ IPTVApp.prototype.applyQualityFiltersToSection = function(categories, streams) {
             else {
                 titleMap[cleanTitle].hd.push(s);
             }
-        });
+        }
+    }).then(function() {
         filteredStreams = filteredStreams.filter(function(s) {
             if (!self.isSD(s)) return true;
             var cleanTitle = self.cleanTitle(self.getStreamTitle(s)).toLowerCase();
@@ -980,20 +1000,8 @@ IPTVApp.prototype.applyQualityFiltersToSection = function(categories, streams) {
             if (!name.startsWith('SD|')) return true;
             return streamCategoryIds[cat.category_id];
         });
-    }
-    if (this.settings.hide3D) {
-        filteredStreams = filteredStreams.filter(function(s) {
-            return !self.is3D(s);
-        });
-        var streamCategoryIds3D = {};
-        filteredStreams.forEach(function(s) { streamCategoryIds3D[s.category_id] = true; });
-        filteredCategories = filteredCategories.filter(function(cat) {
-            var name = (cat.category_name || '').toUpperCase();
-            if (name.indexOf('3D') === -1) return true;
-            return streamCategoryIds3D[cat.category_id];
-        });
-    }
-    return { categories: filteredCategories, streams: filteredStreams };
+        return applyHide3D();
+    });
 };
 IPTVApp.prototype._computeCacheFingerprint = function(cache) {
     var parts = [];
@@ -1071,26 +1079,28 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId, force) {
         api.filterCacheByLanguage(function(catName) {
             return self.matchesLanguage(catName);
         });
-        var vodFiltered = self.applyQualityFiltersToSection(
+        var cacheData = {};
+        return self.applyQualityFiltersToSection(
             api.cache.vodCategories || [],
             api.cache.vodStreams['_all'] || []
-        );
-        var seriesFiltered = self.applyQualityFiltersToSection(
-            api.cache.seriesCategories || [],
-            api.cache.series['_all'] || []
-        );
-        var liveFiltered = self.applyQualityFiltersToSection(
-            api.cache.liveCategories || [],
-            api.cache.liveStreams['_all'] || []
-        );
-        var cacheData = {
-            vod: vodFiltered,
-            series: seriesFiltered,
-            live: liveFiltered
-        };
-        window.log('Background refresh: applied filters - vod:' + vodFiltered.streams.length + ' series:' + seriesFiltered.streams.length + ' live:' + liveFiltered.streams.length);
-        return self.saveProviderCache(playlistId, cacheData).then(function() {
-            return cacheData;
+        ).then(function(vodFiltered) {
+            cacheData.vod = vodFiltered;
+            return self.applyQualityFiltersToSection(
+                api.cache.seriesCategories || [],
+                api.cache.series['_all'] || []
+            );
+        }).then(function(seriesFiltered) {
+            cacheData.series = seriesFiltered;
+            return self.applyQualityFiltersToSection(
+                api.cache.liveCategories || [],
+                api.cache.liveStreams['_all'] || []
+            );
+        }).then(function(liveFiltered) {
+            cacheData.live = liveFiltered;
+            window.log('Background refresh: applied filters - vod:' + cacheData.vod.streams.length + ' series:' + cacheData.series.streams.length + ' live:' + cacheData.live.streams.length);
+            return self.saveProviderCache(playlistId, cacheData).then(function() {
+                return cacheData;
+            });
         });
     }).then(function(cacheData) {
         if (cacheData === null) return;

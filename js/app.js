@@ -80,6 +80,7 @@ class IPTVApp {
         this.displayedCount = 0;
         this.itemsPerBatch = 5;
         this.lastNavTime = 0;
+        this.lastInputTime = 0;
         this.navThrottle = 80;
         this.imageLoadTimer = null;
         this.scrollTimer = null;

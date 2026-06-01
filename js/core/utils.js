@@ -38,6 +38,37 @@ function formatTimeAgo(timestamp) {
     return I18n.t('time.monthsAgo', '{n} months ago').replace('{n}', months);
 }
 
+IPTVApp.prototype.LOWPRIO_INPUT_WINDOW_MS = 300;
+IPTVApp.prototype.LOWPRIO_IDLE_BATCH = 2000;
+IPTVApp.prototype.LOWPRIO_BUSY_BATCH = 250;
+IPTVApp.prototype.LOWPRIO_BUSY_DELAY_MS = 90;
+
+IPTVApp.prototype.isUserInteracting = function() {
+    var last = Math.max(this.lastInputTime || 0, this.lastNavTime || 0);
+    return (Date.now() - last) < this.LOWPRIO_INPUT_WINDOW_MS;
+};
+
+IPTVApp.prototype.runLowPriority = function(total, processRange, onProgress) {
+    var self = this;
+    return new Promise(function(resolve) {
+        var idx = 0;
+        var step = function() {
+            var interacting = self.isUserInteracting();
+            var batch = interacting ? self.LOWPRIO_BUSY_BATCH : self.LOWPRIO_IDLE_BATCH;
+            var end = Math.min(idx + batch, total);
+            processRange(idx, end);
+            idx = end;
+            if (onProgress) onProgress(Math.round(idx / total * 100));
+            if (idx >= total) {
+                resolve();
+                return;
+            }
+            setTimeout(step, interacting ? self.LOWPRIO_BUSY_DELAY_MS : 0);
+        };
+        step();
+    });
+};
+
 IPTVApp.prototype.onAppResumed = function() {
     window.log('RESUME', 'app resumed - re-running startup checks (license, update, playlists)');
     if (typeof this.setupRemoteDebug === 'function') {

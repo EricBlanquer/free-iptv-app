@@ -36,6 +36,7 @@ IPTVApp.prototype.bindKeys = function() {
     });
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
+        self.lastInputTime = Date.now();
         var logAfter = function() {
             window.log('KEY', 'keydown key=' + key + ' focusArea=' + self.focusArea + ' focused=' + self._describeFocused());
         };
