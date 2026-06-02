@@ -599,8 +599,10 @@ IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, 
         var startTime = Date.now();
         var timeoutId = setTimeout(function() {
             window.log('HTTP', 'IMG [' + idx + '] TIMEOUT after 8s: ' + optimizedUrl);
-            div.dataset.loaded = 'error';
-            div.classList.add('no-image');
+            if (div.dataset.loaded !== 'ok' && div.dataset.loaded !== 'tmdb') {
+                div.dataset.loaded = 'error';
+                div.classList.add('no-image');
+            }
             onDone();
         }, 8000);
         img.onload = function() {
@@ -630,8 +632,10 @@ IPTVApp.prototype._loadSingleImage = function(div, url, idx, gridItem, queueId, 
             clearTimeout(timeoutId);
             var duration = Date.now() - startTime;
             window.log('HTTP', 'IMG [' + idx + '] ERROR ' + duration + 'ms (final): ' + optimizedUrl);
-            div.dataset.loaded = 'error';
-            div.classList.add('no-image');
+            if (div.dataset.loaded !== 'ok' && div.dataset.loaded !== 'tmdb') {
+                div.dataset.loaded = 'error';
+                div.classList.add('no-image');
+            }
             onDone();
         };
         img.src = self.proxyImageUrl(optimizedUrl);
@@ -876,7 +880,14 @@ IPTVApp.prototype.loadVisibleGenres = function() {
                     }
                     if (result.poster_path) {
                         var imgDiv = gridItem.querySelector('.grid-item-image');
-                        if (imgDiv && imgDiv.classList.contains('no-image')) {
+                        // Apply the TMDB poster whenever the provider image has not
+                        // succeeded yet (loading/error/none), not only once `no-image`
+                        // is set. Otherwise a slow/dead provider image still in
+                        // 'loading' state when this runs loses its only chance: the
+                        // poster is skipped here but genreLoaded is burned to 'done',
+                        // so the item is never retried and stays poster-less.
+                        var loadState = imgDiv ? imgDiv.dataset.loaded : null;
+                        if (imgDiv && loadState !== 'ok' && loadState !== 'local' && loadState !== 'tmdb') {
                             var tmdbPoster = 'https://image.tmdb.org/t/p/w300' + result.poster_path;
                             imgDiv.style.backgroundImage = 'url("' + tmdbPoster + '")';
                             imgDiv.classList.remove('no-image');
