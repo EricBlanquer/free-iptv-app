@@ -2125,8 +2125,9 @@ IPTVApp.prototype.validateProviderPlaylist = function(playlist) {
         var url = playlist.serverUrl.replace(Regex.trailingSlash, '');
         var authUrl = url + '/player_api.php?username=' + encodeURIComponent(playlist.username) +
             '&password=' + encodeURIComponent(playlist.password);
-        if (self.settings.proxyEnabled && self.settings.proxyUrl) {
-            var baseProxy = self.settings.proxyUrl.replace(/\/+$/, '');
+        var streamProxy = self.getStreamProxyUrl();
+        if (streamProxy) {
+            var baseProxy = streamProxy.replace(/\/+$/, '');
             authUrl = baseProxy + '/?url=' + encodeURIComponent(authUrl) + proxyDuidParam();
         }
         var xhr = new XMLHttpRequest();

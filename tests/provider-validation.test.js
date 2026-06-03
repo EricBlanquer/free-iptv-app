@@ -27,6 +27,15 @@ describe('validateProviderPlaylist matches the real connection (no false red cro
     test('accepts any auth that is not explicitly "0" (handles string "1", undefined)', () => {
         expect(fn[0]).toMatch(/String\(data\.user_info\.auth\) !== '0'/);
     });
+
+    // Regression: validation must take the same network path as the real connection
+    // (getStreamProxyUrl, which honours streamProxy), not its own proxyEnabled check.
+    // Otherwise a provider that connects directly (streamProxy off) gets validated
+    // through the proxy/VPN and can return 403 -> a false red cross.
+    test('uses getStreamProxyUrl (same proxy decision as the connection)', () => {
+        expect(fn[0]).toMatch(/getStreamProxyUrl\(\)/);
+        expect(fn[0]).not.toMatch(/settings\.proxyEnabled\s*&&\s*self\.settings\.proxyUrl/);
+    });
 });
 
 describe('preloadCache does not pop the diagnostic on a heavy-list timeout', () => {
