@@ -54,6 +54,20 @@ IPTVApp.prototype.selectHandlers = {
             this.handlePatternColorSelect(palette, current.dataset.color);
         }
     },
+    'keyword-filter-modal': function(current) {
+        if (current.id === 'keyword-filter-save-btn') {
+            this.closeKeywordFilterEditor(true);
+        } else if (current.id === 'keyword-filter-cancel-btn') {
+            this.closeKeywordFilterEditor(false);
+        } else if (current.id === 'keyword-filter-add-btn') {
+            var input = document.getElementById('keyword-filter-add-input');
+            this.addKeywordFilter(input.value);
+        } else if (current.id === 'keyword-filter-add-input') {
+            this.openKeyboard(current.id);
+        } else if (current.classList.contains('pattern-chip')) {
+            this.removeKeywordFilter(current.dataset.keyword);
+        }
+    },
     'add-category-modal': function() {
         this.handleAddCategorySelect();
     },
@@ -257,6 +271,20 @@ IPTVApp.prototype.selectHandlers = {
             this.showDetailsFromTMDB(current);
         }
     },
+    'settings-menu': function(current) {
+        if (!current || !current.classList.contains('settings-menu-item')) {
+            this.handleSettingsSelect(current);
+            return;
+        }
+        if (current.dataset.target) {
+            this.showSettingsSection(current.dataset.target);
+        }
+        this.settingsMenuIndex = this.focusIndex;
+        var content = document.querySelectorAll('#settings-container .settings-section.active-section .focusable:not(.settings-title-collapsible)');
+        if (content.length > 0) {
+            this.setFocus('settings', 0);
+        }
+    },
     settings: function(current) {
         this.handleSettingsSelect(current);
     },
@@ -322,6 +350,12 @@ IPTVApp.prototype.backHandlers = {
     },
     'focusArea:pattern-modal': function() {
         this.closePatternEditor(false);
+    },
+    'focusArea:keyword-filter-modal': function() {
+        this.closeKeywordFilterEditor(false);
+    },
+    'focusArea:settings': function() {
+        this.setFocus('settings-menu', this.settingsMenuIndex || 0);
     },
     'focusArea:add-category-modal': function() {
         this.closeAddCategoryModal(false);

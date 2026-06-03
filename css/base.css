@@ -308,7 +308,8 @@ body.text-small #actor-filmography-title,
 body.text-small .tmdb-card-title { font-size: 28px; }
 body.text-small #details-meta { font-size: 30px; }
 body.text-small .tmdb-match-inline { font-size: 20px; }
-body.text-small .settings-label { font-size: 26px; }
+body.text-small .settings-label,
+body.text-small .settings-menu-item { font-size: 26px; }
 body.text-small .settings-toggle { font-size: 24px; }
 body.text-small .settings-desc { font-size: 18px; }
 /* Element scaling: small */
@@ -498,7 +499,8 @@ body.text-medium #actor-filmography-title,
 body.text-medium .tmdb-card-title { font-size: 32px; }
 body.text-medium #details-meta { font-size: 34px; }
 body.text-medium .tmdb-match-inline { font-size: 22px; }
-body.text-medium .settings-label { font-size: 30px; }
+body.text-medium .settings-label,
+body.text-medium .settings-menu-item { font-size: 30px; }
 body.text-medium .settings-toggle { font-size: 28px; }
 body.text-medium .settings-desc { font-size: 20px; }
 /* Element scaling: medium */
@@ -675,7 +677,8 @@ body.text-large #actor-filmography-title,
 body.text-large .tmdb-card-title { font-size: 36px; }
 body.text-large #details-meta { font-size: 38px; }
 body.text-large .tmdb-match-inline { font-size: 24px; }
-body.text-large .settings-label { font-size: 34px; }
+body.text-large .settings-label,
+body.text-large .settings-menu-item { font-size: 34px; }
 body.text-large .settings-toggle { font-size: 32px; }
 body.text-large .settings-desc { font-size: 24px; }
 /* Element scaling: large */
@@ -935,7 +938,8 @@ body.text-xlarge #actor-filmography-title,
 body.text-xlarge .tmdb-card-title { font-size: 43px; }
 body.text-xlarge #details-meta { font-size: 45px; }
 body.text-xlarge .tmdb-match-inline { font-size: 28px; }
-body.text-xlarge .settings-label { font-size: 40px; }
+body.text-xlarge .settings-label,
+body.text-xlarge .settings-menu-item { font-size: 40px; }
 body.text-xlarge .settings-toggle { font-size: 38px; }
 body.text-xlarge .settings-desc { font-size: 28px; }
 body.text-xlarge .guide-filter { font-size: 31px; }
@@ -1105,7 +1109,8 @@ body.text-xxlarge #actor-filmography-title,
 body.text-xxlarge .tmdb-card-title { font-size: 51px; }
 body.text-xxlarge #details-meta { font-size: 54px; }
 body.text-xxlarge .tmdb-match-inline { font-size: 34px; }
-body.text-xxlarge .settings-label { font-size: 48px; }
+body.text-xxlarge .settings-label,
+body.text-xxlarge .settings-menu-item { font-size: 48px; }
 body.text-xxlarge .settings-toggle { font-size: 46px; }
 body.text-xxlarge .settings-desc { font-size: 34px; }
 body.text-xxlarge .guide-filter { font-size: 37px; }

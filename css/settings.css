@@ -549,6 +549,80 @@
     padding-bottom: 0;
 }
 
+/* Two-pane settings layout: left section menu + right content */
+#settings-screen {
+    overflow: hidden;
+}
+
+#settings-layout {
+    display: flex;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+#settings-menu {
+    width: 420px;
+    flex-shrink: 0;
+    margin-right: 50px;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.settings-menu-item {
+    color: #ccc;
+    padding: 16px 24px;
+    margin-bottom: 8px;
+    border-left: 3px solid transparent;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-menu-item.active {
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.10);
+    border-left-color: rgba(0, 212, 255, 0.6);
+}
+
+.settings-menu-item.focused {
+    color: #fff;
+    background: rgba(0, 212, 255, 0.22);
+    border-left-color: #00d4ff;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.4), 0 0 18px rgba(0, 212, 255, 0.15);
+}
+
+#settings-container {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#settings-container .settings-section {
+    display: none;
+}
+
+#settings-container .settings-section.active-section {
+    display: block;
+}
+
+#settings-container .collapse-arrow {
+    display: none;
+}
+
+#settings-container .settings-title-collapsible {
+    cursor: default;
+}
+
 .remote-config-inline {
     display: flex;
     align-items: center;
@@ -604,7 +678,8 @@
     color: #e05050;
 }
 
-.pattern-edit-btn {
+.pattern-edit-btn,
+.keyword-filter-edit-btn {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.06);
@@ -615,7 +690,8 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pattern-edit-btn.focused {
+.pattern-edit-btn.focused,
+.keyword-filter-edit-btn.focused {
     background: #00d4ff;
     border-color: transparent;
     color: #000;
@@ -833,6 +909,16 @@
 .pattern-preview-item {
     padding: 5px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.keyword-filter-hint {
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.keyword-filter-empty {
+    color: #666;
+    padding: 10px;
 }
 
 .pattern-preview-item:last-child {

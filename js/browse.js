@@ -2793,6 +2793,34 @@ IPTVApp.prototype.isSM = function(stream) {
     return name.indexOf('SOURD') !== -1 || name.indexOf('MALENTENDANT') !== -1 || name.indexOf('SME|') !== -1;
 };
 
+IPTVApp.prototype._getExcludeKeywordRegex = function() {
+    var enabled = !!this.settings.hideExcludeKeywords;
+    var keywords = this.settings.excludeKeywords || [];
+    var cacheKey = (enabled ? '1' : '0') + '' + keywords.join('');
+    if (this._excludeKeywordRegexKey === cacheKey) {
+        return this._excludeKeywordRegex;
+    }
+    this._excludeKeywordRegexKey = cacheKey;
+    if (!enabled) {
+        this._excludeKeywordRegex = null;
+        return null;
+    }
+    var escaped = [];
+    for (var i = 0; i < keywords.length; i++) {
+        var keyword = (keywords[i] || '').trim();
+        if (keyword) {
+            escaped.push(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        }
+    }
+    this._excludeKeywordRegex = escaped.length ? new RegExp('\\b(' + escaped.join('|') + ')\\b', 'i') : null;
+    return this._excludeKeywordRegex;
+};
+
+IPTVApp.prototype.isExcludedCategoryName = function(categoryName) {
+    var regex = this._getExcludeKeywordRegex();
+    return regex ? regex.test(categoryName || '') : false;
+};
+
 IPTVApp.prototype._normalizeDedupTitle = function(title) {
     if (!title) return '';
     var s = title;
@@ -3283,6 +3311,16 @@ IPTVApp.prototype._preprocessSection = function(section, categories, streams, on
             var name = (cat.category_name || '').toUpperCase();
             return name.indexOf('SOURD') === -1 && name.indexOf('MALENTENDANT') === -1 && !name.startsWith('SME|');
         });
+    }
+    var excludeKeywordRegex = this._getExcludeKeywordRegex();
+    if (excludeKeywordRegex) {
+        var beforeKeywordFilter = categories.length;
+        categories = categories.filter(function(cat) {
+            return !excludeKeywordRegex.test(cat.category_name || '');
+        });
+        if (beforeKeywordFilter !== categories.length) {
+            window.log('CACHE', 'KEYWORD FILTER: ' + beforeKeywordFilter + ' -> ' + categories.length + ' categories (excluded ' + (beforeKeywordFilter - categories.length) + ' by keyword)');
+        }
     }
     var categoryMap = {};
     categories.forEach(function(c) {

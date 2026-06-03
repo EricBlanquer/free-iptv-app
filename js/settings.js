@@ -70,7 +70,7 @@ IPTVApp.prototype.showSettings = function() {
     var self = this;
     this.showScreen('settings');
     this.currentScreen = 'settings';
-    this.focusArea = 'settings';
+    this.focusArea = 'settings-menu';
     this.initSettingsUI();
     var titleEl = document.querySelector('#settings-screen > h1');
     if (titleEl && APP_VERSION) {
@@ -109,13 +109,6 @@ IPTVApp.prototype.showSettings = function() {
         titleEl.parentNode.insertBefore(header, titleEl.nextSibling);
     }
     this.focusIndex = 0;
-    var focusables = document.querySelectorAll('#settings-screen .focusable');
-    for (var fi = 0; fi < focusables.length; fi++) {
-        if (focusables[fi].dataset && focusables[fi].dataset.action === 'managePlaylistsBtn') {
-            this.focusIndex = fi;
-            break;
-        }
-    }
     setTimeout(function() {
         self.updateFocus();
     }, 50);
@@ -753,6 +746,91 @@ IPTVApp.prototype.initSettingsUI = function() {
             patternBgColorHex.addEventListener('input', function() { self.updatePatternIconPreview(); });
         }
     }
+    this.updateKeywordFilterSummary();
+    this.buildSettingsMenu();
+};
+
+IPTVApp.prototype.updateKeywordFilterSummary = function() {
+    var el = document.getElementById('keyword-filter-summary');
+    if (!el) return;
+    var keywords = this.settings.excludeKeywords || [];
+    el.textContent = keywords.length ? keywords.join(', ') : I18n.t('settings.addKeyword', 'Add keyword...');
+};
+
+IPTVApp.prototype.SETTINGS_MENU_ORDER = [
+    'settings-manual-section',
+    'language-section',
+    'filters-section',
+    'display-section',
+    'category-patterns-section',
+    'provider-language-section',
+    'subtitles-section',
+    'player-settings-section',
+    'buffer-section',
+    'progress-section',
+    'apis-section',
+    'services-section',
+    'freebox-section',
+    'data-section'
+];
+
+IPTVApp.prototype.buildSettingsMenu = function() {
+    var self = this;
+    var menu = document.getElementById('settings-menu');
+    if (!menu) return;
+    menu.innerHTML = '';
+    var labelOverrides = {
+        'settings-manual-section': I18n.t('settings.managePlaylists', 'Manage playlists')
+    };
+    var firstId = null;
+    var seen = {};
+    var addItem = function(section) {
+        if (!section || !section.id || seen[section.id]) return;
+        if (section.classList.contains('hidden')) return;
+        seen[section.id] = true;
+        var label = labelOverrides[section.id];
+        if (!label) {
+            var titleSpan = section.querySelector('.settings-title span');
+            label = titleSpan ? titleSpan.textContent : section.id;
+        }
+        var item = document.createElement('div');
+        item.className = 'settings-menu-item focusable';
+        item.dataset.target = section.id;
+        item.textContent = label;
+        menu.appendChild(item);
+        if (!firstId) firstId = section.id;
+    };
+    for (var i = 0; i < this.SETTINGS_MENU_ORDER.length; i++) {
+        addItem(document.getElementById(this.SETTINGS_MENU_ORDER[i]));
+    }
+    var remaining = document.querySelectorAll('#settings-container > .settings-section');
+    for (var r = 0; r < remaining.length; r++) {
+        addItem(remaining[r]);
+    }
+    var active = this.settingsActiveSection;
+    var stillThere = active && menu.querySelector('.settings-menu-item[data-target="' + active + '"]');
+    this.showSettingsSection(stillThere ? active : firstId);
+};
+
+IPTVApp.prototype.showSettingsSection = function(sectionId) {
+    if (!sectionId) return;
+    this.settingsActiveSection = sectionId;
+    var sections = document.querySelectorAll('#settings-container > .settings-section');
+    for (var i = 0; i < sections.length; i++) {
+        var s = sections[i];
+        var isActive = s.id === sectionId;
+        s.classList.toggle('active-section', isActive);
+        if (isActive) {
+            var content = s.querySelector('.collapsible-content');
+            if (content) content.classList.remove('collapsed');
+            var title = s.querySelector('.settings-title-collapsible');
+            if (title) title.classList.remove('collapsed');
+        }
+    }
+    var items = document.querySelectorAll('#settings-menu .settings-menu-item');
+    for (var j = 0; j < items.length; j++) {
+        items[j].classList.toggle('active', items[j].dataset.target === sectionId);
+    }
 };
 
 // Remote configuration pairing
@@ -1015,6 +1093,9 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
                 this.hideSM = this.settings.hideHearingImpaired;
                 this._invalidatePreprocessCache();
             }
+            if (setting === 'hideExcludeKeywords') {
+                this._invalidatePreprocessCache();
+            }
             if (setting === 'useGenreCategories') {
                 this._invalidatePreprocessCache();
             }
@@ -1232,6 +1313,10 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
             this.confirmDeleteCategory(categoryId);
         }
     }
+    else if (current.classList.contains('keyword-filter-edit-btn')) {
+        window.log('ACTION keyword-filter-edit');
+        this.openKeywordFilterEditor();
+    }
 };
 
 IPTVApp.prototype.applyRemoteConfig = function(config) {
@@ -1296,6 +1381,8 @@ IPTVApp.prototype.applyRemoteConfig = function(config) {
         if (config.freeboxAppToken) this.settings.freeboxAppToken = config.freeboxAppToken;
     }
     if (config.hideSD !== undefined) this.settings.hideSD = !!config.hideSD;
+    if (config.hideExcludeKeywords !== undefined) this.settings.hideExcludeKeywords = !!config.hideExcludeKeywords;
+    if (Array.isArray(config.excludeKeywords)) this.settings.excludeKeywords = config.excludeKeywords;
     if (config.categoryPatterns) this.settings.categoryPatterns = config.categoryPatterns;
     if (config.licenseCode) {
         Premium.validateCode(config.licenseCode, function(valid) {
@@ -2678,6 +2765,89 @@ IPTVApp.prototype.addPatternKeyword = function(keyword, subcategory) {
     this.renderPatternChips();
     this.updatePatternPreview();
     document.getElementById('pattern-add-input').value = '';
+};
+
+IPTVApp.prototype.keywordFilterEditorList = null;
+
+IPTVApp.prototype.openKeywordFilterEditor = function() {
+    this.keywordFilterEditorList = (this.settings.excludeKeywords || []).slice();
+    this.keywordFilterPreviousFocusIndex = this.focusIndex;
+    this.renderKeywordFilterChips();
+    var modal = document.getElementById('keyword-filter-modal');
+    this.setHidden(modal, false);
+    this.focusArea = 'keyword-filter-modal';
+    this.focusIndex = 0;
+    this.updateFocus();
+};
+
+IPTVApp.prototype.renderKeywordFilterChips = function() {
+    var container = document.getElementById('keyword-filter-chips');
+    container.innerHTML = '';
+    var keywords = (this.keywordFilterEditorList || []).slice().sort();
+    for (var i = 0; i < keywords.length; i++) {
+        container.appendChild(this.createKeywordFilterChip(keywords[i]));
+    }
+    if (keywords.length === 0) {
+        var noKwDiv = document.createElement('div');
+        noKwDiv.className = 'keyword-filter-empty';
+        noKwDiv.textContent = I18n.t('settings.noKeywords', 'No keywords');
+        container.appendChild(noKwDiv);
+    }
+};
+
+IPTVApp.prototype.createKeywordFilterChip = function(keyword) {
+    var chip = document.createElement('div');
+    chip.className = 'pattern-chip focusable';
+    chip.dataset.keyword = keyword;
+    var chipText = document.createElement('span');
+    chipText.className = 'pattern-chip-text';
+    chipText.textContent = keyword;
+    var chipRemove = document.createElement('span');
+    chipRemove.className = 'pattern-chip-remove';
+    chipRemove.textContent = '×';
+    chip.appendChild(chipText);
+    chip.appendChild(chipRemove);
+    return chip;
+};
+
+IPTVApp.prototype.addKeywordFilter = function(keyword) {
+    if (!keyword || keyword.trim() === '') return;
+    keyword = keyword.trim();
+    var exists = false;
+    for (var i = 0; i < this.keywordFilterEditorList.length; i++) {
+        if (this.keywordFilterEditorList[i].toLowerCase() === keyword.toLowerCase()) {
+            exists = true;
+            break;
+        }
+    }
+    if (!exists) {
+        this.keywordFilterEditorList.push(keyword);
+    }
+    this.renderKeywordFilterChips();
+    document.getElementById('keyword-filter-add-input').value = '';
+};
+
+IPTVApp.prototype.removeKeywordFilter = function(keyword) {
+    var idx = this.keywordFilterEditorList.indexOf(keyword);
+    if (idx >= 0) {
+        this.keywordFilterEditorList.splice(idx, 1);
+    }
+    this.renderKeywordFilterChips();
+};
+
+IPTVApp.prototype.closeKeywordFilterEditor = function(save) {
+    if (save) {
+        this.settings.excludeKeywords = this.keywordFilterEditorList.slice();
+        this.saveSettings();
+        this.updateKeywordFilterSummary();
+        this._invalidatePreprocessCache();
+    }
+    var modal = document.getElementById('keyword-filter-modal');
+    this.setHidden(modal, true);
+    this.keywordFilterEditorList = null;
+    this.focusArea = 'settings';
+    this.focusIndex = this.keywordFilterPreviousFocusIndex || 0;
+    this.updateFocus();
 };
 
 IPTVApp.prototype._setPreviewMessage = function(container, text) {

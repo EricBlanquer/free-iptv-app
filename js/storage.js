@@ -1387,6 +1387,8 @@ IPTVApp.prototype.loadSettings = function() {
         hideSD: true,
         hide3D: true,
         hideHearingImpaired: true,
+        hideExcludeKeywords: true,
+        excludeKeywords: ['Screener', 'CAM', 'TS', 'R5'],
         minProgressMinutes: 2,
         watchedThreshold: 90,
         retentionWeeks: 4,

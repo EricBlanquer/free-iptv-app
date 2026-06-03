@@ -324,6 +324,7 @@ IPTVApp.prototype.bindKeys = function() {
             { id: 'confirm-modal', area: 'confirm-modal' },
             { id: 'premium-modal', area: 'premium-modal' },
             { id: 'pattern-modal', area: 'pattern-modal' },
+            { id: 'keyword-filter-modal', area: 'keyword-filter-modal' },
             { id: 'add-category-modal', area: 'add-category-modal' },
             { id: 'tracks-modal', area: 'tracks' },
             { id: 'tts-voice-modal', area: 'tts-voice-modal' },
@@ -540,7 +541,13 @@ IPTVApp.prototype.navigate = function(direction, isRepeat) {
     } else if (this.focusArea === 'actor') {
         result = this._navigateActor(navContext);
         if (result.handled) return;
-    } else if (this.focusArea === 'settings' || this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal' || this.focusArea === 'genre-picker' || this.focusArea === 'short-runtime') {
+    } else if (this.focusArea === 'settings-menu') {
+        result = this._navigateSettingsMenu(navContext);
+        if (result.handled) return;
+    } else if (this.focusArea === 'settings') {
+        result = this._navigateSettingsContent(navContext);
+        if (result.handled) return;
+    } else if (this.focusArea === 'playlists' || this.focusArea === 'playlist-edit' || this.focusArea === 'confirm-modal' || this.focusArea === 'pattern-modal' || this.focusArea === 'keyword-filter-modal' || this.focusArea === 'add-category-modal' || this.focusArea === 'premium-modal' || this.focusArea === 'genre-picker' || this.focusArea === 'short-runtime') {
         result = { index: this.navigate2D(focusables, newIndex, direction) };
     } else {
         result = { index: newIndex };
@@ -680,6 +687,41 @@ IPTVApp.prototype._navigateContinue = function(ctx) {
         case 'down':
             if (newIndex + contCols < contCount) newIndex += contCols;
             break;
+    }
+    return { index: newIndex };
+};
+
+IPTVApp.prototype._navigateSettingsMenu = function(ctx) {
+    var newIndex = ctx.index;
+    switch (ctx.direction) {
+        case 'up':
+            if (newIndex > 0) newIndex--;
+            break;
+        case 'down':
+            newIndex = Math.min(ctx.focusables.length - 1, newIndex + 1);
+            break;
+        case 'right':
+            this.settingsMenuIndex = ctx.index;
+            var content = document.querySelectorAll('#settings-container .settings-section.active-section .focusable:not(.settings-title-collapsible)');
+            if (content.length > 0) {
+                this.setFocus('settings', 0);
+            }
+            return { index: ctx.index, handled: true };
+        case 'left':
+            return { index: ctx.index, handled: true };
+    }
+    if (newIndex !== ctx.index) {
+        var item = ctx.focusables[newIndex];
+        if (item && item.dataset.target) this.showSettingsSection(item.dataset.target);
+    }
+    return { index: newIndex };
+};
+
+IPTVApp.prototype._navigateSettingsContent = function(ctx) {
+    var newIndex = this.navigate2D(ctx.focusables, ctx.index, ctx.direction);
+    if (ctx.direction === 'left' && newIndex === ctx.index) {
+        this.setFocus('settings-menu', this.settingsMenuIndex || 0);
+        return { index: ctx.index, handled: true };
     }
     return { index: newIndex };
 };
@@ -1218,14 +1260,20 @@ IPTVApp.prototype.getFocusables = function() {
             return this.trackModalItems || [];
         case 'sub-options':
             return this.subOptionsItems || [];
+        case 'settings-menu':
+            selector = '#settings-header-right .focusable, #settings-menu .settings-menu-item';
+            break;
         case 'settings':
-            selector = '#settings-screen .focusable';
+            selector = '#settings-container .settings-section.active-section .focusable:not(.settings-title-collapsible)';
             break;
         case 'playlists':
             selector = '#playlists-screen .focusable';
             break;
         case 'playlist-edit':
             selector = '#playlist-edit-screen .focusable';
+            break;
+        case 'keyword-filter-modal':
+            selector = '#keyword-filter-modal .focusable';
             break;
         case 'pattern-modal':
             selector = '#pattern-modal .focusable';
@@ -1570,7 +1618,7 @@ IPTVApp.prototype.updateFocus = function() {
             area: this.focusArea,
             index: this.focusIndex
         };
-        if (this.focusArea === 'settings') {
+        if (this.focusArea === 'settings' || this.focusArea === 'settings-menu') {
             this.scrollSettingsToElement(el);
         }
         else if (this.focusArea === 'details') {
@@ -1685,12 +1733,12 @@ IPTVApp.prototype.updateFocus = function() {
 };
 
 IPTVApp.prototype.scrollSettingsToElement = function(el) {
-    var container = document.getElementById('settings-screen');
+    var container = el.closest('#settings-menu') || el.closest('#settings-container') || document.getElementById('settings-screen');
     if (!container) return;
     var elRect = el.getBoundingClientRect();
     var containerRect = container.getBoundingClientRect();
-    var marginTop = 215;
-    var marginBottom = 150;
+    var marginTop = 60;
+    var marginBottom = 60;
     if (elRect.top < containerRect.top + marginTop) {
         container.scrollTop -= (containerRect.top + marginTop - elRect.top);
     }

@@ -149,25 +149,14 @@
     <!-- Settings Screen -->
     <div id="settings-screen" class="screen">
         <h1 data-i18n="settings.title">Settings</h1>
-        <div id="settings-container">
-            <!-- Manual config section -->
+        <div id="settings-layout">
+            <div id="settings-menu"></div>
+            <div id="settings-container">
+            <!-- Manage playlists + Remote config (first entry) -->
             <div id="settings-manual-section" class="settings-section">
                 <div class="settings-action primary focusable" data-action="managePlaylistsBtn" data-i18n="settings.managePlaylists">Manage playlists</div>
                 <span id="active-playlist-name" class="settings-info"></span>
-            </div>
-            <div class="settings-section" id="language-section">
-                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="language"><span data-i18n="settings.language">Language</span><span class="collapse-arrow collapsed">▼</span></div>
-                <div class="collapsible-content collapsed" id="language-content">
-                    <div class="settings-row">
-                        <div class="settings-options" id="locale-options">
-                            <!-- Dynamically populated -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Remote config + License section -->
-            <div id="settings-remote-section" class="settings-section">
-                <div class="settings-title" id="remote-collapse-header"><span data-i18n="settings.remoteConfig">Remote configuration</span></div>
+                <div class="settings-title" id="remote-collapse-header" style="margin-top: 35px;"><span data-i18n="settings.remoteConfig">Remote configuration</span></div>
                 <div id="remote-content">
                     <div class="remote-config-instructions" data-i18n="settings.remoteInstructions">On your phone or computer, scan the QR code or open the address below, then enter the displayed code.</div>
                     <div class="remote-config-box">
@@ -193,6 +182,16 @@
                     </div>
                     <div class="settings-row" id="license-desc-row">
                         <span class="settings-desc" data-i18n="premium.licenseDesc">If you enjoy the app, support the project! Enter a license code or visit iptv.blanquer.org</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section" id="language-section">
+                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="language"><span data-i18n="settings.language">Language</span><span class="collapse-arrow collapsed">▼</span></div>
+                <div class="collapsible-content collapsed" id="language-content">
+                    <div class="settings-row">
+                        <div class="settings-options" id="locale-options">
+                            <!-- Dynamically populated -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -367,17 +366,9 @@
                     </div>
                 </div>
             </div>
-            <div class="settings-section" id="display-section">
-                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="display"><span data-i18n="settings.display">Display</span><span class="collapse-arrow collapsed">▼</span></div>
-                <div class="collapsible-content collapsed" id="display-content">
-                    <div class="settings-row">
-                        <span class="settings-label" data-i18n="settings.useGenreCategories">Genre categories</span>
-                        <div class="settings-toggle focusable" data-setting="useGenreCategories" data-value="false" data-i18n="settings.no">No</div>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label" data-i18n="settings.showRecommended">Show "Recommended" category</span>
-                        <div class="settings-toggle focusable" data-setting="showRecommended" data-value="true" data-i18n="settings.yes">Yes</div>
-                    </div>
+            <div class="settings-section" id="filters-section">
+                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="filters"><span data-i18n="settings.filters">Filters</span><span class="collapse-arrow collapsed">▼</span></div>
+                <div class="collapsible-content collapsed" id="filters-content">
                     <div class="settings-row">
                         <span class="settings-label" data-i18n="settings.hideSDDefault">Hide SD by default</span>
                         <div class="settings-toggle focusable" data-setting="hideSD" data-value="true" data-i18n="settings.yes">Yes</div>
@@ -389,6 +380,25 @@
                     <div class="settings-row">
                         <span class="settings-label" data-i18n="settings.hideHIDefault">Hide Hearing Impaired by default</span>
                         <div class="settings-toggle focusable" data-setting="hideHearingImpaired" data-value="true" data-i18n="settings.yes">Yes</div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.hideKeywordsDefault">Hide categories by keyword</span>
+                        <div class="settings-toggle focusable" data-setting="hideExcludeKeywords" data-value="true" data-i18n="settings.yes">Yes</div>
+                        <div class="keyword-filter-edit-btn focusable" id="keyword-filter-summary" style="margin-left: 15px;"></div>
+                    </div>
+                    <div class="settings-desc" data-i18n="settings.hideKeywordsDesc">Hides VOD categories whose name contains one of these keywords (e.g. Screener, CAM).</div>
+                </div>
+            </div>
+            <div class="settings-section" id="display-section">
+                <div class="settings-title settings-title-collapsible focusable collapsed" data-collapse="display"><span data-i18n="settings.display">Display</span><span class="collapse-arrow collapsed">▼</span></div>
+                <div class="collapsible-content collapsed" id="display-content">
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.useGenreCategories">Genre categories</span>
+                        <div class="settings-toggle focusable" data-setting="useGenreCategories" data-value="false" data-i18n="settings.no">No</div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label" data-i18n="settings.showRecommended">Show "Recommended" category</span>
+                        <div class="settings-toggle focusable" data-setting="showRecommended" data-value="true" data-i18n="settings.yes">Yes</div>
                     </div>
                     <div class="settings-row">
                         <span class="settings-label" data-i18n="settings.focusOnCategories">Focus on categories</span>
@@ -545,6 +555,7 @@
                         <div class="settings-action focusable" data-action="factoryReset" data-i18n="settings.factoryReset" style="margin-left: 15px; background: rgba(255,82,82,0.2); border-color: rgba(255,82,82,0.3);">Factory reset</div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -1210,6 +1221,24 @@
             <div class="pattern-modal-actions">
                 <div class="pattern-modal-btn focusable" id="pattern-cancel-btn" data-i18n="settings.cancel">Cancel</div>
                 <div class="pattern-modal-btn primary focusable" id="pattern-save-btn" data-i18n="settings.save">Save</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="keyword-filter-modal" class="modal hidden">
+        <div class="modal-content pattern-modal-content">
+            <div class="pattern-modal-header">
+                <span data-i18n="settings.filterKeywordsTitle">Filter categories by keyword</span>
+            </div>
+            <div class="keyword-filter-hint" data-i18n="settings.filterKeywordsHint">Categories whose name contains one of these keywords are hidden.</div>
+            <div class="pattern-chips" id="keyword-filter-chips"></div>
+            <div class="pattern-add-section">
+                <input type="text" id="keyword-filter-add-input" class="focusable" data-i18n-placeholder="settings.addKeyword" placeholder="Add keyword...">
+                <div class="pattern-add-btn focusable" id="keyword-filter-add-btn" data-i18n="settings.addKeywordBtn">Add</div>
+            </div>
+            <div class="pattern-modal-actions">
+                <div class="pattern-modal-btn focusable" id="keyword-filter-cancel-btn" data-i18n="settings.cancel">Cancel</div>
+                <div class="pattern-modal-btn primary focusable" id="keyword-filter-save-btn" data-i18n="settings.save">Save</div>
             </div>
         </div>
     </div>
