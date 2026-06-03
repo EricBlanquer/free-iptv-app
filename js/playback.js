@@ -549,10 +549,12 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
             if (!subtitlesApplied) {
                 subtitlesApplied = true;
                 setTimeout(function() {
-                    if (!self._restoreSubtitleState(stream)) {
-                        self.reapplySubtitleTrack();
-                        self.autoEnableForcedSubtitles();
-                    }
+                    self._restoreSubtitleState(stream).then(function(restored) {
+                        if (!restored) {
+                            self.reapplySubtitleTrack();
+                            self.autoEnableForcedSubtitles();
+                        }
+                    });
                 }, 800);
             }
         }
@@ -926,46 +928,44 @@ IPTVApp.prototype.updateWatchPosition = function(stream, type, position, force) 
     }
 };
 
-IPTVApp.prototype._saveSubtitleState = function(stream) {
+IPTVApp.prototype._subtitleStateKey = function(stream) {
     var streamId = this.getStreamId(stream);
     var playlistId = stream._playlistId || this.settings.activePlaylistId;
-    var key = 'subtitleState_' + playlistId + '_' + streamId;
-    try {
-        localStorage.setItem(key, JSON.stringify({
-            content: this.externalSubtitleContent,
-            offset: this.subtitleOffset || 0
-        }));
-    } catch (e) { /* storage full */ }
+    return 'subtitleState_' + playlistId + '_' + streamId;
+};
+
+IPTVApp.prototype._saveSubtitleState = function(stream) {
+    this.blobPut(this._subtitleStateKey(stream), JSON.stringify({
+        content: this.externalSubtitleContent,
+        offset: this.subtitleOffset || 0
+    }));
 };
 
 IPTVApp.prototype._restoreSubtitleState = function(stream) {
-    var streamId = this.getStreamId(stream);
-    var playlistId = stream._playlistId || this.settings.activePlaylistId;
-    var key = 'subtitleState_' + playlistId + '_' + streamId;
+    var self = this;
+    var key = this._subtitleStateKey(stream);
     window.log('SUBTITLE', 'restoreState: key=' + key);
-    try {
-        var data = localStorage.getItem(key);
-        if (!data) { window.log('SUBTITLE', 'restoreState: no data'); return false; }
-        var state = JSON.parse(data);
-        if (!state.content) return false;
-        this.externalSubtitleContent = state.content;
-        this.parseAndLoadSubtitle(state.content);
-        this.currentSubtitleIndex = -2;
-        this._subtitleIndexBeforeDisable = -2;
-        this._subtitleManuallySelected = true;
-        this.subtitleOffset = state.offset || 0;
-        this.player.hideSubtitles();
-        this.updateSubtitleOffsetDisplay();
-        window.log('SUBTITLE', 'restored external subtitle + offset=' + this.subtitleOffset);
-        return true;
-    } catch (e) { return false; }
+    return this.blobGet(key).then(function(data) {
+        try {
+            if (!data) { window.log('SUBTITLE', 'restoreState: no data'); return false; }
+            var state = JSON.parse(data);
+            if (!state.content) return false;
+            self.externalSubtitleContent = state.content;
+            self.parseAndLoadSubtitle(state.content);
+            self.currentSubtitleIndex = -2;
+            self._subtitleIndexBeforeDisable = -2;
+            self._subtitleManuallySelected = true;
+            self.subtitleOffset = state.offset || 0;
+            self.player.hideSubtitles();
+            self.updateSubtitleOffsetDisplay();
+            window.log('SUBTITLE', 'restored external subtitle + offset=' + self.subtitleOffset);
+            return true;
+        } catch (e) { return false; }
+    });
 };
 
 IPTVApp.prototype._clearSubtitleState = function(stream) {
-    var streamId = this.getStreamId(stream);
-    var playlistId = stream._playlistId || this.settings.activePlaylistId;
-    try { localStorage.removeItem('subtitleState_' + playlistId + '_' + streamId); }
-    catch (e) { /* ignore */ }
+    this.blobDelete(this._subtitleStateKey(stream));
 };
 
 IPTVApp.prototype.stopPlayback = function() {

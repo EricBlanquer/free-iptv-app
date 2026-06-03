@@ -156,6 +156,7 @@
     "yourRating": "Your rating"
   },
   "diagnostic": {
+    "running": "Running network diagnostic…",
     "clientError": "The provider server rejected the request (HTTP {status}). The URL or credentials may be incorrect.",
     "close": "Close",
     "dnsFailure": "DNS resolution failed for {host}. Try setting your DNS to 1.1.1.1 or 8.8.8.8 on your router.",

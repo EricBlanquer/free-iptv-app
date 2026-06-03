@@ -76,6 +76,76 @@ describe('js/core/diagnostic.js', () => {
         expect(runAndShowBlock[0]).toContain('playlist.url');
         expect(runAndShowBlock[0]).not.toMatch(/if\s*\(\s*!playlist\s*\|\|\s*!playlist\.serverUrl\s*\)/);
     });
+
+    // Regression: a "direct connection" that resolves only after the timeout
+    // (abort does not interrupt the fetch on Tizen/Chromium 63) was scored ok:true,
+    // producing a falsely reassuring "provider is reachable" verdict.
+    describe('checkReachable does not over-report reachability on a slow response', () => {
+        const checkReachableBlock = diagCode.match(/function checkReachable[\s\S]*?\n    \}/);
+
+        test('ok is gated on elapsed < timeout, never unconditionally true', () => {
+            expect(checkReachableBlock).not.toBeNull();
+            expect(checkReachableBlock[0]).toMatch(/ok:\s*elapsed\s*<\s*timeout/);
+            expect(checkReachableBlock[0]).not.toMatch(/return\s*\{\s*ok:\s*true/);
+        });
+
+        test('races the fetch against the timeout so a hung request cannot block the diagnostic', () => {
+            expect(checkReachableBlock[0]).toContain('Promise.race');
+            expect(checkReachableBlock[0]).toMatch(/ok:\s*false,\s*elapsed:\s*timeout,\s*timedOut:\s*true/);
+        });
+    });
+
+    // Regression: the alternate-protocol probe still runs (decide() uses it for the
+    // protocol auto-fix) but must not be shown as a diagnostic step — it gave the user
+    // no actionable information and read as a false error.
+    test('alternate-protocol probe is not rendered as a diagnostic step', () => {
+        expect(diagCode).not.toMatch(/items\.push\([^\n]*stepSwapped/);
+    });
+
+    // Regression: the "without proxy" probe re-hit the exact same URL as the direct
+    // probe (the diagnostic never routes through the CORS proxy), so its proxy_broken
+    // verdict was unreachable dead code and it only added latency. Removed entirely.
+    test('redundant "without proxy" probe and dead proxy_broken verdict are removed', () => {
+        expect(diagCode).not.toContain("'proxy_broken'");
+        expect(diagCode).not.toMatch(/checkReachable\(directNoProxy/);
+        expect(diagCode).not.toMatch(/d\.noProxy/);
+    });
+
+    // The modal must open immediately and stream each probe result, so the
+    // several-second wait on the network probes is visible instead of a blank gap.
+    test('runAndShow opens the modal before the probes run and streams progress', () => {
+        const block = diagCode.match(/function runAndShow[\s\S]*?(?=\n    var PROGRESS_STEP_LABELS)/);
+        expect(block).not.toBeNull();
+        expect(block[0]).toContain('showConfirmModal');
+        expect(block[0]).toMatch(/run\(ctx,\s*function/);
+        expect(block[0].indexOf('showConfirmModal')).toBeLessThan(block[0].indexOf('run(ctx'));
+    });
+
+    // Regression: re-opening the modal for the verdict captured 'confirm-modal' as its
+    // OWN previous focus, trapping the user (Back kept re-triggering the modal, focus
+    // lost). The verdict must update the already-open modal in place, and the modal must
+    // be opened with a valid 'home' focus so Back restores to home.
+    test('verdict updates the modal in place, not via a second showConfirmModal', () => {
+        const finalizeBlock = diagCode.match(/function finalizeModal[\s\S]*?\n    \}/);
+        expect(finalizeBlock).not.toBeNull();
+        expect(finalizeBlock[0]).not.toContain('showConfirmModal');
+        expect(finalizeBlock[0]).toContain('confirm-modal-message');
+        expect((diagCode.match(/showConfirmModal/g) || []).length).toBe(1);
+        expect(diagCode).toMatch(/app\.focusArea = 'home'/);
+    });
+
+    // Regression: a down provider fails many requests in a row; each called runAndShow
+    // and, because the in-progress flag cleared as soon as run() resolved, stacked a new
+    // modal ("double modal"). The flag must stay set until the user closes the modal,
+    // plus a cooldown.
+    test('diagnostic stays in progress until dismissed, with a cooldown', () => {
+        const block = diagCode.match(/function runAndShow[\s\S]*?(?=\n    var PROGRESS_STEP_LABELS)/);
+        expect(block).not.toBeNull();
+        expect(block[0]).toContain('_diagnosticCooldownUntil');
+        const thenBlock = block[0].match(/\.then\(function\(result\)[\s\S]*?\}\)\.catch/);
+        expect(thenBlock).not.toBeNull();
+        expect(thenBlock[0]).not.toContain('_diagnosticInProgress');
+    });
 });
 
 describe('addDemoPlaylist uses local bundled file', () => {

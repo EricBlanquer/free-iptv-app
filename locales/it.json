@@ -151,6 +151,7 @@
     "yourRating": "Il tuo voto"
   },
   "diagnostic": {
+    "running": "Diagnostica di rete in corso…",
     "clientError": "Il server del provider ha rifiutato la richiesta (HTTP {status}). L'URL o le credenziali potrebbero essere errati.",
     "close": "Chiudi",
     "dnsFailure": "Risoluzione DNS fallita per {host}. Imposta i DNS su 1.1.1.1 o 8.8.8.8 nel router.",

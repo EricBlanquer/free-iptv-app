@@ -198,20 +198,8 @@ button.focused {
     z-index: 0;
 }
 
-#loading-backdrop .backdrop-img {
-    width: 720px;
-    height: 1080px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
 #loading-backdrop.poster-mode {
     opacity: 0.6;
-}
-
-#loading-backdrop.poster-mode .backdrop-img {
-    display: none;
 }
 
 #loading-backdrop.poster-mode .poster-bg {

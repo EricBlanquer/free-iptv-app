@@ -178,6 +178,7 @@ class IPTVApp {
             I18n.setLocale(this.settings.locale);
         }
         this.loadTMDBCacheAsync();
+        this._cleanupLegacyBlobStorage();
         this.startMemoryMonitor();
         this.player.init();
         this.player.setPreferHtml5(this.settings.preferHtml5Player);
@@ -187,7 +188,6 @@ class IPTVApp {
             this.settings.textSize = 'xlarge';
         }
         this.applyTextSize(this.settings.textSize);
-        this.preloadBackdropImages();
         this.initAPIs();
         this.initFreebox();
         this.resetScreens();
@@ -260,6 +260,7 @@ class IPTVApp {
                 self.renderPlaylistSelector();
                 self.startPlaylistAgeTimer();
                 self.setDefaultHomeFocus();
+                self.updateFocus();
                 self.autoConnect();
                 if (Premium.shouldShowReminder()) {
                     setTimeout(function() {
@@ -517,7 +518,6 @@ class IPTVApp {
         }
         this._connectingPlaylistId = playlist.id;
         window.log('INIT', 'autoConnect: ' + playlist.type + ' ' + (playlist.name || playlist.serverUrl || playlist.url));
-        this.showLoadingBackdrop();
         this.showLoading(true, I18n.t('loading.connecting', 'Connecting...'));
         var loadingTimeoutMs = playlist.type === 'm3u' ? 320000 : 10000;
         var loadingTimeout = setTimeout(function() {
@@ -583,8 +583,6 @@ class IPTVApp {
                     window.log('CACHE', 'autoConnect: using cache, skipping auth');
                     self.detectLanguages(providerCache.vod.categories);
                     self.updateHomeMenuVisibility();
-                    // Save backdrop images from cache data (for next launch)
-                    self.saveBackdropImages();
                     clearTimeout(loadingTimeout);
                     document.getElementById('home-grid').style.visibility = '';
                     self.showLoading(false);
@@ -668,7 +666,6 @@ class IPTVApp {
                                 else {
                                     window.log('CACHE', 'not saving empty cache (categories=' + (cacheData.vod.categories ? cacheData.vod.categories.length : 0) + ', streams=' + (cacheData.vod.streams ? cacheData.vod.streams.length : 0) + ')');
                                 }
-                                self.saveBackdropImages();
                                 document.getElementById('home-grid').style.visibility = '';
                                 self.showLoading(false);
                                 self.startCacheRefreshTimer(playlist.id);
@@ -801,7 +798,6 @@ class IPTVApp {
     autoConnectMerge(playlists) {
         var self = this;
         window.log('INIT', 'autoConnectMerge: ' + playlists.length + ' playlists');
-        this.showLoadingBackdrop();
         this.showLoading(true, I18n.t('loading.mergingPlaylists', 'Merging playlists...'));
         this.apis = [];
         var providerPlaylists = playlists.filter(function(p) { return p.type === 'provider'; });

@@ -225,3 +225,22 @@ describe('getHomeLiveButtonIndex — backwards-compat wrapper', () => {
         expect(app.getHomeLiveButtonIndex()).toBe(0);
     });
 });
+
+/**
+ * Regression: at launch, setDefaultHomeFocus() restores focusIndex to the last
+ * viewed section (e.g. Films), but the startApp caller did NOT call updateFocus()
+ * afterwards, so the highlight stayed on the previous button (Live). The first
+ * arrow press then appeared to skip a section (Live -> Series, skipping Films).
+ * Every setDefaultHomeFocus() call must be immediately followed by updateFocus().
+ */
+describe('restored home focus is rendered (updateFocus after setDefaultHomeFocus)', () => {
+    const appCode = fs.readFileSync('./js/app.js', 'utf8');
+
+    it('every setDefaultHomeFocus() call in app.js is followed by updateFocus()', () => {
+        const calls = appCode.match(/setDefaultHomeFocus\(\);[\s\S]{0,60}/g) || [];
+        expect(calls.length).toBeGreaterThan(0);
+        calls.forEach(function(c) {
+            expect(c).toMatch(/setDefaultHomeFocus\(\);\s*(self|this)\.updateFocus\(\);/);
+        });
+    });
+});

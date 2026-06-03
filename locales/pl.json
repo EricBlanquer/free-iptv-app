@@ -156,6 +156,7 @@
     "yourRating": "Twoja ocena"
   },
   "diagnostic": {
+    "running": "Trwa diagnostyka sieci…",
     "clientError": "Serwer dostawcy odrzucił żądanie (HTTP {status}). URL lub dane logowania mogą być nieprawidłowe.",
     "close": "Zamknij",
     "dnsFailure": "Nie udało się rozpoznać DNS dla {host}. Ustaw DNS na 1.1.1.1 lub 8.8.8.8 w swoim routerze.",

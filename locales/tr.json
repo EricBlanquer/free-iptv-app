@@ -155,6 +155,7 @@
     "yourRating": "Senin puanın"
   },
   "diagnostic": {
+    "running": "Ağ tanılaması çalışıyor…",
     "clientError": "Sağlayıcı sunucusu isteği reddetti (HTTP {status}). URL veya kimlik bilgileri yanlış olabilir.",
     "close": "Kapat",
     "dnsFailure": "{host} için DNS çözümlemesi başarısız. Yönlendiricinizde DNS'i 1.1.1.1 veya 8.8.8.8 olarak ayarlayın.",

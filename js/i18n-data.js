@@ -1139,6 +1139,7 @@ var I18nData = {
                             "yourRating": "تقييمك"
                     },
                     "diagnostic": {
+                            "running": "جارٍ تشغيل تشخيص الشبكة…",
                             "clientError": "رفض خادم المزود الطلب (HTTP {status}). قد يكون عنوان URL أو بيانات الاعتماد غير صحيحة.",
                             "close": "إغلاق",
                             "dnsFailure": "فشل تحليل DNS لـ {host}. اضبط DNS على 1.1.1.1 أو 8.8.8.8 في جهاز التوجيه الخاص بك.",
@@ -1761,6 +1762,7 @@ var I18nData = {
                             "yourRating": "Deine Bewertung"
                     },
                     "diagnostic": {
+                            "running": "Netzwerkdiagnose läuft…",
                             "clientError": "Der Anbieterserver hat die Anfrage abgelehnt (HTTP {status}). URL oder Anmeldeinformationen sind möglicherweise falsch.",
                             "close": "Schließen",
                             "dnsFailure": "DNS-Auflösung für {host} fehlgeschlagen. Stellen Sie Ihre DNS auf 1.1.1.1 oder 8.8.8.8 in Ihrem Router ein.",
@@ -2383,6 +2385,7 @@ var I18nData = {
                             "yourRating": "Your rating"
                     },
                     "diagnostic": {
+                            "running": "Running network diagnostic…",
                             "clientError": "The provider server rejected the request (HTTP {status}). The URL or credentials may be incorrect.",
                             "close": "Close",
                             "dnsFailure": "DNS resolution failed for {host}. Try setting your DNS to 1.1.1.1 or 8.8.8.8 on your router.",
@@ -3005,6 +3008,7 @@ var I18nData = {
                             "yourRating": "Tu valoración"
                     },
                     "diagnostic": {
+                            "running": "Ejecutando diagnóstico de red…",
                             "clientError": "El servidor del proveedor rechazó la solicitud (HTTP {status}). La URL o las credenciales pueden ser incorrectas.",
                             "close": "Cerrar",
                             "dnsFailure": "Falló la resolución DNS para {host}. Intente configurar sus DNS en 1.1.1.1 o 8.8.8.8 en su router.",
@@ -3627,6 +3631,7 @@ var I18nData = {
                             "yourRating": "Votre note"
                     },
                     "diagnostic": {
+                            "running": "Diagnostic réseau en cours…",
                             "clientError": "Le serveur du fournisseur a rejeté la requête (HTTP {status}). L'URL ou les identifiants sont peut-être incorrects.",
                             "close": "Fermer",
                             "dnsFailure": "Échec de la résolution DNS pour {host}. Essayez de configurer vos DNS sur 1.1.1.1 ou 8.8.8.8 dans votre box.",
@@ -4249,6 +4254,7 @@ var I18nData = {
                             "yourRating": "Il tuo voto"
                     },
                     "diagnostic": {
+                            "running": "Diagnostica di rete in corso…",
                             "clientError": "Il server del provider ha rifiutato la richiesta (HTTP {status}). L'URL o le credenziali potrebbero essere errati.",
                             "close": "Chiudi",
                             "dnsFailure": "Risoluzione DNS fallita per {host}. Imposta i DNS su 1.1.1.1 o 8.8.8.8 nel router.",
@@ -4871,6 +4877,7 @@ var I18nData = {
                             "yourRating": "Jouw beoordeling"
                     },
                     "diagnostic": {
+                            "running": "Netwerkdiagnose wordt uitgevoerd…",
                             "clientError": "De provider-server heeft het verzoek afgewezen (HTTP {status}). De URL of inloggegevens zijn mogelijk onjuist.",
                             "close": "Sluiten",
                             "dnsFailure": "DNS-resolutie voor {host} mislukt. Stel uw DNS in op 1.1.1.1 of 8.8.8.8 in uw router.",
@@ -5493,6 +5500,7 @@ var I18nData = {
                             "yourRating": "Twoja ocena"
                     },
                     "diagnostic": {
+                            "running": "Trwa diagnostyka sieci…",
                             "clientError": "Serwer dostawcy odrzucił żądanie (HTTP {status}). URL lub dane logowania mogą być nieprawidłowe.",
                             "close": "Zamknij",
                             "dnsFailure": "Nie udało się rozpoznać DNS dla {host}. Ustaw DNS na 1.1.1.1 lub 8.8.8.8 w swoim routerze.",
@@ -6115,6 +6123,7 @@ var I18nData = {
                             "yourRating": "A sua avaliação"
                     },
                     "diagnostic": {
+                            "running": "Executando diagnóstico de rede…",
                             "clientError": "O servidor do provedor rejeitou a solicitação (HTTP {status}). A URL ou credenciais podem estar incorretas.",
                             "close": "Fechar",
                             "dnsFailure": "Falha na resolução DNS para {host}. Configure seus DNS para 1.1.1.1 ou 8.8.8.8 no seu roteador.",
@@ -6737,6 +6746,7 @@ var I18nData = {
                             "yourRating": "Ваша оценка"
                     },
                     "diagnostic": {
+                            "running": "Выполняется диагностика сети…",
                             "clientError": "Сервер провайдера отклонил запрос (HTTP {status}). URL или учётные данные могут быть неверными.",
                             "close": "Закрыть",
                             "dnsFailure": "Не удалось разрешить DNS для {host}. Установите DNS на 1.1.1.1 или 8.8.8.8 в вашем роутере.",
@@ -7359,6 +7369,7 @@ var I18nData = {
                             "yourRating": "Senin puanın"
                     },
                     "diagnostic": {
+                            "running": "Ağ tanılaması çalışıyor…",
                             "clientError": "Sağlayıcı sunucusu isteği reddetti (HTTP {status}). URL veya kimlik bilgileri yanlış olabilir.",
                             "close": "Kapat",
                             "dnsFailure": "{host} için DNS çözümlemesi başarısız. Yönlendiricinizde DNS'i 1.1.1.1 veya 8.8.8.8 olarak ayarlayın.",

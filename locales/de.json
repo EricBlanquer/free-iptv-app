@@ -154,6 +154,7 @@
     "yourRating": "Deine Bewertung"
   },
   "diagnostic": {
+    "running": "Netzwerkdiagnose läuft…",
     "clientError": "Der Anbieterserver hat die Anfrage abgelehnt (HTTP {status}). URL oder Anmeldeinformationen sind möglicherweise falsch.",
     "close": "Schließen",
     "dnsFailure": "DNS-Auflösung für {host} fehlgeschlagen. Stellen Sie Ihre DNS auf 1.1.1.1 oder 8.8.8.8 in Ihrem Router ein.",

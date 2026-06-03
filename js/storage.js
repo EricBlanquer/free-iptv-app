@@ -518,6 +518,9 @@ IPTVApp.prototype.getProviderCacheTTL = function() {
 var PROVIDER_CACHE_DB_NAME = 'IPTVProviderCache';
 var PROVIDER_CACHE_STORE_NAME = 'cache';
 var PROVIDER_CACHE_DB_VERSION = 1;
+var BLOB_STORE_DB_NAME = 'IPTVBlobStore';
+var BLOB_STORE_NAME = 'blobs';
+var BLOB_STORE_DB_VERSION = 1;
 
 // Initialize IndexedDB for provider cache
 IPTVApp.prototype.initProviderCacheDB = function() {
@@ -557,6 +560,98 @@ IPTVApp.prototype.initProviderCacheDB = function() {
 
 IPTVApp.prototype.getProviderCacheKey = function(playlistId) {
     return playlistId || 'default';
+};
+
+IPTVApp.prototype.initBlobStoreDB = function() {
+    var self = this;
+    if (this._blobStoreDB) {
+        return Promise.resolve(this._blobStoreDB);
+    }
+    if (this._blobStoreDBPromise) {
+        return this._blobStoreDBPromise;
+    }
+    this._blobStoreDBPromise = new Promise(function(resolve) {
+        if (!window.indexedDB) {
+            resolve(null);
+            return;
+        }
+        var request = indexedDB.open(BLOB_STORE_DB_NAME, BLOB_STORE_DB_VERSION);
+        request.onerror = function(event) {
+            window.log('ERROR', 'Blob store open: ' + event.target.error);
+            resolve(null);
+        };
+        request.onsuccess = function(event) {
+            self._blobStoreDB = event.target.result;
+            resolve(self._blobStoreDB);
+        };
+        request.onupgradeneeded = function(event) {
+            var db = event.target.result;
+            if (!db.objectStoreNames.contains(BLOB_STORE_NAME)) {
+                db.createObjectStore(BLOB_STORE_NAME, { keyPath: 'key' });
+            }
+        };
+    });
+    return this._blobStoreDBPromise;
+};
+
+IPTVApp.prototype.blobGet = function(key) {
+    return this.initBlobStoreDB().then(function(db) {
+        if (!db) return null;
+        return new Promise(function(resolve) {
+            try {
+                var transaction = db.transaction([BLOB_STORE_NAME], 'readonly');
+                var request = transaction.objectStore(BLOB_STORE_NAME).get(key);
+                request.onsuccess = function(event) {
+                    resolve(event.target.result ? event.target.result.value : null);
+                };
+                request.onerror = function() { resolve(null); };
+            }
+            catch (e) { resolve(null); }
+        });
+    });
+};
+
+IPTVApp.prototype.blobPut = function(key, value) {
+    return this.initBlobStoreDB().then(function(db) {
+        if (!db) return false;
+        return new Promise(function(resolve) {
+            try {
+                var transaction = db.transaction([BLOB_STORE_NAME], 'readwrite');
+                transaction.objectStore(BLOB_STORE_NAME).put({ key: key, value: value });
+                transaction.oncomplete = function() { resolve(true); };
+                transaction.onabort = function() {
+                    window.log('ERROR', 'Blob store put ABORTED for ' + key + ': ' + (transaction.error ? transaction.error.message || transaction.error : 'unknown'));
+                    resolve(false);
+                };
+                transaction.onerror = function() { resolve(false); };
+            }
+            catch (e) { resolve(false); }
+        });
+    });
+};
+
+IPTVApp.prototype.blobDelete = function(key) {
+    return this.initBlobStoreDB().then(function(db) {
+        if (!db) return false;
+        return new Promise(function(resolve) {
+            try {
+                var transaction = db.transaction([BLOB_STORE_NAME], 'readwrite');
+                transaction.objectStore(BLOB_STORE_NAME).delete(key);
+                transaction.oncomplete = function() { resolve(true); };
+                transaction.onerror = function() { resolve(false); };
+                transaction.onabort = function() { resolve(false); };
+            }
+            catch (e) { resolve(false); }
+        });
+    });
+};
+
+IPTVApp.prototype._cleanupLegacyBlobStorage = function() {
+    var freed = this._evictNonCriticalStorage();
+    if (freed > 0) {
+        window.log('STORAGE', 'Cleaned ' + Math.round(freed / 1024) + 'KB of legacy non-critical localStorage');
+    }
+    this.blobDelete('nextBackdropsData');
 };
 
 IPTVApp.prototype.loadProviderCache = function(playlistId) {
@@ -1944,172 +2039,6 @@ IPTVApp.prototype.getDeviceId = function() {
     return result || 'emulator';
 };
 
-// Loading backdrop images
-IPTVApp.prototype.loadBackdropImages = function() {
-    try {
-        var data = localStorage.getItem('loadingBackdrops');
-        return data ? JSON.parse(data) : [];
-    }
-    catch (e) {
-        return [];
-    }
-};
-
-IPTVApp.prototype.saveBackdropImages = function() {
-    if (!this.api || !this.api.cache) return;
-    var vodStreams = this.api.cache.vodStreams && this.api.cache.vodStreams['_all'] || [];
-    var vodCategories = this.api.cache.vodCategories || [];
-    var self = this;
-    // Build exclusion patterns (same as VOD section in browse.js)
-    var patterns = this.getCategoryPatterns();
-    var hiddenCategories = this.settings.hiddenDefaultCategories || [];
-    var keywordsToPatterns = function(keywords) {
-        return keywords.map(function(kw) {
-            return Regex.keywordPattern(kw);
-        });
-    };
-    // Only exclude categories that are NOT hidden (hidden ones should appear in Films)
-    var sportPatterns = hiddenCategories.indexOf('sport') === -1 ? keywordsToPatterns(patterns.sport || []) : [];
-    var mangaPatterns = hiddenCategories.indexOf('manga') === -1 ? keywordsToPatterns(patterns.manga || []) : [];
-    var ent = patterns.entertainment || {};
-    var entertainmentPatterns = hiddenCategories.indexOf('entertainment') === -1 ? keywordsToPatterns(ent.concerts || [])
-        .concat(keywordsToPatterns(ent.theatre || []))
-        .concat(keywordsToPatterns(ent.spectacles || []))
-        .concat(keywordsToPatterns(ent.blindtest || []))
-        .concat(keywordsToPatterns(ent.karaoke || [])) : [];
-    var allSpecialPatterns = sportPatterns.concat(entertainmentPatterns).concat(mangaPatterns);
-    // Add custom category patterns
-    var customCategories = this.settings.customCategories || [];
-    customCategories.forEach(function(cat) {
-        var kws = patterns[cat.id] || cat.keywords || [];
-        allSpecialPatterns = allSpecialPatterns.concat(keywordsToPatterns(kws));
-    });
-    // Build category_id -> category_name map
-    var catMap = {};
-    vodCategories.forEach(function(c) {
-        catMap[c.category_id] = c.category_name || '';
-    });
-    // Filter streams: language match + exclude special categories
-    var filtered = vodStreams.filter(function(s) {
-        var catName = catMap[s.category_id] || '';
-        if (!self.matchesLanguage(catName)) return false;
-        return !allSpecialPatterns.some(function(p) { return p.test(catName); });
-    });
-    // Sort by added date descending (most recent first)
-    var sorted = filtered.sort(function(a, b) {
-        var dateA = a.added || '0';
-        var dateB = b.added || '0';
-        return dateB.localeCompare(dateA);
-    });
-    // Get up to 20 unique images from most recent VOD
-    var images = [];
-    var seen = {};
-    for (var i = 0; i < sorted.length && images.length < 20; i++) {
-        var img = sorted[i].stream_icon || sorted[i].cover;
-        if (img && img.length > 10 && !seen[img]) {
-            seen[img] = true;
-            images.push(img);
-        }
-    }
-    try {
-        localStorage.setItem('loadingBackdrops', JSON.stringify(images));
-    }
-    catch (e) { /* storage error */ }
-    this.prepareNextBackdrops(images);
-};
-
-IPTVApp.prototype.prepareNextBackdrops = function(images) {
-    if (!images) images = this.loadBackdropImages();
-    if (!images || images.length === 0) return;
-    var shuffled = images.slice();
-    for (var i = shuffled.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = shuffled[i];
-        shuffled[i] = shuffled[j];
-        shuffled[j] = temp;
-    }
-    var candidates = shuffled.slice(0, 5);
-    try {
-        localStorage.setItem('nextBackdrops', JSON.stringify(candidates.slice(0, 3)));
-    }
-    catch (e) { /* storage error */ }
-    var self = this;
-    var encoded = [];
-    var remaining = candidates.length;
-    candidates.forEach(function(url, idx) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', self.proxyImageUrl(url), true);
-        xhr.responseType = 'blob';
-        xhr.onload = function() {
-            if (xhr.status === 200 && xhr.response) {
-                var reader = new FileReader();
-                reader.onloadend = function() {
-                    encoded[idx] = reader.result;
-                    if (--remaining === 0) {
-                        self._storeBackdropsData(encoded);
-                    }
-                };
-                reader.onerror = function() {
-                    encoded[idx] = null;
-                    if (--remaining === 0) self._storeBackdropsData(encoded);
-                };
-                reader.readAsDataURL(xhr.response);
-            }
-            else {
-                encoded[idx] = null;
-                if (--remaining === 0) self._storeBackdropsData(encoded);
-            }
-        };
-        xhr.onerror = function() {
-            encoded[idx] = null;
-            if (--remaining === 0) self._storeBackdropsData(encoded);
-        };
-        xhr.send();
-    });
-};
-
-IPTVApp.prototype._storeBackdropsData = function(dataUris) {
-    var valid = dataUris.filter(function(d) { return d && d.length > 100; });
-    if (valid.length === 0) return;
-    var seen = {};
-    var unique = [];
-    for (var i = 0; i < valid.length && unique.length < 3; i++) {
-        if (!seen[valid[i]]) {
-            seen[valid[i]] = true;
-            unique.push(valid[i]);
-        }
-    }
-    try {
-        localStorage.setItem('nextBackdropsData', JSON.stringify(unique));
-        window.log('BACKDROP', 'Cached ' + unique.length + ' unique backdrop(s) from ' + valid.length + ' candidates');
-    }
-    catch (e) {
-        window.log('BACKDROP', 'Failed to store data URIs: ' + (e.message || e));
-        try { localStorage.removeItem('nextBackdropsData'); }
-        catch (ex) { /* ignore */ }
-    }
-};
-
-IPTVApp.prototype.preloadBackdropImages = function() {
-    var self = this;
-    var images = this.loadBackdropImages();
-    var maxConcurrent = 3;
-    var idx = 0;
-    function loadNext() {
-        if (idx >= images.length) return;
-        var img = new Image();
-        var currentIdx = idx;
-        idx++;
-        img.onload = img.onerror = function() {
-            loadNext();
-        };
-        img.src = self.proxyImageUrl(images[currentIdx]);
-    }
-    for (var i = 0; i < Math.min(maxConcurrent, images.length); i++) {
-        loadNext();
-    }
-};
-
 IPTVApp.prototype.preloadSectionPosters = function() {
     var self = this;
     var sections = ['vod', 'series'];
@@ -2129,56 +2058,5 @@ IPTVApp.prototype.preloadSectionPosters = function() {
     }
     if (count > 0) {
         window.log('PRELOAD', 'Preloading ' + count + ' posters (vod+series)');
-    }
-};
-
-IPTVApp.prototype.showLoadingBackdrop = function() {
-    var self = this;
-    var backdrop = document.getElementById('loading-backdrop');
-    if (!backdrop) return;
-    var imgDivs = backdrop.querySelectorAll('.backdrop-img');
-    // 1. Try pre-cached data URIs first (instant display, no network)
-    var dataUris = null;
-    try {
-        var storedData = localStorage.getItem('nextBackdropsData');
-        if (storedData) dataUris = JSON.parse(storedData);
-    }
-    catch (e) { /* storage error */ }
-    if (dataUris && dataUris.length > 0) {
-        window.log('showLoadingBackdrop: using ' + dataUris.length + ' cached data URIs');
-        for (var i = 0; i < imgDivs.length && i < dataUris.length; i++) {
-            imgDivs[i].style.backgroundImage = cssUrl(dataUris[i]);
-        }
-        return;
-    }
-    // 2. Fallback: fetch from URL list
-    var images = this.loadBackdropImages();
-    window.log('showLoadingBackdrop: ' + images.length + ' images in cache (no data URIs)');
-    if (images.length === 0) return;
-    var selection = null;
-    try {
-        var stored = localStorage.getItem('nextBackdrops');
-        if (stored) selection = JSON.parse(stored);
-    }
-    catch (e) { /* storage error */ }
-    if (!selection || selection.length === 0) {
-        var shuffled = images.slice();
-        for (var i = shuffled.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var temp = shuffled[i];
-            shuffled[i] = shuffled[j];
-            shuffled[j] = temp;
-        }
-        selection = shuffled.slice(0, 3);
-    }
-    for (var i = 0; i < imgDivs.length && i < selection.length; i++) {
-        (function(div, url) {
-            var proxiedUrl = self.proxyImageUrl(url);
-            var img = new Image();
-            img.onload = function() {
-                div.style.backgroundImage = cssUrl(proxiedUrl);
-            };
-            img.src = proxiedUrl;
-        })(imgDivs[i], selection[i]);
     }
 };

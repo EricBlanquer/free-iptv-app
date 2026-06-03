@@ -519,10 +519,6 @@ IPTVApp.prototype.showLoading = function(show, posterUrl, message) {
     }
     window.log('showLoading: show=' + show + ' message=' + (message || '') + ' currentTmdbBackdrop=' + (this.currentTmdbBackdrop ? 'yes' : 'no') + ' posterUrl=' + (posterUrl ? 'yes' : 'no'));
     if (!show) {
-        var imgDivs = document.querySelectorAll('#loading-backdrop .backdrop-img');
-        for (var i = 0; i < imgDivs.length; i++) {
-            imgDivs[i].style.backgroundImage = '';
-        }
         backdrop.classList.remove('poster-mode', 'tmdb-mode');
         posterBg.style.backgroundImage = '';
     }

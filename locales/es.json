@@ -160,6 +160,7 @@
     "yourRating": "Tu valoración"
   },
   "diagnostic": {
+    "running": "Ejecutando diagnóstico de red…",
     "clientError": "El servidor del proveedor rechazó la solicitud (HTTP {status}). La URL o las credenciales pueden ser incorrectas.",
     "close": "Cerrar",
     "dnsFailure": "Falló la resolución DNS para {host}. Intente configurar sus DNS en 1.1.1.1 o 8.8.8.8 en su router.",

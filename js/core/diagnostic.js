@@ -120,15 +120,20 @@
 
     function checkReachable(url, timeout) {
         var start = Date.now();
-        return fetchWithTimeout(url, {
+        var fetched = fetchWithTimeout(url, {
             method: 'GET',
             cache: 'no-store',
             mode: 'no-cors'
         }, timeout).then(function(r) {
-            return { ok: true, elapsed: Date.now() - start, status: r.status, opaque: r.type === 'opaque' };
+            var elapsed = Date.now() - start;
+            return { ok: elapsed < timeout, elapsed: elapsed, status: r.status, opaque: r.type === 'opaque', timedOut: elapsed >= timeout };
         }).catch(function(ex) {
             return { ok: false, elapsed: Date.now() - start, error: ex.message || String(ex) };
         });
+        var timedOut = new Promise(function(resolve) {
+            setTimeout(function() { resolve({ ok: false, elapsed: timeout, timedOut: true }); }, timeout);
+        });
+        return Promise.race([fetched, timedOut]);
     }
 
     /**
@@ -282,33 +287,6 @@
             return Promise.resolve(result);
         }
 
-        if (ctx.hasProxy) {
-            var directNoProxy = parsed.origin + '/';
-            return checkReachable(directNoProxy, QUICK_TIMEOUT).then(function(noProxy) {
-                result.details.noProxy = noProxy;
-                window.log('DIAG proxyBypass ' + JSON.stringify(noProxy));
-                if (noProxy && noProxy.ok) {
-                    result.problem = 'proxy_broken';
-                    result.autoFix = {
-                        available: true,
-                        labelKey: 'diagnostic.fixDisableProxy',
-                        apply: function() {
-                            if (!app) return false;
-                            app.settings.proxyEnabled = false;
-                            app.settings.streamProxy = false;
-                            app.saveSettings();
-                            if (app.api) app.api.clearCache();
-                            reconnectAndReloadSection(app);
-                            return true;
-                        }
-                    };
-                    return result;
-                }
-                result.problem = 'server_unreachable';
-                return result;
-            });
-        }
-
         result.problem = 'server_unreachable';
         return Promise.resolve(result);
     }
@@ -353,8 +331,6 @@
                 return t('diagnostic.shouldBeHttps', 'Your provider uses HTTPS, not HTTP. You can fix this automatically.');
             case 'should_be_http':
                 return t('diagnostic.shouldBeHttp', 'Your provider uses HTTP, not HTTPS. You can fix this automatically.');
-            case 'proxy_broken':
-                return t('diagnostic.proxyBroken', 'Your CORS proxy is not responding but the provider is reachable directly. You can disable the proxy automatically.');
             case 'endpoint_slow':
                 return t('diagnostic.endpointSlow', 'The provider is reachable but this specific endpoint timed out. The provider may be overloaded, try again later.');
             case 'invalid_credentials':
@@ -399,12 +375,6 @@
             directLabel += ')';
             items.push((d.direct.ok ? '✅ ' : '❌ ') + directLabel);
         }
-        if (d.swapped) {
-            items.push((d.swapped.ok ? '✅ ' : '❌ ') + I18n.t('diagnostic.stepSwapped', 'Alternate protocol'));
-        }
-        if (d.noProxy) {
-            items.push((d.noProxy.ok ? '✅ ' : '❌ ') + I18n.t('diagnostic.stepNoProxy', 'Without proxy'));
-        }
         if (d.timing) {
             items.push('⏱ DNS=' + d.timing.dns + 'ms TCP=' + d.timing.tcp + 'ms TTFB=' + d.timing.ttfb + 'ms');
         }
@@ -423,7 +393,12 @@
      * Called from provider fetchWithRetry when all retries exhaust.
      */
     function runAndShow(app, url, errorType) {
+        // A diagnostic stays "in progress" until the user closes its modal, then a
+        // cooldown follows: a down provider fails many requests in a row, and each
+        // one must NOT stack a fresh modal on top of the one already shown.
         if (app._diagnosticInProgress) return Promise.resolve();
+        var now = Date.now();
+        if (app._diagnosticCooldownUntil && now < app._diagnosticCooldownUntil) return Promise.resolve();
         app._diagnosticInProgress = true;
         var playlist = app.getActivePlaylist && app.getActivePlaylist();
         var target = (playlist && playlist.serverUrl) || (playlist && playlist.url) || url;
@@ -441,34 +416,89 @@
             errorType: errorType || 'timeout'
         };
         window.log('DIAG start target=' + target + ' hasProxy=' + ctx.hasProxy + ' errorType=' + ctx.errorType);
-        return run(ctx).then(function(result) {
-            window.log('DIAG result problem=' + result.problem);
-            showResultModal(app, result);
+        // Land the user on the navigable home screen instead of a blank screen
+        // with a lone error: keeps Back and menu navigation working so they can
+        // reach Settings even when the provider is unreachable.
+        if (app.showLoading) app.showLoading(false);
+        if (app.showScreen) app.showScreen('home');
+        // Set focusArea before updateHomeMenuVisibility so the home re-applies its own
+        // focus (highlight in sync with focusIndex); the modal then captures that valid
+        // home focus and Back restores there — not onto the now-hidden modal.
+        app.focusArea = 'home';
+        if (app.updateHomeMenuVisibility) app.updateHomeMenuVisibility();
+        var settle = function() {
             app._diagnosticInProgress = false;
+            app._diagnosticCooldownUntil = Date.now() + 60000;
+        };
+        // Open the modal immediately and stream the tests as they run, so the
+        // several-second wait for the network probes is visible, not a blank gap.
+        var dismissed = false;
+        var progress = buildProgressBody();
+        app.showConfirmModal('', null, {
+            title: I18n.t('diagnostic.title', 'Connection problem'),
+            html: progress.container,
+            hideYes: true,
+            noLabel: I18n.t('diagnostic.close', 'Close'),
+            noAction: function() { dismissed = true; settle(); }
+        });
+        return run(ctx, function(key, data) {
+            appendProgressStep(progress, key, data);
+        }).then(function(result) {
+            window.log('DIAG result problem=' + result.problem);
+            if (!dismissed) finalizeModal(app, result, settle);
         }).catch(function(ex) {
             window.log('ERROR', 'DIAG ' + (ex.message || ex));
-            app._diagnosticInProgress = false;
+            settle();
         });
     }
 
-    function showResultModal(app, result) {
-        var title = I18n.t('diagnostic.title', 'Connection problem');
-        var summary = buildSummary(result);
+    var PROGRESS_STEP_LABELS = {
+        internet: ['diagnostic.stepInternet', 'Internet'],
+        doh: ['diagnostic.stepDns', 'DNS'],
+        directHead: ['diagnostic.stepDirect', 'Direct connection']
+    };
+
+    function buildProgressBody() {
+        var container = document.createElement('div');
+        var header = document.createElement('div');
+        header.className = 'diag-running';
+        header.textContent = I18n.t('diagnostic.running', 'Running network diagnostic…');
+        container.appendChild(header);
+        var list = document.createElement('div');
+        list.className = 'diag-steps';
+        container.appendChild(list);
+        return { container: container, list: list, seen: {} };
+    }
+
+    function appendProgressStep(progress, key, data) {
+        var label = PROGRESS_STEP_LABELS[key];
+        if (!label || progress.seen[key]) return;
+        progress.seen[key] = true;
+        var line = document.createElement('div');
+        line.className = 'diag-step';
+        line.textContent = (data && data.ok ? '✅ ' : '❌ ') + I18n.t(label[0], label[1]);
+        progress.list.appendChild(line);
+    }
+
+    function finalizeModal(app, result, settle) {
+        var messageEl = document.getElementById('confirm-modal-message');
+        if (messageEl) {
+            while (messageEl.firstChild) messageEl.removeChild(messageEl.firstChild);
+            messageEl.appendChild(buildSummary(result));
+        }
         var hasFix = !!(result.autoFix && result.autoFix.available);
-        var yesLabel = hasFix ? I18n.t(result.autoFix.labelKey || 'diagnostic.fix', 'Fix automatically') : '';
-        var noLabel = I18n.t('diagnostic.close', 'Close');
-        app.showConfirmModal('', function() {
-            if (hasFix && result.autoFix.apply) {
-                result.autoFix.apply();
-            }
-        }, {
-            title: title,
-            html: summary,
-            yesLabel: yesLabel,
-            noLabel: noLabel,
-            hideYes: !hasFix,
-            focusYes: hasFix
-        });
+        var yesBtn = document.getElementById('confirm-yes-btn');
+        if (hasFix && yesBtn) {
+            yesBtn.textContent = I18n.t(result.autoFix.labelKey || 'diagnostic.fix', 'Fix automatically');
+            yesBtn.removeAttribute('data-i18n');
+            yesBtn.style.display = '';
+            app.confirmModalAction_ = function() {
+                if (settle) settle();
+                if (result.autoFix.apply) result.autoFix.apply();
+            };
+            app.focusIndex = 1;
+            if (app.updateFocus) app.updateFocus();
+        }
     }
 
     window.NetworkDiagnostic = {

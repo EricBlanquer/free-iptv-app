@@ -153,6 +153,7 @@
     "yourRating": "Jouw beoordeling"
   },
   "diagnostic": {
+    "running": "Netwerkdiagnose wordt uitgevoerd…",
     "clientError": "De provider-server heeft het verzoek afgewezen (HTTP {status}). De URL of inloggegevens zijn mogelijk onjuist.",
     "close": "Sluiten",
     "dnsFailure": "DNS-resolutie voor {host} mislukt. Stel uw DNS in op 1.1.1.1 of 8.8.8.8 in uw router.",
