@@ -298,18 +298,28 @@ class ProviderAPI {
         ];
         var yieldToUI = () => new Promise(resolve => setTimeout(resolve, 50));
         var failed = [];
-        for (var i = 0; i < steps.length; i++) {
-            if (onProgress) onProgress(i + 1, steps.length, steps[i].name);
-            await yieldToUI();
-            try {
-                await steps[i].fn();
+        // Authentication already proved the provider is reachable; a timeout while
+        // bulk-loading a heavy list is not a connection failure, so don't pop the
+        // network diagnostic modal for it (the per-step progress toast is enough).
+        var prevSilent = this.silent;
+        this.silent = true;
+        try {
+            for (var i = 0; i < steps.length; i++) {
+                if (onProgress) onProgress(i + 1, steps.length, steps[i].name);
+                await yieldToUI();
+                try {
+                    await steps[i].fn();
+                }
+                catch (e) {
+                    window.log('ERROR', 'CACHE preload ' + steps[i].name + ': ' + (e.message || e));
+                    failed.push(steps[i].name);
+                    if (onProgress) onProgress(-1, steps.length, steps[i].name);
+                }
+                await yieldToUI();
             }
-            catch (e) {
-                window.log('ERROR', 'CACHE preload ' + steps[i].name + ': ' + (e.message || e));
-                failed.push(steps[i].name);
-                if (onProgress) onProgress(-1, steps.length, steps[i].name);
-            }
-            await yieldToUI();
+        }
+        finally {
+            this.silent = prevSilent;
         }
         if (onProgress) onProgress(0, 0, null);
         if (failed.length > 0) {

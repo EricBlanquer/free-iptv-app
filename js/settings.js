@@ -2137,7 +2137,7 @@ IPTVApp.prototype.validateProviderPlaylist = function(playlist) {
                 if (xhr.status === 200) {
                     try {
                         var data = JSON.parse(xhr.responseText);
-                        if (data.user_info && data.user_info.auth === 1) {
+                        if (data.user_info && String(data.user_info.auth) !== '0') {
                             resolve({ valid: true, info: data.user_info });
                         }
                         else {
