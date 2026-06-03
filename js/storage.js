@@ -63,6 +63,51 @@ IPTVApp.prototype.startMemoryMonitor = function() {
     }, 30000);
 };
 
+IPTVApp.prototype._evictableStoragePrefixes = ['subtitleState_'];
+IPTVApp.prototype._evictableStorageKeys = ['nextBackdropsData', 'nextBackdrops', 'loadingBackdrops'];
+
+IPTVApp.prototype._evictNonCriticalStorage = function() {
+    var freed = 0;
+    try {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+            var k = localStorage.key(i);
+            if (!k) continue;
+            var evict = this._evictableStorageKeys.indexOf(k) !== -1;
+            if (!evict) {
+                for (var p = 0; p < this._evictableStoragePrefixes.length; p++) {
+                    if (k.indexOf(this._evictableStoragePrefixes[p]) === 0) { evict = true; break; }
+                }
+            }
+            if (evict) {
+                var v = localStorage.getItem(k);
+                freed += v ? v.length : 0;
+                localStorage.removeItem(k);
+            }
+        }
+    }
+    catch (e) { /* best effort */ }
+    return freed;
+};
+
+IPTVApp.prototype._safeLocalSet = function(key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    }
+    catch (e) {
+        var freed = this._evictNonCriticalStorage();
+        window.log('STORAGE', 'Quota exceeded saving ' + key + ', evicted ' + Math.round(freed / 1024) + 'KB of caches, retrying');
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        }
+        catch (e2) {
+            window.log('ERROR', 'STORAGE quota still exceeded for ' + key + ' after eviction: ' + (e2.message || e2));
+            return false;
+        }
+    }
+};
+
 // Watch History
 IPTVApp.prototype.loadWatchHistory = function() {
     try {
@@ -77,7 +122,7 @@ IPTVApp.prototype.loadWatchHistory = function() {
             }
         }
         if (changed) {
-            try { localStorage.setItem('watchHistory', JSON.stringify(list)); } catch (ex) {}
+            this._safeLocalSet('watchHistory', JSON.stringify(list));
         }
         return list;
     }
@@ -90,10 +135,7 @@ IPTVApp.prototype.saveWatchHistory = function() {
     if (Premium.getState() === Premium.STATE_EXPIRED && this.watchHistory.length > Premium.getHistoryFreeLimit()) {
         this.watchHistory = this.watchHistory.slice(0, Premium.getHistoryFreeLimit());
     }
-    try {
-        localStorage.setItem('watchHistory', JSON.stringify(this.watchHistory));
-    }
-    catch (e) { /* storage error */ }
+    this._safeLocalSet('watchHistory', JSON.stringify(this.watchHistory));
     this._rebuildHistoryIndex();
     if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
@@ -178,10 +220,7 @@ IPTVApp.prototype.loadEpisodeProgress = function() {
 };
 
 IPTVApp.prototype.saveEpisodeProgress = function() {
-    try {
-        localStorage.setItem('episodeProgress', JSON.stringify(this.episodeProgress));
-    }
-    catch (e) { /* storage error */ }
+    this._safeLocalSet('episodeProgress', JSON.stringify(this.episodeProgress));
 };
 
 IPTVApp.prototype.updateEpisodeProgress = function(episodeId, position, duration, playlistId, forceSync) {
@@ -265,10 +304,7 @@ IPTVApp.prototype.loadSeriesProgress = function() {
 };
 
 IPTVApp.prototype.saveSeriesProgress = function() {
-    try {
-        localStorage.setItem('seriesProgress', JSON.stringify(this.seriesProgress));
-    }
-    catch (e) { /* storage error */ }
+    this._safeLocalSet('seriesProgress', JSON.stringify(this.seriesProgress));
 };
 
 IPTVApp.prototype.getSeriesProgress = function(seriesId, playlistId) {
@@ -1651,10 +1687,7 @@ IPTVApp.prototype.loadFavorites = function() {
             for (var j = 0; j < arr.length; j++) {
                 if (!arr[j]._addedAt) arr[j]._addedAt = now - (arr.length - 1 - j) * 1000;
             }
-            try {
-                localStorage.setItem('favorites', JSON.stringify(arr));
-            }
-            catch (ex) { /* storage error */ }
+            this._safeLocalSet('favorites', JSON.stringify(arr));
         }
         return arr;
     }
@@ -1664,10 +1697,7 @@ IPTVApp.prototype.loadFavorites = function() {
 };
 
 IPTVApp.prototype.saveFavorites = function() {
-    try {
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
-    }
-    catch (e) { /* storage error */ }
+    this._safeLocalSet('favorites', JSON.stringify(this.favorites));
     this._rebuildFavoritesIndex();
     if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
