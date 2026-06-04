@@ -8,9 +8,17 @@ var Regex = {
     // Match language prefix: requires pipe separator | to avoid matching words like "Ant-Man", "One-Punch"
     // Matches: "FR|", "FR |", "FR- |", "EU|FR|" but NOT "Ant-" or "One-"
     categoryPrefix: /^(?:(?:EU|AF|24\/7)[-\s]*\|?\s*)?([A-Za-z]{2,3})[-\s]*\|\s*/i,
+    // Match a leading bracketed language tag: "[FR] NETFLIX", "[MULTI-LANG] MOVIES".
+    // The token inside the brackets is allow-listed (same languages as streamPrefix)
+    // so real titles like "[REC]" or "[Adult Swim]" are never stripped.
+    bracketPrefix: /^\s*\[\s*(?:MULTI-?LANG|PT-?BR|EX-?YU|EXYU|ALB|FIL|VOSTFR|VOST|VFF|MULTI|FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|ZH|JA|KO|HI|TH|VI|ID|MS|SV|NO|DA|FI|CS|SK|HU|RO|BG|HR|SR|SL|SI|UK|EL|GR|HE|FA|UR|BN|TA|TE|MR|GU|KN|ML|PA|NE|MY|KM|LO|MN|KA|AM|SW|SC|ZU|XH|AF|EU|CA|GL|CY|GA|GD|MT|IS|LB|MK|SQ|BS|ET|LV|LT|AZ|KK|UZ|TG|KY|TK|PS|SD|KU|EO|LA|US|GB|IE|AU|NZ|BR|MX|CL|CO|PE|VE|IN|PK|BD|LK|NP|IR|IL|JP|CN|TW|HK|SG|PH|KR|GE|SE|DK|ZA|NG|KE|GH|EG|MA|DZ|TN|SA|AE|QA|KW|IQ|SY|JO|YE|RS|BA|ME|CZ|BY|KZ|CH|VF|VO)\s*\]\s*/i,
     // Only match known language codes (ISO 639-1/2) to avoid matching words like "You", "The", etc.
     streamPrefix: /^(?:24\/7\|\s*)?(?:(?:FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|ZH|JA|KO|HI|TH|VI|ID|MS|FIL|SV|NO|DA|FI|CS|SK|HU|RO|BG|HR|SR|SL|UK|EL|HE|FA|UR|BN|TA|TE|MR|GU|KN|ML|PA|NE|SI|MY|KM|LO|MN|KA|AM|SW|ZU|XH|AF|EU|CA|GL|CY|GA|GD|MT|IS|LB|MK|SQ|BS|ET|LV|LT|AZ|KK|UZ|TG|KY|TK|PS|SD|KU|EO|VFF|VF|VO|VOST|VOSTFR|MULTI)[-:\s]+)/i,
     qualityPrefix: /^(4K|3D|SD|HD|FHD|UHD|DVB|DBV)[-|\s]+/i,
+    // Parenthetical resolution noise inside a category name, e.g. "(4K&1080P)".
+    // Removed from the display name while standalone suffixes (FHD/HD/HEVC) that
+    // distinguish separate categories are kept untouched.
+    qualityParens: /\s*\([^)]*(?:4K|8K|2160P?|1080P?|720P?|UHD|HEVC|FHD)[^)]*\)\s*/gi,
     sdQualities: ['SD', 'DVB', 'DBV'],
     langCodeTag: /^(FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|ZH|JA|KO|VFF|VF|VO|VOST|VOSTFR|MULTI)$/i,
     langCode: /^[A-Za-z]{2,6}$/,

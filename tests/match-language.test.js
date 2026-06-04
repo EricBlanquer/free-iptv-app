@@ -173,4 +173,29 @@ describe('matchesLanguage: handles both pipe-style and space-style provider pref
             expect(app.matchesLanguage('IT| INTRATTENIMENTO')).toBe(false);
         });
     });
+
+    describe('zunoxide provider leaks (2026-06-04): non-FR region words now hidden for FR', () => {
+        let app;
+        beforeAll(() => { app = buildApp('FR'); });
+
+        it('hides Turkish "EU | TURK SPOR"', () => {
+            expect(app.matchesLanguage('EU | TURK SPOR')).toBe(false);
+        });
+        it('hides "EU | GEORGIA", "AS | KAZAKHSTAN", "AM | SURINAME", "AS | TAIWAN", "AS | CAMBODIA"', () => {
+            expect(app.matchesLanguage('EU | GEORGIA')).toBe(false);
+            expect(app.matchesLanguage('AS | KAZAKHSTAN')).toBe(false);
+            expect(app.matchesLanguage('AM | SURINAME')).toBe(false);
+            expect(app.matchesLanguage('AS | TAIWAN')).toBe(false);
+            expect(app.matchesLanguage('AS | CAMBODIA')).toBe(false);
+        });
+        it('hides Brazilian "[BR] FILMES" and "EU | EZIDXAN"', () => {
+            expect(app.matchesLanguage('[BR] FILMES')).toBe(false);
+            expect(app.matchesLanguage('EU | EZIDXAN')).toBe(false);
+        });
+        it('still SHOWS francophone categories for a French user', () => {
+            expect(app.matchesLanguage('AF | SENEGAL')).toBe(true);
+            expect(app.matchesLanguage('AM | HAITI')).toBe(true);
+            expect(app.matchesLanguage('AM | CANADA FRANCAIS CINEMA')).toBe(true);
+        });
+    });
 });

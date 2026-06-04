@@ -99,18 +99,21 @@ IPTVApp.prototype.stripCategoryPrefix = function(title) {
     if (!title) return '';
     // Remove invisible characters (LTR mark, zero-width chars, etc.) at the start
     var clean = title.replace(/^[\u200E\u200F\u200B\u200C\u200D\uFEFF]+/, '');
-    // First try quality prefix (4K|, 3D|, SD|, etc.)
-    var result = clean.replace(Regex.qualityPrefix, '');
-    if (result !== clean) return result;
-    // Try compound region+lang prefix (e.g., "EU- FR ", "24/7| FR ", "VIP CA- ").
+    // Strip the first matching prefix, in priority order. Each branch only
+    // applies if the previous ones left the string untouched.
+    // Bracketed language tag ([FR], [MULTI-LANG], etc.) - allow-listed tokens only
+    var result = clean.replace(Regex.bracketPrefix, '');
+    // Quality prefix (4K|, 3D|, SD|, etc.)
+    if (result === clean) result = clean.replace(Regex.qualityPrefix, '');
+    // Compound region+lang prefix (e.g., "EU- FR ", "24/7| FR ", "VIP CA- ").
     // Both halves are allow-listed to avoid false positives on real titles.
-    result = clean.replace(/^(?:EU|AF|AS|NA|SA|OC|24\/7|VIP|EST|INT|EX-YU|EXYU|HK|LA|MA|AR|SE|DK|NO|FI|LU)[-\s|]+(?:FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|UK|US|CA|BE|CH|GR|JP|KR|CN|HU|RO|CZ|SK|HR|SR|BG|FI|SE|DK|NO|IE|AUS|NZ|IN|HK|TW|SG|IL|IR|MX|BR|AT)[-\s|]+/i, '');
-    if (result !== clean) return result;
-    // Then try category prefix (FR|, EN|, etc.)
-    result = clean.replace(Regex.categoryPrefix, '');
-    if (result !== clean) return result;
-    // Finally try stream prefix
-    return clean.replace(Regex.streamPrefix, '');
+    if (result === clean) result = clean.replace(/^(?:EU|AF|AS|NA|SA|OC|24\/7|VIP|EST|INT|EX-YU|EXYU|HK|LA|MA|AR|SE|DK|NO|FI|LU)[-\s|]+(?:FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|UK|US|CA|BE|CH|GR|JP|KR|CN|HU|RO|CZ|SK|HR|SR|BG|FI|SE|DK|NO|IE|AUS|NZ|IN|HK|TW|SG|IL|IR|MX|BR|AT)[-\s|]+/i, '');
+    // Category prefix (FR|, EN|, etc.)
+    if (result === clean) result = clean.replace(Regex.categoryPrefix, '');
+    // Stream prefix
+    if (result === clean) result = clean.replace(Regex.streamPrefix, '');
+    // Remove leftover parenthetical resolution noise like "(4K&1080P)"
+    return result.replace(Regex.qualityParens, '');
 };
 
 // Set category item text with marquee span wrapper
@@ -342,6 +345,9 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         EG: 'AR', SA: 'AR', AE: 'AR', QA: 'AR', KW: 'AR', BH: 'AR', OM: 'AR', JO: 'AR',
         LB: 'AR', SY: 'AR', IQ: 'AR', YE: 'AR', LY: 'AR', SD: 'AR',
         HU: 'HU', RO: 'RO', BG: 'BG', HR: 'HR', SK: 'SK', CZ: 'CS',
+        TURK: 'TR', GEORGIA: 'KA', KAZAKHSTAN: 'KK', SURINAME: 'NL',
+        TAIWAN: 'ZH', CAMBODIA: 'KM', AUSTRALIA: 'EN', ZEALAND: 'EN',
+        LANKA: 'SI', EZIDXAN: 'KU', BR: 'PT', THAILLAND: 'TH', MALASIA: 'MS',
         // BE / CH / SW / CA are intentionally NOT in either map: multilingual
         // countries — we rely on an explicit primary token (FR/NL/DE/EN) to
         // disambiguate. If none, the category stays language-agnostic (shown
