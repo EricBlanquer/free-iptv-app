@@ -1552,19 +1552,38 @@ IPTVApp.prototype.updateCategoriesVisibility = function() {
     var screen = document.getElementById('browse-screen');
     if (!screen) return;
     var collapse = false;
-    if (this.currentScreen === 'browse' && (this.focusArea === 'grid' || this.focusArea === 'filters')) {
+    if (this.currentScreen === 'browse') {
         var sidebar = document.getElementById('sidebar');
         var sidebarAvailable = sidebar && sidebar.style.display !== 'none';
-        if (sidebarAvailable && document.querySelector('#content-grid .grid-item')) {
-            collapse = true;
+        var hasGridItems = !!document.querySelector('#content-grid .grid-item');
+        if (sidebarAvailable && hasGridItems) {
+            if (this.focusArea === 'grid') {
+                collapse = true;
+            }
+            else if (this.focusArea === 'filters') {
+                // The category list stays open only while a category sort button
+                // (#category-sort-bar) is focused — those buttons sort the list.
+                // The search fields, view-mode and grid-sort controls collapse it.
+                var focused = this.getFocusables()[this.focusIndex];
+                var onSortBtn = focused && focused.classList && focused.classList.contains('cat-sort-btn');
+                if (!onSortBtn) collapse = true;
+            }
         }
     }
     if (collapse === this._categoriesCollapsed) return;
+    // Toggling collapse hides/shows the sort header, which changes the filters
+    // focusable set. Remember the focused control so we can keep it focused
+    // across the change instead of letting focusIndex point at a different one.
+    var keepEl = this.focusArea === 'filters' ? this.getFocusables()[this.focusIndex] : null;
     this._categoriesCollapsed = collapse;
     screen.classList.toggle('categories-collapsed', collapse);
     this.gridColumns = collapse ? this.gridColumnsWide : this.gridColumnsNarrow;
     if (collapse) this.updateCurrentCategoryLabel();
     this.invalidateFocusables();
+    if (keepEl) {
+        var newIdx = this.getFocusables().indexOf(keepEl);
+        if (newIdx >= 0) this.focusIndex = newIdx;
+    }
 };
 
 IPTVApp.prototype.updateCurrentCategoryLabel = function() {
