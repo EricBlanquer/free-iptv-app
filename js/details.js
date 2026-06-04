@@ -1132,17 +1132,30 @@ IPTVApp.prototype.renderCast = function(cast, director, directorLabel) {
     this.setHidden(castSection, false);
     castGrid.textContent = '';
     var self = this;
+    var dirLabel = directorLabel || I18n.t('details.director', 'Director');
+    // When the director also plays a role, merge both cards into one labelled
+    // "Director & <character>" instead of showing the person twice.
+    var mergedActor = null;
+    if (hasDirector && hasCast) {
+        for (var mi = 0; mi < cast.length; mi++) {
+            var sameId = cast[mi].id != null && director.id != null && String(cast[mi].id) === String(director.id);
+            var sameName = !sameId && cast[mi].name && director.name &&
+                cast[mi].name.trim().toLowerCase() === director.name.trim().toLowerCase();
+            if (sameId || sameName) { mergedActor = cast[mi]; break; }
+        }
+    }
     if (hasDirector) {
         var dirWithRole = {
             id: director.id,
             name: director.name,
-            photo: director.photo,
-            character: directorLabel || I18n.t('details.director', 'Director')
+            photo: director.photo || (mergedActor && mergedActor.photo),
+            character: mergedActor && mergedActor.character ? dirLabel + ' & ' + mergedActor.character : dirLabel
         };
         castGrid.appendChild(this.createCastCard(dirWithRole, true));
     }
     if (hasCast) {
         cast.forEach(function(actor) {
+            if (actor === mergedActor) return;
             castGrid.appendChild(self.createCastCard(actor, true));
         });
     }
@@ -2107,7 +2120,17 @@ IPTVApp.prototype.cleanTitle = function(title) {
     result = result.replace(/\s*\((?:19|20)\d{2}\)/g, '');
     result = result.replace(/\s*\((?:720p|1080p|2160p|4K|UHD|HDR|HDR10|HDTV|WEB-?DL|BluRay|BDRip|DVDRip|VOSTFR|VO|VF|MULTI)\)/gi, '');
     result = result.replace(Regex.removeYearEnd, '');
-    result = result.replace(Regex.qualityTags, '');
+    // Replace with a space (not '') so removing a tag between two words does not
+    // glue them ("Gourou 4K VOF" must become "Gourou VOF", not "GourouVOF").
+    result = result.replace(Regex.qualityTags, ' ');
+    // Subtitle marker + language ("SUBT AR", "SUB FR") — known languages only so
+    // real titles like "Sub Way" survive.
+    result = result.replace(/\s*\b(?:SUBT?|SUB|VOSTFR?|VOST)\s+(?:AR|FR|EN|ES|IT|PT|DE|NL|TR|RU|GR|EL|FA|HE|HI|ZH|JA|KO|PL|RO|MULTI)\b\s*/gi, ' ');
+    // Standalone quality + version/audio tokens qualityTags omits (FHD/HD/SD/HEVC,
+    // VOF/VF/MULTI/VOSTFR...), word-bounded so real titles ("Hard Candy", "Sub Zero")
+    // are untouched. Stripping them here keeps the per-variant version label
+    // (title minus cleanTitle) limited to the quality descriptor.
+    result = result.replace(/\s*\b(?:FULL[\s-]?HD|FHD|UHD|HD|SD|4K|8K|2K|HEVC|H[\s.]?26[45]|X26[45]|VOSTFR|VOST|VOF|VFF|VFQ|VF|VO|MULTI|TRUEFRENCH|SUBT)\b\s*/gi, ' ');
     if (Regex.langTags) result = result.replace(Regex.langTags, '');
     result = result.replace(Regex.vostfr, '');
     result = result.replace(Regex.seasonEpisode, '');

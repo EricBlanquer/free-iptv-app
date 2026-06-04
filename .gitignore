@@ -7,6 +7,9 @@ CLAUDE.md
 *.backup
 *.wgt
 .azure_speech
+# Local-only test fixtures with real provider credentials — never commit
+tests/fixtures/providers.local.json
+*.local.json
 node_modules/
 coverage/
 android/.gradle/

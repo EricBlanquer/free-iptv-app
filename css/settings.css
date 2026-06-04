@@ -243,6 +243,9 @@
     background: #e05050;
     border-color: transparent;
     transform: scale(1.05);
+    /* Anchor the scale to the left so wide buttons (full-width "Manage
+       playlists") don't overflow the container's left edge and clip the "G". */
+    transform-origin: left center;
     box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.4), 0 0 15px rgba(224, 80, 80, 0.3);
 }
 

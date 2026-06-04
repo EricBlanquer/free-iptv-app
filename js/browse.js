@@ -97,12 +97,15 @@ IPTVApp.prototype.getLiveQualityTag = function(name) {
 
 IPTVApp.prototype.stripCategoryPrefix = function(title) {
     if (!title) return '';
-    // Remove invisible characters (LTR mark, zero-width chars, etc.) at the start
-    var clean = title.replace(/^[\u200E\u200F\u200B\u200C\u200D\uFEFF]+/, '');
+    // Remove invisible characters (LTR mark, zero-width chars, etc.) and leading
+    // whitespace so a prefix like " AF | LOCAL" is still recognised.
+    var clean = title.replace(/^[\u200E\u200F\u200B\u200C\u200D\uFEFF\s]+/, '');
     // Strip the first matching prefix, in priority order. Each branch only
     // applies if the previous ones left the string untouched.
     // Bracketed language tag ([FR], [MULTI-LANG], etc.) - allow-listed tokens only
     var result = clean.replace(Regex.bracketPrefix, '');
+    // Region group as a standalone single-pipe prefix (24/7 |, EXYU |)
+    if (result === clean) result = clean.replace(Regex.regionPipePrefix, '');
     // Quality prefix (4K|, 3D|, SD|, etc.)
     if (result === clean) result = clean.replace(Regex.qualityPrefix, '');
     // Compound region+lang prefix (e.g., "EU- FR ", "24/7| FR ", "VIP CA- ").
@@ -145,6 +148,9 @@ IPTVApp.prototype.parseCategoryName = function(categoryName) {
         name = name.replace(Regex.contentTypePrefix, '');
     }
     name = name.replace(Regex.seriesWord, '').replace(Regex.vfq, '').trim();
+    // Drop a separator left at the start once a prefix/content-type word was
+    // removed (e.g. "FR: FILMS - Action" -> "FILMS - Action" -> "- Action").
+    name = name.replace(/^[\s–—:|-]+/, '');
     name = this.formatDisplayTitle(name);
     if (isCanadian) name += ' (Canadien)';
     if (isSD) name += ' (SD)';
@@ -2835,6 +2841,11 @@ IPTVApp.prototype._normalizeDedupTitle = function(title) {
     return this.cleanTitle(s).toLowerCase()
         .normalize('NFD').replace(/[̀-ͯ]/g, '')
         .replace(/[^a-z0-9\s]/g, ' ')
+        // Strip subtitle markers with their language ("subt ar", "sub fr", "vostfr en").
+        .replace(/\b(?:subt?|sub|vostfr?|vost)\s+[a-z]{2,3}\b/g, ' ')
+        // Strip quality/version tokens cleanTitle leaves behind (FHD/HD/SD/HEVC,
+        // VF/VOSTFR/MULTI/SUBT...) so variants of the same film share one dedup key.
+        .replace(/\b(fhd|fullhd|uhd|hd|sd|hq|hevc|h26[45]|x26[45]|vof|vff|vfq|vf|vostfr|vost|vo|subt|multi|truefrench)\b/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 };
@@ -3125,7 +3136,11 @@ IPTVApp.prototype._normalizeGenre = function(genre) {
     if (Regex.seriesWord) {
         g = g.replace(Regex.seriesWord, '');
     }
-    g = g.replace(Regex.vfq, '').trim();
+    // Drop parenthetical qualifiers (and any orphan parenthesis left by an
+    // upstream split), then trim separators left at the edges once a
+    // content-type word was removed ("FILMS - Action" -> "Action", "TN)" -> "TN").
+    g = g.replace(Regex.vfq, '').replace(/\([^)]*\)/g, ' ').replace(/[()]/g, ' ').trim();
+    g = g.replace(/^[\s–—:|.-]+/, '').replace(/[\s–—:|.-]+$/, '').trim();
     if (!g) return '';
     return this.formatDisplayTitle(g);
 };
@@ -3425,7 +3440,7 @@ IPTVApp.prototype._persistPreprocessedCache = function() {
 };
 
 IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap, onProgress) {
-    var DEDUP_FORMAT_VERSION = 3;
+    var DEDUP_FORMAT_VERSION = 5;
     var self = this;
     var t0 = Date.now();
     var filtered = [];
@@ -3547,12 +3562,14 @@ IPTVApp.prototype._preprocessStreams = function(streams, categories, categoryMap
             };
             if (s.genre) {
                 var decodedGenre = s.genre.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-                var genres = decodedGenre.split(/[\/,&]/);
+                // Drop parenthetical qualifiers before splitting so "(DZ/MA/TN)"
+                // is not torn into "MA" / "TN)" fragments.
+                var genres = decodedGenre.replace(/\([^)]*\)/g, ' ').split(/[\/,&]/);
                 for (var gi = 0; gi < genres.length; gi++) addGenre(genres[gi]);
             }
             var catName = categoryMap[s.category_id];
             if (catName) {
-                var catParts = catName.replace(/&amp;/g, '&').split(/[\/,&]/);
+                var catParts = catName.replace(/&amp;/g, '&').replace(/\([^)]*\)/g, ' ').split(/[\/,&]/);
                 for (var cpi = 0; cpi < catParts.length; cpi++) addGenre(catParts[cpi]);
             }
             s._normalizedGenres = normalizedGenres;

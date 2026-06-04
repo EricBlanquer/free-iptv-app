@@ -15,6 +15,10 @@ var Regex = {
     // Only match known language codes (ISO 639-1/2) to avoid matching words like "You", "The", etc.
     streamPrefix: /^(?:24\/7\|\s*)?(?:(?:FR|EN|DE|ES|IT|PT|NL|PL|RU|TR|AR|ZH|JA|KO|HI|TH|VI|ID|MS|FIL|SV|NO|DA|FI|CS|SK|HU|RO|BG|HR|SR|SL|UK|EL|HE|FA|UR|BN|TA|TE|MR|GU|KN|ML|PA|NE|SI|MY|KM|LO|MN|KA|AM|SW|ZU|XH|AF|EU|CA|GL|CY|GA|GD|MT|IS|LB|MK|SQ|BS|ET|LV|LT|AZ|KK|UZ|TG|KY|TK|PS|SD|KU|EO|VFF|VF|VO|VOST|VOSTFR|MULTI)[-:\s]+)/i,
     qualityPrefix: /^(4K|3D|SD|HD|FHD|UHD|DVB|DBV)[-|\s]+/i,
+    // Region group used as a standalone single-pipe prefix, e.g. "24/7 | FRENCH"
+    // or "EXYU | DOMACI". categoryPrefix only matches 2-3 letter codes, so the
+    // slash/4-letter region tokens need their own pattern.
+    regionPipePrefix: /^(?:24\/7|EXYU|EX-?YU)\s*-?\s*\|\s*/i,
     // Parenthetical resolution noise inside a category name, e.g. "(4K&1080P)".
     // Removed from the display name while standalone suffixes (FHD/HD/HEVC) that
     // distinguish separate categories are kept untouched.

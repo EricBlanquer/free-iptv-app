@@ -102,7 +102,12 @@ describe('stripCategoryPrefix: bracketed language prefixes', () => {
         const cases = [
             ['AR | BEIN SPORTS', 'BEIN SPORTS'],
             ['EU | FRANCE GENERALE', 'FRANCE GENERALE'],
-            ['AM | USA GENERAL', 'USA GENERAL']
+            ['AM | USA GENERAL', 'USA GENERAL'],
+            ['24/7 | FRENCH', 'FRENCH'],
+            ['24/7 | ENGLISH', 'ENGLISH'],
+            ['EXYU | DOMACI FILMOVI', 'DOMACI FILMOVI'],
+            [' AF | LOCAL', 'LOCAL'],
+            ['  EU | FRANCE', 'FRANCE']
         ];
         cases.forEach(([input, expected]) => {
             it(`"${input}" -> "${expected}"`, () => {
