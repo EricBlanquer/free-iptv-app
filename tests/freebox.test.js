@@ -54,7 +54,14 @@ function tick() {
 }
 
 describe('FreeboxAPI', function() {
-    beforeEach(function() {
+    beforeEach(async function() {
+        // Stop polling first so no new request is scheduled during the drain.
+        FreeboxAPI.stopPolling();
+        // Let any async left over from the previous test settle into the old
+        // xhrInstances array before discarding it. ensureSession() chains
+        // multiple XHRs through promises; a request created after the next
+        // test cleared the array would shift the indices that test asserts on.
+        await new Promise(function(resolve) { setTimeout(resolve, 25); });
         xhrInstances = [];
         FreeboxAPI.setConfig('mafreebox.freebox.fr', '');
         FreeboxAPI.stopPolling();
