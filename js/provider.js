@@ -77,7 +77,7 @@ class ProviderAPI {
                         var errorType = 'timeout';
                         var httpMatch = (error.message || '').match(/^HTTP (\d+)$/);
                         if (httpMatch) errorType = 'http_' + httpMatch[1];
-                        try { window.NetworkDiagnostic.runAndShow(window.app, url, errorType); }
+                        try { window.NetworkDiagnostic.runAndShow(window.app, url, errorType, this); }
                         catch (ex) { window.log('ERROR', 'DIAG launch: ' + (ex.message || ex)); }
                     }
                     throw error;
@@ -100,7 +100,7 @@ class ProviderAPI {
             this.authData = await response.json();
             if (!this.authData.user_info) {
                 if (!this.silent && window.NetworkDiagnostic && window.NetworkDiagnostic.runAndShow && window.app) {
-                    try { window.NetworkDiagnostic.runAndShow(window.app, url, 'invalid_credentials'); }
+                    try { window.NetworkDiagnostic.runAndShow(window.app, url, 'invalid_credentials', this); }
                     catch (ex) { window.log('ERROR', 'DIAG launch: ' + (ex.message || ex)); }
                 }
                 throw new Error('Invalid credentials');

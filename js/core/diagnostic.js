@@ -392,11 +392,19 @@
      * Run diagnostic for the active provider and display the result modal.
      * Called from provider fetchWithRetry when all retries exhaust.
      */
-    function runAndShow(app, url, errorType) {
+    function runAndShow(app, url, errorType, srcApi) {
         // A diagnostic stays "in progress" until the user closes its modal, then a
         // cooldown follows: a down provider fails many requests in a row, and each
         // one must NOT stack a fresh modal on top of the one already shown.
         if (app._diagnosticInProgress) return Promise.resolve();
+        // The attempt that triggered this may no longer be relevant: the user
+        // navigated to manage their providers, or switched to another provider
+        // while the slow timeout was still pending. Don't pop a stale
+        // connection-problem modal on top of where they went.
+        if (app.currentScreen === 'settings' || app.currentScreen === 'playlist-edit') {
+            return Promise.resolve();
+        }
+        if (srcApi && app.api && srcApi !== app.api) return Promise.resolve();
         var now = Date.now();
         if (app._diagnosticCooldownUntil && now < app._diagnosticCooldownUntil) return Promise.resolve();
         app._diagnosticInProgress = true;
