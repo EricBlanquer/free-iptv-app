@@ -240,7 +240,7 @@ IPTVApp.prototype._buildLangTokenMap = function() {
     var primary = {
         FR: 'FR', FRA: 'FR', FRENCH: 'FR', FRANCAIS: 'FR',
         EN: 'EN', ENG: 'EN', ENGLISH: 'EN',
-        DE: 'DE', DEU: 'DE', GER: 'DE', GERMAN: 'DE', DEUTSCH: 'DE',
+        DE: 'DE', DEU: 'DE', GER: 'DE', GE: 'DE', GERMAN: 'DE', DEUTSCH: 'DE',
         ES: 'ES', ESP: 'ES', SPANISH: 'ES', ESPANOL: 'ES',
         IT: 'IT', ITA: 'IT', ITALIAN: 'IT',
         PT: 'PT', POR: 'PT', PORTUGUESE: 'PT',
@@ -251,6 +251,7 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         AR: 'AR', ARA: 'AR', ARABIC: 'AR', ARAB: 'AR', ARABE: 'AR',
         GR: 'EL', GREEK: 'EL', ELLINIKA: 'EL',
         SV: 'SV', SWE: 'SV', SWEDISH: 'SV',
+        SC: 'SV', NORDIC: 'SV', SCANDINAVIAN: 'SV',
         DA: 'DA', DAN: 'DA', DANISH: 'DA',
         NO: 'NB', NOR: 'NB', NORWEGIAN: 'NB',
         FI: 'FI', FIN: 'FI', FINNISH: 'FI',
@@ -280,11 +281,11 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         ESTONIAN: 'ET', LATVIAN: 'LV', LITHUANIAN: 'LT',
         KURD: 'KU', KURDISH: 'KU',
         VLAAMS: 'NL', NEDERLANDS: 'NL',
-        VFF: 'FR', VOSTFR: 'FR'
+        VFF: 'FR', VOSTFR: 'FR', VFSTFR: 'FR'
     };
     // Secondary: country / region names. Used only if no primary token matched.
     var secondary = {
-        FRANCE: 'FR', BELGIQUE: 'FR', LUXEMBOURG: 'FR', QUEBEC: 'FR',
+        FRANCE: 'FR', BELGIQUE: 'FR', LUXEMBOURG: 'FR', QUEBEC: 'FR', QUEBECOISE: 'FR',
         MA: 'FR', MAROC: 'FR', MOROCCO: 'FR',
         IVOIRE: 'FR', SENEGAL: 'FR', CAMEROUN: 'FR', CAMEROON: 'FR',
         GABON: 'FR', TOGO: 'FR', BENIN: 'FR',
@@ -319,7 +320,7 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         CROATIA: 'HR', SERBIA: 'SR', BOSNIA: 'BS', BIH: 'BS', SRB: 'SR',
         MACEDONIA: 'MK', SLOVENIA: 'SL', SLOVAKIA: 'SK',
         UKRAINE: 'UK', UA: 'UK',
-        JAPAN: 'JA', KOREA: 'KO', CHINA: 'ZH', INDIA: 'HI',
+        JAPAN: 'JA', KOREA: 'KO', CHINA: 'ZH', INDIA: 'HI', INDE: 'HI',
         VIETNAM: 'VI', THAILAND: 'TH', INDONESIA: 'ID',
         MALAYSIA: 'MS', SINGAPORE: 'EN',
         NIGERIA: 'EN', GHANA: 'EN', KENYA: 'EN', UGANDA: 'EN',
@@ -327,7 +328,7 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         ETHIOPIA: 'AM', AMHARIC: 'AM',
         SOMALIA: 'SO', SOMALI: 'SO',
         ISRAEL: 'HE', IRAN: 'FA',
-        AFGHANISTAN: 'FA', PAKISTAN: 'UR',
+        AFGHANISTAN: 'FA', AFG: 'FA', PAKISTAN: 'UR',
         SRILANKA: 'SI', BANGLADESH: 'BN',
         PHILIPPINE: 'TL', PHILIPPINES: 'TL',
         MALTA: 'MT', MT: 'MT',
@@ -348,7 +349,7 @@ IPTVApp.prototype._buildLangTokenMap = function() {
         PK: 'UR', BD: 'BN', LK: 'SI', AF: 'FA', MY: 'MS', VN: 'VI',
         TH: 'TH', ID: 'ID', IL: 'HE', IR: 'FA',
         ZA: 'EN',
-        EG: 'AR', SA: 'AR', AE: 'AR', QA: 'AR', KW: 'AR', BH: 'AR', OM: 'AR', JO: 'AR',
+        EG: 'AR', DZ: 'AR', SA: 'AR', AE: 'AR', QA: 'AR', KW: 'AR', BH: 'AR', OM: 'AR', JO: 'AR',
         LB: 'AR', SY: 'AR', IQ: 'AR', YE: 'AR', LY: 'AR', SD: 'AR',
         HU: 'HU', RO: 'RO', BG: 'BG', HR: 'HR', SK: 'SK', CZ: 'CS',
         TURK: 'TR', GEORGIA: 'KA', KAZAKHSTAN: 'KK', SURINAME: 'NL',

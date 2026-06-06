@@ -425,7 +425,8 @@ body.text-small #loading { font-size: 24px; }
 body.text-small #loading-status { font-size: 20px; }
 body.text-small #buffer-indicator,
 body.text-small #seek-indicator { font-size: 44px; }
-body.text-small #buffer-indicator.compact { font-size: 22px; }
+body.text-small #buffer-indicator.compact,
+body.text-small #buffer-indicator.compact-br { font-size: 22px; }
 body.text-small .grid-disambig { font-size: 16px; }
 body.text-small #guide-day-indicator { font-size: 28px; }
 body.text-small #guide-time-indicator-label { font-size: 14px; }
@@ -616,7 +617,8 @@ body.text-medium #loading { font-size: 28px; }
 body.text-medium #loading-status { font-size: 22px; }
 body.text-medium #buffer-indicator,
 body.text-medium #seek-indicator { font-size: 48px; }
-body.text-medium #buffer-indicator.compact { font-size: 24px; }
+body.text-medium #buffer-indicator.compact,
+body.text-medium #buffer-indicator.compact-br { font-size: 24px; }
 body.text-medium .grid-disambig { font-size: 18px; }
 body.text-medium #guide-day-indicator { font-size: 32px; }
 body.text-medium #guide-time-indicator-label { font-size: 16px; }
@@ -794,7 +796,8 @@ body.text-large #loading { font-size: 32px; }
 body.text-large #loading-status { font-size: 26px; }
 body.text-large #buffer-indicator,
 body.text-large #seek-indicator { font-size: 52px; }
-body.text-large #buffer-indicator.compact { font-size: 28px; }
+body.text-large #buffer-indicator.compact,
+body.text-large #buffer-indicator.compact-br { font-size: 28px; }
 body.text-large .grid-disambig { font-size: 20px; }
 body.text-large #guide-day-indicator { font-size: 36px; }
 body.text-large #guide-time-indicator-label { font-size: 18px; }
@@ -1048,7 +1051,8 @@ body.text-xlarge #loading { font-size: 38px; }
 body.text-xlarge #loading-status { font-size: 31px; }
 body.text-xlarge #buffer-indicator,
 body.text-xlarge #seek-indicator { font-size: 62px; }
-body.text-xlarge #buffer-indicator.compact { font-size: 33px; }
+body.text-xlarge #buffer-indicator.compact,
+body.text-xlarge #buffer-indicator.compact-br { font-size: 33px; }
 body.text-xlarge .grid-disambig { font-size: 24px; }
 body.text-xlarge #guide-day-indicator { font-size: 43px; }
 body.text-xlarge #guide-time-indicator-label { font-size: 21px; }
@@ -1219,7 +1223,8 @@ body.text-xxlarge #loading { font-size: 46px; }
 body.text-xxlarge #loading-status { font-size: 37px; }
 body.text-xxlarge #buffer-indicator,
 body.text-xxlarge #seek-indicator { font-size: 74px; }
-body.text-xxlarge #buffer-indicator.compact { font-size: 40px; }
+body.text-xxlarge #buffer-indicator.compact,
+body.text-xxlarge #buffer-indicator.compact-br { font-size: 40px; }
 body.text-xxlarge .grid-disambig { font-size: 28px; }
 body.text-xxlarge #guide-day-indicator { font-size: 51px; }
 body.text-xxlarge #guide-time-indicator-label { font-size: 25px; }

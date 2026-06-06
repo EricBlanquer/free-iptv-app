@@ -56,14 +56,17 @@
 
 #buffer-indicator.compact-br {
     top: auto;
-    bottom: 30px;
+    /* Vertically centered on the overlay track-button row: overlay
+       padding-bottom (60px) + half the height difference with the buttons. */
+    bottom: 69px;
     left: auto;
-    right: 30px;
+    /* Mirror the first track button's left gap (overlay padding 80 + tracks
+       margin 30 + button margin 15 = 125px) so left/right spacing matches. */
+    right: 125px;
     transform: none;
-    padding: 6px 10px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     background: rgba(0, 0, 0, 0.5);
-    font-size: 14px !important;
 }
 
 #av-player {

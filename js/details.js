@@ -2061,7 +2061,7 @@ IPTVApp.prototype.getStreamYear = function(streamData, rawTitle, tmdbInfo) {
     if (streamData) {
         var sy = streamData.year ? String(streamData.year).match(/(?:19|20)\d{2}/) : null;
         if (sy) return sy[0];
-        var rd = this._yearFromDate(streamData.release_date);
+        var rd = this._yearFromDate(streamData.release_date || streamData.releaseDate || streamData.releasedate);
         if (rd) return rd;
         var fad = this._yearFromDate(streamData.first_air_date);
         if (fad) return fad;
@@ -2193,9 +2193,9 @@ IPTVApp.prototype.trimTMDBResult = function(data) {
     return trimmed;
 };
 
-IPTVApp.prototype.fetchTMDBCached = function(rawTitle, type, callback, forceRefresh, tmdbId) {
+IPTVApp.prototype.fetchTMDBCached = function(rawTitle, type, callback, forceRefresh, tmdbId, yearOverride) {
     var self = this;
-    var year = this.extractYear(rawTitle);
+    var year = yearOverride || this.extractYear(rawTitle);
     var title = this.cleanTitle(rawTitle);
     var cacheKey = tmdbId ? ('id_' + tmdbId) : this.getTMDBCacheKey(title, year);
     var cached = this.tmdbCache[cacheKey];
@@ -2325,6 +2325,7 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
         this.fetchTMDBDetailsById(tmdbId, tmdbType);
         return;
     }
+    var providerYear = this.getStreamYear(streamData, title, null);
     this.fetchTMDBCached(title, type, function(result) {
         if (self._detailsSession !== session) {
             window.log('SESSION', 'fetchTMDBInfo stale (was=' + session + ' now=' + self._detailsSession + ') title="' + title + '"');
@@ -2431,7 +2432,7 @@ IPTVApp.prototype.fetchTMDBInfo = function(title, type) {
             setDescription(I18n.t('details.noDescription', 'No description'), 'fetchTMDBInfo-notFound');
             self.hideUserRatingUI();
         }
-    }, false, tmdbId);
+    }, false, tmdbId, providerYear);
 };
 
 IPTVApp.prototype.renderSimilarGenres = function(streamData) {

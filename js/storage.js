@@ -508,6 +508,7 @@ IPTVApp.prototype.getTMDBCacheKey = function(title, year) {
 // Provider Data Cache - Using IndexedDB for larger capacity
 // TTL is configurable via settings.cacheRefreshHours (default 12h)
 var PROVIDER_CACHE_TTL_DEFAULT_HOURS = 12;
+var DEFERRED_REFRESH_PLAYBACK_DELAY_MS = 5 * 60 * 1000;
 IPTVApp.prototype.getProviderCacheTTL = function() {
     var h = this.settings && this.settings.cacheRefreshHours;
     if (typeof h !== 'number' || !isFinite(h) || h <= 0) {
@@ -1317,6 +1318,63 @@ IPTVApp.prototype.refreshProviderCacheBackground = function(playlistId, force) {
 };
 
 
+IPTVApp.prototype.queueDeferredRefresh = function(playlistsOrId) {
+    if (!this._deferredRefreshPlaylists) {
+        this._deferredRefreshPlaylists = [];
+    }
+    var ids = Array.isArray(playlistsOrId) ? playlistsOrId : [playlistsOrId];
+    var self = this;
+    ids.forEach(function(id) {
+        if (id && self._deferredRefreshPlaylists.indexOf(id) === -1) {
+            self._deferredRefreshPlaylists.push(id);
+        }
+    });
+    window.log('CACHE', 'Deferred refresh queued: ' + this._deferredRefreshPlaylists.join(','));
+};
+
+IPTVApp.prototype.armDeferredRefreshTimer = function(type) {
+    if (type !== 'vod' && type !== 'series' && type !== 'episode') {
+        return;
+    }
+    if (this._deferredRefreshTimer || this._deferredRefreshFired) {
+        return;
+    }
+    if (!this._deferredRefreshPlaylists || this._deferredRefreshPlaylists.length === 0) {
+        return;
+    }
+    var self = this;
+    this._deferredRefreshTimer = setTimeout(function() {
+        self._deferredRefreshTimer = null;
+        self._deferredRefreshFired = true;
+        self.flushDeferredRefresh();
+    }, DEFERRED_REFRESH_PLAYBACK_DELAY_MS);
+    window.log('CACHE', 'Deferred refresh armed (' + this._deferredRefreshPlaylists.length + ' provider(s)), fires after ' + Math.round(DEFERRED_REFRESH_PLAYBACK_DELAY_MS / 60000) + 'min of playback');
+};
+
+IPTVApp.prototype.cancelDeferredRefreshTimer = function() {
+    if (this._deferredRefreshTimer) {
+        clearTimeout(this._deferredRefreshTimer);
+        this._deferredRefreshTimer = null;
+        window.log('CACHE', 'Deferred refresh timer cancelled (playback stopped before delay)');
+    }
+    this._deferredRefreshFired = false;
+};
+
+IPTVApp.prototype.flushDeferredRefresh = function() {
+    var ids = this._deferredRefreshPlaylists || [];
+    if (ids.length === 0) {
+        return;
+    }
+    this._deferredRefreshPlaylists = [];
+    var self = this;
+    window.log('CACHE', 'Flushing deferred refresh for ' + ids.length + ' provider(s) during playback');
+    ids.forEach(function(playlistId) {
+        if (!self._backgroundRefreshInProgress || !self._backgroundRefreshInProgress[playlistId]) {
+            self.refreshProviderCacheBackground(playlistId);
+        }
+    });
+};
+
 IPTVApp.prototype.startCacheRefreshTimer = function(playlistsOrId) {
     var self = this;
     if (this._cacheRefreshTimer) {
@@ -1330,12 +1388,8 @@ IPTVApp.prototype.startCacheRefreshTimer = function(playlistsOrId) {
             ? Date.now() - self.providerCacheInfo.timestamp
             : Infinity;
         if (cacheAge > self.getProviderCacheTTL()) {
-            window.log('CACHE', 'Timer: cache expired (age: ' + Math.round(cacheAge / 60000) + 'min), refreshing...');
-            playlistIds.forEach(function(playlistId) {
-                if (!self._backgroundRefreshInProgress || !self._backgroundRefreshInProgress[playlistId]) {
-                    self.refreshProviderCacheBackground(playlistId);
-                }
-            });
+            window.log('CACHE', 'Timer: cache expired (age: ' + Math.round(cacheAge / 60000) + 'min), queueing deferred refresh');
+            self.queueDeferredRefresh(playlistIds);
         }
     }, 60000);
     window.log('CACHE', 'Refresh timer started (' + playlistIds.length + ' provider(s))');

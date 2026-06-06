@@ -34,9 +34,10 @@ describe('selecting a provider tab forces a hard refresh', () => {
         expect(body).toMatch(/this\.autoConnect\(\)/);
     });
 
-    it('autoConnect propagates the forced flag to the background refresh', () => {
-        expect(appCode).toMatch(/var hardRefresh = self\._forceRefresh/);
-        expect(appCode).toMatch(/refreshProviderCacheBackground\(playlist\.id,\s*hardRefresh\)/);
+    it('autoConnect runs a hard refresh immediately when forced, and defers a soft one', () => {
+        expect(appCode).toMatch(/if\s*\(self\._forceRefresh\)/);
+        expect(appCode).toMatch(/refreshProviderCacheBackground\(playlist\.id,\s*true\)/);
+        expect(appCode).toMatch(/else if \(providerCache\._needsRefresh\)\s*\{\s*self\.queueDeferredRefresh\(playlist\.id\)/);
     });
 
     it('refreshProviderCacheBackground bypasses the fingerprint guard when forced', () => {

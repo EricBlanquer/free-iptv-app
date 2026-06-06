@@ -243,8 +243,6 @@
     background: #e05050;
     border-color: transparent;
     transform: scale(1.05);
-    /* Anchor the scale to the left so wide buttons (full-width "Manage
-       playlists") don't overflow the container's left edge and clip the "G". */
     transform-origin: left center;
     box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.4), 0 0 15px rgba(224, 80, 80, 0.3);
 }
@@ -258,6 +256,19 @@
     background: #34d058;
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(52, 208, 88, 0.4), 0 0 15px rgba(52, 208, 88, 0.3);
+}
+
+/* Size this standalone button to its content instead of the full panel width,
+   so the focus scale can grow it to the right (transform-origin: left center)
+   without clipping the left "G" or overflowing the right edge. As the first
+   element at the top-left of the overflow:auto container, it also needs a top
+   and left margin so its focus ring/glow isn't clipped by the container edge. */
+.settings-action[data-action="managePlaylistsBtn"] {
+    display: block;
+    width: -webkit-fit-content;
+    width: fit-content;
+    margin-top: 12px;
+    margin-left: 10px;
 }
 
 .settings-input {

@@ -346,6 +346,7 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
     this.videoQuality = '';
     this._completionTriggered = false;
     this._errorRetryCount = 0;
+    this.cancelDeferredRefreshTimer();
     // Reset EPG info (only relevant for live, clear for VOD/series)
     this.currentEPG = null;
     document.getElementById('player-epg').textContent = '';
@@ -488,6 +489,7 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
             self.bufferPercent = undefined;
             self._errorRetryCount = 0;
             self._liveHlsFallbackUrl = null;
+            self.armDeferredRefreshTimer(type);
             // Add to history only after playback starts successfully
             if (self._pendingHistoryStream) {
                 self.addToWatchHistory(self._pendingHistoryStream.stream, self._pendingHistoryStream.type, 0);
@@ -970,6 +972,7 @@ IPTVApp.prototype._clearSubtitleState = function(stream) {
 
 IPTVApp.prototype.stopPlayback = function() {
     this.clearTimer('overlayTimer');
+    this.cancelDeferredRefreshTimer();
     // Cancel any pending retry so a Back press after an error stops the
     // reconnection loop immediately instead of re-launching the broken stream.
     if (this._retryTimer) {
@@ -1132,6 +1135,7 @@ IPTVApp.prototype.stopPlayback = function() {
 
 IPTVApp.prototype.onPlaybackCompleted = function() {
     var self = this;
+    this.cancelDeferredRefreshTimer();
     var isSeries = this.selectedStream && this.selectedStream.type === 'series';
     var isCatchup = this.currentPlayingType === 'catchup';
     // Handle catchup: play next program

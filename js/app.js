@@ -453,7 +453,7 @@ class IPTVApp {
             noLabel: I18n.t('welcome.demoNo', 'No, configure manually'),
             focusYes: true,
             noAction: function() {
-                self.showSettings();
+                self.showPlaylistEdit();
             }
         });
     }
@@ -586,12 +586,14 @@ class IPTVApp {
                     clearTimeout(loadingTimeout);
                     document.getElementById('home-grid').style.visibility = '';
                     self.showLoading(false);
-                    if (providerCache._needsRefresh || self._forceRefresh) {
-                        var hardRefresh = self._forceRefresh;
+                    if (self._forceRefresh) {
                         self._forceRefresh = false;
                         setTimeout(function() {
-                            self.refreshProviderCacheBackground(playlist.id, hardRefresh);
+                            self.refreshProviderCacheBackground(playlist.id, true);
                         }, 2000);
+                    }
+                    else if (providerCache._needsRefresh) {
+                        self.queueDeferredRefresh(playlist.id);
                     }
                     self.startCacheRefreshTimer(playlist.id);
                     setTimeout(function() {
@@ -826,14 +828,10 @@ class IPTVApp {
                 self.updateHomeMenuVisibility();
                 document.getElementById('home-grid').style.visibility = '';
                 self.showLoading(false);
-                // Trigger background refresh for stale providers (delayed to not block UI)
+                // Defer background refresh for stale providers until playback (avoids startup lag)
                 if (mergedCache._needsRefreshIds && mergedCache._needsRefreshIds.length > 0) {
-                    setTimeout(function() {
-                        window.log('CACHE', 'autoConnectMerge: triggering background refresh for ' + mergedCache._needsRefreshIds.length + ' providers');
-                        mergedCache._needsRefreshIds.forEach(function(playlistId) {
-                            self.refreshProviderCacheBackground(playlistId);
-                        });
-                    }, 5000);
+                    window.log('CACHE', 'autoConnectMerge: queueing deferred refresh for ' + mergedCache._needsRefreshIds.length + ' providers');
+                    self.queueDeferredRefresh(mergedCache._needsRefreshIds);
                 }
                 self.startCacheRefreshTimer(providerPlaylists);
             }

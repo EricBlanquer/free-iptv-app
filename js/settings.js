@@ -774,6 +774,20 @@ IPTVApp.prototype.SETTINGS_MENU_ORDER = [
     'data-section'
 ];
 
+// Sections that are useless when every playlist is a plain m3u (live channels
+// only, no VOD/series API): provider/VOD-specific settings are hidden.
+IPTVApp.prototype.M3U_HIDDEN_SECTIONS = [
+    'filters-section',
+    'category-patterns-section',
+    'provider-language-section',
+    'subtitles-section',
+    'apis-section',
+    'progress-section',
+    'freebox-section',
+    'services-section',
+    'buffer-section'
+];
+
 IPTVApp.prototype.buildSettingsMenu = function() {
     var self = this;
     var menu = document.getElementById('settings-menu');
@@ -784,9 +798,17 @@ IPTVApp.prototype.buildSettingsMenu = function() {
     };
     var firstId = null;
     var seen = {};
+    var requiresAccount = !this.isIPTVConfigured();
+    var allPlaylists = this.settings.playlists || [];
+    var isM3UOnly = allPlaylists.length > 0 && allPlaylists.every(function(p) {
+        return p.type === 'm3u';
+    });
+    var m3uHidden = this.M3U_HIDDEN_SECTIONS;
     var addItem = function(section) {
         if (!section || !section.id || seen[section.id]) return;
         if (section.classList.contains('hidden')) return;
+        if (requiresAccount && section.id !== 'settings-manual-section') return;
+        if (isM3UOnly && m3uHidden.indexOf(section.id) !== -1) return;
         seen[section.id] = true;
         var label = labelOverrides[section.id];
         if (!label) {
