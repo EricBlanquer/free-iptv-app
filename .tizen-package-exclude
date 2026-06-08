@@ -23,3 +23,5 @@ package.json
 package-lock.json
 android/
 server/
+webos/
+docs/

@@ -1,0 +1,16 @@
+{
+  "id": "fr.blanquer.freeiptv",
+  "version": "2.0.0",
+  "vendor": "Eric Blanquer",
+  "type": "web",
+  "main": "index.html",
+  "title": "Free IPTV",
+  "icon": "icon-80.png",
+  "largeIcon": "icon-130.png",
+  "bgColor": "#0a0e1a",
+  "iconColor": "#0a0e1a",
+  "disableBackHistoryAPI": true,
+  "supportPortraitMode": false,
+  "supportTouchMode": "none",
+  "handlesRelaunch": true
+}

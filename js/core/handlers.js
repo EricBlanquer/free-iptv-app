@@ -620,6 +620,9 @@ IPTVApp.prototype.backHandlers = {
             else if (typeof tizen !== 'undefined') {
                 tizen.application.getCurrentApplication().exit();
             }
+            else if (typeof window.webOS !== 'undefined' || typeof window.PalmSystem !== 'undefined') {
+                window.close();
+            }
         };
         if (this.settings.exitConfirmation === false) {
             window.log('ACTION', 'exit-no-confirm');

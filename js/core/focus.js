@@ -35,7 +35,8 @@ IPTVApp.prototype.bindKeys = function() {
         }
     });
     document.addEventListener('keydown', function(e) {
-        var key = e.keyCode;
+        // webOS Back button (461) -> treat exactly like the Tizen Back key (10009)
+        var key = e.keyCode === 461 ? 10009 : e.keyCode;
         self.lastInputTime = Date.now();
         var logAfter = function() {
             window.log('KEY', 'keydown key=' + key + ' focusArea=' + self.focusArea + ' focused=' + self._describeFocused());
