@@ -1453,12 +1453,26 @@ IPTVApp.prototype.showPlaylists = function() {
     this.showScreen('playlists');
     this.currentScreen = 'playlists';
     this.focusArea = 'playlists';
-    this.focusIndex = 0;
     this.renderPlaylistsList();
+    this.invalidateFocusables();
+    this.focusIndex = this.getActivePlaylistFocusIndex();
     this.validateAllPlaylists();
     setTimeout(function() {
         self.updateFocus();
     }, 50);
+};
+
+IPTVApp.prototype.getActivePlaylistFocusIndex = function() {
+    var activeId = this.settings.activePlaylistId;
+    if (!activeId) return 0;
+    var focusables = this.getFocusables();
+    for (var i = 0; i < focusables.length; i++) {
+        var el = focusables[i];
+        if (el.classList.contains('playlist-item') && this.sameId(el.dataset.playlistId, activeId)) {
+            return i;
+        }
+    }
+    return 0;
 };
 
 IPTVApp.prototype.renderPlaylistsList = function() {
