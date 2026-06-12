@@ -612,7 +612,10 @@ IPTVApp.prototype.backHandlers = {
         this.updateFocus();
     },
     'screen:home': function() {
+        var self = this;
         var doExit = function() {
+            if (self._exiting) return;
+            self._exiting = true;
             window.log('ACTION', 'exit');
             if (typeof Android !== 'undefined' && Android.exitApp) {
                 Android.exitApp();

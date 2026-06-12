@@ -28,6 +28,7 @@ rm -rf "$BUILD_DIR"
 ~/tizen-studio/tools/ide/bin/tizen build-web \
     -e "android/*" -e "node_modules/*" -e "server/*" -e "tests/*" \
     -e "scripts/*" -e "cloudflare-worker/*" -e "seller-office/*" \
+    -e "webos/*" -e "docs/*" -e "issues/*" \
     -e "www/*" -e "CLAUDE.md" -e "README.md" -e "PRIVACY_POLICY.md" \
     -e "package.json" -e "package-lock.json" -e ".git/*" \
     -e "tizen-manifest.xml" -e ".gitignore" \
