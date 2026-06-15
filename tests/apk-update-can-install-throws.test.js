@@ -40,6 +40,7 @@ function buildApp(android) {
 
     const src =
         'IPTVApp.prototype.startApkDownload = function() {\n' + methodBody(appCode, 'startApkDownload') + '\n};\n' +
+        'IPTVApp.prototype._isInstalledFromPlayStore = function() {\n' + methodBody(appCode, '_isInstalledFromPlayStore') + '\n};\n' +
         'IPTVApp.prototype._showApkUpdateUnavailable = function() {\n' + methodBody(appCode, '_showApkUpdateUnavailable') + '\n};\n';
 
     const ctx = vm.createContext({

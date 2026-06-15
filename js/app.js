@@ -1163,8 +1163,19 @@ class IPTVApp {
         catch (ex) { window.log('ERROR reloadWebAssets: ' + (ex.message || ex)); }
     }
 
+    _isInstalledFromPlayStore() {
+        try {
+            return typeof Android !== 'undefined' && Android && Android.isInstalledFromPlayStore
+                && Android.isInstalledFromPlayStore();
+        }
+        catch (ex) {
+            return false;
+        }
+    }
+
     checkPendingApkUpdate() {
         if (typeof Android === 'undefined' || !Android || !Android.getRemoteApkVersion) return;
+        if (this._isInstalledFromPlayStore()) return;
         var self = this;
         setTimeout(function() {
             try {
@@ -1219,6 +1230,7 @@ class IPTVApp {
 
     startApkDownload() {
         if (typeof Android === 'undefined' || !Android.downloadAndInstallApk) return;
+        if (this._isInstalledFromPlayStore()) return;
         var canInstall = true;
         try {
             if (Android.canInstallPackages) canInstall = Android.canInstallPackages();

@@ -1754,6 +1754,7 @@ IPTVApp.prototype.selectPlaylist = function(playlistId) {
     this.autoConnect();
     this.showScreen('home');
     this.currentScreen = 'home';
+    this.updateHomeMenuVisibility();
     this.setFocus('home', 0);
 };
 

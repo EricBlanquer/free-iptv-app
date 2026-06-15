@@ -77,6 +77,8 @@ IPTVApp.prototype.updateHomeMenuVisibility = function() {
     var playlist = this.getActivePlaylist();
     var isM3U = playlist && playlist.type === 'm3u';
     var isJellyfin = playlist && playlist.type === 'jellyfin';
+    var homeGrid = document.getElementById('home-grid');
+    if (homeGrid) homeGrid.style.visibility = '';
     var homeButtons = document.querySelectorAll('#home-grid > .home-btn');
     var providerOnlySections = ['vod', 'series', 'sport', 'manga', 'entertainment', 'history'];
     var jellyfinHiddenSections = ['live', 'sport', 'manga', 'entertainment'];

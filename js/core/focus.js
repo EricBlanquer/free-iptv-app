@@ -340,6 +340,8 @@ IPTVApp.prototype.bindKeys = function() {
             { id: 'content-grid', area: 'grid' },
             { id: 'details-screen', area: 'details' },
             { id: 'actor-screen', area: 'actor' },
+            { id: 'settings-menu', area: 'settings-menu' },
+            { id: 'settings-header-right', area: 'settings-menu' },
             { id: 'settings-screen', area: 'settings' },
             { id: 'playlists-screen', area: 'playlists' },
             { id: 'playlist-edit-screen', area: 'playlist-edit' }

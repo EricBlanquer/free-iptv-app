@@ -1,6 +1,10 @@
 package fr.blanquer.freeiptv;
 
 import android.app.Activity;
+import android.app.UiModeManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -40,6 +44,7 @@ public class MainActivity extends Activity {
     private SurfaceView mSurfaceView;
     private NativePlayer mNativePlayer;
     private WebUpdater mWebUpdater;
+    private boolean mIsAndroidTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class MainActivity extends Activity {
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mTizenShimJs = loadAsset("tizen-shim.js");
+        mIsAndroidTV = detectAndroidTV();
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.TRANSPARENT);
         mAspectRatioLayout = new AspectRatioFrameLayout(this);
@@ -153,6 +159,14 @@ public class MainActivity extends Activity {
         mNativePlayer.setJsCallback(js -> runOnUiThread(() -> mWebView.evaluateJavascript(js, null)));
     }
 
+    private boolean detectAndroidTV() {
+        UiModeManager uiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
+        boolean tvUiMode = uiModeManager != null
+            && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+        boolean leanback = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+        return tvUiMode || leanback;
+    }
+
     private void setupWebView() {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -176,6 +190,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPageStarted(android.webkit.WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                view.evaluateJavascript("window.__isAndroidTV=" + mIsAndroidTV + ";", null);
                 if (mTizenShimJs != null) {
                     view.evaluateJavascript(mTizenShimJs, null);
                 }
@@ -381,6 +396,23 @@ public class MainActivity extends Activity {
                 return getPackageManager().canRequestPackageInstalls();
             }
             return true;
+        }
+
+        @JavascriptInterface
+        public boolean isInstalledFromPlayStore() {
+            try {
+                String installer;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    installer = getPackageManager().getInstallSourceInfo(getPackageName()).getInstallingPackageName();
+                }
+                else {
+                    installer = getPackageManager().getInstallerPackageName(getPackageName());
+                }
+                return "com.android.vending".equals(installer);
+            }
+            catch (Exception ex) {
+                return false;
+            }
         }
 
         @JavascriptInterface

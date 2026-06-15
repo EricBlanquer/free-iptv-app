@@ -1,5 +1,5 @@
 (function() {
-    window.isMobileTouch = /Android/i.test(navigator.userAgent) && /\bMobile\b/i.test(navigator.userAgent);
+    window.isMobileTouch = window.__isAndroidTV !== true && /Android/i.test(navigator.userAgent) && /\bMobile\b/i.test(navigator.userAgent);
     if (typeof window.webapis !== 'undefined') return;
     if (navigator.userAgent.indexOf('Android') === -1) return;
     if (typeof window.Android === 'undefined') return;
