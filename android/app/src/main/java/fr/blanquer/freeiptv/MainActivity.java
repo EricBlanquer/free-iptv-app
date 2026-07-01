@@ -93,10 +93,6 @@ public class MainActivity extends Activity {
         } else {
             mWebView.loadUrl("file:///android_asset/index.html");
         }
-        mWebUpdater.setApkUpdateListener(remoteVersion -> {
-            runOnUiThread(() -> mWebView.evaluateJavascript(
-                "if(window.app && window.app.showApkUpdatePrompt) window.app.showApkUpdatePrompt(" + remoteVersion + ");", null));
-        });
         mWebUpdater.checkAndUpdate(() -> {
             runOnUiThread(() -> mWebView.evaluateJavascript(
                 "if(window.app && window.app.showWebUpdateReady) window.app.showWebUpdateReady();", null));
@@ -339,22 +335,6 @@ public class MainActivity extends Activity {
         return sb.toString();
     }
 
-    private void launchInstaller(java.io.File apkFile) {
-        try {
-            android.net.Uri apkUri = androidx.core.content.FileProvider.getUriForFile(
-                this, getPackageName() + ".fileprovider", apkFile);
-            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
-            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-            intent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-        catch (Exception ex) {
-            mWebView.evaluateJavascript(
-                "if(window.app && window.app.onApkDownloadError) window.app.onApkDownloadError('" + ex.getMessage().replace("'", "\\'") + "');", null);
-        }
-    }
-
     private class AndroidBridge {
         @JavascriptInterface
         public String getDeviceId() {
@@ -383,55 +363,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void markWebHealthy() {
             if (mWebUpdater != null) mWebUpdater.clearPendingLoad();
-        }
-
-        @JavascriptInterface
-        public int getRemoteApkVersion() {
-            return mWebUpdater == null ? 0 : mWebUpdater.getRemoteApkVersion();
-        }
-
-        @JavascriptInterface
-        public boolean canInstallPackages() {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                return getPackageManager().canRequestPackageInstalls();
-            }
-            return true;
-        }
-
-        @JavascriptInterface
-        public boolean isInstalledFromPlayStore() {
-            try {
-                String installer;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                    installer = getPackageManager().getInstallSourceInfo(getPackageName()).getInstallingPackageName();
-                }
-                else {
-                    installer = getPackageManager().getInstallerPackageName(getPackageName());
-                }
-                return "com.android.vending".equals(installer);
-            }
-            catch (Exception ex) {
-                return false;
-            }
-        }
-
-        @JavascriptInterface
-        public void requestInstallPermission() {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                runOnUiThread(() -> {
-                    try {
-                        android.content.Intent intent = new android.content.Intent(
-                            android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            android.net.Uri.parse("package:" + getPackageName()));
-                        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                    catch (Exception ex) {
-                        runOnUiThread(() -> mWebView.evaluateJavascript(
-                            "window.log && window.log('ERROR requestInstallPermission: " + ex.getMessage() + "');", null));
-                    }
-                });
-            }
         }
 
         @JavascriptInterface
@@ -466,31 +397,6 @@ public class MainActivity extends Activity {
             }, true, hasUpdate -> {
                 runOnUiThread(() -> mWebView.evaluateJavascript(
                     "if(window.app && window.app.onUpdateCheckFinished) window.app.onUpdateCheckFinished(" + hasUpdate + ");", null));
-            });
-        }
-
-        @JavascriptInterface
-        public void downloadAndInstallApk() {
-            if (mWebUpdater == null) return;
-            mWebUpdater.downloadApk(new WebUpdater.ApkDownloadListener() {
-                @Override
-                public void onProgress(int percent) {
-                    runOnUiThread(() -> mWebView.evaluateJavascript(
-                        "if(window.app && window.app.updateApkDownloadProgress) window.app.updateApkDownloadProgress(" + percent + ");", null));
-                }
-                @Override
-                public void onReady(java.io.File apkFile) {
-                    runOnUiThread(() -> {
-                        mWebView.evaluateJavascript(
-                            "if(window.app && window.app.onApkDownloadReady) window.app.onApkDownloadReady();", null);
-                        launchInstaller(apkFile);
-                    });
-                }
-                @Override
-                public void onError(String message) {
-                    runOnUiThread(() -> mWebView.evaluateJavascript(
-                        "if(window.app && window.app.onApkDownloadError) window.app.onApkDownloadError('" + message.replace("'", "\\'") + "');", null));
-                }
             });
         }
 

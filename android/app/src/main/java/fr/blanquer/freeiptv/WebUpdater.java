@@ -27,7 +27,6 @@ public class WebUpdater {
     private static final String BASE_URL = "https://iptv.blanquer.org/android/";
     private static final String VERSION_URL = BASE_URL + "version.json";
     private static final String ZIP_URL = BASE_URL + "web-assets.zip";
-    private static final String APK_URL = "https://iptv.blanquer.org/app.apk";
     private static final String PREFS_NAME = "web_updater";
     private static final String KEY_BUILD = "installed_build";
     private static final String KEY_LAST_CHECK = "last_check_time";
@@ -121,112 +120,6 @@ public class WebUpdater {
     }
 
     private String remoteSignature;
-    private String remoteApkSignature;
-    private int remoteApkVersionCode;
-    private ApkUpdateListener apkUpdateListener;
-
-    public int getRemoteApkVersion() { return remoteApkVersionCode; }
-
-    public interface ApkDownloadListener {
-        void onProgress(int percent);
-        void onReady(File apkFile);
-        void onError(String message);
-    }
-
-    public void downloadApk(ApkDownloadListener listener) {
-        new Thread(() -> {
-            HttpURLConnection conn = null;
-            File updatesDir = new File(context.getFilesDir(), "updates");
-            if (!updatesDir.exists()) updatesDir.mkdirs();
-            File apkFile = new File(updatesDir, "update.apk");
-            try {
-                conn = (HttpURLConnection) new URL(APK_URL).openConnection();
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(60000);
-                if (conn.getResponseCode() != 200) {
-                    if (listener != null) listener.onError("HTTP " + conn.getResponseCode());
-                    return;
-                }
-                int total = conn.getContentLength();
-                int downloaded = 0;
-                int lastPercent = -1;
-                try (InputStream in = new BufferedInputStream(conn.getInputStream());
-                     OutputStream out = new FileOutputStream(apkFile)) {
-                    byte[] buffer = new byte[16384];
-                    int count;
-                    while ((count = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, count);
-                        downloaded += count;
-                        if (total > 0 && listener != null) {
-                            int percent = (int) ((downloaded * 100L) / total);
-                            if (percent != lastPercent) {
-                                lastPercent = percent;
-                                listener.onProgress(percent);
-                            }
-                        }
-                    }
-                }
-                if (!verifyApkSignature(apkFile)) {
-                    Log.e(TAG, "APK signature verification FAILED");
-                    apkFile.delete();
-                    if (listener != null) listener.onError("signature");
-                    return;
-                }
-                Log.d(TAG, "APK downloaded and verified: " + apkFile.getAbsolutePath());
-                if (listener != null) listener.onReady(apkFile);
-            } catch (Exception e) {
-                Log.e(TAG, "downloadApk: " + e.getMessage());
-                apkFile.delete();
-                if (listener != null) listener.onError(e.getMessage() == null ? "unknown" : e.getMessage());
-            } finally {
-                if (conn != null) conn.disconnect();
-            }
-        }).start();
-    }
-
-    private boolean verifyApkSignature(File apkFile) {
-        if (remoteApkSignature == null || remoteApkSignature.isEmpty()) {
-            Log.w(TAG, "No APK signature in version.json");
-            return false;
-        }
-        try {
-            InputStream keyStream = context.getAssets().open("signing-key-public.pem");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = keyStream.read(buf)) != -1) baos.write(buf, 0, len);
-            keyStream.close();
-            String pemKey = baos.toString("UTF-8")
-                    .replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\\s", "");
-            byte[] keyBytes = android.util.Base64.decode(pemKey, android.util.Base64.DEFAULT);
-            PublicKey publicKey = KeyFactory.getInstance("RSA")
-                    .generatePublic(new X509EncodedKeySpec(keyBytes));
-            Signature sig = Signature.getInstance("SHA256withRSA");
-            sig.initVerify(publicKey);
-            FileInputStream fis = new FileInputStream(apkFile);
-            byte[] buffer = new byte[8192];
-            int count;
-            while ((count = fis.read(buffer)) != -1) {
-                sig.update(buffer, 0, count);
-            }
-            fis.close();
-            byte[] signatureBytes = android.util.Base64.decode(remoteApkSignature, android.util.Base64.DEFAULT);
-            return sig.verify(signatureBytes);
-        } catch (Exception e) {
-            Log.e(TAG, "verifyApkSignature: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public interface ApkUpdateListener {
-        void onApkUpdateAvailable(int remoteVersion);
-    }
-
-    public void setApkUpdateListener(ApkUpdateListener listener) {
-        this.apkUpdateListener = listener;
-    }
 
     public interface CheckCompleteListener {
         void onComplete(boolean hasUpdate);
@@ -259,20 +152,6 @@ public class WebUpdater {
                 }
                 String remoteBuild = versionInfo.optString("build", versionInfo.optString("version"));
                 remoteSignature = versionInfo.optString("signature", null);
-                remoteApkSignature = versionInfo.optString("apkSignature", null);
-                int remoteApkVersion = versionInfo.optInt("apkVersion", 0);
-                remoteApkVersionCode = remoteApkVersion;
-                if (remoteApkVersion > 0) {
-                    try {
-                        int localApkVersion = context.getPackageManager()
-                                .getPackageInfo(context.getPackageName(), 0).versionCode;
-                        if (remoteApkVersion > localApkVersion) {
-                            hasUpdate = true;
-                        }
-                    }
-                    catch (Exception ex) {}
-                    checkApkUpdate(remoteApkVersion);
-                }
                 String localBuild = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                         .getString(KEY_BUILD, null);
                 boolean webUpdateAvailable = !remoteBuild.equals(localBuild);
@@ -419,21 +298,6 @@ public class WebUpdater {
         } catch (Exception e) {
             Log.e(TAG, "verifySignature: " + e.getMessage());
             return false;
-        }
-    }
-
-    private void checkApkUpdate(int remoteApkVersion) {
-        try {
-            int localVersion = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionCode;
-            if (remoteApkVersion > localVersion) {
-                Log.d(TAG, "APK update available: " + localVersion + " -> " + remoteApkVersion);
-                if (apkUpdateListener != null) {
-                    apkUpdateListener.onApkUpdateAvailable(remoteApkVersion);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "checkApkUpdate: " + e.getMessage());
         }
     }
 

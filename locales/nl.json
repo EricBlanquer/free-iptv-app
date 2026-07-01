@@ -1,16 +1,4 @@
 {
-  "apkUpdate": {
-    "downloadError": "Download mislukt: {msg}",
-    "downloading": "Update downloaden... {percent}%",
-    "install": "Installeren",
-    "later": "Later",
-    "message": "Een nieuwe versie van de app is beschikbaar (build {remote}). Nu installeren?",
-    "openSettings": "Instellingen openen",
-    "permissionNeeded": "Android vereist dat u de installatie vanuit deze app toestaat. Open de instellingen om de toestemming te verlenen en probeer het opnieuw.",
-    "permissionTitle": "Toestemming vereist",
-    "title": "Update beschikbaar",
-    "unavailable": "Automatische update is niet beschikbaar op dit apparaat. Download de nieuwste versie van iptv.blanquer.org."
-  },
   "app": {
     "exitMessage": "Wilt u de app afsluiten?",
     "exitTitle": "Afsluiten",
@@ -487,7 +475,6 @@
     "iconEmoji": "Emoji",
     "iconPreview": "Voorbeeld",
     "iconTextColor": "Tekstkleur",
-    "installUpdate": "Update installeren",
     "language": "Taal",
     "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
     "liveFormat": "Live TV-formaat",

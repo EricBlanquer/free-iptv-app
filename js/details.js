@@ -2558,7 +2558,8 @@ IPTVApp.prototype._checkTmdbCardsAvailability = function(gridId) {
         index++;
         var title = item.dataset.title;
         var mediaType = item.dataset.tmdbType;
-        var available = self.findInPlaylist(title, mediaType);
+        var tmdbId = item.dataset.tmdbId;
+        var available = self.findInPlaylist(title, mediaType, tmdbId);
         delete item.dataset.needsAvailCheck;
         if (available && !item.querySelector('.tmdb-card-available')) {
             var availEl = document.createElement('div');
@@ -2915,7 +2916,7 @@ IPTVApp.prototype.showDetailsFromTMDB = function(filmItem) {
     var posterUrl = filmItem.dataset.posterUrl;
     var backdropUrl = filmItem.dataset.backdropUrl;
     this.previousScreen = cameFromDetails ? 'details' : 'actor';
-    var available = this.findInPlaylist(title, tmdbType);
+    var available = this.findInPlaylist(title, tmdbType, tmdbId);
     if (available) {
         this.selectedStream = { id: available.id, type: available.type, data: available.stream };
     }
@@ -3235,8 +3236,7 @@ IPTVApp.prototype.popDetailsState = function() {
 };
 
 // Playlist search - searches in both VOD and series if needed
-IPTVApp.prototype.findInPlaylist = function(title, mediaType) {
-    var normalizedTitle = this._normalizeTitleForMatch(title);
+IPTVApp.prototype.findInPlaylist = function(title, mediaType, tmdbId) {
     var vodStreams = this.getStreams('vod');
     var seriesStreams = this.getStreams('series');
     // Try primary section first
@@ -3250,7 +3250,11 @@ IPTVApp.prototype.findInPlaylist = function(title, mediaType) {
         streams = seriesStreams;
         type = 'series';
     }
-    var result = this._searchInStreams(normalizedTitle, streams, type);
+    var result = this._searchInStreamsByTmdb(tmdbId, streams, type);
+    if (result) return result;
+    var matchTitle = typeof this.cleanTitle === 'function' ? this.cleanTitle(title) : title;
+    var normalizedTitle = this._normalizeTitleForMatch(matchTitle);
+    result = this._searchInStreams(normalizedTitle, streams, type);
     if (result) return result;
     // If not found, try the other section
     if (mediaType === 'movie') {
@@ -3261,16 +3265,39 @@ IPTVApp.prototype.findInPlaylist = function(title, mediaType) {
         streams = vodStreams;
         type = 'vod';
     }
+    result = this._searchInStreamsByTmdb(tmdbId, streams, type);
+    if (result) return result;
     return this._searchInStreams(normalizedTitle, streams, type);
+};
+
+IPTVApp.prototype._searchInStreamsByTmdb = function(tmdbId, streams, type) {
+    var wanted = tmdbId == null ? '' : String(tmdbId).trim();
+    if (!wanted || wanted === '0') return null;
+    for (var i = 0; i < streams.length; i++) {
+        var candidates = [streams[i].tmdb_id, streams[i]._tmdbId, streams[i].tmdb];
+        for (var j = 0; j < candidates.length; j++) {
+            var candidate = candidates[j] == null ? '' : String(candidates[j]).trim();
+            if (candidate && candidate !== '0' && candidate === wanted) {
+                return {
+                    id: streams[i].stream_id || streams[i].vod_id || streams[i].series_id,
+                    type: type,
+                    stream: streams[i]
+                };
+            }
+        }
+    }
+    return null;
 };
 
 IPTVApp.prototype._searchInStreams = function(normalizedTitle, streams, type) {
     var bestMatch = null;
     var bestScore = 0;
     for (var i = 0; i < streams.length; i++) {
-        var raw = (streams[i].name || streams[i].title || '').toLowerCase();
-        raw = raw.replace(Regex.categoryPrefix, '').replace(Regex.removeYearParens, '');
-        var streamTitle = this._normalizeTitleForMatch(raw);
+        var raw = streams[i].name || streams[i].title || '';
+        var cleaned = typeof this.cleanTitle === 'function'
+            ? this.cleanTitle(raw)
+            : raw.replace(Regex.categoryPrefix, '').replace(Regex.removeYearParens, '');
+        var streamTitle = this._normalizeTitleForMatch(cleaned);
         if (streamTitle === normalizedTitle) {
             return {
                 id: streams[i].stream_id || streams[i].vod_id || streams[i].series_id,

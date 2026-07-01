@@ -52,17 +52,11 @@ SIGNATURE=$(openssl dgst -sha256 -sign "$PRIVATE_KEY" "$OUT_DIR/web-assets.zip" 
 # Create version.json with build hash and signature
 BUILD_HASH=$(cd "$BUILD_DIR" && find . -type f -exec md5sum {} \; | sort | md5sum | cut -d' ' -f1)
 
-# Check if APK exists and sign it too
-APK_FILE="$PROJECT_DIR/android/app/build/outputs/apk/debug/app-debug.apk"
-APK_VERSION=""
-APK_SIGNATURE=""
-if [ -f "$APK_FILE" ]; then
-    APK_VERSION=$(~/Android/Sdk/build-tools/$(ls ~/Android/Sdk/build-tools/ | tail -1)/aapt dump badging "$APK_FILE" 2>/dev/null | grep -oP "versionCode='\K\d+" || echo "0")
-    APK_SIGNATURE=$(openssl dgst -sha256 -sign "$PRIVATE_KEY" "$APK_FILE" | base64 -w0)
-fi
-
+# version.json advertises the web bundle only. The in-app APK self-update was
+# removed (Whale TV forbids in-app updates), so apkVersion/apkSignature are no
+# longer published - any old install reads apkVersion=0 and never prompts.
 cat > "$OUT_DIR/version.json" << EOF
-{"version":"$VERSION","build":"$BUILD_HASH","signature":"$SIGNATURE","apkVersion":${APK_VERSION:-0},"apkSignature":"$APK_SIGNATURE"}
+{"version":"$VERSION","build":"$BUILD_HASH","signature":"$SIGNATURE"}
 EOF
 
 # Upload to FTP
@@ -72,12 +66,14 @@ curl -s -u "dpteam:$FTP_PASSWORD" --ftp-create-dirs \
 curl -s -u "dpteam:$FTP_PASSWORD" \
     -T "$OUT_DIR/web-assets.zip" "ftp://ftp.webmo.fr/www/iptv/android/web-assets.zip"
 
-# Upload APK if exists
+# Refresh the website's manual-download APK (direct link, not an in-app update).
+# Release and debug share the same signing key, so this stays install-compatible.
+APK_FILE="$PROJECT_DIR/android/app/build/outputs/apk/release/app-release.apk"
 if [ -f "$APK_FILE" ]; then
     cp "$APK_FILE" "$OUT_DIR/app.apk"
     curl -s -u "dpteam:$FTP_PASSWORD" \
         -T "$OUT_DIR/app.apk" "ftp://ftp.webmo.fr/www/iptv/app.apk"
-    echo "APK uploaded (versionCode=$APK_VERSION)"
+    echo "Manual-download APK refreshed"
 fi
 
 # Cleanup

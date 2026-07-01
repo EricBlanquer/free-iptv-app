@@ -16,6 +16,7 @@ coverage/
 android/.gradle/
 android/app/build/
 android/build/server/__pycache__/
+__pycache__/
 android/signing-key-private.pem
 android/app/release-keystore.jks
 android/gradle.properties

@@ -70,15 +70,12 @@ IPTVApp.prototype.runLowPriority = function(total, processRange, onProgress) {
 };
 
 IPTVApp.prototype.onAppResumed = function() {
-    window.log('RESUME', 'app resumed - re-running startup checks (license, update, playlists)');
+    window.log('RESUME', 'app resumed - re-running startup checks (license, playlists)');
     if (typeof this.setupRemoteDebug === 'function') {
         this.setupRemoteDebug();
     }
     if (typeof Premium !== 'undefined' && typeof Premium.init === 'function') {
         Premium.init(this.deviceId);
-    }
-    if (typeof this.checkPendingApkUpdate === 'function') {
-        this.checkPendingApkUpdate();
     }
     if (typeof this.updateHomeMenuVisibility === 'function') {
         this.updateHomeMenuVisibility();

@@ -1,16 +1,4 @@
 {
-  "apkUpdate": {
-    "downloadError": "Échec du téléchargement : {msg}",
-    "downloading": "Téléchargement de la mise à jour... {percent} %",
-    "install": "Installer",
-    "later": "Plus tard",
-    "message": "Une nouvelle version de l'application est disponible (build {remote}). L'installer maintenant ?",
-    "openSettings": "Ouvrir les réglages",
-    "permissionNeeded": "Android exige que vous autorisiez l'installation depuis cette application. Ouvrez les réglages pour accorder la permission, puis revenez et réessayez.",
-    "permissionTitle": "Autorisation requise",
-    "title": "Mise à jour disponible",
-    "unavailable": "La mise à jour automatique n'est pas disponible sur cet appareil. Téléchargez la dernière version sur iptv.blanquer.org."
-  },
   "app": {
     "exitMessage": "Voulez-vous quitter l'application ?",
     "exitTitle": "Quitter",
@@ -493,7 +481,6 @@
     "iconEmoji": "Emoji",
     "iconPreview": "Aperçu",
     "iconTextColor": "Couleur texte",
-    "installUpdate": "Installer la mise à jour",
     "language": "Langue",
     "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
     "liveFormat": "Format TV en direct",

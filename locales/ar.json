@@ -1,16 +1,4 @@
 {
-  "apkUpdate": {
-    "downloadError": "فشل التنزيل: {msg}",
-    "downloading": "تنزيل التحديث... {percent}%",
-    "install": "تثبيت",
-    "later": "لاحقًا",
-    "message": "تتوفر إصدار جديد من التطبيق (بناء {remote}). تثبيت الآن؟",
-    "openSettings": "فتح الإعدادات",
-    "permissionNeeded": "يتطلب أندرويد السماح بالتثبيت من هذا التطبيق. افتح الإعدادات لمنح الإذن ثم حاول مرة أخرى.",
-    "permissionTitle": "الإذن مطلوب",
-    "title": "تحديث متاح",
-    "unavailable": "التحديث التلقائي غير متاح على هذا الجهاز. نزّل أحدث إصدار من iptv.blanquer.org."
-  },
   "app": {
     "exitMessage": "هل تريد الخروج من التطبيق؟",
     "exitTitle": "خروج",
@@ -492,7 +480,6 @@
     "iconEmoji": "إيموجي",
     "iconPreview": "معاينة",
     "iconTextColor": "لون النص",
-    "installUpdate": "تثبيت التحديث",
     "language": "اللغة",
     "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
     "liveFormat": "صيغة البث المباشر",

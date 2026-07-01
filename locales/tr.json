@@ -1,16 +1,4 @@
 {
-  "apkUpdate": {
-    "downloadError": "İndirme başarısız: {msg}",
-    "downloading": "Güncelleme indiriliyor... %{percent}",
-    "install": "Yükle",
-    "later": "Daha sonra",
-    "message": "Uygulamanın yeni bir sürümü mevcut (yapı {remote}). Şimdi yüklensin mi?",
-    "openSettings": "Ayarları aç",
-    "permissionNeeded": "Android, bu uygulamadan yüklemeye izin vermenizi gerektirir. İzin vermek için ayarları açın ve tekrar deneyin.",
-    "permissionTitle": "İzin gerekli",
-    "title": "Güncelleme mevcut",
-    "unavailable": "Otomatik güncelleme bu cihazda kullanılamıyor. En son sürümü iptv.blanquer.org adresinden indirin."
-  },
   "app": {
     "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",
     "exitTitle": "Çıkış",
@@ -489,7 +477,6 @@
     "iconEmoji": "Emoji",
     "iconPreview": "Önizleme",
     "iconTextColor": "Metin rengi",
-    "installUpdate": "Güncellemeyi yükle",
     "language": "Dil",
     "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
     "liveFormat": "Canlı TV formatı",

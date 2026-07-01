@@ -409,20 +409,6 @@
     max-width: 800px;
 }
 
-.apk-download-toast {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
-    padding: 15px 30px;
-    border-radius: 10px;
-    z-index: 10000;
-    border: 2px solid rgba(255, 152, 0, 0.5);
-    display: none;
-}
-
 .diag-summary {
     text-align: left;
     max-width: 700px;

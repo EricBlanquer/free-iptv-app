@@ -1061,18 +1061,6 @@ var I18nData = {
     },
     translations: {
             "ar": {
-                    "apkUpdate": {
-                            "downloadError": "فشل التنزيل: {msg}",
-                            "downloading": "تنزيل التحديث... {percent}%",
-                            "install": "تثبيت",
-                            "later": "لاحقًا",
-                            "message": "تتوفر إصدار جديد من التطبيق (بناء {remote}). تثبيت الآن؟",
-                            "openSettings": "فتح الإعدادات",
-                            "permissionNeeded": "يتطلب أندرويد السماح بالتثبيت من هذا التطبيق. افتح الإعدادات لمنح الإذن ثم حاول مرة أخرى.",
-                            "permissionTitle": "الإذن مطلوب",
-                            "title": "تحديث متاح",
-                            "unavailable": "التحديث التلقائي غير متاح على هذا الجهاز. نزّل أحدث إصدار من iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "هل تريد الخروج من التطبيق؟",
                             "exitTitle": "خروج",
@@ -1464,7 +1452,6 @@ var I18nData = {
                             "iconEmoji": "إيموجي",
                             "iconPreview": "معاينة",
                             "iconTextColor": "لون النص",
-                            "installUpdate": "تثبيت التحديث",
                             "language": "اللغة",
                             "liveAutoFormatSwitch": "تبديل تلقائي لتنسيق البث المباشر عند انتهاء المهلة",
                             "liveFormat": "صيغة البث المباشر",
@@ -1684,18 +1671,6 @@ var I18nData = {
                     }
             },
             "de": {
-                    "apkUpdate": {
-                            "downloadError": "Download fehlgeschlagen: {msg}",
-                            "downloading": "Update wird heruntergeladen... {percent}%",
-                            "install": "Installieren",
-                            "later": "Später",
-                            "message": "Eine neue Version der App ist verfügbar (Build {remote}). Jetzt installieren?",
-                            "openSettings": "Einstellungen öffnen",
-                            "permissionNeeded": "Android verlangt, dass Sie die Installation aus dieser App zulassen. Öffnen Sie die Einstellungen, um die Berechtigung zu erteilen, und versuchen Sie es dann erneut.",
-                            "permissionTitle": "Berechtigung erforderlich",
-                            "title": "Update verfügbar",
-                            "unavailable": "Das automatische Update ist auf diesem Gerät nicht verfügbar. Laden Sie die neueste Version von iptv.blanquer.org herunter."
-                    },
                     "app": {
                             "exitMessage": "Möchten Sie die App beenden?",
                             "exitTitle": "Beenden",
@@ -2087,7 +2062,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Vorschau",
                             "iconTextColor": "Textfarbe",
-                            "installUpdate": "Update installieren",
                             "language": "Sprache",
                             "liveAutoFormatSwitch": "Live-Format bei Zeitüberschreitung automatisch wechseln",
                             "liveFormat": "Live-TV-Format",
@@ -2307,18 +2281,6 @@ var I18nData = {
                     }
             },
             "en": {
-                    "apkUpdate": {
-                            "downloadError": "Download failed: {msg}",
-                            "downloading": "Downloading update... {percent}%",
-                            "install": "Install",
-                            "later": "Later",
-                            "message": "A new version of the app is available (build {remote}). Install now?",
-                            "openSettings": "Open settings",
-                            "permissionNeeded": "Android requires you to allow installation from this app. Open settings to grant permission, then come back and retry.",
-                            "permissionTitle": "Permission required",
-                            "title": "Update available",
-                            "unavailable": "Automatic update is not available on this device. Download the latest version from iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Do you want to exit the app?",
                             "exitTitle": "Exit",
@@ -2710,7 +2672,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Preview",
                             "iconTextColor": "Text color",
-                            "installUpdate": "Install update",
                             "language": "Language",
                             "liveAutoFormatSwitch": "Auto-switch live format on timeout",
                             "liveFormat": "Live TV format",
@@ -2930,18 +2891,6 @@ var I18nData = {
                     }
             },
             "es": {
-                    "apkUpdate": {
-                            "downloadError": "Error de descarga: {msg}",
-                            "downloading": "Descargando actualización... {percent}%",
-                            "install": "Instalar",
-                            "later": "Más tarde",
-                            "message": "Una nueva versión de la aplicación está disponible (build {remote}). ¿Instalar ahora?",
-                            "openSettings": "Abrir configuración",
-                            "permissionNeeded": "Android requiere que permita la instalación desde esta aplicación. Abra la configuración para otorgar el permiso y vuelva a intentarlo.",
-                            "permissionTitle": "Permiso requerido",
-                            "title": "Actualización disponible",
-                            "unavailable": "La actualización automática no está disponible en este dispositivo. Descarga la última versión desde iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "¿Quieres salir de la aplicación?",
                             "exitTitle": "Salir",
@@ -3333,7 +3282,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Vista previa",
                             "iconTextColor": "Color de texto",
-                            "installUpdate": "Instalar actualización",
                             "language": "Idioma",
                             "liveAutoFormatSwitch": "Cambio auto de formato live al timeout",
                             "liveFormat": "Formato TV en vivo",
@@ -3553,18 +3501,6 @@ var I18nData = {
                     }
             },
             "fr": {
-                    "apkUpdate": {
-                            "downloadError": "Échec du téléchargement : {msg}",
-                            "downloading": "Téléchargement de la mise à jour... {percent} %",
-                            "install": "Installer",
-                            "later": "Plus tard",
-                            "message": "Une nouvelle version de l'application est disponible (build {remote}). L'installer maintenant ?",
-                            "openSettings": "Ouvrir les réglages",
-                            "permissionNeeded": "Android exige que vous autorisiez l'installation depuis cette application. Ouvrez les réglages pour accorder la permission, puis revenez et réessayez.",
-                            "permissionTitle": "Autorisation requise",
-                            "title": "Mise à jour disponible",
-                            "unavailable": "La mise à jour automatique n'est pas disponible sur cet appareil. Téléchargez la dernière version sur iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Voulez-vous quitter l'application ?",
                             "exitTitle": "Quitter",
@@ -3956,7 +3892,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Aperçu",
                             "iconTextColor": "Couleur texte",
-                            "installUpdate": "Installer la mise à jour",
                             "language": "Langue",
                             "liveAutoFormatSwitch": "Bascule auto du format live au timeout",
                             "liveFormat": "Format TV en direct",
@@ -4176,18 +4111,6 @@ var I18nData = {
                     }
             },
             "it": {
-                    "apkUpdate": {
-                            "downloadError": "Download fallito: {msg}",
-                            "downloading": "Download dell'aggiornamento... {percent}%",
-                            "install": "Installa",
-                            "later": "Più tardi",
-                            "message": "Una nuova versione dell'app è disponibile (build {remote}). Installare ora?",
-                            "openSettings": "Apri impostazioni",
-                            "permissionNeeded": "Android richiede di consentire l'installazione da questa app. Apri le impostazioni per concedere l'autorizzazione, poi torna e riprova.",
-                            "permissionTitle": "Autorizzazione richiesta",
-                            "title": "Aggiornamento disponibile",
-                            "unavailable": "L'aggiornamento automatico non è disponibile su questo dispositivo. Scarica l'ultima versione da iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Vuoi uscire dall'app?",
                             "exitTitle": "Esci",
@@ -4579,7 +4502,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Anteprima",
                             "iconTextColor": "Colore testo",
-                            "installUpdate": "Installa aggiornamento",
                             "language": "Lingua",
                             "liveAutoFormatSwitch": "Cambio automatico formato live al timeout",
                             "liveFormat": "Formato TV in diretta",
@@ -4799,18 +4721,6 @@ var I18nData = {
                     }
             },
             "nl": {
-                    "apkUpdate": {
-                            "downloadError": "Download mislukt: {msg}",
-                            "downloading": "Update downloaden... {percent}%",
-                            "install": "Installeren",
-                            "later": "Later",
-                            "message": "Een nieuwe versie van de app is beschikbaar (build {remote}). Nu installeren?",
-                            "openSettings": "Instellingen openen",
-                            "permissionNeeded": "Android vereist dat u de installatie vanuit deze app toestaat. Open de instellingen om de toestemming te verlenen en probeer het opnieuw.",
-                            "permissionTitle": "Toestemming vereist",
-                            "title": "Update beschikbaar",
-                            "unavailable": "Automatische update is niet beschikbaar op dit apparaat. Download de nieuwste versie van iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Wilt u de app afsluiten?",
                             "exitTitle": "Afsluiten",
@@ -5202,7 +5112,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Voorbeeld",
                             "iconTextColor": "Tekstkleur",
-                            "installUpdate": "Update installeren",
                             "language": "Taal",
                             "liveAutoFormatSwitch": "Live-formaat automatisch wisselen bij time-out",
                             "liveFormat": "Live TV-formaat",
@@ -5422,18 +5331,6 @@ var I18nData = {
                     }
             },
             "pl": {
-                    "apkUpdate": {
-                            "downloadError": "Pobieranie nieudane: {msg}",
-                            "downloading": "Pobieranie aktualizacji... {percent}%",
-                            "install": "Zainstaluj",
-                            "later": "Później",
-                            "message": "Dostępna jest nowa wersja aplikacji (build {remote}). Zainstalować teraz?",
-                            "openSettings": "Otwórz ustawienia",
-                            "permissionNeeded": "Android wymaga zezwolenia na instalację z tej aplikacji. Otwórz ustawienia, aby udzielić uprawnienia, a następnie spróbuj ponownie.",
-                            "permissionTitle": "Wymagane uprawnienie",
-                            "title": "Dostępna aktualizacja",
-                            "unavailable": "Aktualizacja automatyczna nie jest dostępna na tym urządzeniu. Pobierz najnowszą wersję z iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Czy chcesz wyjść z aplikacji?",
                             "exitTitle": "Wyjdź",
@@ -5825,7 +5722,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Podgląd",
                             "iconTextColor": "Kolor tekstu",
-                            "installUpdate": "Zainstaluj aktualizację",
                             "language": "Język",
                             "liveAutoFormatSwitch": "Automatyczna zmiana formatu live przy timeout",
                             "liveFormat": "Format TV na żywo",
@@ -6045,18 +5941,6 @@ var I18nData = {
                     }
             },
             "pt": {
-                    "apkUpdate": {
-                            "downloadError": "Falha no download: {msg}",
-                            "downloading": "Baixando atualização... {percent}%",
-                            "install": "Instalar",
-                            "later": "Mais tarde",
-                            "message": "Uma nova versão do app está disponível (build {remote}). Instalar agora?",
-                            "openSettings": "Abrir configurações",
-                            "permissionNeeded": "O Android exige que você permita a instalação a partir deste app. Abra as configurações para conceder a permissão e tente novamente.",
-                            "permissionTitle": "Permissão necessária",
-                            "title": "Atualização disponível",
-                            "unavailable": "A atualização automática não está disponível neste dispositivo. Baixe a versão mais recente em iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Deseja sair do aplicativo?",
                             "exitTitle": "Sair",
@@ -6448,7 +6332,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Prévia",
                             "iconTextColor": "Cor do texto",
-                            "installUpdate": "Instalar atualização",
                             "language": "Idioma",
                             "liveAutoFormatSwitch": "Troca auto de formato live no timeout",
                             "liveFormat": "Formato TV ao vivo",
@@ -6668,18 +6551,6 @@ var I18nData = {
                     }
             },
             "ru": {
-                    "apkUpdate": {
-                            "downloadError": "Ошибка загрузки: {msg}",
-                            "downloading": "Загрузка обновления... {percent}%",
-                            "install": "Установить",
-                            "later": "Позже",
-                            "message": "Доступна новая версия приложения (сборка {remote}). Установить сейчас?",
-                            "openSettings": "Открыть настройки",
-                            "permissionNeeded": "Android требует разрешить установку из этого приложения. Откройте настройки, чтобы предоставить разрешение, затем повторите попытку.",
-                            "permissionTitle": "Требуется разрешение",
-                            "title": "Доступно обновление",
-                            "unavailable": "Автоматическое обновление недоступно на этом устройстве. Скачайте последнюю версию с iptv.blanquer.org."
-                    },
                     "app": {
                             "exitMessage": "Вы хотите выйти из приложения?",
                             "exitTitle": "Выход",
@@ -7071,7 +6942,6 @@ var I18nData = {
                             "iconEmoji": "Эмодзи",
                             "iconPreview": "Предпросмотр",
                             "iconTextColor": "Цвет текста",
-                            "installUpdate": "Установить обновление",
                             "language": "Язык",
                             "liveAutoFormatSwitch": "Авто-смена формата live при таймауте",
                             "liveFormat": "Формат ТВ",
@@ -7291,18 +7161,6 @@ var I18nData = {
                     }
             },
             "tr": {
-                    "apkUpdate": {
-                            "downloadError": "İndirme başarısız: {msg}",
-                            "downloading": "Güncelleme indiriliyor... %{percent}",
-                            "install": "Yükle",
-                            "later": "Daha sonra",
-                            "message": "Uygulamanın yeni bir sürümü mevcut (yapı {remote}). Şimdi yüklensin mi?",
-                            "openSettings": "Ayarları aç",
-                            "permissionNeeded": "Android, bu uygulamadan yüklemeye izin vermenizi gerektirir. İzin vermek için ayarları açın ve tekrar deneyin.",
-                            "permissionTitle": "İzin gerekli",
-                            "title": "Güncelleme mevcut",
-                            "unavailable": "Otomatik güncelleme bu cihazda kullanılamıyor. En son sürümü iptv.blanquer.org adresinden indirin."
-                    },
                     "app": {
                             "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",
                             "exitTitle": "Çıkış",
@@ -7694,7 +7552,6 @@ var I18nData = {
                             "iconEmoji": "Emoji",
                             "iconPreview": "Önizleme",
                             "iconTextColor": "Metin rengi",
-                            "installUpdate": "Güncellemeyi yükle",
                             "language": "Dil",
                             "liveAutoFormatSwitch": "Zaman aşımında canlı format otomatik değiştirme",
                             "liveFormat": "Canlı TV formatı",

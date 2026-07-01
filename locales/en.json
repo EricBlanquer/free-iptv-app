@@ -1,16 +1,4 @@
 {
-  "apkUpdate": {
-    "downloadError": "Download failed: {msg}",
-    "downloading": "Downloading update... {percent}%",
-    "install": "Install",
-    "later": "Later",
-    "message": "A new version of the app is available (build {remote}). Install now?",
-    "openSettings": "Open settings",
-    "permissionNeeded": "Android requires you to allow installation from this app. Open settings to grant permission, then come back and retry.",
-    "permissionTitle": "Permission required",
-    "title": "Update available",
-    "unavailable": "Automatic update is not available on this device. Download the latest version from iptv.blanquer.org."
-  },
   "app": {
     "exitMessage": "Do you want to exit the app?",
     "exitTitle": "Exit",
@@ -488,7 +476,6 @@
     "iconEmoji": "Emoji",
     "iconPreview": "Preview",
     "iconTextColor": "Text color",
-    "installUpdate": "Install update",
     "language": "Language",
     "liveAutoFormatSwitch": "Auto-switch live format on timeout",
     "liveFormat": "Live TV format",

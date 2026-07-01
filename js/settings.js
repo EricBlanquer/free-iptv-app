@@ -95,15 +95,8 @@ IPTVApp.prototype.showSettings = function() {
             var checkBtn = document.createElement('div');
             checkBtn.id = 'settings-check-updates-btn';
             checkBtn.className = 'settings-action focusable';
-            if (this._apkUpdateAvailable) {
-                checkBtn.setAttribute('data-action', 'installUpdate');
-                checkBtn.textContent = I18n.t('settings.installUpdate', 'Install update');
-                checkBtn.style.background = 'rgba(76, 175, 80, 0.8)';
-            }
-            else {
-                checkBtn.setAttribute('data-action', 'checkUpdates');
-                checkBtn.textContent = I18n.t('settings.checkUpdates', 'Check for updates');
-            }
+            checkBtn.setAttribute('data-action', 'checkUpdates');
+            checkBtn.textContent = I18n.t('settings.checkUpdates', 'Check for updates');
             header.appendChild(checkBtn);
         }
         titleEl.parentNode.insertBefore(header, titleEl.nextSibling);
@@ -1283,9 +1276,6 @@ IPTVApp.prototype.handleSettingsSelect = function(clickedElement) {
         }
         else if (actionType === 'privacyPolicy') {
             this.showPrivacyPolicy();
-        }
-        else if (actionType === 'installUpdate') {
-            this.startApkDownload();
         }
         else if (actionType === 'checkUpdates') {
             if (typeof Android !== 'undefined' && Android && Android.forceCheckUpdates) {
@@ -3213,8 +3203,10 @@ IPTVApp.prototype.showConfirmModal = function(message, action, options) {
     var self = this;
     this.confirmModalAction_ = action;
     this.confirmModalNoAction_ = (options && options.noAction) ? options.noAction : null;
-    this.confirmModalPreviousFocusArea = this.focusArea;
-    this.confirmModalPreviousFocusIndex = this.focusIndex;
+    if (this.focusArea !== 'confirm-modal') {
+        this.confirmModalPreviousFocusArea = this.focusArea;
+        this.confirmModalPreviousFocusIndex = this.focusIndex;
+    }
     var modal = document.getElementById('confirm-modal');
     var titleEl = document.getElementById('confirm-modal-title');
     var messageEl = document.getElementById('confirm-modal-message');
@@ -3388,21 +3380,6 @@ IPTVApp.prototype.unpairFreebox = function() {
     this.updateFreeboxStatus();
     this.updateFreeboxVisibility();
     this.updateHomeDownloadButton();
-};
-
-IPTVApp.prototype.updateSettingsUpdateButton = function() {
-    var btn = document.getElementById('settings-check-updates-btn');
-    if (!btn) return;
-    if (this._apkUpdateAvailable) {
-        btn.setAttribute('data-action', 'installUpdate');
-        btn.textContent = I18n.t('settings.installUpdate', 'Install update');
-        btn.style.background = 'rgba(76, 175, 80, 0.8)';
-    }
-    else {
-        btn.setAttribute('data-action', 'checkUpdates');
-        btn.textContent = I18n.t('settings.checkUpdates', 'Check for updates');
-        btn.style.background = '';
-    }
 };
 
 IPTVApp.prototype.formatSettingValue = function(key, value) {
