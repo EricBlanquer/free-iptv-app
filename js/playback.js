@@ -333,6 +333,106 @@ IPTVApp.prototype.playStream = function(streamId, type, stream, startPosition) {
     this._doPlayStream(streamId, type, stream, startPosition);
 };
 
+IPTVApp.prototype.isPlaybackActive = function() {
+    return this.currentScreen === 'player' && !!this.currentPlayingStream;
+};
+
+IPTVApp.prototype._isOfflineNow = function() {
+    if (window.NetworkDiagnostic && window.NetworkDiagnostic.isLikelyOffline) {
+        return window.NetworkDiagnostic.isLikelyOffline();
+    }
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
+};
+
+IPTVApp.prototype.setupPlaybackNetworkMonitor = function() {
+    var self = this;
+    if (this._networkMonitorSetup) return;
+    this._networkMonitorSetup = true;
+    window.addEventListener('offline', function() { self.handlePlaybackNetworkLost(); });
+    window.addEventListener('online', function() { self.handlePlaybackNetworkRestored(); });
+};
+
+IPTVApp.prototype.handlePlaybackNetworkLost = function() {
+    if (!this.isPlaybackActive()) return;
+    if (this._networkLost) return;
+    this._networkLost = true;
+    var stream = this.currentPlayingStream;
+    var type = this.currentPlayingType;
+    var position = 0;
+    if (type !== 'live' && this.player) {
+        try { position = (this.player.getCurrentTime ? this.player.getCurrentTime() : this.player.currentTime) || 0; }
+        catch (e) { position = 0; }
+    }
+    this._resumeAfterNetwork = { streamId: this.getStreamId(stream), type: type, stream: stream, position: position };
+    window.log('NETWORK', 'Playback network lost, saved resume position=' + position);
+    try { this.player.stop(); } catch (e) {}
+    this.showLoading(false);
+    this.showNetworkLostPopup();
+    this.startNetworkRecoveryPoll();
+};
+
+IPTVApp.prototype.handlePlaybackNetworkRestored = function() {
+    if (!this._networkLost) return;
+    this._networkLost = false;
+    this.stopNetworkRecoveryPoll();
+    var resume = this._resumeAfterNetwork;
+    this._resumeAfterNetwork = null;
+    this.hideNetworkLostPopup();
+    if (resume && this.currentScreen === 'player') {
+        window.log('NETWORK', 'Network restored, resuming playback at ' + resume.position);
+        this.playStream(resume.streamId, resume.type, resume.stream, resume.position);
+    }
+};
+
+IPTVApp.prototype.startNetworkRecoveryPoll = function() {
+    var self = this;
+    this.stopNetworkRecoveryPoll();
+    this._networkRecoveryTimer = setInterval(function() {
+        if (!self._isOfflineNow()) {
+            self.handlePlaybackNetworkRestored();
+        }
+    }, 2500);
+};
+
+IPTVApp.prototype.stopNetworkRecoveryPoll = function() {
+    if (this._networkRecoveryTimer) {
+        clearInterval(this._networkRecoveryTimer);
+        this._networkRecoveryTimer = null;
+    }
+};
+
+IPTVApp.prototype.showNetworkLostPopup = function() {
+    var self = this;
+    this.showConfirmModal(
+        I18n.t('player.networkLostMessage', 'No internet connection. Playback will resume automatically when the network is restored.'),
+        null,
+        {
+            title: I18n.t('player.connectionLost', 'Connection lost'),
+            hideYes: true,
+            noLabel: I18n.t('player.playerOk', 'OK'),
+            noAction: function() {
+                self.cancelNetworkRecovery();
+                self.stopPlayback();
+            }
+        }
+    );
+    this._networkPopupShown = true;
+};
+
+IPTVApp.prototype.hideNetworkLostPopup = function() {
+    if (this._networkPopupShown) {
+        this._networkPopupShown = false;
+        this.hideConfirmModal();
+    }
+};
+
+IPTVApp.prototype.cancelNetworkRecovery = function() {
+    this._networkLost = false;
+    this._resumeAfterNetwork = null;
+    this._networkPopupShown = false;
+    this.stopNetworkRecoveryPoll();
+};
+
 IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition) {
     var self = this;
     var playlistId = stream ? stream._playlistId : null;
@@ -602,6 +702,12 @@ IPTVApp.prototype._doPlayStream = function(streamId, type, stream, startPosition
         }
     };
     this.player.onError = function(error) {
+        // Network lost during playback: show a persistent popup and auto-resume
+        // when the connection is restored (Samsung TV certification requirement).
+        if (self.isPlaybackActive() && self._isOfflineNow()) {
+            self.handlePlaybackNetworkLost();
+            return;
+        }
         // Clear pending history on error - don't add failed streams to history
         self._pendingHistoryStream = null;
         // HTTP error (stream not available)
@@ -973,6 +1079,12 @@ IPTVApp.prototype._clearSubtitleState = function(stream) {
 IPTVApp.prototype.stopPlayback = function() {
     this.clearTimer('overlayTimer');
     this.cancelDeferredRefreshTimer();
+    // Clear any pending network-recovery state so leaving the player stops the
+    // auto-resume loop and hides the connection-lost popup.
+    this.stopNetworkRecoveryPoll();
+    this._networkLost = false;
+    this._resumeAfterNetwork = null;
+    this._networkPopupShown = false;
     // Cancel any pending retry so a Back press after an error stops the
     // reconnection loop immediately instead of re-launching the broken stream.
     if (this._retryTimer) {

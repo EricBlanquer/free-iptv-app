@@ -2084,6 +2084,9 @@ IPTVApp.prototype.getDeviceId = function() {
         debug.push('prod-err:' + (e.message || e));
     }
     this.macDebug = debug.join(' | ');
+    if (!result) {
+        result = this._generateDeviceId();
+    }
     // Cache deviceId for future launches
     if (result) {
         try {
@@ -2091,6 +2094,25 @@ IPTVApp.prototype.getDeviceId = function() {
         } catch (e) { /* storage error */ }
     }
     return result || 'emulator';
+};
+
+IPTVApp.prototype._generateDeviceId = function() {
+    var ua = navigator.userAgent || '';
+    var os = /Tizen/i.test(ua) ? 'tizen'
+        : /Web0S|webOS/i.test(ua) ? 'webos'
+        : /Android/i.test(ua) ? 'android'
+        : 'web';
+    var rnd = '';
+    try {
+        var bytes = new Uint8Array(8);
+        (window.crypto || window.msCrypto).getRandomValues(bytes);
+        for (var i = 0; i < bytes.length; i++) {
+            rnd += (bytes[i] + 0x100).toString(16).slice(1);
+        }
+    } catch (e) {
+        rnd = (Date.now().toString(16) + Math.random().toString(16).slice(2) + '0000000000000000').slice(0, 16);
+    }
+    return os + '-' + rnd;
 };
 
 IPTVApp.prototype.preloadSectionPosters = function() {

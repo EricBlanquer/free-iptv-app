@@ -181,6 +181,7 @@ class IPTVApp {
         this._cleanupLegacyBlobStorage();
         this.startMemoryMonitor();
         this.player.init();
+        this.setupPlaybackNetworkMonitor();
         this.player.setPreferHtml5(this.settings.preferHtml5Player);
         this.player.setDialogueBoost(this.settings.dialogueBoost);
         this.player.setProxyUrl(this.getStreamProxyUrl());

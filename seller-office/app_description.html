@@ -3,177 +3,176 @@
 <head>
 <meta charset="utf-8">
 <style>
-body { font-family: Arial, sans-serif; margin: 40px; font-size: 13px; line-height: 1.5; }
-h1 { font-size: 22px; text-align: center; color: #1a237e; margin-bottom: 5px; }
-h2 { font-size: 16px; color: #1a237e; margin-top: 30px; border-bottom: 2px solid #1a237e; padding-bottom: 5px; }
-h3 { font-size: 14px; color: #333; margin-top: 20px; }
-.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-td, th { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; }
-th { background: #e8eaf6; text-align: left; }
+@page { size: A4; margin: 18mm 16mm; }
+body { font-family: Arial, sans-serif; font-size: 12.5px; line-height: 1.5; color: #222; }
+h1 { font-size: 24px; text-align: center; color: #1a237e; margin-bottom: 4px; }
+h2 { font-size: 16px; color: #1a237e; margin-top: 26px; border-bottom: 2px solid #1a237e; padding-bottom: 4px; }
+h3 { font-size: 14px; color: #333; margin-top: 18px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 24px; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+td, th { padding: 5px 9px; border: 1px solid #ccc; vertical-align: top; text-align: left; }
+th { background: #e8eaf6; }
 .page-break { page-break-before: always; }
-img { max-width: 100%; }
-.screenshot { border: 1px solid #ddd; margin: 5px 0; }
+img.screenshot { width: 100%; max-width: 720px; border: 1px solid #ddd; margin: 6px 0 4px; display: block; }
+.caption { color: #666; font-size: 11px; margin-bottom: 6px; }
+pre { font-size: 11.5px; background: #f5f5f5; padding: 14px; border-radius: 5px; white-space: pre-wrap; }
+.note { background: #fff8e1; border: 1px solid #ffe082; padding: 8px 12px; border-radius: 4px; margin: 8px 0; }
+figure { margin: 0; page-break-inside: avoid; }
 </style>
 </head>
 <body>
 
 <h1>Free IPTV</h1>
-<p class="subtitle">App Description Document<br>Eric Blanquer</p>
+<p class="subtitle">Application UI Description<br>Content Provider: Eric Blanquer</p>
 
 <h2>Revision History</h2>
 <table>
-<tr><th>Version</th><th>Date</th><th>Description</th><th>Author</th></tr>
-<tr><td>1.0</td><td>2026-03-29</td><td>Initial submission</td><td>Eric Blanquer</td></tr>
-<tr><td>1.1</td><td>2026-03-31</td><td>Added app preview images and settings screenshot</td><td>Eric Blanquer</td></tr>
+<tr><th>File Version</th><th>Date</th><th>Description</th><th>Author</th><th>Related App Version</th></tr>
+<tr><td>1.0</td><td>2026-03-29</td><td>Initial submission</td><td>Eric Blanquer</td><td>1.0.0</td></tr>
+<tr><td>1.1</td><td>2026-03-31</td><td>Added app preview images and settings screenshot</td><td>Eric Blanquer</td><td>1.0.2</td></tr>
+<tr><td>2.0</td><td>2026-07-02</td><td>Updated for the 2.0 release (new "Aurora" home screen). All screenshots recaptured in English. Added first-launch (disclaimer and demo playlist), playlist setup, remote configuration, live player and language screens. Added the related application version column.</td><td>Eric Blanquer</td><td>2.0.0</td></tr>
 </table>
 
 <h2>Contents</h2>
 <ol>
+<li>Application Overview</li>
 <li>UI Structure</li>
-<li>Usage Scenario</li>
-<li>Menu &amp; Function Description</li>
-<li>Key Policy</li>
-<li>How to Change Languages</li>
+<li>Use Cases</li>
+<li>Menus &amp; Function Description</li>
+<li>Remote Control Keys</li>
+<li>Language Options</li>
 </ol>
 
+<h2>1. Application Overview</h2>
+<p>Free IPTV is a media player for Samsung Smart TVs. It lets users watch their own IPTV sources: live TV channels, movies (VOD) and series, using either an M3U playlist URL or provider credentials (Xtream API server / Jellyfin).</p>
+<div class="note"><b>Important:</b> The application does not host or provide any content. Users configure their own sources and are responsible for having the legal right to access them. No account or login to the developer is required. A bundled free demo playlist (public news channels) is offered on first launch so the application can be evaluated without any external credentials.</div>
+
 <div class="page-break"></div>
-<h2>1. UI Structure</h2>
-<pre style="font-size: 12px; background: #f5f5f5; padding: 15px; border-radius: 5px;">
-Home Screen
-├── Live TV → Browse (categories + channel list) → Player
-├── Movies (VOD) → Browse (categories + movie grid) → Details → Player
-├── Series → Browse (categories + series grid) → Details (seasons/episodes) → Player
-├── Manga → Browse (filtered VOD + Series)
-├── Sport → Browse (filtered VOD)
-├── Entertainment → Browse (filtered VOD)
-├── History → Browse (watch history) → Player
-├── Downloads → Browse (offline content) → Player
+<h2>2. UI Structure</h2>
+<pre>
+First launch
+├── Legal Disclaimer  ("I Understand")
+└── Welcome  ("Would you like to try a demo playlist?")
+        ├── Yes, try demo   → loads the bundled demo playlist
+        └── No, configure manually → Playlists
+
+Home Screen (Aurora)
+├── Live TV      → Browse (categories + channels) → Player
+├── Movies (VOD) → Browse (categories + grid) → Details → Player   [API Server playlists]
+├── Series       → Browse (categories + grid) → Details (seasons/episodes) → Player   [API Server playlists]
+├── Manga / Sport / Entertainment → Browse (filtered content)      [API Server playlists]
+├── History      → Browse (watch history) → Player
 └── Settings
-    ├── Manage Playlists (add/edit/delete M3U or API Server)
-    ├── Language
-    ├── Remote Configuration (QR code)
-    ├── Text Size (small/medium/large)
-    ├── Text-to-Speech
-    ├── Stream Proxy
-    ├── APIs (TMDB, OpenSubtitles, SubDL)
-    └── Premium / Support
+    ├── Manage Playlists (add / edit / delete: API Server, M3U, Jellyfin)
+    ├── Language (11 languages)
+    ├── Remote Configuration (QR code, iptv.blanquer.org)
+    ├── Display (view mode, text size, filters)
+    ├── Player (preferred player, audio options)
+    └── Data (cache, history)
 </pre>
+<p>Sections Movies, Series, Manga, Sport and Entertainment appear only when an API Server (Xtream) or Jellyfin playlist is configured. With the bundled demo (an M3U playlist of live channels), the Home screen shows Live TV and Settings.</p>
 
 <div class="page-break"></div>
-<h2>2. Usage Scenario</h2>
+<h2>3. Use Cases</h2>
 
-<h3>First Launch (No playlist configured)</h3>
+<h3>Use Case 1 — First launch and demo playlist (recommended for testing)</h3>
 <ol>
-<li>App launches and shows Home screen with only "Live TV" and "Settings" buttons</li>
-<li>User navigates to Settings</li>
-<li>User selects "Manage playlists" and presses Enter</li>
-<li>User selects playlist type: "M3U" or "API Server"</li>
-<li>For M3U: user enters a playlist URL (e.g., https://iptv-org.github.io/iptv/index.m3u)</li>
-<li>For API Server: user enters server URL, username, and password</li>
-<li>User selects "Save" and returns to Home</li>
-<li>App loads playlist data and shows all available sections (Live TV, Movies, Series, etc.)</li>
+<li>On the first launch, the legal Disclaimer is shown. Select "I Understand".</li>
+<li>The Welcome dialog asks "Would you like to try a demo playlist?". Select "Yes, try demo".</li>
+<li>The demo playlist (public news channels: DW, France&nbsp;24, Al&nbsp;Jazeera) is loaded and the app opens Live TV.</li>
+<li>Select any channel and press Enter — playback starts within a few seconds.</li>
 </ol>
 
-<h3>Watching Live TV</h3>
+<h3>Use Case 2 — Configure a source manually</h3>
 <ol>
-<li>From Home, user selects "Live TV"</li>
-<li>Browse screen shows categories on the left, channels on the right</li>
-<li>User navigates categories and selects a channel</li>
-<li>Player starts streaming the selected channel</li>
-<li>User can change channels with Up/Down keys</li>
-<li>Press Return to go back to channel list</li>
+<li>Open Settings → Manage playlists → Add playlist.</li>
+<li>Choose the type: API Server (Xtream), M3U or Jellyfin.</li>
+<li>For API Server / Jellyfin: enter the Server URL, Username and Password. For M3U: enter the playlist URL.</li>
+<li>Save. The app loads the source and shows the available sections on the Home screen.</li>
 </ol>
 
-<h3>Watching a Movie (VOD)</h3>
+<h3>Use Case 3 — Watch live TV</h3>
 <ol>
-<li>From Home, user selects "Movies"</li>
-<li>Browse screen shows movie categories and movie posters</li>
-<li>User selects a movie to see details (synopsis, cast, rating from TMDB)</li>
-<li>User selects "Play" to start playback</li>
-<li>During playback: Left/Right to seek, Enter to pause/resume</li>
-<li>User can select subtitle tracks and audio tracks</li>
+<li>From Home, select Live TV.</li>
+<li>The Browse screen shows categories on the left and channels on the right.</li>
+<li>Select a channel and press Enter to start playback.</li>
+<li>Press Enter during playback to show/hide the control overlay; press Return to go back to the list.</li>
 </ol>
 
-<h3>Remote Configuration</h3>
+<h3>Use Case 4 — Remote configuration from a phone or computer</h3>
 <ol>
-<li>User opens Settings</li>
-<li>Under "Remote Configuration", a QR code is displayed</li>
-<li>User scans QR code with phone/computer</li>
-<li>Opens iptv.blanquer.org where user can configure playlists remotely</li>
-<li>Configuration is synced to the TV app</li>
+<li>Open Settings → Remote Configuration.</li>
+<li>Scan the displayed QR code (or open iptv.blanquer.org) and enter the shown pairing code.</li>
+<li>Configure playlists from the phone/computer; the configuration is applied to the TV app.</li>
 </ol>
 
 <div class="page-break"></div>
-<h2>3. Menu &amp; Function Description</h2>
+<h2>4. Menus &amp; Function Description</h2>
 
-<h3>3.1 Home Screen</h3>
-<p>Grid of buttons to access available sections. Live TV and Settings are always visible.<br>Movies, Series, Sport, Manga, Entertainment and History sections appear only when an API Server playlist is configured.</p>
-<img class="screenshot" src="screenshots/home-m3u.png" alt="Home Screen with M3U playlist">
+<h3>4.1 Legal Disclaimer</h3>
+<p>Shown on launch. The user must acknowledge that the app does not host content before continuing. Button: "I Understand".</p>
+<figure><img class="screenshot" src="screenshots-en/disclaimer.png" alt="Legal disclaimer screen"><figcaption class="caption">Legal Disclaimer — button: "I Understand".</figcaption></figure>
 
-<h3>3.2 Browse Screen (Live TV)</h3>
-<p>Left panel with categories. Right panel showing channels. Navigate with Up/Down, select with Enter. Grid or list view toggle available (RED key).</p>
-<img class="screenshot" src="screenshots/live-tv.jpg" alt="Browse Screen - Live TV">
+<h3>4.2 Welcome — Demo Playlist</h3>
+<p>Offered on first launch when no playlist is configured. Buttons: "Yes, try demo" (loads the bundled demo playlist) and "No, configure manually" (opens the Playlists screen).</p>
+<figure><img class="screenshot" src="screenshots-en/welcome-demo.png" alt="Welcome demo playlist dialog"><figcaption class="caption">Welcome dialog — "Yes, try demo" / "No, configure manually".</figcaption></figure>
 
-<h3>3.3 Playlist Management</h3>
-<p>Add, edit, delete M3U playlists or API server connections. Supports M3U URL and Xtream API server credentials.</p>
-<img class="screenshot" src="screenshots/playlist.jpg" alt="Playlist Management">
-
-<h3>3.4 Settings Screen</h3>
-<p>Configuration options: playlist management, language selection, remote configuration via QR code, license status, API keys, text size, text-to-speech.</p>
-<img class="screenshot" src="screenshots/settings.jpg" alt="Settings Screen">
-
-<h3>3.5 Remote Configuration</h3>
-<p>QR code displayed in Settings. User scans with phone/computer to configure playlists remotely — configuration is synced to the TV app via iptv.blanquer.org</p>
-<img class="screenshot" src="screenshots/remote-config.jpg" alt="Remote Configuration">
+<h3>4.3 Home Screen (Aurora)</h3>
+<p>Grid of section tiles. Live TV and Settings are always available. Movies, Series, Manga, Sport, Entertainment and History appear when the configured playlist provides them. Navigate with the arrow keys, open with Enter.</p>
+<figure><img class="screenshot" src="screenshots-en/home.png" alt="Aurora home screen"><figcaption class="caption">Home screen (demo playlist): Live TV and Settings tiles.</figcaption></figure>
 
 <div class="page-break"></div>
-<h3>3.6 Function Reference</h3>
-<table>
-<tr><th>Screen</th><th>Function</th><th>Description</th></tr>
-<tr><td>Home</td><td>Section Navigation</td><td>Grid of buttons to access available sections. Live TV and Settings always visible. Other sections (Movies, Series, Sport, etc.) appear with API Server playlists</td></tr>
-<tr><td>Browse</td><td>Category Sidebar</td><td>Left panel with categories. Navigate with Up/Down, select with Enter</td></tr>
-<tr><td>Browse</td><td>Content Grid</td><td>Right panel showing channels/movies/series. Grid or list view toggle available</td></tr>
-<tr><td>Browse</td><td>Search</td><td>Press Enter on search bar to filter content by title</td></tr>
-<tr><td>Details</td><td>Movie/Series Info</td><td>Shows poster, synopsis, cast, rating (from TMDB if API key configured)</td></tr>
-<tr><td>Details</td><td>Season/Episode Nav</td><td>For series: navigate seasons and episodes</td></tr>
-<tr><td>Player</td><td>Playback Controls</td><td>Play/Pause, Seek (Left/Right), Channel switch (Up/Down for live)</td></tr>
-<tr><td>Player</td><td>Audio/Subtitle Tracks</td><td>Select audio language and subtitle track during playback</td></tr>
-<tr><td>Settings</td><td>Playlist Management</td><td>Add, edit, delete M3U playlists or API server connections</td></tr>
-<tr><td>Settings</td><td>Remote Configuration</td><td>QR code to configure playlists from phone/computer via iptv.blanquer.org</td></tr>
-<tr><td>Settings</td><td>Language</td><td>Change app UI language (11 languages available)</td></tr>
-<tr><td>Settings</td><td>Text Size</td><td>Adjust text size: Small, Medium, Large</td></tr>
-<tr><td>Settings</td><td>TTS</td><td>Enable/disable Text-to-Speech voice guidance</td></tr>
-</table>
+<h3>4.4 Manage Playlists</h3>
+<p>Lists configured playlists with their type and active status. Buttons per playlist: Edit, Preview, Delete. "Add playlist" opens the creation form.</p>
+<figure><img class="screenshot" src="screenshots-en/playlists.png" alt="Playlists management screen"><figcaption class="caption">Playlists — active playlist marked "Active"; Edit / Preview / Delete and "Add playlist".</figcaption></figure>
+
+<h3>4.5 Add / Edit Playlist</h3>
+<p>Create or edit a source. Type selector: API Server, M3U or Jellyfin. Fields: Name (optional), Server URL, Username, Password (for API Server / Jellyfin) or URL (for M3U). Optional default subtitle/audio language and audio channels.</p>
+<figure><img class="screenshot" src="screenshots-en/playlist-edit.png" alt="New playlist form"><figcaption class="caption">New playlist form — Type (API Server / M3U / Jellyfin), Server URL, Username, Password.</figcaption></figure>
 
 <div class="page-break"></div>
-<h2>4. Key Policy</h2>
+<h3>4.6 Browse (Live TV / Movies / Series)</h3>
+<p>Category sidebar on the left, content on the right. Toggle grid/list view, sort (A-Z, by number) and search by name. Navigate with the arrow keys; open with Enter.</p>
+<figure><img class="screenshot" src="screenshots-en/live-tv-browse.png" alt="Live TV browse screen"><figcaption class="caption">Browse (Live TV) — category "News (7)" and the channel list.</figcaption></figure>
 
+<h3>4.7 Player</h3>
+<p>Full-screen playback. Pressing a key shows the control overlay: playback state, progress/position, live indicator, stream format and quality. During playback: Enter shows/hides the overlay, Left/Right seek, Up/Down change channel (live). Return stops and goes back.</p>
+<figure><img class="screenshot" src="screenshots-en/player.png" alt="Player with control overlay"><figcaption class="caption">Player — control overlay with playback state, "Live", stream format and quality indicators.</figcaption></figure>
+
+<div class="page-break"></div>
+<h3>4.8 Settings &amp; Remote Configuration</h3>
+<p>Left menu: Manage playlists, Language, Display, Player, Data. The Remote Configuration panel shows a QR code and a pairing code to configure playlists from a phone or computer (iptv.blanquer.org). Licence status and code are shown below.</p>
+<figure><img class="screenshot" src="screenshots-en/settings.png" alt="Settings and remote configuration"><figcaption class="caption">Settings — menu, Manage playlists, Remote Configuration (QR + pairing code), status.</figcaption></figure>
+
+<h3>4.9 Language</h3>
+<p>Select the interface language from 11 options. The change is applied immediately; no restart is required.</p>
+<figure><img class="screenshot" src="screenshots-en/language.png" alt="Language selection screen"><figcaption class="caption">Language — 11 languages (English selected).</figcaption></figure>
+
+<div class="page-break"></div>
+<h2>5. Remote Control Keys</h2>
 <table>
 <tr><th>Button</th><th>Action</th><th>Remarks</th></tr>
-<tr><td>ENTER</td><td>Select / Play / Pause</td><td></td></tr>
-<tr><td>UP / DOWN</td><td>Navigate menus. In player: change channel (live)</td><td></td></tr>
-<tr><td>LEFT / RIGHT</td><td>Navigate menus. In player: seek backward/forward</td><td></td></tr>
-<tr><td>Ch. Up / Down</td><td>Page up/down in lists</td><td></td></tr>
+<tr><td>ENTER / OK</td><td>Select / Play. In player: show/hide the control overlay</td><td></td></tr>
+<tr><td>UP / DOWN</td><td>Navigate menus and lists. In player (live): change channel</td><td></td></tr>
+<tr><td>LEFT / RIGHT</td><td>Navigate. In player: seek backward / forward. In Browse: switch between category sidebar and content</td><td></td></tr>
+<tr><td>Ch. Up / Down</td><td>Page up / down in long lists</td><td></td></tr>
 <tr><td>PLAY / PAUSE</td><td>Play or pause playback</td><td></td></tr>
-<tr><td>STOP</td><td>Stop playback and return to browse</td><td></td></tr>
-<tr><td>RED</td><td>Toggle grid/list view</td><td></td></tr>
-<tr><td>GREEN</td><td>Add/remove favorites</td><td></td></tr>
+<tr><td>STOP</td><td>Stop playback and return to Browse</td><td></td></tr>
+<tr><td>RED</td><td>Toggle grid / list view</td><td></td></tr>
+<tr><td>GREEN</td><td>Add / remove favourites</td><td></td></tr>
 <tr><td>YELLOW</td><td>Sort options</td><td></td></tr>
 <tr><td>BLUE</td><td>Filter options</td><td></td></tr>
-<tr><td>RETURN</td><td>Go back to previous screen</td><td>Samsung Mandatory</td></tr>
-<tr><td>EXIT</td><td>Close the app</td><td>Samsung Mandatory</td></tr>
+<tr><td>RETURN</td><td>Go back to the previous screen</td><td>Standard key — not modified</td></tr>
+<tr><td>EXIT</td><td>Close the application</td><td>Standard key — not modified</td></tr>
 </table>
 
-<div class="page-break"></div>
-<h2>5. How to Change Languages</h2>
-
+<h2>6. Language Options</h2>
 <table>
 <tr><th>Item</th><th>Details</th></tr>
-<tr><td>How to change languages</td><td>
-Go to Settings → Language → Select desired language from the list.<br><br>
-Supported languages: English, French, German, Spanish, Italian, Portuguese, Dutch, Polish, Russian, Arabic, Turkish.<br><br>
-The app UI language changes immediately after selection. No restart required.
+<tr><td>How to change the language</td><td>
+Go to Settings → Language → select the desired language from the list.<br><br>
+Supported languages: English, Arabic, German, Spanish, French, Italian, Dutch, Polish, Portuguese, Russian, Turkish (11 languages).<br><br>
+The interface language changes immediately after selection. No restart is required.
 </td></tr>
 </table>
 

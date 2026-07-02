@@ -827,6 +827,14 @@ body.text-large #categories-reveal-hint .material-symbols-outlined { font-size: 
     text-align: center;
 }
 
+.toast-message,
+.disclaimer-text,
+#confirm-modal-message,
+.premium-message,
+.diag-main-message {
+    white-space: pre-line;
+}
+
 .toast-message.toast-error {
     top: auto;
     left: auto;

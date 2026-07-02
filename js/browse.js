@@ -4554,7 +4554,7 @@ IPTVApp.prototype.getFilteredContinueHistory = function(section) {
     var seenSeries = {};
     return this.watchHistory.filter(function(item) {
         if (item.playlistId === '_fb_') return false;
-        if (activePlaylistId && item.playlistId && item.playlistId !== activePlaylistId) return false;
+        if (activePlaylistId && item.playlistId && String(item.playlistId) !== String(activePlaylistId)) return false;
         if (item.watched) return false;
         if (item.type !== 'series' && (!item.position || item.position < minMs)) return false;
         if (item.type === 'series') {
@@ -4585,7 +4585,7 @@ IPTVApp.prototype.getFavoritesCount = function() {
     var isVodSubsection = vodSubsections.indexOf(section) !== -1;
     var isCustom = section.indexOf('custom_') === 0;
     return this.favorites.filter(function(fav) {
-        if (activePlaylistId && fav._playlistId && fav._playlistId !== activePlaylistId) return false;
+        if (activePlaylistId && fav._playlistId && String(fav._playlistId) !== String(activePlaylistId)) return false;
         var favType = fav._type || 'vod';
         var favSection = fav._section || favType;
         if (isVodSubsection || isCustom) return favSection === section;

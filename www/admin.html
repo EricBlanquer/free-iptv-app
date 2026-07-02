@@ -64,6 +64,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             font-size: 13px;
             font-weight: 400;
+            white-space: nowrap;
         }
         th.sortable { cursor: pointer; user-select: none; }
         th.sortable:hover { color: #ccc; }
@@ -232,14 +233,15 @@
                 <button class="filter-btn" data-filter="paid">Paid</button>
                 <button class="filter-btn" data-filter="gifted">Gifted</button>
             </div>
+            <input id="device-search" type="text" placeholder="Search device ID, location, ISP, code, comment…" style="width:100%;max-width:440px;margin:0 0 16px;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
             <table>
                 <thead>
                     <tr>
                         <th class="sortable" data-sort="deviceId">Device ID<span class="arrow"></span></th>
-                        <th class="sortable" data-sort="licenseCode">License<span class="arrow"></span></th>
+                        <th class="sortable" data-sort="licenseCode">Registration<span class="arrow"></span></th>
                         <th class="sortable" data-sort="location">Location<span class="arrow"></span></th>
                         <th class="sortable" data-sort="installDate">Install Date<span class="arrow"></span></th>
-                        <th class="sortable" data-sort="licensedAt">Licensed At<span class="arrow"></span></th>
+                        <th class="sortable" data-sort="licensedAt">Registered At<span class="arrow"></span></th>
                         <th class="sortable" data-sort="lastSeen">Last Seen<span class="arrow"></span></th>
                         <th>Comment</th>
                         <th></th>
@@ -257,6 +259,7 @@
                     <tr>
                         <th>Code</th>
                         <th>Created</th>
+                        <th>Origin</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -284,6 +287,7 @@
         var sortKey = 'lastSeen';
         var sortDir = -1;
         var filterMode = 'all';
+        var searchQuery = '';
 
         function logout() {
             localStorage.removeItem('adminSecret');
@@ -360,10 +364,10 @@
 
                 var statsData = [
                     { value: totalDevices, label: 'Devices' },
-                    { value: licensedDevices, label: 'Licensed' },
+                    { value: licensedDevices, label: 'Registered' },
                     { value: paidDevices, label: 'Paid' },
                     { value: giftedDevices, label: 'Gifted' },
-                    { value: totalDevices - licensedDevices, label: 'Unlicensed' },
+                    { value: totalDevices - licensedDevices, label: 'Unregistered' },
                     { value: totalLicenses - usedLicenses, label: 'Available codes' }
                 ];
 
@@ -398,6 +402,9 @@
                     var tdCreated = document.createElement('td');
                     tdCreated.className = 'date';
                     tdCreated.textContent = formatDate(lic.createdAt);
+                    var tdOrigin = document.createElement('td');
+                    tdOrigin.style.cssText = 'color:#888;font-size:12px;';
+                    tdOrigin.textContent = lic.payerEmail ? lic.payerEmail : 'generated';
                     var tdAction = document.createElement('td');
                     var revokeBtn = document.createElement('button');
                     revokeBtn.className = 'revoke-btn';
@@ -407,6 +414,7 @@
                     tdAction.appendChild(revokeBtn);
                     tr.appendChild(tdCode);
                     tr.appendChild(tdCreated);
+                    tr.appendChild(tdOrigin);
                     tr.appendChild(tdAction);
                     unusedBody.appendChild(tr);
                 });
@@ -486,6 +494,14 @@
                 if (filterMode === 'gifted') return dev.licenseCode && !isPaid;
                 return true;
             });
+
+            if (searchQuery) {
+                sorted = sorted.filter(function(dev) {
+                    var hay = [dev.deviceId, dev.licenseCode, dev.location, dev.lastIp, dev.isp, dev.comment,
+                        dev.lastUserAgent ? parseDeviceName(dev.lastUserAgent) : ''].join(' ').toLowerCase();
+                    return hay.indexOf(searchQuery) !== -1;
+                });
+            }
 
             var headers = document.querySelectorAll('th.sortable');
             headers.forEach(function(th) {
@@ -615,6 +631,16 @@
             });
         });
 
+        (function() {
+            var searchInput = document.getElementById('device-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    searchQuery = this.value.trim().toLowerCase();
+                    renderDevices();
+                });
+            }
+        })();
+
         document.querySelectorAll('.filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 filterMode = btn.dataset.filter;
@@ -680,7 +706,7 @@
         }
 
         function revokeCode(code) {
-            showConfirm('Revoke license ' + code + '?', function() {
+            showConfirm('Revoke registration ' + code + '?', function() {
                 fetch(API_URL + '?action=license-revoke', {
                     method: 'POST',
                     headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' },
@@ -697,7 +723,7 @@
         }
 
         function licenseDevice(deviceId) {
-            showConfirm('Generate and assign a license to ' + deviceId + '?', function() {
+            showConfirm('Generate and assign a registration to ' + deviceId + '?', function() {
                 fetch(API_URL + '?action=license-generate', {
                     method: 'POST',
                     headers: { 'X-Admin-Secret': secret, 'Content-Type': 'application/json' }

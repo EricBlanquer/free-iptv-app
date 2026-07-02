@@ -1034,11 +1034,11 @@
         <!-- Support Section -->
         <div id="support-section" class="card" style="margin-top: 30px; text-align: center;">
             <h2 style="color: #ffd700; margin-bottom: 15px; border-left: none; padding-left: 0;" data-i18n="supportTitle">Support Free IPTV</h2>
-            <p style="color: #aaa; margin-bottom: 20px; line-height: 1.6;" data-i18n="supportDesc">Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation (any amount). You'll receive a license code as a thank you.</p>
+            <p style="color: #aaa; margin-bottom: 20px; line-height: 1.6; white-space: pre-line;" data-i18n="supportDesc">Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation (any amount). You'll receive a license code as a thank you.</p>
             <form id="donate-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin-bottom: 20px;">
                 <input type="hidden" name="cmd" value="_donations">
                 <input type="hidden" name="business" value="eric.blanquer@gmail.com">
-                <input type="hidden" name="item_name" value="Free IPTV - Premium License">
+                <input type="hidden" name="item_name" value="Free IPTV - Support">
                 <input type="hidden" name="currency_code" value="EUR">
                 <input type="hidden" name="notify_url" value="https://iptv.blanquer.org/premium-api.php?action=paypal-ipn">
                 <input type="hidden" name="return" value="https://iptv.blanquer.org?donated=1">
@@ -1093,7 +1093,7 @@
                         box.style.cssText = 'background:rgba(76,175,80,0.15);border:1px solid #4CAF50;border-radius:10px;padding:16px;display:inline-block;';
                         var label = document.createElement('div');
                         label.style.cssText = 'color:#4CAF50;font-size:13px;margin-bottom:6px;';
-                        label.textContent = 'Your license code:';
+                        label.textContent = t('yourCode');
                         var codeDiv = document.createElement('div');
                         codeDiv.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:28px;letter-spacing:6px;color:#fff;font-weight:700;';
                         codeDiv.textContent = latest.code;
@@ -1109,14 +1109,15 @@
                             box.appendChild(sendBtn);
                         }
                         else {
-                            hint.textContent = 'Enter this code in the app Settings > License';
+                            hint.textContent = t('enterInSettings');
                             box.appendChild(hint);
                         }
                         resultEl.appendChild(box);
                     } else {
                         var noCode = document.createElement('span');
                         noCode.style.color = '#ff9800';
-                        noCode.textContent = 'No license found for this email. Please allow a few minutes after your donation.';
+                        noCode.style.whiteSpace = 'pre-line';
+                        noCode.textContent = t('noCodeFound');
                         resultEl.appendChild(noCode);
                     }
                 })
@@ -1194,7 +1195,7 @@
                 subdlDesc: 'Sous-titres (alternative).',
                 sendConfig: 'Envoyer la configuration',
                 sendToTV: 'Envoyer à la TV',
-                licenseSentToTV: 'Licence envoyée à votre TV\u00A0!',
+                licenseSentToTV: 'Enregistrement envoyé à votre TV\u00A0!',
                 configSuccess: 'Configuration envoyée avec succès !',
                 tvWillConfigure: 'Votre TV va se configurer automatiquement.',
                 reloadIn: 'Rechargement dans {seconds}s...',
@@ -1241,16 +1242,16 @@
                 ttsPitch: 'Tonalité TTS',
                 streamProxy: 'Proxy des flux',
                 supportTitle: 'Soutenir Free IPTV',
-                supportDesc: "Free IPTV est gratuit et sans pub. Si vous appréciez l'app, soutenez son développement par un don (montant libre). Vous recevrez un code de licence en remerciement.",
+                supportDesc: "Free IPTV est gratuit et sans pub.\nSi vous appréciez l'app, soutenez son développement par un don (montant libre).\nVous recevrez un code d'enregistrement en remerciement.",
                 supportDonate: 'Faire un don via PayPal',
                 supportDonateOther: 'Autre montant',
-                supportThanks: "Après votre don, entrez votre email PayPal ci-dessous pour récupérer votre code de licence.",
-                retrieveTitle: 'Récupérer votre code de licence',
+                supportThanks: "Après votre don, entrez votre email PayPal ci-dessous pour récupérer votre code d'enregistrement.",
+                retrieveTitle: 'Récupérer votre code d\'enregistrement',
                 retrieveBtn: 'Récupérer',
                 installAndroid: 'Installer sur Android',
-                yourCode: 'Votre code de licence\u00A0:',
-                enterInSettings: "Entrez ce code dans l'app Paramètres > Licence",
-                noCodeFound: 'Aucune licence trouvée pour cet email. Veuillez patienter quelques minutes après votre don.',
+                yourCode: 'Votre code d\'enregistrement\u00A0:',
+                enterInSettings: "Entrez ce code dans l'app Paramètres > Enregistrement",
+                noCodeFound: 'Aucun enregistrement trouvé pour cet email.\nVeuillez patienter quelques minutes après votre don.',
                 advancedMode: 'Mode avancé',
                 hideAdvanced: 'Masquer le mode avancé',
                 otherSettings: 'Autres paramètres',
@@ -1293,7 +1294,7 @@
                 subdlDesc: 'Subtitles (alternative).',
                 sendConfig: 'Send configuration',
                 sendToTV: 'Send to TV',
-                licenseSentToTV: 'License sent to your TV!',
+                licenseSentToTV: 'Registration sent to your TV!',
                 configSuccess: 'Configuration sent successfully!',
                 tvWillConfigure: 'Your TV will configure automatically.',
                 reloadIn: 'Reloading in {seconds}s...',
@@ -1340,16 +1341,16 @@
                 ttsPitch: 'TTS Pitch',
                 streamProxy: 'Proxy streams',
                 supportTitle: 'Support Free IPTV',
-                supportDesc: 'Free IPTV is free and ad-free. If you enjoy the app, support its development with a donation (any amount). You\'ll receive a license code as a thank you.',
+                supportDesc: 'Free IPTV is free and ad-free.\nIf you enjoy the app, support its development with a donation (any amount).\nYou\'ll receive a registration code as a thank you.',
                 supportDonate: 'Donate via PayPal',
                 supportDonateOther: 'Other amount',
-                supportThanks: 'After your donation, enter your PayPal email below to retrieve your license code.',
-                retrieveTitle: 'Retrieve your license code',
+                supportThanks: 'After your donation, enter your PayPal email below to retrieve your registration code.',
+                retrieveTitle: 'Retrieve your registration code',
                 retrieveBtn: 'Retrieve',
                 installAndroid: 'Install on Android',
-                yourCode: 'Your license code:',
-                enterInSettings: 'Enter this code in the app Settings > License',
-                noCodeFound: 'No license found for this email. Please allow a few minutes after your donation.',
+                yourCode: 'Your registration code:',
+                enterInSettings: 'Enter this code in the app Settings > Registration',
+                noCodeFound: 'No registration found for this email.\nPlease allow a few minutes after your donation.',
                 advancedMode: 'Advanced mode',
                 hideAdvanced: 'Hide advanced mode',
                 otherSettings: 'Other settings',
@@ -1392,7 +1393,7 @@
                 subdlDesc: 'Subtítulos (alternativa).',
                 sendConfig: 'Enviar configuración',
                 sendToTV: 'Enviar a la TV',
-                licenseSentToTV: '¡Licencia enviada a tu TV!',
+                licenseSentToTV: '¡Registro enviado a tu TV!',
                 configSuccess: '¡Configuración enviada con éxito!',
                 tvWillConfigure: 'Su TV se configurará automáticamente.',
                 reloadIn: 'Recargando en {seconds}s...',
@@ -1439,16 +1440,16 @@
                 ttsPitch: 'Tono TTS',
                 streamProxy: 'Proxy de flujos',
                 supportTitle: 'Apoya Free IPTV',
-                supportDesc: 'Free IPTV es gratis y sin anuncios. Si te gusta la app, apoya su desarrollo con una donación (cualquier cantidad). Recibirás un código de licencia como agradecimiento.',
+                supportDesc: 'Free IPTV es gratis y sin anuncios.\nSi te gusta la app, apoya su desarrollo con una donación (cualquier cantidad).\nRecibirás un código de registro como agradecimiento.',
                 supportDonate: 'Donar vía PayPal',
                 supportDonateOther: 'Otro monto',
-                supportThanks: 'Después de tu donación, ingresa tu email de PayPal abajo para recuperar tu código de licencia.',
-                retrieveTitle: 'Recuperar tu código de licencia',
+                supportThanks: 'Después de tu donación, ingresa tu email de PayPal abajo para recuperar tu código de registro.',
+                retrieveTitle: 'Recuperar tu código de registro',
                 retrieveBtn: 'Recuperar',
                 installAndroid: 'Instalar en Android',
-                yourCode: 'Tu código de licencia:',
-                enterInSettings: 'Ingresa este código en la app Ajustes > Licencia',
-                noCodeFound: 'No se encontró licencia para este email. Espera unos minutos después de tu donación.'
+                yourCode: 'Tu código de registro:',
+                enterInSettings: 'Ingresa este código en la app Ajustes > Registro',
+                noCodeFound: 'No se encontró registro para este email.\nEspera unos minutos después de tu donación.'
             },
             de: {
                 tvCode: 'TV-Code',
@@ -1480,7 +1481,7 @@
                 subdlDesc: 'Untertitel (Alternative).',
                 sendConfig: 'Konfiguration senden',
                 sendToTV: 'An TV senden',
-                licenseSentToTV: 'Lizenz an Ihren TV gesendet!',
+                licenseSentToTV: 'Registrierung an Ihren TV gesendet!',
                 configSuccess: 'Konfiguration erfolgreich gesendet!',
                 tvWillConfigure: 'Ihr TV wird automatisch konfiguriert.',
                 reloadIn: 'Neuladen in {seconds}s...',
@@ -1527,16 +1528,16 @@
                 ttsPitch: 'TTS-Tonhöhe',
                 streamProxy: 'Streams proxen',
                 supportTitle: 'Free IPTV unterstützen',
-                supportDesc: 'Free IPTV ist kostenlos und werbefrei. Wenn Ihnen die App gefällt, unterstützen Sie die Entwicklung mit einer Spende (beliebiger Betrag). Sie erhalten einen Lizenzcode als Dankeschön.',
+                supportDesc: 'Free IPTV ist kostenlos und werbefrei.\nWenn Ihnen die App gefällt, unterstützen Sie die Entwicklung mit einer Spende (beliebiger Betrag).\nSie erhalten einen Registrierungscode als Dankeschön.',
                 supportDonate: 'Über PayPal spenden',
                 supportDonateOther: 'Anderer Betrag',
-                supportThanks: 'Geben Sie nach Ihrer Spende Ihre PayPal-E-Mail unten ein, um Ihren Lizenzcode abzurufen.',
-                retrieveTitle: 'Lizenzcode abrufen',
+                supportThanks: 'Geben Sie nach Ihrer Spende unten Ihre PayPal-E-Mail ein, um Ihren Registrierungscode abzurufen.',
+                retrieveTitle: 'Registrierungscode abrufen',
                 retrieveBtn: 'Abrufen',
                 installAndroid: 'Auf Android installieren',
-                yourCode: 'Ihr Lizenzcode:',
-                enterInSettings: 'Geben Sie diesen Code in der App unter Einstellungen > Lizenz ein',
-                noCodeFound: 'Keine Lizenz für diese E-Mail gefunden. Bitte warten Sie einige Minuten nach Ihrer Spende.'
+                yourCode: 'Ihr Registrierungscode:',
+                enterInSettings: 'Geben Sie diesen Code in der App unter Einstellungen > Registrierung ein',
+                noCodeFound: 'Keine Registrierung für diese E-Mail gefunden.\nBitte warten Sie einige Minuten nach Ihrer Spende.'
             },
             it: {
                 tvCode: 'Codice TV',
@@ -1568,7 +1569,7 @@
                 subdlDesc: 'Sottotitoli (alternativa).',
                 sendConfig: 'Invia configurazione',
                 sendToTV: 'Invia alla TV',
-                licenseSentToTV: 'Licenza inviata alla tua TV!',
+                licenseSentToTV: 'Registrazione inviata alla tua TV!',
                 configSuccess: 'Configurazione inviata con successo!',
                 tvWillConfigure: 'La tua TV si configurerà automaticamente.',
                 reloadIn: 'Ricaricamento tra {seconds}s...',
@@ -1615,16 +1616,16 @@
                 ttsPitch: 'Tonalità TTS',
                 streamProxy: 'Proxy dei flussi',
                 supportTitle: 'Supporta Free IPTV',
-                supportDesc: 'Free IPTV è gratuito e senza pubblicità. Se ti piace l\'app, supporta lo sviluppo con una donazione (qualsiasi importo). Riceverai un codice di licenza come ringraziamento.',
+                supportDesc: 'Free IPTV è gratuito e senza pubblicità.\nSe ti piace l\'app, supporta lo sviluppo con una donazione (qualsiasi importo).\nRiceverai un codice di registrazione come ringraziamento.',
                 supportDonate: 'Dona tramite PayPal',
                 supportDonateOther: 'Altro importo',
-                supportThanks: 'Dopo la tua donazione, inserisci la tua email PayPal qui sotto per recuperare il tuo codice di licenza.',
-                retrieveTitle: 'Recupera il tuo codice di licenza',
+                supportThanks: 'Dopo la tua donazione, inserisci la tua email PayPal qui sotto per recuperare il tuo codice di registrazione.',
+                retrieveTitle: 'Recupera il tuo codice di registrazione',
                 retrieveBtn: 'Recupera',
                 installAndroid: 'Installa su Android',
-                yourCode: 'Il tuo codice di licenza:',
-                enterInSettings: 'Inserisci questo codice nell\'app Impostazioni > Licenza',
-                noCodeFound: 'Nessuna licenza trovata per questa email. Attendi qualche minuto dopo la donazione.'
+                yourCode: 'Il tuo codice di registrazione:',
+                enterInSettings: 'Inserisci questo codice nell\'app Impostazioni > Registrazione',
+                noCodeFound: 'Nessuna registrazione trovata per questa email.\nAttendi qualche minuto dopo la donazione.'
             },
             pt: {
                 tvCode: 'Código TV',
@@ -1656,7 +1657,7 @@
                 subdlDesc: 'Legendas (alternativa).',
                 sendConfig: 'Enviar configuração',
                 sendToTV: 'Enviar para a TV',
-                licenseSentToTV: 'Licença enviada para sua TV!',
+                licenseSentToTV: 'Registo enviado para a sua TV!',
                 configSuccess: 'Configuração enviada com sucesso!',
                 tvWillConfigure: 'Sua TV será configurada automaticamente.',
                 reloadIn: 'Recarregando em {seconds}s...',
@@ -1703,16 +1704,16 @@
                 ttsPitch: 'Tom TTS',
                 streamProxy: 'Proxy de fluxos',
                 supportTitle: 'Apoie Free IPTV',
-                supportDesc: 'Free IPTV é gratuito e sem anúncios. Se você gosta do app, apoie o desenvolvimento com uma doação (qualquer valor). Você receberá um código de licença como agradecimento.',
+                supportDesc: 'Free IPTV é gratuito e sem anúncios.\nSe você gosta do app, apoie o desenvolvimento com uma doação (qualquer valor).\nVocê receberá um código de registo como agradecimento.',
                 supportDonate: 'Doar via PayPal',
                 supportDonateOther: 'Outro valor',
-                supportThanks: 'Após sua doação, insira seu email do PayPal abaixo para recuperar seu código de licença.',
-                retrieveTitle: 'Recuperar seu código de licença',
+                supportThanks: 'Após a sua doação, insira o seu email PayPal abaixo para recuperar o seu código de registo.',
+                retrieveTitle: 'Recuperar o seu código de registo',
                 retrieveBtn: 'Recuperar',
                 installAndroid: 'Instalar no Android',
-                yourCode: 'Seu código de licença:',
-                enterInSettings: 'Insira este código no app Configurações > Licença',
-                noCodeFound: 'Nenhuma licença encontrada para este email. Aguarde alguns minutos após sua doação.'
+                yourCode: 'O seu código de registo:',
+                enterInSettings: 'Insira este código na app Definições > Registo',
+                noCodeFound: 'Nenhum registo encontrado para este email.\nAguarde alguns minutos após a sua doação.'
             },
             nl: {
                 tvCode: 'TV-code',
@@ -1744,7 +1745,7 @@
                 subdlDesc: 'Ondertitels (alternatief).',
                 sendConfig: 'Configuratie verzenden',
                 sendToTV: 'Naar TV sturen',
-                licenseSentToTV: 'Licentie naar uw TV gestuurd!',
+                licenseSentToTV: 'Registratie naar je TV verzonden!',
                 configSuccess: 'Configuratie succesvol verzonden!',
                 tvWillConfigure: 'Uw TV wordt automatisch geconfigureerd.',
                 reloadIn: 'Herladen over {seconds}s...',
@@ -1791,16 +1792,16 @@
                 ttsPitch: 'TTS-toonhoogte',
                 streamProxy: 'Streams proxyen',
                 supportTitle: 'Steun Free IPTV',
-                supportDesc: 'Free IPTV is gratis en zonder advertenties. Als je de app leuk vindt, steun de ontwikkeling met een donatie (elk bedrag). Je ontvangt een licentiecode als bedankje.',
+                supportDesc: 'Free IPTV is gratis en zonder advertenties.\nAls je de app leuk vindt, steun de ontwikkeling met een donatie (elk bedrag).\nJe ontvangt een registratiecode als bedankje.',
                 supportDonate: 'Doneer via PayPal',
                 supportDonateOther: 'Ander bedrag',
-                supportThanks: 'Voer na je donatie hieronder je PayPal-e-mail in om je licentiecode op te halen.',
-                retrieveTitle: 'Licentiecode ophalen',
+                supportThanks: 'Voer na je donatie hieronder je PayPal-e-mail in om je registratiecode op te halen.',
+                retrieveTitle: 'Haal je registratiecode op',
                 retrieveBtn: 'Ophalen',
                 installAndroid: 'Installeren op Android',
-                yourCode: 'Je licentiecode:',
-                enterInSettings: 'Voer deze code in de app in bij Instellingen > Licentie',
-                noCodeFound: 'Geen licentie gevonden voor dit e-mailadres. Wacht een paar minuten na je donatie.'
+                yourCode: 'Je registratiecode:',
+                enterInSettings: 'Voer deze code in de app in bij Instellingen > Registratie',
+                noCodeFound: 'Geen registratie gevonden voor dit e-mailadres.\nWacht enkele minuten na je donatie.'
             },
             pl: {
                 tvCode: 'Kod TV',
@@ -1832,7 +1833,7 @@
                 subdlDesc: 'Napisy (alternatywa).',
                 sendConfig: 'Wyślij konfigurację',
                 sendToTV: 'Wyślij do TV',
-                licenseSentToTV: 'Licencja wysłana na Twój TV!',
+                licenseSentToTV: 'Rejestracja wysłana do Twojego TV!',
                 configSuccess: 'Konfiguracja wysłana pomyślnie!',
                 tvWillConfigure: 'Twój telewizor skonfiguruje się automatycznie.',
                 reloadIn: 'Przeładowanie za {seconds}s...',
@@ -1879,16 +1880,16 @@
                 ttsPitch: 'Ton TTS',
                 streamProxy: 'Proxy strumieni',
                 supportTitle: 'Wesprzyj Free IPTV',
-                supportDesc: 'Free IPTV jest darmowe i bez reklam. Jeśli podoba Ci się aplikacja, wesprzyj jej rozwój darowizną (dowolna kwota). Otrzymasz kod licencji w podziękowaniu.',
+                supportDesc: 'Free IPTV jest darmowe i bez reklam.\nJeśli podoba Ci się aplikacja, wesprzyj jej rozwój darowizną (dowolna kwota).\nOtrzymasz kod rejestracyjny w podziękowaniu.',
                 supportDonate: 'Wpłać przez PayPal',
                 supportDonateOther: 'Inna kwota',
-                supportThanks: 'Po dokonaniu wpłaty wpisz poniżej swój email PayPal, aby pobrać kod licencji.',
-                retrieveTitle: 'Pobierz kod licencji',
+                supportThanks: 'Po dokonaniu darowizny wpisz poniżej swój email PayPal, aby odebrać kod rejestracyjny.',
+                retrieveTitle: 'Odbierz swój kod rejestracyjny',
                 retrieveBtn: 'Pobierz',
                 installAndroid: 'Zainstaluj na Androidzie',
-                yourCode: 'Twój kod licencji:',
-                enterInSettings: 'Wpisz ten kod w aplikacji Ustawienia > Licencja',
-                noCodeFound: 'Nie znaleziono licencji dla tego emaila. Poczekaj kilka minut po dokonaniu wpłaty.'
+                yourCode: 'Twój kod rejestracyjny:',
+                enterInSettings: 'Wpisz ten kod w aplikacji Ustawienia > Rejestracja',
+                noCodeFound: 'Nie znaleziono rejestracji dla tego adresu email.\nPoczekaj kilka minut po darowiźnie.'
             },
             ru: {
                 tvCode: 'Код ТВ',
@@ -1920,7 +1921,7 @@
                 subdlDesc: 'Субтитры (альтернатива).',
                 sendConfig: 'Отправить конфигурацию',
                 sendToTV: 'Отправить на ТВ',
-                licenseSentToTV: 'Лицензия отправлена на ваш ТВ!',
+                licenseSentToTV: 'Регистрация отправлена на ваш ТВ!',
                 configSuccess: 'Конфигурация успешно отправлена!',
                 tvWillConfigure: 'Ваш ТВ настроится автоматически.',
                 reloadIn: 'Перезагрузка через {seconds}с...',
@@ -1967,16 +1968,16 @@
                 ttsPitch: 'Тон TTS',
                 streamProxy: 'Прокси потоков',
                 supportTitle: 'Поддержите Free IPTV',
-                supportDesc: 'Free IPTV бесплатно и без рекламы. Если вам нравится приложение, поддержите разработку пожертвованием (любая сумма). Вы получите код лицензии для разблокировки всех премиум функций навсегда.',
+                supportDesc: 'Free IPTV — бесплатное и без рекламы.\nЕсли вам нравится приложение, поддержите разработку пожертвованием (любая сумма).\nВы получите код регистрации в благодарность.',
                 supportDonate: 'Пожертвовать через PayPal',
                 supportDonateOther: 'Другая сумма',
-                supportThanks: 'После пожертвования введите ваш email PayPal ниже, чтобы получить код лицензии.',
-                retrieveTitle: 'Получить код лицензии',
+                supportThanks: 'После пожертвования введите ниже свой email PayPal, чтобы получить код регистрации.',
+                retrieveTitle: 'Получить код регистрации',
                 retrieveBtn: 'Получить',
                 installAndroid: 'Установить на Android',
-                yourCode: 'Ваш код лицензии:',
-                enterInSettings: 'Введите этот код в приложении Настройки > Лицензия',
-                noCodeFound: 'Лицензия для этого email не найдена. Подождите несколько минут после пожертвования.'
+                yourCode: 'Ваш код регистрации:',
+                enterInSettings: 'Введите этот код в приложении: Настройки > Регистрация',
+                noCodeFound: 'Регистрация для этого email не найдена.\nПодождите несколько минут после пожертвования.'
             },
             tr: {
                 tvCode: 'TV Kodu',
@@ -2008,7 +2009,7 @@
                 subdlDesc: 'Altyazılar (alternatif).',
                 sendConfig: 'Yapılandırmayı gönder',
                 sendToTV: 'TV\'ye gönder',
-                licenseSentToTV: 'Lisans TV\'nize gönderildi!',
+                licenseSentToTV: 'Kayıt TV\'nize gönderildi!',
                 configSuccess: 'Yapılandırma başarıyla gönderildi!',
                 tvWillConfigure: "TV'niz otomatik olarak yapılandırılacak.",
                 reloadIn: '{seconds}s içinde yeniden yükleniyor...',
@@ -2055,16 +2056,16 @@
                 ttsPitch: 'TTS Tonu',
                 streamProxy: 'Akış proxy',
                 supportTitle: 'Free IPTV\'yi Destekle',
-                supportDesc: 'Free IPTV ücretsiz ve reklamsızdır. Uygulamayı beğendiyseniz, geliştirmeyi bir bağışla destekleyin (herhangi bir miktar). Teşekkür olarak bir lisans kodu alacaksınız.',
+                supportDesc: 'Free IPTV ücretsiz ve reklamsızdır.\nUygulamayı beğendiyseniz, geliştirmeyi bir bağışla (herhangi bir tutar) destekleyin.\nTeşekkür olarak bir kayıt kodu alacaksınız.',
                 supportDonate: 'PayPal ile Bağış Yap',
                 supportDonateOther: 'Başka miktar',
-                supportThanks: 'Bağışınızdan sonra lisans kodunuzu almak için PayPal e-postanızı aşağıya girin.',
-                retrieveTitle: 'Lisans kodunuzu alın',
+                supportThanks: 'Bağışınızdan sonra, kayıt kodunuzu almak için PayPal e-postanızı aşağıya girin.',
+                retrieveTitle: 'Kayıt kodunuzu alın',
                 retrieveBtn: 'Al',
                 installAndroid: "Android'a yükle",
-                yourCode: 'Lisans kodunuz:',
-                enterInSettings: 'Bu kodu uygulamada Ayarlar > Lisans bölümüne girin',
-                noCodeFound: 'Bu e-posta için lisans bulunamadı. Bağışınızdan sonra birkaç dakika bekleyin.'
+                yourCode: 'Kayıt kodunuz:',
+                enterInSettings: 'Bu kodu uygulamada Ayarlar > Kayıt bölümüne girin',
+                noCodeFound: 'Bu e-posta için kayıt bulunamadı.\nBağışınızdan sonra lütfen birkaç dakika bekleyin.'
             },
             ar: {
                 tvCode: 'رمز التلفزيون',
@@ -2096,7 +2097,7 @@
                 subdlDesc: 'ترجمات (بديل).',
                 sendConfig: 'إرسال التكوين',
                 sendToTV: 'إرسال إلى التلفاز',
-                licenseSentToTV: 'تم إرسال الترخيص إلى تلفازك!',
+                licenseSentToTV: 'تم إرسال التسجيل إلى تلفازك!',
                 configSuccess: 'تم إرسال التكوين بنجاح!',
                 tvWillConfigure: 'سيتم تكوين التلفزيون تلقائياً.',
                 reloadIn: 'إعادة التحميل خلال {seconds} ثانية...',
@@ -2143,16 +2144,16 @@
                 ttsPitch: 'نغمة TTS',
                 streamProxy: 'وكيل البث',
                 supportTitle: 'ادعم Free IPTV',
-                supportDesc: 'Free IPTV مجاني وبدون إعلانات. إذا أعجبك التطبيق، ادعم التطوير بتبرع (أي مبلغ). ستحصل على رمز ترخيص لفتح جميع الميزات المميزة بشكل دائم.',
+                supportDesc: 'Free IPTV مجاني وبدون إعلانات.\nإذا أعجبك التطبيق، ادعم تطويره بتبرع (أي مبلغ).\nستحصل على رمز تسجيل كشكر.',
                 supportDonate: 'تبرع عبر PayPal',
                 supportDonateOther: 'مبلغ آخر',
-                supportThanks: 'بعد تبرعك، أدخل بريدك الإلكتروني في PayPal أدناه لاسترداد رمز الترخيص.',
-                retrieveTitle: 'استرداد رمز الترخيص',
+                supportThanks: 'بعد تبرعك، أدخل بريد PayPal الإلكتروني أدناه لاسترجاع رمز التسجيل.',
+                retrieveTitle: 'استرجع رمز التسجيل',
                 retrieveBtn: 'استرداد',
                 installAndroid: 'تثبيت على أندرويد',
-                yourCode: 'رمز الترخيص الخاص بك:',
-                enterInSettings: 'أدخل هذا الرمز في التطبيق الإعدادات > الترخيص',
-                noCodeFound: 'لم يتم العثور على ترخيص لهذا البريد الإلكتروني. يرجى الانتظار بضع دقائق بعد التبرع.'
+                yourCode: 'رمز التسجيل الخاص بك:',
+                enterInSettings: 'أدخل هذا الرمز في التطبيق: الإعدادات > التسجيل',
+                noCodeFound: 'لم يتم العثور على تسجيل لهذا البريد الإلكتروني.\nيرجى الانتظار بضع دقائق بعد تبرعك.'
             }
         };
 

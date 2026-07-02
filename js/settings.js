@@ -1400,7 +1400,7 @@ IPTVApp.prototype.applyRemoteConfig = function(config) {
         Premium.validateCode(config.licenseCode, function(valid) {
             if (valid) {
                 self.updatePremiumStatus();
-                self.showToast(I18n.t('premium.validationSuccess', 'License activated!'), 3000);
+                self.showToast(I18n.t('premium.validationSuccess', 'Registration activated!'), 3000);
             }
         });
     }
@@ -3414,26 +3414,31 @@ IPTVApp.prototype.updatePremiumStatus = function() {
     if (licenseDescRow) {
         licenseDescRow.style.display = isLicensed ? 'none' : '';
     }
+    var hintEl = document.getElementById('premium-status-hint');
+    var hintRow = document.getElementById('premium-status-hint-row');
     if (state === Premium.STATE_LICENSED) {
-        statusEl.textContent = I18n.t('premium.statusLicensed', 'Licensed');
+        statusEl.textContent = I18n.t('premium.statusLicensed', 'Registered');
         statusEl.style.color = '#4CAF50';
         if (licenseInput) {
             licenseInput.value = Premium.getLicenseCode() || '';
         }
-    }
-    else if (state === Premium.STATE_TRIAL) {
-        var days = Premium.getTrialDaysLeft();
-        statusEl.textContent = I18n.t('premium.statusTrial', 'Trial ({days} days left)', { days: days });
-        statusEl.style.color = '#00d4ff';
-    }
-    else if (state === Premium.STATE_GRACE) {
-        var graceDays = 60 - Math.floor((Date.now() - Premium.getInstallDate()) / 86400000);
-        statusEl.textContent = I18n.t('premium.statusGrace', 'Grace period ({days} days left)', { days: graceDays > 0 ? graceDays : 0 });
-        statusEl.style.color = '#ff9800';
+        if (hintRow) hintRow.style.display = 'none';
     }
     else {
-        statusEl.textContent = I18n.t('premium.statusExpired', 'Expired');
-        statusEl.style.color = '#ff5252';
+        statusEl.textContent = I18n.t('premium.statusUnregistered', 'Not registered');
+        statusEl.style.color = '#00d4ff';
+        if (hintRow) hintRow.style.display = '';
+        if (hintEl) {
+            if (state === Premium.STATE_EXPIRED) {
+                hintEl.textContent = I18n.t('premium.statusHintExpired', 'Aurora theme disabled and a support reminder shows at launch. All features stay free — register to re-enable Aurora.');
+            }
+            else {
+                var daysLeft = (state === Premium.STATE_TRIAL)
+                    ? Premium.getTrialDaysLeft()
+                    : Math.max(0, 60 - Math.floor((Date.now() - Premium.getInstallDate()) / 86400000));
+                hintEl.textContent = I18n.t('premium.statusHintActive', 'Aurora theme active for {days} more days, no support reminder. All features stay free.', { days: daysLeft });
+            }
+        }
     }
 };
 
@@ -3446,14 +3451,14 @@ IPTVApp.prototype.handleValidateLicense = function() {
     this.showToast(I18n.t('common.loading', 'Loading...'), 3000);
     Premium.validateCode(code, function(valid, error) {
         if (valid) {
-            self.showToast(I18n.t('premium.validationSuccess', 'License activated!'), 3000);
+            self.showToast(I18n.t('premium.validationSuccess', 'Registration activated!'), 3000);
             self.updatePremiumStatus();
         }
         else if (error === 'network') {
             self.showToast(I18n.t('premium.validationNetwork', 'Network error, try again later'), 3000, true);
         }
         else {
-            self.showToast(I18n.t('premium.validationError', 'Invalid license code'), 3000, true);
+            self.showToast(I18n.t('premium.validationError', 'Invalid registration code'), 3000, true);
         }
     });
 };
