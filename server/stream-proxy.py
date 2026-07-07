@@ -284,7 +284,7 @@ FREEBOX_TRANSFER_TIMEOUT = 3600
 
 vm_downloads = {}
 vm_download_counter = 0
-vm_download_lock = threading.Lock()
+vm_download_lock = threading.RLock()
 vm_download_queue = []
 vm_provider_limits = {}
 STATE_FILE = TEMP_DOWNLOAD_DIR / 'state.json'
@@ -576,9 +576,9 @@ def _run_download(dl_id, url, filepath, filename):
         with vm_download_lock:
             if entry['status'] == 'stopped':
                 return
-        cmd = ['curl', '-4', '-sS', '-L', '-o', str(filepath), '--', url]
+        cmd = ['curl', '-4', '-sS', '-L', '--fail', '-o', str(filepath), '--', url]
         if filepath.exists() and filepath.stat().st_size > 0:
-            cmd = ['curl', '-4', '-sS', '-L', '-C', '-', '-o', str(filepath), '--', url]
+            cmd = ['curl', '-4', '-sS', '-L', '--fail', '-C', '-', '-o', str(filepath), '--', url]
             if attempt > 0:
                 print(f'[DL] Retry {attempt}/{MAX_RETRIES}: {filename}')
             else:
@@ -607,6 +607,9 @@ def _run_download(dl_id, url, filepath, filename):
         retcode = proc.returncode
         if retcode == 0:
             break
+        if retcode == 22:
+            print(f'[DL] HTTP error from provider (curl 22), not retrying: {filename}', file=sys.stderr)
+            break
         if attempt < MAX_RETRIES:
             with vm_download_lock:
                 if entry['status'] == 'stopped':
@@ -617,8 +620,9 @@ def _run_download(dl_id, url, filepath, filename):
         final_bytes = filepath.stat().st_size
     except OSError:
         final_bytes = 0
+    download_ok = (retcode == 0 and final_bytes > 0)
     with vm_download_lock:
-        if retcode == 0:
+        if download_ok:
             has_freebox = bool(entry.get('_freebox_app_token'))
             if has_freebox:
                 entry['status'] = 'uploading'
@@ -635,8 +639,15 @@ def _run_download(dl_id, url, filepath, filename):
             entry['rx_rate'] = 0
             entry['_proc'] = None
             entry['status'] = 'error'
-            print(f'[DL] Error after {MAX_RETRIES} retries (rc={retcode}): {filename}', file=sys.stderr)
-            _save_state()
+            reason = f'rc={retcode}' if retcode != 0 else 'empty response (provider rejected, e.g. 401)'
+            print(f'[DL] Error: {filename} ({reason})', file=sys.stderr)
+    if not download_ok:
+        _save_state()
+        try:
+            if filepath.exists() and filepath.stat().st_size == 0:
+                filepath.unlink()
+        except OSError:
+            pass
             return
     _save_state()
     if retcode == 0 and has_freebox:

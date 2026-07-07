@@ -1846,7 +1846,9 @@ IPTVApp.prototype.loadFavorites = function() {
 };
 
 IPTVApp.prototype.saveFavorites = function() {
-    this._safeLocalSet('favorites', JSON.stringify(this.favorites));
+    this._safeLocalSet('favorites', JSON.stringify(this.favorites, function(key, value) {
+        return key === '_duplicateVersions' ? undefined : value;
+    }));
     this._rebuildFavoritesIndex();
     if (this._invalidateRecommendations) this._invalidateRecommendations();
 };
