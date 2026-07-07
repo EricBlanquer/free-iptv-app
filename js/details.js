@@ -837,6 +837,28 @@ IPTVApp.prototype.displayBasicMetadata = function(streamData, title) {
     }
 };
 
+IPTVApp.prototype._formatOriginCountry = function(tmdbInfo) {
+    if (!tmdbInfo) return '';
+    var entries = [];
+    if (tmdbInfo.production_countries && tmdbInfo.production_countries.length) {
+        entries = tmdbInfo.production_countries.map(function(c) {
+            return { code: c.iso_3166_1, name: c.name };
+        });
+    }
+    else if (tmdbInfo.origin_country && tmdbInfo.origin_country.length) {
+        entries = tmdbInfo.origin_country.map(function(code) {
+            return { code: code, name: '' };
+        });
+    }
+    if (!entries.length) return '';
+    var locale = (typeof I18n !== 'undefined' && I18n.getLocale) ? I18n.getLocale() : 'en';
+    return entries.slice(0, 2).map(function(entry) {
+        var flag = entry.code ? getFlag(entry.code) : '';
+        var label = (entry.code ? getCountryName(entry.code, locale) : '') || entry.name || entry.code || '';
+        return flag ? (flag + ' ' + label) : label;
+    }).join(', ');
+};
+
 IPTVApp.prototype._renderTMDBMeta = function(tmdbInfo, type, providerRating, matchText) {
     var metaEl = document.getElementById('details-meta-parts');
     if (!metaEl || !tmdbInfo) return;
@@ -850,6 +872,8 @@ IPTVApp.prototype._renderTMDBMeta = function(tmdbInfo, type, providerRating, mat
             metaParts.push(tmdbInfo.number_of_seasons + ' saison' + (tmdbInfo.number_of_seasons > 1 ? 's' : ''));
         }
     }
+    var country = this._formatOriginCountry(tmdbInfo);
+    if (country) metaParts.push(country);
     metaParts.forEach(function(part, idx) {
         if (idx > 0) metaEl.appendChild(document.createTextNode(' · '));
         metaEl.appendChild(document.createTextNode(part));
@@ -2162,6 +2186,14 @@ IPTVApp.prototype.trimTMDBResult = function(data) {
     };
     if (data.genres) {
         trimmed.genres = data.genres;
+    }
+    if (data.production_countries && data.production_countries.length) {
+        trimmed.production_countries = data.production_countries.map(function(c) {
+            return { iso_3166_1: c.iso_3166_1, name: c.name };
+        });
+    }
+    if (data.origin_country && data.origin_country.length) {
+        trimmed.origin_country = data.origin_country.slice();
     }
     if (data.credits) {
         trimmed.credits = {};
