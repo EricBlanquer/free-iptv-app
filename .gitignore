@@ -20,3 +20,4 @@ __pycache__/
 android/signing-key-private.pem
 android/app/release-keystore.jks
 android/gradle.properties
+issues/
