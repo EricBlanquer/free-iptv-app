@@ -49,6 +49,30 @@ describe('home exit is idempotent', function() {
         expect(exitCalls).toBe(1);
     });
 
+    it('routes exit to the Android bridge when present (Freebox Pop / Android TV)', function() {
+        var sandbox = loadHandlers();
+        var androidExitCalls = 0;
+        var tizenExitCalls = 0;
+        sandbox.Android = { exitApp: function() { androidExitCalls++; } };
+        sandbox.tizen = {
+            application: {
+                getCurrentApplication: function() {
+                    return { exit: function() { tizenExitCalls++; } };
+                }
+            }
+        };
+
+        var app = new sandbox.IPTVApp();
+        app.settings = { exitConfirmation: false };
+
+        var homeBack = app.backHandlers['screen:home'];
+        homeBack.call(app);
+        homeBack.call(app);
+
+        expect(androidExitCalls).toBe(1);
+        expect(tizenExitCalls).toBe(0);
+    });
+
     it('still exits once on a single back', function() {
         var sandbox = loadHandlers();
         var exitCalls = 0;

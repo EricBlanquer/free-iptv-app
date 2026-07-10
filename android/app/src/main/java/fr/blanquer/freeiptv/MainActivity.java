@@ -423,7 +423,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void exitApp() {
-            runOnUiThread(() -> moveTaskToBack(true));
+            runOnUiThread(() -> finishAndRemoveTask());
         }
 
         @JavascriptInterface
