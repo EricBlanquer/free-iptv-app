@@ -145,6 +145,8 @@
   "diagnostic": {
     "running": "Ağ tanılaması çalışıyor…",
     "clientError": "Sağlayıcı sunucusu isteği reddetti (HTTP {status}).\nURL veya kimlik bilgileri yanlış olabilir.",
+    "accountSharing": "Sağlayıcınız hesap paylaşımı tespit etti ve bu aboneliği geçici olarak engelledi (çok fazla eşzamanlı bağlantı veya ülke).\nBu sağlayıcı için tek bir ağ rotası kullanın veya bayinizle iletişime geçin.",
+    "stepBlocked": "Engellendi",
     "close": "Kapat",
     "dnsFailure": "{host} için DNS çözümlemesi başarısız.\nYönlendiricinizde DNS'i 1.1.1.1 veya 8.8.8.8 olarak ayarlayın.",
     "endpointSlow": "Sağlayıcıya erişilebiliyor ancak bu endpoint zaman aşımına uğradı.\nSunucu aşırı yüklü olabilir, daha sonra tekrar deneyin.",

@@ -148,6 +148,8 @@
   "diagnostic": {
     "running": "Diagnostic réseau en cours…",
     "clientError": "Le serveur du fournisseur a rejeté la requête (HTTP {status}).\nL'URL ou les identifiants sont peut-être incorrects.",
+    "accountSharing": "Votre fournisseur a détecté un partage de compte et a temporairement bloqué cet abonnement (trop de connexions ou de pays simultanés).\nUtilisez une seule route réseau pour ce fournisseur, ou contactez votre revendeur.",
+    "stepBlocked": "Bloqué",
     "close": "Fermer",
     "dnsFailure": "Échec de la résolution DNS pour {host}.\nEssayez de configurer vos DNS sur 1.1.1.1 ou 8.8.8.8 dans votre box.",
     "endpointSlow": "Le fournisseur est joignable mais cet endpoint a expiré.\nLe serveur est peut-être surchargé, réessayez plus tard.",

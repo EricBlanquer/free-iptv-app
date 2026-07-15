@@ -1129,6 +1129,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "جارٍ تشغيل تشخيص الشبكة…",
                             "clientError": "رفض خادم المزود الطلب (HTTP {status}).\nقد يكون عنوان URL أو بيانات الاعتماد غير صحيحة.",
+                            "accountSharing": "اكتشف مزودك مشاركة الحساب وحظر هذا الاشتراك مؤقتًا (عدد كبير جدًا من الاتصالات أو البلدان المتزامنة).\nاستخدم مسار شبكة واحدًا لهذا المزود أو اتصل بالبائع.",
+                            "stepBlocked": "محظور",
                             "close": "إغلاق",
                             "dnsFailure": "فشل تحليل DNS لـ {host}.\nاضبط DNS على 1.1.1.1 أو 8.8.8.8 في جهاز التوجيه الخاص بك.",
                             "endpointSlow": "المزود متاح لكن هذه النقطة انتهت مهلتها.\nقد يكون الخادم محملاً، حاول لاحقًا.",
@@ -1745,6 +1747,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Netzwerkdiagnose läuft…",
                             "clientError": "Der Anbieterserver hat die Anfrage abgelehnt (HTTP {status}).\nURL oder Anmeldeinformationen sind möglicherweise falsch.",
+                            "accountSharing": "Ihr Anbieter hat Kontoteilung erkannt und dieses Abonnement vorübergehend gesperrt (zu viele gleichzeitige Verbindungen oder Länder).\nVerwenden Sie eine einzige Netzwerkroute für diesen Anbieter oder wenden Sie sich an Ihren Händler.",
+                            "stepBlocked": "Blockiert",
                             "close": "Schließen",
                             "dnsFailure": "DNS-Auflösung für {host} fehlgeschlagen.\nStellen Sie Ihre DNS auf 1.1.1.1 oder 8.8.8.8 in Ihrem Router ein.",
                             "endpointSlow": "Der Anbieter ist erreichbar, aber dieser Endpunkt ist abgelaufen.\nDer Server ist möglicherweise überlastet, versuchen Sie es später erneut.",
@@ -2361,6 +2365,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Running network diagnostic…",
                             "clientError": "The provider server rejected the request (HTTP {status}).\nThe URL or credentials may be incorrect.",
+                            "accountSharing": "Your provider detected account sharing and temporarily blocked this subscription (too many simultaneous connections or countries).\nUse a single network route for this provider, or contact your reseller.",
+                            "stepBlocked": "Blocked",
                             "close": "Close",
                             "dnsFailure": "DNS resolution failed for {host}.\nTry setting your DNS to 1.1.1.1 or 8.8.8.8 on your router.",
                             "endpointSlow": "The provider is reachable but this specific endpoint timed out.\nThe provider may be overloaded, try again later.",
@@ -2977,6 +2983,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Ejecutando diagnóstico de red…",
                             "clientError": "El servidor del proveedor rechazó la solicitud (HTTP {status}).\nLa URL o las credenciales pueden ser incorrectas.",
+                            "accountSharing": "Tu proveedor detectó uso compartido de la cuenta y bloqueó temporalmente esta suscripción (demasiadas conexiones o países simultáneos).\nUsa una única ruta de red para este proveedor o contacta con tu revendedor.",
+                            "stepBlocked": "Bloqueado",
                             "close": "Cerrar",
                             "dnsFailure": "Falló la resolución DNS para {host}.\nIntente configurar sus DNS en 1.1.1.1 o 8.8.8.8 en su router.",
                             "endpointSlow": "El proveedor es accesible pero este endpoint expiró.\nEl servidor puede estar sobrecargado, intente más tarde.",
@@ -3593,6 +3601,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Diagnostic réseau en cours…",
                             "clientError": "Le serveur du fournisseur a rejeté la requête (HTTP {status}).\nL'URL ou les identifiants sont peut-être incorrects.",
+                            "accountSharing": "Votre fournisseur a détecté un partage de compte et a temporairement bloqué cet abonnement (trop de connexions ou de pays simultanés).\nUtilisez une seule route réseau pour ce fournisseur, ou contactez votre revendeur.",
+                            "stepBlocked": "Bloqué",
                             "close": "Fermer",
                             "dnsFailure": "Échec de la résolution DNS pour {host}.\nEssayez de configurer vos DNS sur 1.1.1.1 ou 8.8.8.8 dans votre box.",
                             "endpointSlow": "Le fournisseur est joignable mais cet endpoint a expiré.\nLe serveur est peut-être surchargé, réessayez plus tard.",
@@ -4209,6 +4219,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Diagnostica di rete in corso…",
                             "clientError": "Il server del provider ha rifiutato la richiesta (HTTP {status}).\nL'URL o le credenziali potrebbero essere errati.",
+                            "accountSharing": "Il tuo provider ha rilevato la condivisione dell'account e ha bloccato temporaneamente questo abbonamento (troppe connessioni o paesi simultanei).\nUsa un'unica rotta di rete per questo provider o contatta il tuo rivenditore.",
+                            "stepBlocked": "Bloccato",
                             "close": "Chiudi",
                             "dnsFailure": "Risoluzione DNS fallita per {host}.\nImposta i DNS su 1.1.1.1 o 8.8.8.8 nel router.",
                             "endpointSlow": "Il provider è raggiungibile ma questo endpoint è scaduto.\nIl server potrebbe essere sovraccarico, riprova più tardi.",
@@ -4825,6 +4837,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Netwerkdiagnose wordt uitgevoerd…",
                             "clientError": "De provider-server heeft het verzoek afgewezen (HTTP {status}).\nDe URL of inloggegevens zijn mogelijk onjuist.",
+                            "accountSharing": "Je provider heeft het delen van accounts gedetecteerd en dit abonnement tijdelijk geblokkeerd (te veel gelijktijdige verbindingen of landen).\nGebruik één netwerkroute voor deze provider of neem contact op met je verkoper.",
+                            "stepBlocked": "Geblokkeerd",
                             "close": "Sluiten",
                             "dnsFailure": "DNS-resolutie voor {host} mislukt.\nStel uw DNS in op 1.1.1.1 of 8.8.8.8 in uw router.",
                             "endpointSlow": "De provider is bereikbaar maar dit endpoint is verlopen.\nDe server is mogelijk overbelast, probeer het later opnieuw.",
@@ -5441,6 +5455,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Trwa diagnostyka sieci…",
                             "clientError": "Serwer dostawcy odrzucił żądanie (HTTP {status}).\nURL lub dane logowania mogą być nieprawidłowe.",
+                            "accountSharing": "Twój dostawca wykrył udostępnianie konta i tymczasowo zablokował tę subskrypcję (zbyt wiele jednoczesnych połączeń lub krajów).\nUżyj jednej trasy sieciowej dla tego dostawcy lub skontaktuj się ze sprzedawcą.",
+                            "stepBlocked": "Zablokowane",
                             "close": "Zamknij",
                             "dnsFailure": "Nie udało się rozpoznać DNS dla {host}.\nUstaw DNS na 1.1.1.1 lub 8.8.8.8 w swoim routerze.",
                             "endpointSlow": "Dostawca jest dostępny, ale ten endpoint wygasł.\nSerwer może być przeciążony, spróbuj później.",
@@ -6057,6 +6073,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Executando diagnóstico de rede…",
                             "clientError": "O servidor do provedor rejeitou a solicitação (HTTP {status}).\nA URL ou credenciais podem estar incorretas.",
+                            "accountSharing": "O seu fornecedor detetou partilha de conta e bloqueou temporariamente esta subscrição (demasiadas ligações ou países em simultâneo).\nUse uma única rota de rede para este fornecedor ou contacte o seu revendedor.",
+                            "stepBlocked": "Bloqueado",
                             "close": "Fechar",
                             "dnsFailure": "Falha na resolução DNS para {host}.\nConfigure seus DNS para 1.1.1.1 ou 8.8.8.8 no seu roteador.",
                             "endpointSlow": "O provedor está acessível mas este endpoint expirou.\nO servidor pode estar sobrecarregado, tente mais tarde.",
@@ -6673,6 +6691,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Выполняется диагностика сети…",
                             "clientError": "Сервер провайдера отклонил запрос (HTTP {status}).\nURL или учётные данные могут быть неверными.",
+                            "accountSharing": "Ваш провайдер обнаружил совместное использование учётной записи и временно заблокировал эту подписку (слишком много одновременных подключений или стран).\nИспользуйте один сетевой маршрут для этого провайдера или обратитесь к продавцу.",
+                            "stepBlocked": "Заблокировано",
                             "close": "Закрыть",
                             "dnsFailure": "Не удалось разрешить DNS для {host}.\nУстановите DNS на 1.1.1.1 или 8.8.8.8 в вашем роутере.",
                             "endpointSlow": "Провайдер доступен, но этот эндпоинт истёк.\nСервер может быть перегружен, попробуйте позже.",
@@ -7289,6 +7309,8 @@ var I18nData = {
                     "diagnostic": {
                             "running": "Ağ tanılaması çalışıyor…",
                             "clientError": "Sağlayıcı sunucusu isteği reddetti (HTTP {status}).\nURL veya kimlik bilgileri yanlış olabilir.",
+                            "accountSharing": "Sağlayıcınız hesap paylaşımı tespit etti ve bu aboneliği geçici olarak engelledi (çok fazla eşzamanlı bağlantı veya ülke).\nBu sağlayıcı için tek bir ağ rotası kullanın veya bayinizle iletişime geçin.",
+                            "stepBlocked": "Engellendi",
                             "close": "Kapat",
                             "dnsFailure": "{host} için DNS çözümlemesi başarısız.\nYönlendiricinizde DNS'i 1.1.1.1 veya 8.8.8.8 olarak ayarlayın.",
                             "endpointSlow": "Sağlayıcıya erişilebiliyor ancak bu endpoint zaman aşımına uğradı.\nSunucu aşırı yüklü olabilir, daha sonra tekrar deneyin.",

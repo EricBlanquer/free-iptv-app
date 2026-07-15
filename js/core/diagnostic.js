@@ -166,6 +166,15 @@
             result.details.providerStatus = parseInt(httpStatusMatch[1], 10);
         }
 
+        if (ctx.blockReason) {
+            result.details.blockReason = ctx.blockReason;
+            if (/account[_ ]?shar/i.test(ctx.blockReason)) {
+                result.problem = 'account_sharing';
+                result.severity = 'error';
+                return Promise.resolve(result);
+            }
+        }
+
         if (ctx.errorType === 'invalid_credentials' || ctx.errorType === 'http_401' || ctx.errorType === 'http_403') {
             result.problem = 'invalid_credentials';
             result.autoFix = buildEditPlaylistFix(ctx.app);
@@ -339,6 +348,8 @@
                 return t('diagnostic.serverError', 'The provider server returned an error (HTTP {status}). The server is overloaded or malfunctioning. Try again later.', { status: details.providerStatus || '?' });
             case 'client_error':
                 return t('diagnostic.clientError', 'The provider server rejected the request (HTTP {status}). The URL or credentials may be incorrect.', { status: details.providerStatus || '?' });
+            case 'account_sharing':
+                return t('diagnostic.accountSharing', 'Your provider detected account sharing and temporarily blocked this subscription (too many simultaneous connections or countries). Use a single network route for this provider, or contact your reseller.');
             case 'server_unreachable':
                 return t('diagnostic.serverUnreachable', 'The provider server is unreachable. Your ISP may be blocking it, or the server is down. A VPN may help.');
             case 'invalid_url':
@@ -362,6 +373,10 @@
         if (d.providerStatus) {
             var statusIcon = d.providerStatus >= 200 && d.providerStatus < 400 ? '✅ ' : '❌ ';
             items.push(statusIcon + I18n.t('diagnostic.stepProvider', 'Provider') + ' HTTP ' + d.providerStatus);
+        }
+        if (d.blockReason) {
+            var blockedSep = (I18n.getLocale && I18n.getLocale() === 'fr') ? ' : ' : ': ';
+            items.push('❌ ' + I18n.t('diagnostic.stepBlocked', 'Blocked') + blockedSep + d.blockReason);
         }
         if (d.internet) {
             items.push((d.internet.ok ? '✅ ' : '❌ ') + I18n.t('diagnostic.stepInternet', 'Internet'));
@@ -392,7 +407,7 @@
      * Run diagnostic for the active provider and display the result modal.
      * Called from provider fetchWithRetry when all retries exhaust.
      */
-    function runAndShow(app, url, errorType, srcApi) {
+    function runAndShow(app, url, errorType, srcApi, extra) {
         // A diagnostic stays "in progress" until the user closes its modal, then a
         // cooldown follows: a down provider fails many requests in a row, and each
         // one must NOT stack a fresh modal on top of the one already shown.
@@ -421,7 +436,8 @@
             proxyUrl: app.settings.proxyUrl || '',
             hasProxy: hasProxy,
             app: app,
-            errorType: errorType || 'timeout'
+            errorType: errorType || 'timeout',
+            blockReason: (extra && extra.blockReason) || null
         };
         window.log('DIAG start target=' + target + ' hasProxy=' + ctx.hasProxy + ' errorType=' + ctx.errorType);
         // Land the user on the navigable home screen instead of a blank screen

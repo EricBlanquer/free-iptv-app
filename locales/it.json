@@ -141,6 +141,8 @@
   "diagnostic": {
     "running": "Diagnostica di rete in corso…",
     "clientError": "Il server del provider ha rifiutato la richiesta (HTTP {status}).\nL'URL o le credenziali potrebbero essere errati.",
+    "accountSharing": "Il tuo provider ha rilevato la condivisione dell'account e ha bloccato temporaneamente questo abbonamento (troppe connessioni o paesi simultanei).\nUsa un'unica rotta di rete per questo provider o contatta il tuo rivenditore.",
+    "stepBlocked": "Bloccato",
     "close": "Chiudi",
     "dnsFailure": "Risoluzione DNS fallita per {host}.\nImposta i DNS su 1.1.1.1 o 8.8.8.8 nel router.",
     "endpointSlow": "Il provider è raggiungibile ma questo endpoint è scaduto.\nIl server potrebbe essere sovraccarico, riprova più tardi.",

@@ -144,6 +144,8 @@
   "diagnostic": {
     "running": "Netzwerkdiagnose läuft…",
     "clientError": "Der Anbieterserver hat die Anfrage abgelehnt (HTTP {status}).\nURL oder Anmeldeinformationen sind möglicherweise falsch.",
+    "accountSharing": "Ihr Anbieter hat Kontoteilung erkannt und dieses Abonnement vorübergehend gesperrt (zu viele gleichzeitige Verbindungen oder Länder).\nVerwenden Sie eine einzige Netzwerkroute für diesen Anbieter oder wenden Sie sich an Ihren Händler.",
+    "stepBlocked": "Blockiert",
     "close": "Schließen",
     "dnsFailure": "DNS-Auflösung für {host} fehlgeschlagen.\nStellen Sie Ihre DNS auf 1.1.1.1 oder 8.8.8.8 in Ihrem Router ein.",
     "endpointSlow": "Der Anbieter ist erreichbar, aber dieser Endpunkt ist abgelaufen.\nDer Server ist möglicherweise überlastet, versuchen Sie es später erneut.",

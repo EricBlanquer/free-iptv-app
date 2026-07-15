@@ -8,6 +8,35 @@ class ProviderAPI {
         return url.replace(/password=[^&]+/g, 'password=***');
     }
 
+    /**
+     * Extract a provider "block" reason from a non-ok response.
+     * Xtream firewalls (e.g. account_sharing) return the cause in an
+     * X-Firewall-Reason header AND a JSON body {"reason":"..."}. The header
+     * is not relayed by the VM proxy, so the JSON body is the reliable source.
+     * @param {Response} response - the non-ok fetch response
+     * @returns {Promise<string|null>} the block reason, or null if none
+     */
+    static async extractBlockReason(response) {
+        var reason = null;
+        try {
+            if (response.headers && response.headers.get) {
+                reason = response.headers.get('X-Firewall-Reason') || null;
+            }
+        }
+        catch (ex) { /* headers unavailable */ }
+        try {
+            var text = await response.text();
+            if (text) {
+                var data = JSON.parse(text);
+                if (data && typeof data.reason === 'string' && data.reason) {
+                    reason = data.reason;
+                }
+            }
+        }
+        catch (ex) { /* body missing or not JSON */ }
+        return reason;
+    }
+
     constructor(server, username, password, proxyUrl) {
         this.server = server.replace(Regex.trailingSlash, '');
         this.username = username;
@@ -65,7 +94,13 @@ class ProviderAPI {
                 }
                 window.log(logMsg);
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    var httpError = new Error(`HTTP ${response.status}`);
+                    httpError.httpStatus = response.status;
+                    httpError.blockReason = await ProviderAPI.extractBlockReason(response);
+                    if (httpError.blockReason) {
+                        window.log('BLOCKED', 'HTTP ' + response.status + ' reason=' + httpError.blockReason + ' ' + ProviderAPI.redactUrl(url));
+                    }
+                    throw httpError;
                 }
                 return response;
             }
@@ -77,7 +112,7 @@ class ProviderAPI {
                         var errorType = 'timeout';
                         var httpMatch = (error.message || '').match(/^HTTP (\d+)$/);
                         if (httpMatch) errorType = 'http_' + httpMatch[1];
-                        try { window.NetworkDiagnostic.runAndShow(window.app, url, errorType, this); }
+                        try { window.NetworkDiagnostic.runAndShow(window.app, url, errorType, this, { blockReason: error.blockReason }); }
                         catch (ex) { window.log('ERROR', 'DIAG launch: ' + (ex.message || ex)); }
                     }
                     throw error;

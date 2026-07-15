@@ -152,6 +152,8 @@
   "diagnostic": {
     "running": "Executando diagnóstico de rede…",
     "clientError": "O servidor do provedor rejeitou a solicitação (HTTP {status}).\nA URL ou credenciais podem estar incorretas.",
+    "accountSharing": "O seu fornecedor detetou partilha de conta e bloqueou temporariamente esta subscrição (demasiadas ligações ou países em simultâneo).\nUse uma única rota de rede para este fornecedor ou contacte o seu revendedor.",
+    "stepBlocked": "Bloqueado",
     "close": "Fechar",
     "dnsFailure": "Falha na resolução DNS para {host}.\nConfigure seus DNS para 1.1.1.1 ou 8.8.8.8 no seu roteador.",
     "endpointSlow": "O provedor está acessível mas este endpoint expirou.\nO servidor pode estar sobrecarregado, tente mais tarde.",

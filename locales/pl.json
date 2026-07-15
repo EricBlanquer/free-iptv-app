@@ -146,6 +146,8 @@
   "diagnostic": {
     "running": "Trwa diagnostyka sieci…",
     "clientError": "Serwer dostawcy odrzucił żądanie (HTTP {status}).\nURL lub dane logowania mogą być nieprawidłowe.",
+    "accountSharing": "Twój dostawca wykrył udostępnianie konta i tymczasowo zablokował tę subskrypcję (zbyt wiele jednoczesnych połączeń lub krajów).\nUżyj jednej trasy sieciowej dla tego dostawcy lub skontaktuj się ze sprzedawcą.",
+    "stepBlocked": "Zablokowane",
     "close": "Zamknij",
     "dnsFailure": "Nie udało się rozpoznać DNS dla {host}.\nUstaw DNS na 1.1.1.1 lub 8.8.8.8 w swoim routerze.",
     "endpointSlow": "Dostawca jest dostępny, ale ten endpoint wygasł.\nSerwer może być przeciążony, spróbuj później.",
