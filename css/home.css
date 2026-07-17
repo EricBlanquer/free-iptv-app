@@ -572,6 +572,74 @@ body[data-home-theme="aurora"] #loading {
     transform: scale(1.05);
 }
 
+/* Aurora theme: provider tabs share the tiles' glass material */
+#home-screen[data-home-theme="aurora"] .playlist-tab {
+    position: relative;
+    padding: 10px 28px;
+    margin: 0 8px;
+    border-radius: 8px;
+    border: 2px solid rgba(143, 179, 255, 0.4);
+    background: linear-gradient(180deg, rgba(10, 16, 32, 0.72) 0%, rgba(4, 7, 16, 0.88) 100%);
+    box-shadow:
+        0 0 0 1px rgba(2, 7, 18, 0.68),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+        inset 1px 0 0 rgba(255, 255, 255, 0.04),
+        inset -1px 0 0 rgba(0, 0, 0, 0.22);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.2s;
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab .playlist-name {
+    color: rgba(244, 247, 255, 0.72);
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+    -webkit-font-smoothing: antialiased;
+    transition: color 0.2s;
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab.active {
+    border-color: rgba(0, 212, 255, 0.9);
+    background: linear-gradient(180deg, rgba(0, 74, 100, 0.46) 0%, rgba(2, 26, 40, 0.88) 100%);
+    box-shadow:
+        0 0 16px 2px rgba(0, 212, 255, 0.35),
+        0 0 0 1px rgba(2, 7, 18, 0.68),
+        inset 0 1px 0 rgba(170, 238, 255, 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab.active .playlist-name {
+    color: #f4f7ff;
+    text-shadow: 0 0 12px rgba(0, 212, 255, 0.55), 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab:focus,
+#home-screen[data-home-theme="aurora"] .playlist-tab.focused {
+    outline: none;
+    border-color: #ffffff;
+    transform: scale(1.08);
+    z-index: 5;
+    box-shadow:
+        0 0 0 3px #ffffff,
+        0 0 22px 5px rgba(255, 255, 255, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab:focus .playlist-name,
+#home-screen[data-home-theme="aurora"] .playlist-tab.focused .playlist-name {
+    color: #ffffff;
+}
+
+#home-screen[data-home-theme="aurora"] .playlist-tab.active:focus,
+#home-screen[data-home-theme="aurora"] .playlist-tab.active.focused {
+    border-color: #ffffff;
+    box-shadow:
+        0 0 0 3px #ffffff,
+        0 0 26px 7px rgba(0, 212, 255, 0.55),
+        inset 0 1px 0 rgba(170, 238, 255, 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
 
 #home-provider-age {
     position: absolute;
