@@ -134,6 +134,7 @@
     "director": "Режиссёр",
     "episode": "Эпизод",
     "filmography": "Фильмография",
+    "lifespan": "{birth}-{death} ({count} лет)",
     "noBiography": "Биография недоступна",
     "noDescription": "Описание недоступно",
     "rateHint": "Нажмите 0-9 для прямой оценки",

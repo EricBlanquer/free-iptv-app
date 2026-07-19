@@ -136,6 +136,7 @@
     "director": "المخرج",
     "episode": "الحلقة",
     "filmography": "الأعمال السينمائية",
+    "lifespan": "{birth}-{death} ({count} سنة)",
     "noBiography": "لا توجد سيرة ذاتية",
     "noDescription": "لا يوجد وصف",
     "rateHint": "اضغط 0-9 للتقييم المباشر",

@@ -131,6 +131,7 @@
     "director": "Yönetmen",
     "episode": "Bölüm",
     "filmography": "Filmografi",
+    "lifespan": "{birth}-{death} ({count} yıl)",
     "noBiography": "Biyografi yok",
     "noDescription": "Açıklama yok",
     "rateHint": "Doğrudan puanlamak için 0-9’a bas",

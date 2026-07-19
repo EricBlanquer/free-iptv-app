@@ -134,6 +134,7 @@
     "director": "Réalisateur",
     "episode": "Épisode",
     "filmography": "Filmographie",
+    "lifespan": "{birth}-{death} ({count} ans)",
     "noBiography": "Biographie non disponible",
     "noDescription": "Description non disponible",
     "rateHint": "Appuyez 0-9 pour noter directement",

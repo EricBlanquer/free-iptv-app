@@ -129,6 +129,7 @@
     "director": "Regisseur",
     "episode": "Aflevering",
     "filmography": "Filmografie",
+    "lifespan": "{birth}-{death} ({count} jaar)",
     "noBiography": "Geen biografie beschikbaar",
     "noDescription": "Geen beschrijving beschikbaar",
     "rateHint": "Druk 0-9 om direct te beoordelen",

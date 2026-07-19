@@ -2789,6 +2789,50 @@ IPTVApp.prototype.updateMarkWatchedButton = function() {
         : I18n.t('player.markWatched', 'Mark as watched');
 };
 
+IPTVApp.prototype._cleanBiography = function(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/\s*\[\s*(?:\d+|notes?\s*\d*|nb\s*\d*|réf[^\]]*|ref[^\]]*|citation needed)\s*\]/gi, '')
+        .replace(/\s*Description above from the Wikipedia article[\s\S]*$/i, '')
+        .replace(/\*/g, '')
+        .replace(/[ \t]{2,}/g, ' ')
+        .replace(/[ \t]+([.,])/g, '$1')
+        .trim();
+};
+
+IPTVApp.prototype._parseIsoDate = function(value) {
+    if (!value) return null;
+    var parts = String(value).split('-');
+    if (parts.length < 3) return null;
+    var year = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10);
+    var day = parseInt(parts[2], 10);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+    return new Date(year, month - 1, day);
+};
+
+IPTVApp.prototype._formatPersonAge = function(person, today) {
+    if (!person) return '';
+    var birth = this._parseIsoDate(person.birthday);
+    if (!birth) return '';
+    var death = this._parseIsoDate(person.deathday);
+    var end = death || today || new Date();
+    var age = end.getFullYear() - birth.getFullYear();
+    var monthDiff = end.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && end.getDate() < birth.getDate())) {
+        age--;
+    }
+    if (age < 0) return '';
+    if (death) {
+        return I18n.t('details.lifespan', birth.getFullYear() + '-' + death.getFullYear() + ' (' + age + ' years)', {
+            birth: birth.getFullYear(),
+            death: death.getFullYear(),
+            count: age
+        });
+    }
+    return I18n.t('details.age', age + ' years old', { count: age });
+};
+
 // Actor screen
 IPTVApp.prototype.showActor = function(actorId) {
     window.log('ACTION showActor: ' + actorId);
@@ -2819,17 +2863,17 @@ IPTVApp.prototype.showActor = function(actorId) {
                 photoUrl ? 'url("' + photoUrl + '")' : '';
             document.getElementById('actor-name').textContent = person.name || '';
             var meta = [];
-            if (person.birthday) {
-                var age = new Date().getFullYear() - parseInt(person.birthday.substring(0, 4));
-                meta.push(I18n.t('details.age', age + ' years old', { count: age }));
+            var ageText = self._formatPersonAge(person);
+            if (ageText) {
+                meta.push(ageText);
             }
             if (person.place_of_birth) {
                 meta.push(person.place_of_birth);
             }
             document.getElementById('actor-meta').textContent = meta.join(' · ');
-            var bioText = person.biography || I18n.t('details.noBiography', 'No biography');
-            document.getElementById('actor-bio').textContent = bioText.replace(/\*/g, '');
-            if (person.biography) self.showTTSTooltip('actor-bio');
+            var bio = self._cleanBiography(person.biography);
+            document.getElementById('actor-bio').textContent = bio || I18n.t('details.noBiography', 'No biography');
+            if (bio) self.showTTSTooltip('actor-bio');
             self.renderFilmography(person.combined_credits);
         }
     });

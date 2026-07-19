@@ -138,6 +138,7 @@
     "director": "Diretor",
     "episode": "Episódio",
     "filmography": "Filmografia",
+    "lifespan": "{birth}-{death} ({count} anos)",
     "noBiography": "Biografia não disponível",
     "noDescription": "Descrição não disponível",
     "rateHint": "Prima 0-9 para avaliar diretamente",

@@ -127,6 +127,7 @@
     "director": "Regista",
     "episode": "Episodio",
     "filmography": "Filmografia",
+    "lifespan": "{birth}-{death} ({count} anni)",
     "noBiography": "Biografia non disponibile",
     "noDescription": "Descrizione non disponibile",
     "rateHint": "Premi 0-9 per votare direttamente",
