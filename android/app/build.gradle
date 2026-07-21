@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'fr.blanquer.freeiptv'
-    compileSdk 35
+    compileSdk 36
 
     signingConfigs {
         release {
@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId 'fr.blanquer.freeiptv'
         minSdk 21
-        targetSdk 35
+        targetSdk 36
         // Minutes since 2025-01-01 - always increasing at each build
         versionCode((int) ((System.currentTimeMillis() / 1000 - 1735689600) / 60))
         def configXml = new File(rootProject.rootDir.parentFile, 'config.xml')
