@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Rode o dispositivo para o modo paisagem"
+  },
   "app": {
     "exitMessage": "Deseja sair do aplicativo?",
     "exitTitle": "Sair",
@@ -131,14 +134,14 @@
     "Writing": "Roteiro"
   },
   "details": {
-    "age": "{count} anos",
+    "born": "{birth} ({count} anos)",
     "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
     "creator": "Criador",
     "defaultVersion": "Padrão",
     "director": "Diretor",
     "episode": "Episódio",
     "filmography": "Filmografia",
-    "lifespan": "{birth}-{death} ({count} anos)",
+    "lifespan": "{birth} - {death} ({count} anos)",
     "noBiography": "Biografia não disponível",
     "noDescription": "Descrição não disponível",
     "rateHint": "Prima 0-9 para avaliar diretamente",

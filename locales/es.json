@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Gira tu dispositivo al modo horizontal"
+  },
   "app": {
     "exitMessage": "¿Quieres salir de la aplicación?",
     "exitTitle": "Salir",
@@ -129,14 +132,14 @@
     "Writing": "Guion"
   },
   "details": {
-    "age": "{count} años",
+    "born": "{birth} ({count} años)",
     "configureTMDB": "Configure su clave API de TMDB en ajustes para mostrar descripciones.",
     "creator": "Creador",
     "defaultVersion": "Predeterminado",
     "director": "Director",
     "episode": "Episodio",
     "filmography": "Filmografía",
-    "lifespan": "{birth}-{death} ({count} años)",
+    "lifespan": "{birth} - {death} ({count} años)",
     "noBiography": "Biografía no disponible",
     "noDescription": "Descripción no disponible",
     "rateHint": "Pulsa 0-9 para valorar directamente",

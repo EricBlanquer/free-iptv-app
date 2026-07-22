@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Veuillez tourner votre appareil en mode paysage"
+  },
   "app": {
     "exitMessage": "Voulez-vous quitter l'application ?",
     "exitTitle": "Quitter",
@@ -127,14 +130,14 @@
     "Writing": "Scénario"
   },
   "details": {
-    "age": "{count} ans",
+    "born": "{birth} ({count} ans)",
     "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
     "creator": "Créateur",
     "defaultVersion": "Défaut",
     "director": "Réalisateur",
     "episode": "Épisode",
     "filmography": "Filmographie",
-    "lifespan": "{birth}-{death} ({count} ans)",
+    "lifespan": "{birth} - {death} ({count} ans)",
     "noBiography": "Biographie non disponible",
     "noDescription": "Description non disponible",
     "rateHint": "Appuyez 0-9 pour noter directement",

@@ -14,6 +14,16 @@
     <link rel="stylesheet" href="css/material-symbols.css">
 </head>
 <body>
+    <div id="rotate-overlay">
+        <span class="material-symbols-outlined" id="rotate-overlay-icon">screen_rotation</span>
+        <div id="rotate-overlay-text" data-i18n="orientation.rotateDevice">Please rotate your device to landscape</div>
+    </div>
+    <script>
+        window.__setDeviceOrientation = function(orientation) {
+            var overlay = document.getElementById('rotate-overlay');
+            if (overlay) overlay.classList.toggle('show', orientation === 'portrait');
+        };
+    </script>
     <!-- Home Screen - 4 big buttons -->
     <div id="home-screen" class="screen active">
         <div id="home-license-banner" class="hidden" data-i18n="home.licenseExpired">License expired</div>

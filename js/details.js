@@ -2823,14 +2823,18 @@ IPTVApp.prototype._formatPersonAge = function(person, today) {
         age--;
     }
     if (age < 0) return '';
+    var birthText = this.formatLocalDate(person.birthday);
     if (death) {
-        return I18n.t('details.lifespan', birth.getFullYear() + '-' + death.getFullYear() + ' (' + age + ' years)', {
-            birth: birth.getFullYear(),
-            death: death.getFullYear(),
+        return I18n.t('details.lifespan', birthText + ' - ' + this.formatLocalDate(person.deathday) + ' (' + age + ' years)', {
+            birth: birthText,
+            death: this.formatLocalDate(person.deathday),
             count: age
         });
     }
-    return I18n.t('details.age', age + ' years old', { count: age });
+    return I18n.t('details.born', birthText + ' (' + age + ' years old)', {
+        birth: birthText,
+        count: age
+    });
 };
 
 // Actor screen

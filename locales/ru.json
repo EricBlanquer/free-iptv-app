@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Поверните устройство в горизонтальное положение"
+  },
   "app": {
     "exitMessage": "Вы хотите выйти из приложения?",
     "exitTitle": "Выход",
@@ -127,14 +130,14 @@
     "Writing": "Сценарий"
   },
   "details": {
-    "age": "{count} лет",
+    "born": "{birth} ({count} лет)",
     "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
     "creator": "Создатель",
     "defaultVersion": "По умолчанию",
     "director": "Режиссёр",
     "episode": "Эпизод",
     "filmography": "Фильмография",
-    "lifespan": "{birth}-{death} ({count} лет)",
+    "lifespan": "{birth} - {death} ({count} лет)",
     "noBiography": "Биография недоступна",
     "noDescription": "Описание недоступно",
     "rateHint": "Нажмите 0-9 для прямой оценки",

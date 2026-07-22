@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Ruota il dispositivo in modalità orizzontale"
+  },
   "app": {
     "exitMessage": "Vuoi uscire dall'app?",
     "exitTitle": "Esci",
@@ -120,14 +123,14 @@
     "Writing": "Sceneggiatura"
   },
   "details": {
-    "age": "{count} anni",
+    "born": "{birth} ({count} anni)",
     "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
     "creator": "Creatore",
     "defaultVersion": "Predefinito",
     "director": "Regista",
     "episode": "Episodio",
     "filmography": "Filmografia",
-    "lifespan": "{birth}-{death} ({count} anni)",
+    "lifespan": "{birth} - {death} ({count} anni)",
     "noBiography": "Biografia non disponibile",
     "noDescription": "Descrizione non disponibile",
     "rateHint": "Premi 0-9 per votare direttamente",

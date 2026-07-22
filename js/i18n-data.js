@@ -1061,6 +1061,9 @@ var I18nData = {
     },
     translations: {
             "ar": {
+                    "orientation": {
+                            "rotateDevice": "يرجى تدوير جهازك إلى الوضع الأفقي"
+                    },
                     "app": {
                             "exitMessage": "هل تريد الخروج من التطبيق؟",
                             "exitTitle": "خروج",
@@ -1108,14 +1111,14 @@ var I18nData = {
                             "Writing": "كتابة"
                     },
                     "details": {
-                            "age": "{count} سنة",
+                            "born": "{birth} ({count} سنة)",
                             "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
                             "creator": "المبدع",
                             "defaultVersion": "افتراضي",
                             "director": "المخرج",
                             "episode": "الحلقة",
                             "filmography": "الأعمال السينمائية",
-                            "lifespan": "{birth}-{death} ({count} سنة)",
+                            "lifespan": "{birth} - {death} ({count} سنة)",
                             "noBiography": "لا توجد سيرة ذاتية",
                             "noDescription": "لا يوجد وصف",
                             "rateHint": "اضغط 0-9 للتقييم المباشر",
@@ -1680,6 +1683,9 @@ var I18nData = {
                     }
             },
             "de": {
+                    "orientation": {
+                            "rotateDevice": "Bitte drehen Sie Ihr Gerät ins Querformat"
+                    },
                     "app": {
                             "exitMessage": "Möchten Sie die App beenden?",
                             "exitTitle": "Beenden",
@@ -1727,14 +1733,14 @@ var I18nData = {
                             "Writing": "Drehbuch"
                     },
                     "details": {
-                            "age": "{count} Jahre",
+                            "born": "{birth} ({count} Jahre)",
                             "configureTMDB": "Konfigurieren Sie Ihren TMDB API-Schlüssel in den Einstellungen, um Beschreibungen anzuzeigen.",
                             "creator": "Schöpfer",
                             "defaultVersion": "Standard",
                             "director": "Regisseur",
                             "episode": "Episode",
                             "filmography": "Filmographie",
-                            "lifespan": "{birth}-{death} ({count} Jahre)",
+                            "lifespan": "{birth} - {death} ({count} Jahre)",
                             "noBiography": "Keine Biographie verfügbar",
                             "noDescription": "Keine Beschreibung verfügbar",
                             "rateHint": "Drücke 0-9 zum direkten Bewerten",
@@ -2299,6 +2305,9 @@ var I18nData = {
                     }
             },
             "en": {
+                    "orientation": {
+                            "rotateDevice": "Please rotate your device to landscape"
+                    },
                     "app": {
                             "exitMessage": "Do you want to exit the app?",
                             "exitTitle": "Exit",
@@ -2346,14 +2355,14 @@ var I18nData = {
                             "Writing": "Writing"
                     },
                     "details": {
-                            "age": "{count} years old",
+                            "born": "{birth} ({count} years old)",
                             "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
                             "creator": "Creator",
                             "defaultVersion": "Default",
                             "director": "Director",
                             "episode": "Episode",
                             "filmography": "Filmography",
-                            "lifespan": "{birth}-{death} ({count} years)",
+                            "lifespan": "{birth} - {death} ({count} years)",
                             "noBiography": "No biography available",
                             "noDescription": "No description available",
                             "rateHint": "Press 0-9 for direct rating",
@@ -2918,6 +2927,9 @@ var I18nData = {
                     }
             },
             "es": {
+                    "orientation": {
+                            "rotateDevice": "Gira tu dispositivo al modo horizontal"
+                    },
                     "app": {
                             "exitMessage": "¿Quieres salir de la aplicación?",
                             "exitTitle": "Salir",
@@ -2965,14 +2977,14 @@ var I18nData = {
                             "Writing": "Guion"
                     },
                     "details": {
-                            "age": "{count} años",
+                            "born": "{birth} ({count} años)",
                             "configureTMDB": "Configure su clave API de TMDB en ajustes para mostrar descripciones.",
                             "creator": "Creador",
                             "defaultVersion": "Predeterminado",
                             "director": "Director",
                             "episode": "Episodio",
                             "filmography": "Filmografía",
-                            "lifespan": "{birth}-{death} ({count} años)",
+                            "lifespan": "{birth} - {death} ({count} años)",
                             "noBiography": "Biografía no disponible",
                             "noDescription": "Descripción no disponible",
                             "rateHint": "Pulsa 0-9 para valorar directamente",
@@ -3537,6 +3549,9 @@ var I18nData = {
                     }
             },
             "fr": {
+                    "orientation": {
+                            "rotateDevice": "Veuillez tourner votre appareil en mode paysage"
+                    },
                     "app": {
                             "exitMessage": "Voulez-vous quitter l'application ?",
                             "exitTitle": "Quitter",
@@ -3584,14 +3599,14 @@ var I18nData = {
                             "Writing": "Scénario"
                     },
                     "details": {
-                            "age": "{count} ans",
+                            "born": "{birth} ({count} ans)",
                             "configureTMDB": "Configurez votre clé API TMDB dans les paramètres pour afficher les descriptions.",
                             "creator": "Créateur",
                             "defaultVersion": "Défaut",
                             "director": "Réalisateur",
                             "episode": "Épisode",
                             "filmography": "Filmographie",
-                            "lifespan": "{birth}-{death} ({count} ans)",
+                            "lifespan": "{birth} - {death} ({count} ans)",
                             "noBiography": "Biographie non disponible",
                             "noDescription": "Description non disponible",
                             "rateHint": "Appuyez 0-9 pour noter directement",
@@ -4156,6 +4171,9 @@ var I18nData = {
                     }
             },
             "it": {
+                    "orientation": {
+                            "rotateDevice": "Ruota il dispositivo in modalità orizzontale"
+                    },
                     "app": {
                             "exitMessage": "Vuoi uscire dall'app?",
                             "exitTitle": "Esci",
@@ -4203,14 +4221,14 @@ var I18nData = {
                             "Writing": "Sceneggiatura"
                     },
                     "details": {
-                            "age": "{count} anni",
+                            "born": "{birth} ({count} anni)",
                             "configureTMDB": "Configura la tua chiave API TMDB nelle impostazioni per visualizzare le descrizioni.",
                             "creator": "Creatore",
                             "defaultVersion": "Predefinito",
                             "director": "Regista",
                             "episode": "Episodio",
                             "filmography": "Filmografia",
-                            "lifespan": "{birth}-{death} ({count} anni)",
+                            "lifespan": "{birth} - {death} ({count} anni)",
                             "noBiography": "Biografia non disponibile",
                             "noDescription": "Descrizione non disponibile",
                             "rateHint": "Premi 0-9 per votare direttamente",
@@ -4775,6 +4793,9 @@ var I18nData = {
                     }
             },
             "nl": {
+                    "orientation": {
+                            "rotateDevice": "Draai je apparaat naar de liggende stand"
+                    },
                     "app": {
                             "exitMessage": "Wilt u de app afsluiten?",
                             "exitTitle": "Afsluiten",
@@ -4822,14 +4843,14 @@ var I18nData = {
                             "Writing": "Scenario"
                     },
                     "details": {
-                            "age": "{count} jaar",
+                            "born": "{birth} ({count} jaar)",
                             "configureTMDB": "Configureer uw TMDB API-sleutel in instellingen om beschrijvingen weer te geven.",
                             "creator": "Maker",
                             "defaultVersion": "Standaard",
                             "director": "Regisseur",
                             "episode": "Aflevering",
                             "filmography": "Filmografie",
-                            "lifespan": "{birth}-{death} ({count} jaar)",
+                            "lifespan": "{birth} - {death} ({count} jaar)",
                             "noBiography": "Geen biografie beschikbaar",
                             "noDescription": "Geen beschrijving beschikbaar",
                             "rateHint": "Druk 0-9 om direct te beoordelen",
@@ -5394,6 +5415,9 @@ var I18nData = {
                     }
             },
             "pl": {
+                    "orientation": {
+                            "rotateDevice": "Obróć urządzenie do orientacji poziomej"
+                    },
                     "app": {
                             "exitMessage": "Czy chcesz wyjść z aplikacji?",
                             "exitTitle": "Wyjdź",
@@ -5441,14 +5465,14 @@ var I18nData = {
                             "Writing": "Scenariusz"
                     },
                     "details": {
-                            "age": "{count} lat",
+                            "born": "{birth} ({count} lat)",
                             "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy.",
                             "creator": "Twórca",
                             "defaultVersion": "Domyślna",
                             "director": "Reżyser",
                             "episode": "Odcinek",
                             "filmography": "Filmografia",
-                            "lifespan": "{birth}-{death} ({count} lat)",
+                            "lifespan": "{birth} - {death} ({count} lat)",
                             "noBiography": "Brak biografii",
                             "noDescription": "Brak opisu",
                             "rateHint": "Naciśnij 0-9, aby ocenić bezpośrednio",
@@ -6013,6 +6037,9 @@ var I18nData = {
                     }
             },
             "pt": {
+                    "orientation": {
+                            "rotateDevice": "Rode o dispositivo para o modo paisagem"
+                    },
                     "app": {
                             "exitMessage": "Deseja sair do aplicativo?",
                             "exitTitle": "Sair",
@@ -6060,14 +6087,14 @@ var I18nData = {
                             "Writing": "Roteiro"
                     },
                     "details": {
-                            "age": "{count} anos",
+                            "born": "{birth} ({count} anos)",
                             "configureTMDB": "Configure sua chave API TMDB nas configurações para exibir descrições.",
                             "creator": "Criador",
                             "defaultVersion": "Padrão",
                             "director": "Diretor",
                             "episode": "Episódio",
                             "filmography": "Filmografia",
-                            "lifespan": "{birth}-{death} ({count} anos)",
+                            "lifespan": "{birth} - {death} ({count} anos)",
                             "noBiography": "Biografia não disponível",
                             "noDescription": "Descrição não disponível",
                             "rateHint": "Prima 0-9 para avaliar diretamente",
@@ -6632,6 +6659,9 @@ var I18nData = {
                     }
             },
             "ru": {
+                    "orientation": {
+                            "rotateDevice": "Поверните устройство в горизонтальное положение"
+                    },
                     "app": {
                             "exitMessage": "Вы хотите выйти из приложения?",
                             "exitTitle": "Выход",
@@ -6679,14 +6709,14 @@ var I18nData = {
                             "Writing": "Сценарий"
                     },
                     "details": {
-                            "age": "{count} лет",
+                            "born": "{birth} ({count} лет)",
                             "configureTMDB": "Настройте ключ TMDB API в настройках для отображения описаний.",
                             "creator": "Создатель",
                             "defaultVersion": "По умолчанию",
                             "director": "Режиссёр",
                             "episode": "Эпизод",
                             "filmography": "Фильмография",
-                            "lifespan": "{birth}-{death} ({count} лет)",
+                            "lifespan": "{birth} - {death} ({count} лет)",
                             "noBiography": "Биография недоступна",
                             "noDescription": "Описание недоступно",
                             "rateHint": "Нажмите 0-9 для прямой оценки",
@@ -7251,6 +7281,9 @@ var I18nData = {
                     }
             },
             "tr": {
+                    "orientation": {
+                            "rotateDevice": "Lütfen cihazınızı yatay moda çevirin"
+                    },
                     "app": {
                             "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",
                             "exitTitle": "Çıkış",
@@ -7298,14 +7331,14 @@ var I18nData = {
                             "Writing": "Senaryo"
                     },
                     "details": {
-                            "age": "{count} yaşında",
+                            "born": "{birth} ({count} yaşında)",
                             "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
                             "creator": "Yaratıcı",
                             "defaultVersion": "Varsayılan",
                             "director": "Yönetmen",
                             "episode": "Bölüm",
                             "filmography": "Filmografi",
-                            "lifespan": "{birth}-{death} ({count} yıl)",
+                            "lifespan": "{birth} - {death} ({count} yıl)",
                             "noBiography": "Biyografi yok",
                             "noDescription": "Açıklama yok",
                             "rateHint": "Doğrudan puanlamak için 0-9’a bas",

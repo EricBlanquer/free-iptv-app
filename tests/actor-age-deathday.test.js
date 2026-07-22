@@ -6,7 +6,8 @@
  * (e.g. "136 years old" for someone born in 1889 and dead in 1945).
  *
  * `_formatPersonAge` now:
- *  - stops the count at `deathday` and renders "birth-death (age)"
+ *  - shows the birth date next to the age, and the death date when known
+ *  - stops the count at `deathday`
  *  - computes the exact age (month/day aware), not a plain year difference
  *  - returns '' when the birthday is missing or the dates are inconsistent
  */
@@ -23,11 +24,11 @@ function slice(src, name) {
 const detailsSrc = fs.readFileSync('./js/details.js', 'utf8');
 
 global.I18n = {
-    getLocale: () => 'en',
+    getLocale: () => 'en-GB',
     t: (key, fallback, params) => {
         let out = key === 'details.lifespan'
-            ? '{birth}-{death} ({count} years)'
-            : '{count} years old';
+            ? '{birth} - {death} ({count} years)'
+            : '{birth} ({count} years old)';
         if (params) {
             Object.keys(params).forEach((p) => {
                 out = out.split('{' + p + '}').join(params[p]);
@@ -38,40 +39,41 @@ global.I18n = {
 };
 
 function TestApp() {}
+eval(slice(detailsSrc, 'formatLocalDate'));
 eval(slice(detailsSrc, '_parseIsoDate'));
 eval(slice(detailsSrc, '_formatPersonAge'));
 
 const app = new TestApp();
 const TODAY = new Date(2026, 6, 20);
 
-test('deceased person shows lifespan and age at death, not current age', () => {
+test('deceased person shows both dates and the age at death, not the current age', () => {
     const out = app._formatPersonAge({ birthday: '1889-04-20', deathday: '1945-04-30' }, TODAY);
-    expect(out).toBe('1889-1945 (56 years)');
+    expect(out).toBe('20/04/1889 - 30/04/1945 (56 years)');
 });
 
-test('living person shows the current age', () => {
+test('living person shows the birth date and the current age', () => {
     const out = app._formatPersonAge({ birthday: '1974-11-11' }, TODAY);
-    expect(out).toBe('51 years old');
+    expect(out).toBe('11/11/1974 (51 years old)');
 });
 
 test('birthday not reached yet this year subtracts one year', () => {
     const out = app._formatPersonAge({ birthday: '1974-07-21' }, TODAY);
-    expect(out).toBe('51 years old');
+    expect(out).toBe('21/07/1974 (51 years old)');
 });
 
 test('birthday reached today counts the full year', () => {
     const out = app._formatPersonAge({ birthday: '1974-07-20' }, TODAY);
-    expect(out).toBe('52 years old');
+    expect(out).toBe('20/07/1974 (52 years old)');
 });
 
 test('death before the birthday of that year subtracts one year', () => {
     const out = app._formatPersonAge({ birthday: '1930-08-25', deathday: '2019-03-04' }, TODAY);
-    expect(out).toBe('1930-2019 (88 years)');
+    expect(out).toBe('25/08/1930 - 04/03/2019 (88 years)');
 });
 
 test('empty deathday is treated as still alive', () => {
     const out = app._formatPersonAge({ birthday: '1974-11-11', deathday: '' }, TODAY);
-    expect(out).toBe('51 years old');
+    expect(out).toBe('11/11/1974 (51 years old)');
 });
 
 test('missing birthday yields no age', () => {

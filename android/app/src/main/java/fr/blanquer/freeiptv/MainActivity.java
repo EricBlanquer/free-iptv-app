@@ -1,12 +1,15 @@
 package fr.blanquer.freeiptv;
 
 import android.app.Activity;
+import android.app.PictureInPictureParams;
 import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Rational;
 import android.view.KeyEvent;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
@@ -174,12 +177,7 @@ public class MainActivity extends Activity {
         settings.setDatabaseEnabled(true);
         settings.setLoadWithOverviewMode(false);
         settings.setUseWideViewPort(true);
-        // Scale content to fit screen width: device dp width / 1920 * 100
-        int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        float density = getResources().getDisplayMetrics().density;
-        int dpWidth = (int)(screenWidth / density);
-        int scale = (int)(dpWidth * 100.0f / 1920.0f);
-        mWebView.setInitialScale(scale);
+        updateWebViewScale();
         mWebView.setBackgroundColor(Color.TRANSPARENT);
         mWebView.addJavascriptInterface(new AndroidBridge(), "Android");
         mWebView.setWebViewClient(new WebViewClient() {
@@ -190,6 +188,12 @@ public class MainActivity extends Activity {
                 if (mTizenShimJs != null) {
                     view.evaluateJavascript(mTizenShimJs, null);
                 }
+            }
+
+            @Override
+            public void onPageFinished(android.webkit.WebView view, String url) {
+                super.onPageFinished(view, url);
+                setWebPortraitOverlay(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -296,10 +300,90 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void updateWebViewScale() {
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        float density = getResources().getDisplayMetrics().density;
+        int dpWidth = (int) (screenWidth / density);
+        int scale = (int) (dpWidth * 100.0f / 1920.0f);
+        mWebView.setInitialScale(scale);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) {
+            return;
+        }
+        boolean portrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT;
+        if (portrait && mNativePlayer != null && mNativePlayer.isPlaying()) {
+            maybeEnterPictureInPicture();
+            setWebPortraitOverlay(false);
+            return;
+        }
+        updateWebViewScale();
+        applyImmersiveMode();
+        setWebPortraitOverlay(portrait);
+    }
+
+    private void setWebPortraitOverlay(boolean portrait) {
+        mWebView.evaluateJavascript(
+                "if(window.__setDeviceOrientation)window.__setDeviceOrientation('"
+                        + (portrait ? "portrait" : "landscape") + "');", null);
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        maybeEnterPictureInPicture();
+    }
+
+    private void maybeEnterPictureInPicture() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            return;
+        }
+        if (mNativePlayer == null || !mNativePlayer.isPlaying()) {
+            return;
+        }
+        try {
+            enterPictureInPictureMode(buildPictureInPictureParams());
+        }
+        catch (Exception ex) { /* ignore */ }
+    }
+
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
+    private PictureInPictureParams buildPictureInPictureParams() {
+        Rational ratio = new Rational(16, 9);
+        int width = mNativePlayer.getVideoWidth();
+        int height = mNativePlayer.getVideoHeight();
+        if (width > 0 && height > 0) {
+            float aspect = width / (float) height;
+            if (aspect >= 0.42f && aspect <= 2.39f) {
+                ratio = new Rational(width, height);
+            }
+        }
+        return new PictureInPictureParams.Builder().setAspectRatio(ratio).build();
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if (isInPictureInPictureMode) {
+            mWebView.setVisibility(View.GONE);
+        }
+        else {
+            mWebView.setVisibility(View.VISIBLE);
+            applyImmersiveMode();
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
-        if (mNativePlayer != null) {
+        boolean inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        if (mNativePlayer != null && !inPip) {
             mNativePlayer.pauseIfPlaying();
         }
         mWebView.evaluateJavascript("if(window.app&&window.app.stopTTS)window.app.stopTTS()", null);

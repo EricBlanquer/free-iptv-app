@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Lütfen cihazınızı yatay moda çevirin"
+  },
   "app": {
     "exitMessage": "Uygulamadan çıkmak istiyor musunuz?",
     "exitTitle": "Çıkış",
@@ -124,14 +127,14 @@
     "Writing": "Senaryo"
   },
   "details": {
-    "age": "{count} yaşında",
+    "born": "{birth} ({count} yaşında)",
     "configureTMDB": "Açıklamaları görüntülemek için ayarlarda TMDB API anahtarınızı yapılandırın.",
     "creator": "Yaratıcı",
     "defaultVersion": "Varsayılan",
     "director": "Yönetmen",
     "episode": "Bölüm",
     "filmography": "Filmografi",
-    "lifespan": "{birth}-{death} ({count} yıl)",
+    "lifespan": "{birth} - {death} ({count} yıl)",
     "noBiography": "Biyografi yok",
     "noDescription": "Açıklama yok",
     "rateHint": "Doğrudan puanlamak için 0-9’a bas",

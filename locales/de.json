@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Bitte drehen Sie Ihr Gerät ins Querformat"
+  },
   "app": {
     "exitMessage": "Möchten Sie die App beenden?",
     "exitTitle": "Beenden",
@@ -123,14 +126,14 @@
     "Writing": "Drehbuch"
   },
   "details": {
-    "age": "{count} Jahre",
+    "born": "{birth} ({count} Jahre)",
     "configureTMDB": "Konfigurieren Sie Ihren TMDB API-Schlüssel in den Einstellungen, um Beschreibungen anzuzeigen.",
     "creator": "Schöpfer",
     "defaultVersion": "Standard",
     "director": "Regisseur",
     "episode": "Episode",
     "filmography": "Filmographie",
-    "lifespan": "{birth}-{death} ({count} Jahre)",
+    "lifespan": "{birth} - {death} ({count} Jahre)",
     "noBiography": "Keine Biographie verfügbar",
     "noDescription": "Keine Beschreibung verfügbar",
     "rateHint": "Drücke 0-9 zum direkten Bewerten",

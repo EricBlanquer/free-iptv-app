@@ -453,7 +453,7 @@ class IPTVApp {
             noLabel: I18n.t('welcome.demoNo', 'No, configure manually'),
             focusYes: true,
             noAction: function() {
-                self.showPlaylistEdit();
+                self.showSettings();
             }
         });
     }

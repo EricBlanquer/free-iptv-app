@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "يرجى تدوير جهازك إلى الوضع الأفقي"
+  },
   "app": {
     "exitMessage": "هل تريد الخروج من التطبيق؟",
     "exitTitle": "خروج",
@@ -129,14 +132,14 @@
     "Writing": "كتابة"
   },
   "details": {
-    "age": "{count} سنة",
+    "born": "{birth} ({count} سنة)",
     "configureTMDB": "قم بتكوين مفتاح TMDB API في الإعدادات لعرض الأوصاف.",
     "creator": "المبدع",
     "defaultVersion": "افتراضي",
     "director": "المخرج",
     "episode": "الحلقة",
     "filmography": "الأعمال السينمائية",
-    "lifespan": "{birth}-{death} ({count} سنة)",
+    "lifespan": "{birth} - {death} ({count} سنة)",
     "noBiography": "لا توجد سيرة ذاتية",
     "noDescription": "لا يوجد وصف",
     "rateHint": "اضغط 0-9 للتقييم المباشر",

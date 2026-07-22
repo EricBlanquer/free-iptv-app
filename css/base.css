@@ -1248,3 +1248,32 @@ body.text-xxlarge .premium-btn { font-size: 43px; }
 body.text-xxlarge .premium-site-info { font-size: 28px; }
 body.text-xxlarge #premium-status-text { font-size: 31px; }
 body.text-xxlarge #categories-reveal-hint .material-symbols-outlined { font-size: 18px; }
+
+#rotate-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    background: #05070d;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+#rotate-overlay.show {
+    display: flex;
+}
+#rotate-overlay-icon {
+    font-size: 180px;
+    color: #4caf50;
+    margin-bottom: 48px;
+}
+#rotate-overlay-text {
+    font-size: 46px;
+    color: #ffffff;
+    max-width: 60%;
+    line-height: 1.4;
+}

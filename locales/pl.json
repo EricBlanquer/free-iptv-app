@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Obróć urządzenie do orientacji poziomej"
+  },
   "app": {
     "exitMessage": "Czy chcesz wyjść z aplikacji?",
     "exitTitle": "Wyjdź",
@@ -125,14 +128,14 @@
     "Writing": "Scenariusz"
   },
   "details": {
-    "age": "{count} lat",
+    "born": "{birth} ({count} lat)",
     "configureTMDB": "Skonfiguruj klucz API TMDB w ustawieniach, aby wyświetlać opisy.",
     "creator": "Twórca",
     "defaultVersion": "Domyślna",
     "director": "Reżyser",
     "episode": "Odcinek",
     "filmography": "Filmografia",
-    "lifespan": "{birth}-{death} ({count} lat)",
+    "lifespan": "{birth} - {death} ({count} lat)",
     "noBiography": "Brak biografii",
     "noDescription": "Brak opisu",
     "rateHint": "Naciśnij 0-9, aby ocenić bezpośrednio",

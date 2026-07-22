@@ -1,4 +1,7 @@
 {
+  "orientation": {
+    "rotateDevice": "Please rotate your device to landscape"
+  },
   "app": {
     "exitMessage": "Do you want to exit the app?",
     "exitTitle": "Exit",
@@ -125,14 +128,14 @@
     "Writing": "Writing"
   },
   "details": {
-    "age": "{count} years old",
+    "born": "{birth} ({count} years old)",
     "configureTMDB": "Configure your TMDB API key in settings to display descriptions.",
     "creator": "Creator",
     "defaultVersion": "Default",
     "director": "Director",
     "episode": "Episode",
     "filmography": "Filmography",
-    "lifespan": "{birth}-{death} ({count} years)",
+    "lifespan": "{birth} - {death} ({count} years)",
     "noBiography": "No biography available",
     "noDescription": "No description available",
     "rateHint": "Press 0-9 for direct rating",

@@ -53,6 +53,8 @@ public class NativePlayer {
     private boolean mPreparing = false;
     private boolean mBuffering = false;
     private float mScreenAspectRatio = 16f / 9f;
+    private volatile int mVideoWidth = 0;
+    private volatile int mVideoHeight = 0;
 
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
@@ -161,6 +163,18 @@ public class NativePlayer {
 
     public String getState() {
         return mState;
+    }
+
+    public boolean isPlaying() {
+        return STATE_PLAYING.equals(mState);
+    }
+
+    public int getVideoWidth() {
+        return mVideoWidth;
+    }
+
+    public int getVideoHeight() {
+        return mVideoHeight;
     }
 
     public long getCurrentTime() {
@@ -335,6 +349,8 @@ public class NativePlayer {
             // ignore
         }
         mStreamInfoJson = arr.toString();
+        mVideoWidth = videoSize.width;
+        mVideoHeight = videoSize.height;
         if (videoSize.width > 0 && videoSize.height > 0) {
             float ratio = (float) videoSize.width * videoSize.pixelWidthHeightRatio / videoSize.height;
             evalJs("window.log&&window.log('PLAYER','VideoSize: " + videoSize.width + "x" + videoSize.height + " pixelRatio=" + videoSize.pixelWidthHeightRatio + " aspectRatio=" + ratio + " resizeMode=" + mAspectRatioLayout.getResizeMode() + "')");
