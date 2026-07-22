@@ -217,9 +217,21 @@ class IPTVApp {
             }
             if (self.currentScreen !== 'player') return;
             if (document.hidden) {
-                self.player.stop();
+                if (self._pendingBgStop) clearTimeout(self._pendingBgStop);
+                self._pendingBgStop = setTimeout(function() {
+                    self._pendingBgStop = null;
+                    if (window.__inPip) return;
+                    if (typeof Android !== 'undefined' && Android && Android.isInPip && Android.isInPip()) return;
+                    self.player.stop();
+                }, 3000);
             }
             else {
+                if (self._pendingBgStop) {
+                    clearTimeout(self._pendingBgStop);
+                    self._pendingBgStop = null;
+                }
+                if (window.__inPip) return;
+                if (typeof Android !== 'undefined' && Android && Android.isPlayerActive && Android.isPlayerActive()) return;
                 self.resetScreens();
                 self.focusArea = 'home';
                 self.setDefaultHomeFocus();

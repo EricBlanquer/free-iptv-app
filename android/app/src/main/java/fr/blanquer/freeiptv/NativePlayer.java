@@ -55,6 +55,7 @@ public class NativePlayer {
     private float mScreenAspectRatio = 16f / 9f;
     private volatile int mVideoWidth = 0;
     private volatile int mVideoHeight = 0;
+    private volatile boolean mSessionActive = false;
 
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
@@ -86,6 +87,7 @@ public class NativePlayer {
     }
 
     public void open(String url) {
+        mSessionActive = true;
         mHandler.post(() -> {
             mPlayer.setMediaItem(MediaItem.fromUri(url));
             mState = STATE_IDLE;
@@ -129,6 +131,7 @@ public class NativePlayer {
     }
 
     public void stop() {
+        mSessionActive = false;
         mHandler.post(() -> {
             mPlayer.stop();
             mState = STATE_IDLE;
@@ -137,6 +140,7 @@ public class NativePlayer {
     }
 
     public void close() {
+        mSessionActive = false;
         mHandler.post(() -> {
             mPlayer.stop();
             mPlayer.clearMediaItems();
@@ -166,7 +170,15 @@ public class NativePlayer {
     }
 
     public boolean isPlaying() {
-        return STATE_PLAYING.equals(mState);
+        if (mPlayer == null) {
+            return false;
+        }
+        int state = mPlayer.getPlaybackState();
+        return mPlayer.getPlayWhenReady() && state != Player.STATE_IDLE && state != Player.STATE_ENDED;
+    }
+
+    public boolean isSessionActive() {
+        return mSessionActive;
     }
 
     public int getVideoWidth() {

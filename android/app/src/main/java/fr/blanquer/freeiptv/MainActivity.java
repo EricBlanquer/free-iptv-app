@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.PictureInPictureParams;
 import android.app.UiModeManager;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Rational;
 import android.view.KeyEvent;
+import android.view.OrientationEventListener;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.view.SurfaceView;
@@ -48,6 +50,9 @@ public class MainActivity extends Activity {
     private NativePlayer mNativePlayer;
     private WebUpdater mWebUpdater;
     private boolean mIsAndroidTV;
+    private boolean mStopped;
+    private OrientationEventListener mOrientationListener;
+    private boolean mDeviceLandscape = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,7 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(Color.TRANSPARENT);
         mAspectRatioLayout = new AspectRatioFrameLayout(this);
         mSurfaceView = new SurfaceView(this);
+        mSurfaceView.setZOrderMediaOverlay(true);
         FrameLayout.LayoutParams surfaceParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         surfaceParams.gravity = android.view.Gravity.CENTER;
@@ -82,6 +88,7 @@ public class MainActivity extends Activity {
         initNativePlayer();
         setupWebView();
         applyImmersiveMode();
+        initOrientationListener();
         mWebUpdater = new WebUpdater(this);
         boolean devNoUpdate = new java.io.File(getFilesDir(), "DEV_NO_UPDATE").exists();
         if (devNoUpdate) {
@@ -315,14 +322,47 @@ public class MainActivity extends Activity {
             return;
         }
         boolean portrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT;
-        if (portrait && mNativePlayer != null && mNativePlayer.isPlaying()) {
-            maybeEnterPictureInPicture();
-            setWebPortraitOverlay(false);
-            return;
-        }
         updateWebViewScale();
         applyImmersiveMode();
         setWebPortraitOverlay(portrait);
+    }
+
+    private void lockLandscapeForPlayer(boolean lock) {
+        runOnUiThread(() -> setRequestedOrientation(lock
+                ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED));
+    }
+
+    private void initOrientationListener() {
+        mOrientationListener = new OrientationEventListener(this) {
+            @Override
+            public void onOrientationChanged(int angle) {
+                if (angle == ORIENTATION_UNKNOWN) {
+                    return;
+                }
+                boolean portrait = angle > 315 || angle < 45 || (angle > 135 && angle < 225);
+                boolean landscape = (angle > 45 && angle < 135) || (angle > 225 && angle < 315);
+                if (portrait && mDeviceLandscape) {
+                    mDeviceLandscape = false;
+                    onDeviceRotatedToPortrait();
+                }
+                else if (landscape && !mDeviceLandscape) {
+                    mDeviceLandscape = true;
+                }
+            }
+        };
+        if (mOrientationListener.canDetectOrientation()) {
+            mOrientationListener.enable();
+        }
+    }
+
+    private void onDeviceRotatedToPortrait() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) {
+            return;
+        }
+        if (mNativePlayer != null && mNativePlayer.isPlaying()) {
+            maybeEnterPictureInPicture();
+        }
     }
 
     private void setWebPortraitOverlay(boolean portrait) {
@@ -348,6 +388,7 @@ public class MainActivity extends Activity {
             return;
         }
         try {
+            mWebView.evaluateJavascript("window.__inPip=true;", null);
             enterPictureInPictureMode(buildPictureInPictureParams());
         }
         catch (Exception ex) { /* ignore */ }
@@ -371,9 +412,15 @@ public class MainActivity extends Activity {
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
         if (isInPictureInPictureMode) {
+            mWebView.evaluateJavascript("window.__inPip=true;", null);
             mWebView.setVisibility(View.GONE);
         }
         else {
+            mWebView.evaluateJavascript("window.__inPip=false;", null);
+            if (mStopped) {
+                finishAndRemoveTask();
+                return;
+            }
             mWebView.setVisibility(View.VISIBLE);
             applyImmersiveMode();
         }
@@ -393,12 +440,26 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        mStopped = false;
         mWebView.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mStopped = true;
+        boolean inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        if (!inPip && mNativePlayer != null && mNativePlayer.isPlaying()) {
+            mNativePlayer.pauseIfPlaying();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mOrientationListener != null) {
+            mOrientationListener.disable();
+        }
         if (mNativePlayer != null) {
             mNativePlayer.release();
         }
@@ -420,6 +481,16 @@ public class MainActivity extends Activity {
     }
 
     private class AndroidBridge {
+        @JavascriptInterface
+        public boolean isInPip() {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        }
+
+        @JavascriptInterface
+        public boolean isPlayerActive() {
+            return mNativePlayer != null && mNativePlayer.isSessionActive();
+        }
+
         @JavascriptInterface
         public String getDeviceId() {
             return android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
@@ -565,6 +636,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void playerOpen(String url) {
             mNativePlayer.open(url);
+            lockLandscapeForPlayer(true);
         }
 
         @JavascriptInterface
@@ -590,6 +662,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void playerClose() {
             mNativePlayer.close();
+            lockLandscapeForPlayer(false);
         }
 
         @JavascriptInterface
